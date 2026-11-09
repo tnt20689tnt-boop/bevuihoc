@@ -12,7 +12,7 @@ const SUBJECTS: Record<Subject, { title: string; emoji: string; intro: string }>
   vietnamese: { title: "Tiếng Việt", emoji: "📖", intro: "Học chữ, ghép vần, đọc từ và câu." },
   english: { title: "Tiếng Anh", emoji: "🌍", intro: "Học chữ cái, màu sắc, con vật và câu giao tiếp." },
 };
-const WORDS = [
+const WORDS: [string, string][] = [
   ["cat", "con mèo"], ["dog", "con chó"], ["apple", "quả táo"], ["book", "quyển sách"],
   ["sun", "mặt trời"], ["moon", "mặt trăng"], ["bird", "con chim"], ["fish", "con cá"],
   ["red", "màu đỏ"], ["blue", "màu xanh"], ["green", "màu xanh lá"], ["milk", "sữa"],
@@ -114,10 +114,10 @@ function LessonRoom({ profile }: { profile: Profile }) {
     setSelected(choice);
     if (choice === question.answer) {
       setScore(v => v + 1); setSavingPoints(true);
-      void supabase.from("point_events").insert({
+      void Promise.resolve(supabase.from("point_events").insert({
         user_id: profile.id, grade: profile.grade, reason: "lesson_practice",
         points: 10, correct: 1, goals: 0, note: `${meta.title} - cấp ${level} - câu ${index + 1}`,
-      }).then(({ error }) => {
+      })).then(({ error }) => {
         if (error) toast.error("Chưa lưu được điểm. Bé thử lại sau nhé!");
         else { setEarnedPoints(v => v + 10); toast.success("+10 điểm học tập ⭐"); }
       }).finally(() => setSavingPoints(false));
@@ -169,7 +169,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
                     <button onClick={backToLevels} className="rounded-xl border-2 border-border bg-card px-5 py-3 font-extrabold">Chọn cấp khác</button>
                   </div>
                 </div>
-              ) : (
+              ) : question && (
                 <div className="mt-7">
                   <p className="text-sm font-extrabold text-primary">CÂU {index + 1} / 5</p>
                   <h2 className="mt-3 text-2xl font-extrabold leading-snug">{question.prompt}</h2>
