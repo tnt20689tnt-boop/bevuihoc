@@ -26,6 +26,7 @@ export function ArenaBattle({ currentGrade, onExit }: Props) {
   const [played, setPlayed] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
   const [showResult, setShowResult] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(false);
 
   const enterRoom = (nextRoom: Room) => {
     setRoom(nextRoom);
@@ -67,6 +68,9 @@ export function ArenaBattle({ currentGrade, onExit }: Props) {
     utterance.lang = room?.subject === "english" ? "en-US" : "vi-VN";
     utterance.rate = 0.9;
     utterance.pitch = 1.05;
+    utterance.onstart = () => setIsSpeaking(true);
+    utterance.onend = () => setIsSpeaking(false);
+    utterance.onerror = () => setIsSpeaking(false);
     const voices = window.speechSynthesis.getVoices();
     const preferred = voices.find((voice) => room?.subject === "english" ? voice.lang.toLowerCase().startsWith("en") : voice.lang.toLowerCase().startsWith("vi"));
     if (preferred) utterance.voice = preferred;
@@ -76,8 +80,8 @@ export function ArenaBattle({ currentGrade, onExit }: Props) {
   useEffect(() => {
     if (!room || !question) return;
     const intro = room.subject === "english" ? "Welcome to English class. I am your host. Listen carefully to the question." : "Xin chào các con! MC đã sẵn sàng. Chúng ta cùng bắt đầu " + room.title.toLowerCase() + " nhé!";
-    const optionsText = question.options.map((option, index) => "Đáp án " + String.fromCharCode(65 + index) + ": " + option).join(". ");
-    speak(intro + " " + question.question + ". " + optionsText);
+    const optionsText = question.options.map((option, index) => (room.subject === "english" ? "Option " : "Đáp án ") + String.fromCharCode(65 + index) + ": " + option).join(". ");
+    speak(intro + " " + (room.subject === "english" ? "Here is your question: " : "Câu hỏi: ") + question.question + ". " + optionsText);
     return () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); };
   }, [room, question]);
 
