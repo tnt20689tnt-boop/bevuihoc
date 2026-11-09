@@ -691,42 +691,7 @@ function PlayerController({
   useEffect(() => {
     interactHandler.current = onInteract;
   }, [onInteract]);
-  useEffect(() => {
-    const canvas = gl.domElement;
-    const onPointerDown = (event: PointerEvent) => {
-      if (event.button !== 0) return;
-      dragPointer.current = event.pointerId;
-      lastPointer.current = { x: event.clientX, y: event.clientY };
-      canvas.setPointerCapture(event.pointerId);
-    };
-    const onPointerMove = (event: PointerEvent) => {
-      if (dragPointer.current !== event.pointerId) return;
-      const dx = event.clientX - lastPointer.current.x;
-      const dy = event.clientY - lastPointer.current.y;
-      lastPointer.current = { x: event.clientX, y: event.clientY };
-      // Same calibrated drag response as Chùa Tâm An.
-      cameraYaw.current -= dx * 0.006;
-      cameraPitch.current = THREE.MathUtils.clamp(cameraPitch.current + dy * 0.004, 0.05, 1.3);
-    };
-    const stopDrag = (event: PointerEvent) => {
-      if (dragPointer.current === event.pointerId) dragPointer.current = null;
-    };
-    const onWheel = (event: WheelEvent) => {
-      cameraDistance.current = THREE.MathUtils.clamp(cameraDistance.current + event.deltaY * 0.01, 4, 40);
-    };
-    canvas.addEventListener("pointerdown", onPointerDown);
-    canvas.addEventListener("pointermove", onPointerMove);
-    canvas.addEventListener("pointerup", stopDrag);
-    canvas.addEventListener("pointercancel", stopDrag);
-    canvas.addEventListener("wheel", onWheel, { passive: true });
-    return () => {
-      canvas.removeEventListener("pointerdown", onPointerDown);
-      canvas.removeEventListener("pointermove", onPointerMove);
-      canvas.removeEventListener("pointerup", stopDrag);
-      canvas.removeEventListener("pointercancel", stopDrag);
-      canvas.removeEventListener("wheel", onWheel);
-    };
-  }, [gl]);
+
 
   useEffect(() => {
     const interact = () => {
