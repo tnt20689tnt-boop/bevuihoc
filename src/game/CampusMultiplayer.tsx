@@ -23,8 +23,8 @@ type Props = {
 
 export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
   const [peers, setPeers] = useState<CampusPeer[]>([]);
-  const publicNameRef = useRef<string | null>(null);
-  if (!publicNameRef.current) publicNameRef.current = `Bạn học ${Math.floor(1000 + Math.random() * 9000)}`;
+  const publicNameRef = useRef(profile.display_name);
+  publicNameRef.current = profile.display_name?.trim() || "Bạn học";
   const channelRef = useRef<RealtimeChannel | null>(null);
   const identityRef = useRef("");
   const seqRef = useRef(0);
@@ -103,7 +103,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
       if (channelRef.current === channel) channelRef.current = null;
       void supabase.removeChannel(channel);
     };
-  }, [roomId, profile.avatar, positionRef]);
+  }, [roomId, profile.avatar, profile.display_name, positionRef]);
 
   useFrame(() => {
     const channel = channelRef.current;
