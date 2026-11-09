@@ -6,9 +6,9 @@ export const Route = createFileRoute("/_authenticated/arena")({
   head: () => ({
     meta: [
       { title: "Đấu Trường Tri Thức – Bé Vui Học" },
-      { name: "description", content: "Ba phòng học Toán, Tiếng Việt và Tiếng Anh dành cho học sinh." },
+      { name: "description", content: "Đấu trường nhiều người chơi: tự động lên bục, đếm ngược và thi câu hỏi ngẫu nhiên Toán, Tiếng Việt, Tiếng Anh." },
       { property: "og:title", content: "Đấu Trường Trí Tuệ – Bé Vui Học" },
-      { property: "og:description", content: "Chọn phòng học và chinh phục thử thách kiến thức theo khối lớp." },
+      { property: "og:description", content: "Các bé cùng lên bục thi đấu và nhận câu hỏi ngẫu nhiên." },
     ],
   }),
   component: () => <GameShell>{(profile) => <ArenaBattle currentGrade={profile.grade} profile={profile} onExit={() => window.history.back()} />}</GameShell>,
