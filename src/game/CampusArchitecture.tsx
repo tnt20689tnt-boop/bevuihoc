@@ -32,6 +32,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
       })}
       <CampusGreenery portals={portals} />
       <CentralLandmark />
+      <SchoolBoundary />
       <EntranceGate />
     </group>
   );
@@ -202,36 +203,135 @@ function CentralLandmark() {
   );
 }
 
+function SchoolBoundary() {
+  const radius = 26.5;
+  const segments = Array.from({ length: 40 }, (_, i) => {
+    const angle = (i / 40) * Math.PI * 2;
+    return { angle, x: Math.sin(angle) * radius, z: Math.cos(angle) * radius };
+  }).filter(({ angle }) => Math.abs(Math.atan2(Math.sin(angle), Math.cos(angle))) > 0.27);
+
+  return (
+    <group>
+      {segments.map(({ angle, x, z }, i) => (
+        <group key={i} position={[x, 0, z]} rotation={[0, angle, 0]}>
+          <mesh position={[0, 1.15, 0]} castShadow receiveShadow>
+            <boxGeometry args={[4.18, 2.3, 0.42]} />
+            <meshStandardMaterial color="#f4e5c9" roughness={0.88} />
+          </mesh>
+          <mesh position={[0, 2.28, 0]} castShadow>
+            <boxGeometry args={[4.22, 0.18, 0.5]} />
+            <meshStandardMaterial color="#bd8050" roughness={0.78} />
+          </mesh>
+          <mesh position={[0, 1.72, 0.225]}>
+            <boxGeometry args={[3.7, 0.12, 0.035]} />
+            <meshStandardMaterial color="#d6a56d" roughness={0.8} />
+          </mesh>
+        </group>
+      ))}
+      {Array.from({ length: 32 }, (_, i) => {
+        const angle = (i / 32) * Math.PI * 2;
+        if (Math.abs(Math.atan2(Math.sin(angle), Math.cos(angle))) < 0.27) return null;
+        const x = Math.sin(angle) * radius;
+        const z = Math.cos(angle) * radius;
+        return (
+          <group key={i} position={[x, 0, z]}>
+            <mesh position={[0, 1.45, 0]} castShadow>
+              <boxGeometry args={[0.62, 2.9, 0.68]} />
+              <meshStandardMaterial color="#e8c99c" roughness={0.82} />
+            </mesh>
+            <mesh position={[0, 2.98, 0]} castShadow>
+              <boxGeometry args={[0.9, 0.22, 0.92]} />
+              <meshStandardMaterial color="#477e59" roughness={0.72} />
+            </mesh>
+          </group>
+        );
+      })}
+    </group>
+  );
+}
+
 function EntranceGate() {
   return (
-    <group position={[0, 0, 21.2]}>
-      <mesh position={[-3.1, 1.8, 0]} castShadow>
-        <boxGeometry args={[0.42, 3.6, 0.5]} />
-        <meshStandardMaterial color="#d88b54" roughness={0.8} />
+    <group position={[0, 0, 26.2]}>
+      {/* Hai trụ cổng lớn ốp đá, chân đế và mái chóp */}
+      {[-5.7, 5.7].map((x) => (
+        <group key={x} position={[x, 0, 0]}>
+          <mesh position={[0, 0.28, 0]} castShadow>
+            <boxGeometry args={[1.9, 0.56, 1.65]} />
+            <meshStandardMaterial color="#b98255" roughness={0.82} />
+          </mesh>
+          <mesh position={[0, 2.05, 0]} castShadow>
+            <boxGeometry args={[1.48, 3.55, 1.25]} />
+            <meshStandardMaterial color="#f7e8c9" roughness={0.82} />
+          </mesh>
+          <mesh position={[0, 3.9, 0]} castShadow>
+            <boxGeometry args={[1.78, 0.28, 1.5]} />
+            <meshStandardMaterial color="#477e59" roughness={0.72} />
+          </mesh>
+          <mesh position={[0, 4.25, 0]} rotation={[0, Math.PI / 4, 0]} castShadow>
+            <coneGeometry args={[0.86, 0.72, 4]} />
+            <meshStandardMaterial color="#d99a58" roughness={0.72} />
+          </mesh>
+          <mesh position={[0, 2.2, 0.64]}>
+            <boxGeometry args={[0.82, 1.35, 0.06]} />
+            <meshStandardMaterial color="#d8b47d" roughness={0.7} />
+          </mesh>
+          <mesh position={[0, 2.2, 0.69]}>
+            <octahedronGeometry args={[0.28]} />
+            <meshStandardMaterial color="#fff0a8" emissive="#dba94b" emissiveIntensity={0.2} />
+          </mesh>
+        </group>
+      ))}
+      {/* Dầm cổng lớn và mái che */}
+      <mesh position={[0, 4.05, 0]} castShadow>
+        <boxGeometry args={[10.8, 0.72, 1.35]} />
+        <meshStandardMaterial color="#477e59" roughness={0.74} />
       </mesh>
-      <mesh position={[3.1, 1.8, 0]} castShadow>
-        <boxGeometry args={[0.42, 3.6, 0.5]} />
-        <meshStandardMaterial color="#d88b54" roughness={0.8} />
+      <mesh position={[0, 4.48, 0]} castShadow>
+        <boxGeometry args={[11.5, 0.2, 1.65]} />
+        <meshStandardMaterial color="#d99a58" roughness={0.72} />
       </mesh>
-      <mesh position={[0, 3.5, 0]} castShadow>
-        <boxGeometry args={[6.8, 0.55, 0.7]} />
-        <meshStandardMaterial color="#477e59" roughness={0.78} />
+      <mesh position={[0, 4.82, 0]} castShadow>
+        <boxGeometry args={[9.8, 0.16, 1.3]} />
+        <meshStandardMaterial color="#f7e8c9" roughness={0.78} />
       </mesh>
-      <Html position={[0, 3.52, 0.4]} center distanceFactor={12}>
+      <Html position={[0, 4.08, 0.72]} center distanceFactor={13}>
         <div
           style={{
             whiteSpace: "nowrap",
-            borderRadius: 10,
-            padding: "6px 14px",
+            borderRadius: 12,
+            padding: "8px 25px",
             color: "#fff9e9",
-            background: "#477e59",
-            font: "800 17px 'Baloo 2', sans-serif",
-            boxShadow: "0 4px 0 #2d573b",
+            background: "linear-gradient(135deg,#356b4a,#579365)",
+            border: "3px solid #f2d39b",
+            font: "900 21px 'Baloo 2', sans-serif",
+            letterSpacing: 1,
+            boxShadow: "0 5px 0 #294d36, 0 8px 18px #0003",
           }}
         >
-          CHÀO MỪNG ĐẾN TRƯỜNG
+          ✦ TRƯỜNG BÉ HỌC VUI ✦
+          <div style={{ font: "700 11px 'Nunito',sans-serif", letterSpacing: 2 }}>
+            ƯƠM MẦM TRI THỨC · CHẮP CÁNH ƯỚC MƠ
+          </div>
         </div>
       </Html>
+      {/* Lối đi lát đá dẫn qua cổng */}
+      <mesh position={[0, 0.045, 3.8]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <planeGeometry args={[11.2, 7.5]} />
+        <meshStandardMaterial color="#f4e8ce" roughness={0.94} />
+      </mesh>
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * 7.4, 0, 0]}>
+          <mesh position={[0, 0.55, 0]} castShadow>
+            <cylinderGeometry args={[0.18, 0.22, 1.1, 12]} />
+            <meshStandardMaterial color="#bd8050" roughness={0.8} />
+          </mesh>
+          <mesh position={[0, 1.15, 0]}>
+            <sphereGeometry args={[0.28, 14, 12]} />
+            <meshStandardMaterial color="#fff0a8" emissive="#e8b95e" emissiveIntensity={0.25} />
+          </mesh>
+        </group>
+      ))}
     </group>
   );
 }
