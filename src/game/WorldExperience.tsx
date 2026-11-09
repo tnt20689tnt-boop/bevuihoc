@@ -51,6 +51,10 @@ export function WorldExperience({ profile }: { profile: Profile }) {
 
   const goToActivity = useCallback(
     (activity: Activity) => {
+      if (activity.to === "/thi-dau") {
+        enterPortal({ to: "arena", x: 0, z: 0 });
+        return;
+      }
       if (activity.to === "/hoc/$subject") {
         void navigate({
           to: "/hoc/$subject",
@@ -60,7 +64,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
       }
       void navigate({ to: activity.to as never });
     },
-    [navigate],
+    [enterPortal, navigate],
   );
 
   const returnToPlaza = useCallback(() => {
