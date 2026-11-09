@@ -92,6 +92,7 @@ export function WorldScene(props: WorldSceneProps) {
         positionRef={playerPosition}
         fromRoom={props.fromRoom}
         avatar={props.avatar}
+        displayName={props.profile.display_name}
         touchRef={props.touchRef}
         onNearbyPortal={props.onNearbyPortal}
         onInteract={props.onInteract}
@@ -652,6 +653,7 @@ function PlayerController({
   room,
   fromRoom,
   avatar,
+  displayName,
   positionRef,
   touchRef,
   onNearbyPortal,
@@ -660,6 +662,7 @@ function PlayerController({
   room: RoomDef;
   fromRoom: RoomId | null;
   avatar: Avatar;
+  displayName: string;
   positionRef: MutableRefObject<ReturnType<typeof spawnPoint>>;
   touchRef: MutableRefObject<MovementInput>;
   onNearbyPortal: (portal: Portal | null) => void;
@@ -868,6 +871,22 @@ function PlayerController({
   return (
     <group ref={character} rotation={[0, position.current.ry, 0]}>
       <Character3D avatar={avatar} state={animation} />
+      <Html position={[0, 2.05, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
+        <span style={{
+          display: "block",
+          maxWidth: 150,
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+          borderRadius: 10,
+          padding: "3px 9px",
+          color: "#26344b",
+          background: "#fff9e7",
+          border: "1px solid #ffffff",
+          font: "800 11px 'Nunito', sans-serif",
+          boxShadow: "0 2px 8px #1b2c4630",
+        }}>{displayName || "Bạn học"}</span>
+      </Html>
     </group>
   );
 }
