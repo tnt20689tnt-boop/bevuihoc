@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { generateLevelQuestions, generateQuestion, type Question, type Subject } from "./learningEngine";
+import { generateQuestion, type Question, type Subject } from "./learningEngine";
 
 type Player = "p1" | "p2";
 type GameState = "idle" | "playing" | "finished";
@@ -74,8 +74,6 @@ function Audience() {
 type ArenaBattleProps = { currentGrade: number; onExit?: () => void };
 
 export function ArenaBattle({ currentGrade, onExit }: ArenaBattleProps) {
-  const [subject, setSubject] = useState<Subject>("math");
-  const [level, setLevel] = useState(50);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(QUESTION_SECONDS);
@@ -179,10 +177,13 @@ export function ArenaBattle({ currentGrade, onExit }: ArenaBattleProps) {
 
   const startGame = () => {
     stopTimers();
-    const generated = generateLevelQuestions(subject, currentGrade, level, QUESTION_COUNT);
-    const complete = [...generated];
-    while (complete.length < QUESTION_COUNT) complete.push(generateQuestion(subject, currentGrade, level));
-    setQuestions(complete.slice(0, QUESTION_COUNT));
+    // Tự động luân phiên 3 môn: Toán → Tiếng Việt → Tiếng Anh.
+    // 10 câu sẽ có 4 câu Toán, 3 câu Tiếng Việt và 3 câu Tiếng Anh.
+    const subjects: Subject[] = ["math", "vietnamese", "english"];
+    const mixedQuestions = Array.from({ length: QUESTION_COUNT }, (_, index) =>
+      generateQuestion(subjects[index % subjects.length], currentGrade, 50)
+    );
+    setQuestions(mixedQuestions);
     setQuestionIndex(0);
     setP1Score(0);
     setP2Score(0);
@@ -248,10 +249,9 @@ export function ArenaBattle({ currentGrade, onExit }: ArenaBattleProps) {
           <section className="z-20 my-4 w-full max-w-xl rounded-3xl border border-yellow-300/40 bg-indigo-950/90 p-5 text-center shadow-2xl sm:p-8">
             <div className="mb-3 text-5xl">🏆</div><h2 className="text-2xl font-black text-yellow-300 sm:text-3xl">Sẵn sàng tranh tài?</h2>
             <p className="my-3 text-sm text-indigo-100">Hai thí sinh cùng trả lời một bộ câu hỏi. Mỗi câu có 10 giây, đúng được 1 điểm.</p>
-            <div className="mb-3 rounded-full border border-yellow-400/50 bg-yellow-400/10 px-4 py-2 text-sm font-black text-yellow-200">🔥 ĐANG THI ĐẤU: LỚP {currentGrade}</div><div className="grid grid-cols-2 gap-2 text-left">
-              <label className="text-xs font-bold text-indigo-200">Môn học<select value={subject} onChange={(e) => setSubject(e.target.value as Subject)} className="mt-1 w-full rounded-xl bg-white p-2 text-sm font-bold text-slate-900"><option value="math">Toán</option><option value="vietnamese">Tiếng Việt</option><option value="english">Tiếng Anh</option></select></label>
-              <label className="text-xs font-bold text-indigo-200">Level<input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(Math.max(1, Math.min(100, Number(e.target.value) || 1)))} className="mt-1 w-full rounded-xl bg-white p-2 text-sm font-bold text-slate-900" /></label>
-            </div>
+            <div className="mb-3 rounded-full border border-yellow-400/50 bg-yellow-400/10 px-4 py-2 text-sm font-black text-yellow-200">🔥 ĐANG THI ĐẤU: LỚP {currentGrade}</div>
+            <div className="mb-3 flex flex-wrap justify-center gap-2 text-xs font-bold"><span className="rounded-full bg-blue-500/20 px-3 py-1 text-blue-200">➗ Toán</span><span className="rounded-full bg-emerald-500/20 px-3 py-1 text-emerald-200">📖 Tiếng Việt</span><span className="rounded-full bg-orange-500/20 px-3 py-1 text-orange-200">🔤 Tiếng Anh</span></div>
+            <p className="text-xs text-indigo-200">10 câu hỏi tự động luân phiên cả 3 môn • Không cần chọn môn</p>
             <button onClick={startGame} className="mt-5 w-full rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 px-8 py-3 text-lg font-black text-slate-950 shadow-lg transition hover:scale-[1.02]">BẮT ĐẦU THI ĐẤU</button>
             {onExit && <button onClick={onExit} className="mt-3 text-sm font-bold text-indigo-200 underline hover:text-white">← Quay lại</button>}
             <div className="mt-5 rounded-2xl border border-white/15 bg-black/20 p-4 text-left">
@@ -269,7 +269,7 @@ export function ArenaBattle({ currentGrade, onExit }: ArenaBattleProps) {
         {gameState === "playing" && currentQuestion && (
           <section className="z-20 w-full max-w-4xl rounded-3xl border border-white/20 bg-slate-950/80 p-4 text-center shadow-2xl backdrop-blur-md sm:p-6">
             <div className="mb-3 flex items-center justify-between text-xs font-bold text-indigo-100 sm:text-sm">
-              <span>LỚP {currentGrade} • CÂU {questionIndex + 1} / {questions.length}</span>
+              <span>LỚP {currentGrade} • CÂU {questionIndex + 1} / {questions.length}</span><span className="rounded-full bg-white/10 px-3 py-1">{currentQuestion.subject === "math" ? "➗ TOÁN" : currentQuestion.subject === "vietnamese" ? "📖 TIẾNG VIỆT" : "🔤 TIẾNG ANH"}</span>
               <span className={timeLeft <= 3 ? "animate-pulse text-red-400" : "text-yellow-300"}>⏱ {timeLeft} GIÂY</span>
             </div>
             <div className="mx-auto mb-3 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-yellow-300 transition-all" style={{ width: `${(timeLeft / QUESTION_SECONDS) * 100}%` }} /></div>
