@@ -79,24 +79,24 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
                         <filter id="pBlur"><feGaussianBlur stdDeviation="5"/></filter>
                       </defs>
                       <ellipse cx="180" cy="410" rx="120" ry="15" fill="#a77baf" opacity=".18"/>
-                      <!-- long flowing hair -->
+                      {/* long flowing hair */}
                       <path d="M69 177 Q24 57 105 30 Q178 -9 255 30 Q342 75 293 202 Q328 285 285 374 Q265 402 238 367 L122 382 Q78 410 66 350 Q39 266 69 177Z" fill="url(#pHair)" stroke="#55334f" strokeWidth="3"/>
                       <path d="M89 112 Q57 35 131 26 Q80 81 105 153 Q69 222 94 324 Q58 283 68 195Z" fill={makeup.hair} opacity=".8"/>
                       <path d="M267 100 Q318 48 290 164 Q322 262 272 350 Q291 248 249 175Z" fill="#fff" opacity=".13"/>
                       <path d="M105 45 Q147 7 197 34 Q126 29 111 112" fill="none" stroke="url(#pShine)" strokeWidth="9" strokeLinecap="round" opacity=".7"/>
-                      <!-- ears and face -->
+                      {/* ears and face */}
                       <ellipse cx="91" cy="215" rx="19" ry="29" fill="#f6c8b9"/>
                       <ellipse cx="269" cy="215" rx="19" ry="29" fill="#f6c8b9"/>
                       <path d="M103 132 Q105 72 180 70 Q255 72 257 132 L249 248 Q238 315 180 330 Q122 315 111 248Z" fill="url(#pSkin)" stroke="#e9b2a5" strokeWidth="2"/>
                       <ellipse cx="90" cy="219" rx="9" ry="15" fill="#f4b8ac"/><ellipse cx="270" cy="219" rx="9" ry="15" fill="#f4b8ac"/>
-                      <!-- fringe -->
+                      {/* fringe */}
                       <path d="M91 153 Q70 58 151 49 Q221 28 272 98 Q286 130 257 164 Q252 112 220 103 Q190 149 147 122 Q120 116 103 168Z" fill="url(#pHair)" stroke="#55334f" strokeWidth="2"/>
                       <path d="M113 104 Q134 53 178 57 Q144 72 139 119 M190 55 Q236 59 251 112" fill="none" stroke="#fff" strokeOpacity=".24" strokeWidth="7" strokeLinecap="round"/>
-                      <!-- brows -->
+                      {/* brows */}
                       <path d="M119 177 Q145 158 163 176 M198 176 Q218 158 241 177" fill="none" stroke="#694356" strokeWidth="5" strokeLinecap="round"/>
-                      <!-- eyeshadow -->
+                      {/* eyeshadow */}
                       <path d="M113 197 Q141 176 166 197 Q141 215 113 197 M194 197 Q219 176 247 197 Q219 215 194 197" fill={makeup.shadow} opacity=".72"/>
-                      <!-- big anime eyes -->
+                      {/* big anime eyes */}
                       <path d="M113 202 Q139 180 165 204 Q159 238 139 240 Q117 235 113 202Z" fill="#fff"/>
                       <path d="M195 204 Q221 180 247 202 Q243 235 221 240 Q201 238 195 204Z" fill="#fff"/>
                       <ellipse cx="140" cy="213" rx="15" ry="23" fill="url(#pIris)"/><ellipse cx="220" cy="213" rx="15" ry="23" fill="url(#pIris)"/>
@@ -105,26 +105,26 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
                       <circle cx="133" cy="224" r="3.5" fill="#c9b5ff"/><circle cx="213" cy="224" r="3.5" fill="#c9b5ff"/>
                       <path d="M112 201 Q137 177 166 199 M194 199 Q222 177 248 201" fill="none" stroke="#483047" strokeWidth="5" strokeLinecap="round"/>
                       <path d="M119 194 l-7 -7 M128 188 l-4 -9 M239 194 l8 -7 M230 188 l4 -9" stroke="#483047" strokeWidth="3" strokeLinecap="round"/>
-                      <!-- cheeks and nose -->
+                      {/* cheeks and nose */}
                       <ellipse cx="112" cy="253" rx="23" ry="11" fill={makeup.blush} opacity=".55" filter="url(#pBlur)"/>
                       <ellipse cx="248" cy="253" rx="23" ry="11" fill={makeup.blush} opacity=".55" filter="url(#pBlur)"/>
                       <path d="M180 222 Q173 241 181 245" fill="none" stroke="#d99d91" strokeWidth="2.5" strokeLinecap="round"/>
                       <path d="M166 270 Q180 259 194 270 Q182 286 180 284 Q174 284 166 270Z" fill={makeup.lipstick}/>
                       <path d="M170 270 Q180 266 190 270" fill="none" stroke="#ffe7ed" strokeWidth="3" strokeLinecap="round"/>
                       <path d="M171 292 Q180 296 189 292" fill="none" stroke="#d9958c" strokeWidth="2" strokeLinecap="round"/>
-                      <!-- neck and dress -->
+                      {/* neck and dress */}
                       <path d="M157 314 L157 348 L203 348 L203 314" fill="url(#pSkin)"/>
                       <path d="M104 430 Q112 359 158 343 L180 364 L202 343 Q250 359 258 430Z" fill="url(#pDress)" stroke="#fff" strokeWidth="4"/>
                       <path d="M157 346 L180 372 L203 346" fill="none" stroke="#fff" strokeWidth="5"/>
                       <path d="M180 372 L168 393 L180 411 L192 393Z" fill="#f7d36f" stroke="#fff4c4" strokeWidth="3"/>
                       <path d="M109 391 Q180 420 251 391" fill="none" stroke="#fff" strokeWidth="4" opacity=".7"/>
-                      <!-- crown -->
+                      {/* crown */}
                       <path d="M122 82 L112 31 L148 58 L180 12 L212 58 L248 31 L238 84Z" fill="#f7d36f" stroke="#fff4c4" strokeWidth="5" strokeLinejoin="round"/>
                       <path d="M126 79 Q180 93 234 79" fill="none" stroke="#d89a42" strokeWidth="5"/>
                       <circle cx="180" cy="54" r="9" fill="#ff8db7" stroke="#fff" strokeWidth="3"/>
                       <circle cx="143" cy="65" r="6" fill="#9ce5e3" stroke="#fff" strokeWidth="2"/>
                       <circle cx="217" cy="65" r="6" fill="#9ce5e3" stroke="#fff" strokeWidth="2"/>
-                      <!-- sparkles -->
+                      {/* sparkles */}
                       <path d="M57 135 l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5Z M302 186 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4Z" fill="#ffe18a" stroke="#fff" strokeWidth="2"/>
                     </svg>
                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-amber-200 px-4 py-1 text-2xl shadow-lg">{makeup.accessory}</div>
