@@ -15,6 +15,7 @@ type ArenaPlayer = {
   avatar: unknown;
   grade: number;
   joinedAt: number;
+  ready: boolean;
 };
 type GameMessage = { startsAt: number; question: Question; questionIndex: number };
 type Props = { currentGrade: number; profile: Profile; onExit?: () => void };
@@ -51,7 +52,7 @@ function PlayerPodium({ player, index }: { player: ArenaPlayer; index: number })
       </group>
       <Html position={[0, 2.55, 0]} center distanceFactor={10} style={{ pointerEvents: "none" }}>
         <div style={{ whiteSpace: "nowrap", borderRadius: 999, border: "2px solid #fff4d0", background: "rgba(18,39,72,.94)", color: "#fff8df", padding: "4px 12px", font: "900 12px Nunito,sans-serif", boxShadow: "0 3px 10px #0005" }}>
-          {player.name}
+          {player.name}{player.ready ? " • SẴN SÀNG ✓" : " • ĐANG CHỜ"}
         </div>
       </Html>
     </group>
@@ -99,6 +100,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const [answered, setAnswered] = useState(0);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const lastQuestionAction = useRef(0);
+  const startSentRef = useRef(false);
 
   const self = useMemo<ArenaPlayer>(() => ({
     id: profile.id,
@@ -106,6 +108,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     avatar: profile.avatar,
     grade: currentGrade,
     joinedAt: 0,
+    ready: false,
   }), [profile.id, profile.display_name, profile.avatar, currentGrade]);
 
   const applyGameStart = useCallback((message: GameMessage) => {
@@ -135,7 +138,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         if (player?.id && player.id !== profile.id) unique.set(player.id, player);
       });
       const ownPresence = all.find((player) => player?.id === profile.id);
-      unique.set(profile.id, { ...self, joinedAt: ownPresence?.joinedAt ?? Date.now() });
+      unique.set(profile.id, { ...self, joinedAt: ownPresence?.joinedAt ?? Date.now(), ready: Boolean(ownPresence?.ready) });
       setPlayers([...unique.values()].sort((a, b) => a.joinedAt - b.joinedAt || a.id.localeCompare(b.id)));
     };
 
@@ -155,7 +158,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       })
       .subscribe(async (status) => {
         if (!alive || status !== "SUBSCRIBED") return;
-        await channel.track({ ...self, joinedAt: Date.now() });
+        await channel.track({ ...self, joinedAt: Date.now(), ready: false });
         refreshPlayers();
       });
 
@@ -178,8 +181,16 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     return () => window.clearInterval(timer);
   }, [phase, startsAt]);
 
-  const startCompetition = () => {
-    if (phase !== "waiting") return;
+  const markReady = async () => {
+    if (phase !== "waiting" || players.some((player) => player.id === profile.id && player.ready)) return;
+    setPlayers((current) => current.map((player) => player.id === profile.id ? { ...player, ready: true } : player));
+    await channelRef.current?.track({ ...self, joinedAt: players.find((player) => player.id === profile.id)?.joinedAt ?? Date.now(), ready: true });
+  };
+
+  useEffect(() => {
+    if (phase !== "waiting" || players.length < 2 || !players.every((player) => player.ready)) return;
+    if (players[0]?.id !== profile.id || startSentRef.current) return;
+    startSentRef.current = true;
     const message: GameMessage = {
       startsAt: Date.now() + 3000,
       question: randomQuestion(currentGrade),
@@ -187,7 +198,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     };
     applyGameStart(message);
     void channelRef.current?.send({ type: "broadcast", event: "game-start", payload: message });
-  };
+  }, [players, phase, profile.id, currentGrade, applyGameStart]);
 
   const nextQuestion = () => {
     if (Date.now() - lastQuestionAction.current < 1200) return;
@@ -247,8 +258,9 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         <section className="mx-auto mt-5 max-w-2xl rounded-3xl border border-amber-200/30 bg-white/10 p-5 text-center">
           <div className="text-4xl">🎤</div>
           <h2 className="mt-2 text-xl font-black text-amber-200">CÁC THÍ SINH VÀO VỊ TRÍ!</h2>
-          <p className="mt-2 text-sm text-sky-100">Khi các bé đã lên bục, bất kỳ bé nào cũng có thể nhấn bắt đầu. Tất cả sẽ cùng đếm ngược.</p>
-          <button onClick={startCompetition} className="mt-4 rounded-full bg-amber-300 px-9 py-4 text-lg font-black text-slate-950 shadow-lg transition hover:scale-105">🏁 BẮT ĐẦU THI ĐẤU</button>
+          <p className="mt-2 text-sm text-sky-100">Mỗi bé phải nhấn SẴN SÀNG. Bé bấm trước sẽ đứng chờ; đủ cả 2 bé sẵn sàng, trận đấu tự động bắt đầu.</p>
+          <p className="mt-3 text-sm font-black text-amber-200">{players.filter((player) => player.ready).length}/{Math.max(2, players.length)} bé đã sẵn sàng</p>
+          <button onClick={markReady} disabled={players.some((player) => player.id === profile.id && player.ready)} className="mt-4 rounded-full bg-emerald-400 px-9 py-4 text-lg font-black text-slate-950 shadow-lg transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60">{players.some((player) => player.id === profile.id && player.ready) ? "✓ CON ĐÃ SẴN SÀNG" : "🙋 SẴN SÀNG"}</button>
         </section>
       )}
 
