@@ -208,7 +208,8 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   };
 
   const leaveCompetition = () => {
-    void supabase.removeChannel(channelRef.current ?? undefined);
+    const activeChannel = channelRef.current;
+    if (activeChannel) void supabase.removeChannel(activeChannel);
     channelRef.current = null;
     setPhase("waiting");
     setStartsAt(null);
