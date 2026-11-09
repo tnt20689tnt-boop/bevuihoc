@@ -65,7 +65,7 @@ export function TopBar({ profile }: { profile?: Profile | null | undefined }) {
             activeProps={{ className: "bg-secondary text-secondary-foreground" }}
           >
             <n.icon className="h-5 w-5" />
-            <span className="hidden sm:inline">{n.label}</span>
+            <span className={n.to === "/arena" ? "inline" : "hidden sm:inline"}>{n.label}</span>
           </Link>
         ))}
         {isAdmin && (
