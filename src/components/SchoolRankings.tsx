@@ -17,7 +17,7 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
   const { data: profile } = useMyProfile();
   const page = config[mode];
   const { data, isLoading, error } = useQuery({
-    queryKey: ["school-rankings"],
+    queryKey: ["school-rankings", profile?.id],
     queryFn: async (): Promise<PlayerRow[]> => {
       const [{ data: profiles, error: profileError }, { data: events, error: eventError }] = await Promise.all([
         supabase.from("profiles").select("id, display_name, grade").limit(1000),
@@ -42,7 +42,9 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
         .sort((a, b) => b.points - a.points || b.correct - a.correct || a.display_name.localeCompare(b.display_name, "vi"))
         .slice(0, 100);
     },
-    staleTime: 30_000,
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
   });
 
   return (
