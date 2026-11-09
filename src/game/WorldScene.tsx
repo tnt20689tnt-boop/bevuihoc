@@ -675,10 +675,15 @@ function PlayerController({
   const activePortal = useRef<string | null>(null);
   const nearbyHandler = useRef(onNearbyPortal);
   const interactHandler = useRef(onInteract);
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
-  const facingYaw = useRef(position.current.ry ?? 0);
+  const cameraYaw = useRef(position.current.ry ?? 0);
+  const cameraPitch = useRef(0.48);
+  const cameraDistance = useRef(12.4);
+  const smoothedCamera = useRef(new THREE.Vector3());
+  const smoothedTarget = useRef(new THREE.Vector3());
+  const cameraInitialized = useRef(false);
   const sitting = useRef(false);
   const benchSpots = [
     { x: -8, z: 1, rotation: 0.42 },
@@ -695,6 +700,33 @@ function PlayerController({
 
 
   useEffect(() => {
+    let drag: { id: number; x: number; y: number } | null = null;
+    const canvas = gl.domElement;
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0 && event.pointerType === "mouse") return;
+      drag = { id: event.pointerId, x: event.clientX, y: event.clientY };
+      try { canvas.setPointerCapture(event.pointerId); } catch { /* capture may be unavailable */ }
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (!drag || drag.id !== event.pointerId) return;
+      cameraYaw.current -= (event.clientX - drag.x) * 0.006;
+      cameraPitch.current = THREE.MathUtils.clamp(
+        cameraPitch.current + (event.clientY - drag.y) * 0.004,
+        0.08,
+        1.22,
+      );
+      drag.x = event.clientX;
+      drag.y = event.clientY;
+    };
+    const onPointerUp = () => { drag = null; };
+    const onWheel = (event: WheelEvent) => {
+      cameraDistance.current = THREE.MathUtils.clamp(cameraDistance.current + event.deltaY * 0.01, 5, 24);
+    };
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
+    canvas.addEventListener("wheel", onWheel, { passive: true });
     const interact = () => {
       const nearestBench = room.id === "plaza"
         ? benchSpots
@@ -708,8 +740,7 @@ function PlayerController({
         const { bench } = nearestBench;
         positionRef.current.x = bench.x + Math.sin(bench.rotation) * 0.95;
         positionRef.current.z = bench.z + Math.cos(bench.rotation) * 0.95;
-        facingYaw.current = bench.rotation + Math.PI;
-        if (character.current) character.current.rotation.y = facingYaw.current;
+        if (character.current) character.current.rotation.y = bench.rotation + Math.PI;
         sitting.current = true;
         animation.current.motion = "sit";
       } else {
@@ -743,25 +774,30 @@ function PlayerController({
       window.removeEventListener("campus-interact", onTouchInteract);
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("blur", clearKeys);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerUp);
+      canvas.removeEventListener("wheel", onWheel);
     };
-  }, []);
+  }, [gl]);
 
   useFrame((_, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05);
     const keys = held.current;
-    let dx =
+    const moveRight =
       Number(keys.has("d") || keys.has("arrowright")) -
-      Number(keys.has("a") || keys.has("arrowleft")) +
-      touchRef.current.x;
-    let dz =
-      Number(keys.has("s") || keys.has("arrowdown")) -
-      Number(keys.has("w") || keys.has("arrowup")) +
-      touchRef.current.z;
-    const magnitude = Math.hypot(dx, dz);
-    if (magnitude > 1) {
-      dx /= magnitude;
-      dz /= magnitude;
-    }
+      Number(keys.has("a") || keys.has("arrowleft")) + touchRef.current.x;
+    const moveForward =
+      Number(keys.has("w") || keys.has("arrowup")) -
+      Number(keys.has("s") || keys.has("arrowdown")) - touchRef.current.z;
+    const magnitude = Math.hypot(moveRight, moveForward);
+    const inputRight = magnitude > 1 ? moveRight / magnitude : moveRight;
+    const inputForward = magnitude > 1 ? moveForward / magnitude : moveForward;
+    const sinYaw = Math.sin(cameraYaw.current);
+    const cosYaw = Math.cos(cameraYaw.current);
+    let dx = -sinYaw * inputForward + cosYaw * inputRight;
+    let dz = -cosYaw * inputForward - sinYaw * inputRight;
     const moving = Math.hypot(dx, dz) > 0.04;
     if (moving && sitting.current) sitting.current = false;
     const speed = keys.has("shift") ? 6.4 : 4.2;
@@ -777,8 +813,12 @@ function PlayerController({
       if (!blocked(nextX, position.current.z)) position.current.x = nextX;
       if (!blocked(position.current.x, nextZ)) position.current.z = nextZ;
       animation.current.motion = keys.has("shift") ? "run" : "walk";
-      facingYaw.current = Math.atan2(dx, dz);
-      if (character.current) character.current.rotation.y = facingYaw.current;
+      const targetYaw = Math.atan2(dx, dz);
+      if (character.current) {
+        const currentYaw = character.current.rotation.y;
+        const deltaYaw = THREE.MathUtils.euclideanModulo(targetYaw - currentYaw + Math.PI, Math.PI * 2) - Math.PI;
+        character.current.rotation.y += deltaYaw * (1 - Math.exp(-12 * dt));
+      }
     } else {
       animation.current.motion = sitting.current ? "sit" : "idle";
     }
@@ -800,17 +840,26 @@ function PlayerController({
       nearbyHandler.current(nearest);
     }
 
-    // Third-person follow camera: stay behind the direction the child is facing.
-    // Smoothly follows turns without mouse dragging or camera-relative movement.
-    const cameraDistance = 12.4;
+    // Chua Tam An style orbit camera: drag to rotate independently while moving.
+    const cp = Math.cos(cameraPitch.current);
+    lookTarget.current.set(position.current.x, 1.6, position.current.z);
     desiredCamera.current.set(
-      position.current.x - Math.sin(facingYaw.current) * cameraDistance,
-      9.2,
-      position.current.z - Math.cos(facingYaw.current) * cameraDistance,
+      position.current.x + Math.sin(cameraYaw.current) * cameraDistance.current * cp,
+      1.6 + Math.sin(cameraPitch.current) * cameraDistance.current,
+      position.current.z + Math.cos(cameraYaw.current) * cameraDistance.current * cp,
     );
-    camera.position.lerp(desiredCamera.current, 1 - Math.exp(-4.2 * dt));
-    lookTarget.current.set(position.current.x, 0.95, position.current.z);
-    camera.lookAt(lookTarget.current);
+    const followAlpha = 1 - Math.exp(-10 * dt);
+    const lookAlpha = 1 - Math.exp(-14 * dt);
+    if (!cameraInitialized.current) {
+      smoothedCamera.current.copy(desiredCamera.current);
+      smoothedTarget.current.copy(lookTarget.current);
+      cameraInitialized.current = true;
+    } else {
+      smoothedCamera.current.lerp(desiredCamera.current, followAlpha);
+      smoothedTarget.current.lerp(lookTarget.current, lookAlpha);
+    }
+    camera.position.copy(smoothedCamera.current);
+    camera.lookAt(smoothedTarget.current);
   });
 
   return (
