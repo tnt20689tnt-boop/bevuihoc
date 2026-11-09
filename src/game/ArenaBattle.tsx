@@ -1,189 +1,287 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Canvas } from "@react-three/fiber";
+import { Html } from "@react-three/drei";
+import type { RealtimeChannel } from "@supabase/supabase-js";
+import { Character3D, makeAnimState } from "@/game/Character3D";
+import { supabase } from "@/integrations/supabase/client";
+import type { Profile } from "@/hooks/use-player";
+import { toAvatar, type Avatar } from "@/lib/avatar";
 import { generateQuestion, type Question, type Subject } from "./learningEngine";
 
-type Room = {
-  subject: Subject;
-  title: string;
-  subtitle: string;
-  emoji: string;
-  color: string;
-  board: string;
-  activities: string[];
+type Phase = "waiting" | "countdown" | "playing";
+type ArenaPlayer = {
+  id: string;
+  name: string;
+  avatar: unknown;
+  grade: number;
+  joinedAt: number;
+};
+type GameMessage = { startsAt: number; question: Question; questionIndex: number };
+type Props = { currentGrade: number; profile: Profile; onExit?: () => void };
+
+const SUBJECTS: Subject[] = ["math", "vietnamese", "english"];
+const subjectName: Record<Subject, string> = {
+  math: "Toán học",
+  vietnamese: "Tiếng Việt",
+  english: "Tiếng Anh",
 };
 
-const ROOMS: Room[] = [
-  { subject: "math", title: "PHÒNG TOÁN HỌC", subtitle: "Khám phá những con số và thử thách tư duy", emoji: "➗", color: "from-sky-500 to-blue-700", board: "BẢNG CON SỐ", activities: ["Phép cộng – trừ", "Bảng nhân – chia", "Hình học & tư duy"] },
-  { subject: "vietnamese", title: "PHÒNG TIẾNG VIỆT", subtitle: "Làm quen chữ cái, từ ngữ và những câu chuyện", emoji: "📖", color: "from-emerald-500 to-green-700", board: "GÓC TIẾNG VIỆT", activities: ["Chính tả", "Từ đồng nghĩa – trái nghĩa", "Đọc hiểu & ngữ pháp"] },
-  { subject: "english", title: "PHÒNG TIẾNG ANH", subtitle: "Học từ vựng và mẫu câu tiếng Anh thật vui", emoji: "🔤", color: "from-orange-500 to-rose-600", board: "ENGLISH CORNER", activities: ["Từ vựng", "Mẫu câu cơ bản", "Đọc hiểu tiếng Anh"] },
-];
+function randomQuestion(grade: number): Question {
+  const subject = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)] ?? "math";
+  return generateQuestion(subject, grade, 50);
+}
 
-type Props = { currentGrade: number; onExit?: () => void };
+function PlayerPodium({ player, index }: { player: ArenaPlayer; index: number }) {
+  const x = (index % 4 - 1.5) * 2.25;
+  const z = index < 4 ? 1.25 : -2.3;
+  const avatar: Avatar = toAvatar(player.avatar);
+  const animation = useRef(makeAnimState());
+  return (
+    <group position={[x, 0, z]}>
+      <mesh position={[0, 0.18, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[0.78, 0.88, 0.36, 32]} />
+        <meshStandardMaterial color={index === 0 ? "#e8b84f" : "#5f91c5"} metalness={0.16} roughness={0.48} />
+      </mesh>
+      <mesh position={[0, 0.39, 0]}>
+        <cylinderGeometry args={[0.64, 0.72, 0.08, 32]} />
+        <meshStandardMaterial color="#f9e1a4" metalness={0.12} roughness={0.4} />
+      </mesh>
+      <group position={[0, 0.44, 0]}>
+        <Character3D avatar={avatar} state={animation} />
+      </group>
+      <Html position={[0, 2.55, 0]} center distanceFactor={10} style={{ pointerEvents: "none" }}>
+        <div style={{ whiteSpace: "nowrap", borderRadius: 999, border: "2px solid #fff4d0", background: "rgba(18,39,72,.94)", color: "#fff8df", padding: "4px 12px", font: "900 12px Nunito,sans-serif", boxShadow: "0 3px 10px #0005" }}>
+          {player.name}
+        </div>
+      </Html>
+    </group>
+  );
+}
 
-export function ArenaBattle({ currentGrade, onExit }: Props) {
-  const [room, setRoom] = useState<Room | null>(null);
+function ArenaStage({ players }: { players: ArenaPlayer[] }) {
+  return (
+    <div className="h-[280px] w-full overflow-hidden rounded-3xl border-4 border-amber-200/70 bg-gradient-to-b from-sky-200 to-indigo-300 shadow-inner sm:h-[340px]">
+      <Canvas shadows camera={{ position: [0, 7.5, 13.5], fov: 42 }} dpr={[1, 1.5]}>
+        <color attach="background" args={["#b7dff5"]} />
+        <ambientLight intensity={1.35} />
+        <hemisphereLight args={["#ffffff", "#98734f", 1.1]} />
+        <directionalLight position={[-5, 10, 7]} intensity={2} castShadow />
+        <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.04, 0]} receiveShadow>
+          <planeGeometry args={[18, 12]} />
+          <meshStandardMaterial color="#d5b17d" roughness={0.92} />
+        </mesh>
+        <mesh position={[0, 0.08, -4.1]} castShadow>
+          <boxGeometry args={[11, 0.16, 0.35]} />
+          <meshStandardMaterial color="#8a4e32" />
+        </mesh>
+        <mesh position={[0, 2.05, -4.28]}>
+          <boxGeometry args={[8.5, 2.8, 0.18]} />
+          <meshStandardMaterial color="#173d55" emissive="#0b2638" emissiveIntensity={0.3} />
+        </mesh>
+        <Html position={[0, 2.35, -4.12]} center distanceFactor={11}>
+          <div style={{ width: 390, textAlign: "center", color: "#fff1c7", font: "1000 24px Nunito,sans-serif", textShadow: "0 2px 4px #0009" }}>🏆 ĐẤU TRƯỜNG TRI THỨC</div>
+        </Html>
+        {players.slice(0, 8).map((player, index) => <PlayerPodium key={player.id} player={player} index={index} />)}
+      </Canvas>
+    </div>
+  );
+}
+
+export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
+  const [players, setPlayers] = useState<ArenaPlayer[]>([]);
+  const [phase, setPhase] = useState<Phase>("waiting");
+  const [startsAt, setStartsAt] = useState<number | null>(null);
+  const [countdown, setCountdown] = useState(3);
   const [question, setQuestion] = useState<Question | null>(null);
-  const [score, setScore] = useState(0);
-  const [played, setPlayed] = useState(0);
+  const [questionIndex, setQuestionIndex] = useState(0);
   const [selected, setSelected] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
-  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [score, setScore] = useState(0);
+  const [answered, setAnswered] = useState(0);
+  const channelRef = useRef<RealtimeChannel | null>(null);
+  const lastQuestionAction = useRef(0);
 
-  const enterRoom = (nextRoom: Room) => {
-    setRoom(nextRoom);
-    setScore(0);
-    setPlayed(0);
+  const self = useMemo<ArenaPlayer>(() => ({
+    id: profile.id,
+    name: profile.display_name || "Bạn học",
+    avatar: profile.avatar,
+    grade: currentGrade,
+    joinedAt: 0,
+  }), [profile.id, profile.display_name, profile.avatar, currentGrade]);
+
+  const applyGameStart = useCallback((message: GameMessage) => {
+    setQuestion(message.question);
+    setQuestionIndex(message.questionIndex);
     setSelected(null);
-    setShowResult(false);
-    setQuestion(generateQuestion(nextRoom.subject, currentGrade, 50));
-  };
+    setStartsAt(message.startsAt);
+    setPhase("countdown");
+    setCountdown(3);
+    setScore(0);
+    setAnswered(0);
+  }, []);
 
-  const answer = (value: string) => {
-    if (!question || selected !== null) return;
-    setSelected(value);
-    setShowResult(true);
-    setPlayed((n) => n + 1);
-    if (value === question.correctAnswer) setScore((n) => n + 1);
+  useEffect(() => {
+    let alive = true;
+    const channel = supabase.channel("be-vui-hoc-arena-lobby", {
+      config: { presence: { key: profile.id }, broadcast: { self: false } },
+    });
+    channelRef.current = channel;
+
+    const refreshPlayers = () => {
+      if (!alive) return;
+      const state = channel.presenceState<ArenaPlayer>();
+      const all = Object.values(state).flat();
+      const unique = new Map<string, ArenaPlayer>();
+      all.forEach((player) => {
+        if (player?.id && player.id !== profile.id) unique.set(player.id, player);
+      });
+      unique.set(profile.id, self);
+      setPlayers([...unique.values()].sort((a, b) => a.joinedAt - b.joinedAt || a.name.localeCompare(b.name, "vi")));
+    };
+
+    channel
+      .on("presence", { event: "sync" }, refreshPlayers)
+      .on("presence", { event: "join" }, refreshPlayers)
+      .on("presence", { event: "leave" }, refreshPlayers)
+      .on("broadcast", { event: "game-start" }, ({ payload }) => {
+        if (!alive || !payload || typeof payload !== "object") return;
+        const message = payload as GameMessage;
+        if (typeof message.startsAt === "number" && message.question?.question && Array.isArray(message.question.options)) applyGameStart(message);
+      })
+      .on("broadcast", { event: "next-question" }, ({ payload }) => {
+        if (!alive || !payload || typeof payload !== "object") return;
+        const message = payload as GameMessage;
+        if (typeof message.startsAt === "number" && message.question?.question && Array.isArray(message.question.options)) applyGameStart(message);
+      })
+      .subscribe(async (status) => {
+        if (!alive || status !== "SUBSCRIBED") return;
+        await channel.track({ ...self, joinedAt: Date.now() });
+        refreshPlayers();
+      });
+
+    return () => {
+      alive = false;
+      if (channelRef.current === channel) channelRef.current = null;
+      void supabase.removeChannel(channel);
+    };
+  }, [profile.id, self, applyGameStart]);
+
+  useEffect(() => {
+    if (phase !== "countdown" || startsAt === null) return;
+    const update = () => {
+      const left = Math.max(0, Math.ceil((startsAt - Date.now()) / 1000));
+      setCountdown(left);
+      if (left <= 0) setPhase("playing");
+    };
+    update();
+    const timer = window.setInterval(update, 100);
+    return () => window.clearInterval(timer);
+  }, [phase, startsAt]);
+
+  const startCompetition = () => {
+    if (phase !== "waiting") return;
+    const message: GameMessage = {
+      startsAt: Date.now() + 3000,
+      question: randomQuestion(currentGrade),
+      questionIndex: 1,
+    };
+    applyGameStart(message);
+    void channelRef.current?.send({ type: "broadcast", event: "game-start", payload: message });
   };
 
   const nextQuestion = () => {
-    if (!room) return;
-    setQuestion(generateQuestion(room.subject, currentGrade, 50));
-    setSelected(null);
-    setShowResult(false);
+    if (Date.now() - lastQuestionAction.current < 1200) return;
+    lastQuestionAction.current = Date.now();
+    const message: GameMessage = {
+      startsAt: Date.now() + 3000,
+      question: randomQuestion(currentGrade),
+      questionIndex: questionIndex + 1,
+    };
+    applyGameStart(message);
+    void channelRef.current?.send({ type: "broadcast", event: "next-question", payload: message });
   };
 
-  const backToRooms = () => {
-    setRoom(null);
+  const answer = (value: string) => {
+    if (!question || selected !== null || phase !== "playing") return;
+    setSelected(value);
+    setAnswered((n) => n + 1);
+    if (value === question.correctAnswer) setScore((n) => n + 1);
+  };
+
+  const leaveCompetition = () => {
+    void supabase.removeChannel(channelRef.current ?? undefined);
+    channelRef.current = null;
+    setPhase("waiting");
+    setStartsAt(null);
     setQuestion(null);
     setSelected(null);
-    setShowResult(false);
+    setScore(0);
+    setAnswered(0);
+    onExit?.();
   };
 
   const correct = !!question && selected === question.correctAnswer;
-
-  const speak = (text: string) => {
-    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = room?.subject === "english" ? "en-US" : "vi-VN";
-    utterance.rate = 0.9;
-    utterance.pitch = 1.05;
-    utterance.onstart = () => setIsSpeaking(true);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find((voice) => room?.subject === "english" ? voice.lang.toLowerCase().startsWith("en") : voice.lang.toLowerCase().startsWith("vi"));
-    if (preferred) utterance.voice = preferred;
-    window.speechSynthesis.speak(utterance);
-  };
-
-  useEffect(() => {
-    if (!room || !question) return;
-    const intro = room.subject === "english" ? "Welcome to English class. I am your host. Listen carefully to the question." : "Xin chào các con! MC đã sẵn sàng. Chúng ta cùng bắt đầu " + room.title.toLowerCase() + " nhé!";
-    const optionsText = question.options.map((option, index) => (room.subject === "english" ? "Option " : "Đáp án ") + String.fromCharCode(65 + index) + ": " + option).join(". ");
-    speak(intro + " " + (room.subject === "english" ? "Here is your question: " : "Câu hỏi: ") + question.question + ". " + optionsText);
-    return () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); };
-  }, [room, question]);
+  const subject = question ? subjectName[question.subject] : "";
 
   return (
-    <main className="relative min-h-[calc(100dvh-5rem)] overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-950 via-slate-900 to-sky-950 p-4 text-white sm:p-7">
-      <div className="pointer-events-none absolute -left-20 top-20 h-64 w-64 rounded-full bg-sky-400/10 blur-3xl" />
-      <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-amber-300/10 blur-3xl" />
-      <header className="relative z-10 mb-6 flex flex-wrap items-center justify-between gap-3">
+    <main className="relative min-h-[calc(100dvh-5rem)] overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-950 via-slate-900 to-sky-950 p-3 text-white sm:p-6">
+      <header className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-black tracking-[.28em] text-amber-300">BÉ VUI HỌC • LỚP {currentGrade}</p>
+          <p className="text-xs font-black tracking-[.25em] text-amber-300">BÉ VUI HỌC • LỚP {currentGrade}</p>
           <h1 className="mt-1 text-2xl font-black sm:text-3xl">🏆 ĐẤU TRƯỜNG TRI THỨC</h1>
-          <p className="mt-1 text-sm text-sky-100/80">{room ? room.title : "Chọn lớp học mà con muốn khám phá hôm nay!"}</p>
+          <p className="mt-1 text-sm text-sky-100/80">Bé vào nhà là tự động lên bục chờ thi đấu.</p>
         </div>
-        {room ? (
-          <button onClick={backToRooms} className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold hover:bg-white/20">← Chọn phòng khác</button>
-        ) : onExit ? (
-          <button onClick={onExit} className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold hover:bg-white/20">← Quay lại</button>
-        ) : null}
+        {onExit && <button onClick={leaveCompetition} className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold">← Rời đấu trường</button>}
       </header>
 
-      {!room ? (
-        <section className="relative z-10">
-          <div className="mx-auto mb-7 max-w-2xl text-center">
-            <div className="mb-3 text-6xl">🏫</div>
-            <h2 className="text-xl font-black text-amber-200 sm:text-2xl">NGÔI TRƯỜNG TRI THỨC</h2>
-            <p className="mt-2 text-sm text-sky-100">Ba cánh cửa đang chờ con. Hãy chọn một phòng để bước vào lớp và bắt đầu thử thách nhé!</p>
-          </div>
-          <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-3">
-            {ROOMS.map((item) => (
-              <button key={item.subject} onClick={() => enterRoom(item)} className="group overflow-hidden rounded-3xl border-2 border-white/20 bg-white/10 text-left shadow-2xl transition hover:-translate-y-1 hover:border-amber-300/80 hover:bg-white/15">
-                <div className={`relative flex h-40 items-center justify-center bg-gradient-to-br ${item.color}`}>
-                  <div className="absolute inset-x-5 top-5 h-2 rounded-full bg-white/25" />
-                  <div className="absolute bottom-0 left-5 right-5 h-5 rounded-t-xl border-x-4 border-t-4 border-amber-100/70 bg-amber-900/30" />
-                  <span className="text-7xl drop-shadow-lg transition group-hover:scale-110">{item.emoji}</span>
-                  <span className="absolute right-4 top-4 rounded-full bg-black/20 px-3 py-1 text-xs font-black">LỚP {currentGrade}</span>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-black text-amber-200">{item.title}</h3>
-                  <p className="mt-2 min-h-10 text-sm text-sky-100/90">{item.subtitle}</p>
-                  <div className="mt-4 space-y-2">
-                    {item.activities.map((activity) => <div key={activity} className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="text-emerald-300">✓</span>{activity}</div>)}
-                  </div>
-                  <div className="mt-5 rounded-xl bg-white/15 px-4 py-3 text-center text-sm font-black group-hover:bg-amber-300 group-hover:text-slate-950">VÀO LỚP HỌC →</div>
-                </div>
-              </button>
-            ))}
-          </div>
-          <p className="mt-7 text-center text-xs text-sky-100/60">Mỗi phòng có bộ câu hỏi riêng, tự điều chỉnh theo khối lớp của con.</p>
+      <ArenaStage players={players} />
+
+      <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm">
+        <span className="rounded-full bg-white/10 px-4 py-2 font-bold">👦👧 {players.length} bé đang chờ</span>
+        <span className="rounded-full bg-white/10 px-4 py-2 font-bold">🎲 Câu hỏi ngẫu nhiên 3 môn</span>
+        <span className="rounded-full bg-white/10 px-4 py-2 font-bold">⭐ {score} điểm của con</span>
+      </div>
+
+      {phase === "waiting" && (
+        <section className="mx-auto mt-5 max-w-2xl rounded-3xl border border-amber-200/30 bg-white/10 p-5 text-center">
+          <div className="text-4xl">🎤</div>
+          <h2 className="mt-2 text-xl font-black text-amber-200">CÁC THÍ SINH VÀO VỊ TRÍ!</h2>
+          <p className="mt-2 text-sm text-sky-100">Khi các bé đã lên bục, bất kỳ bé nào cũng có thể nhấn bắt đầu. Tất cả sẽ cùng đếm ngược.</p>
+          <button onClick={startCompetition} className="mt-4 rounded-full bg-amber-300 px-9 py-4 text-lg font-black text-slate-950 shadow-lg transition hover:scale-105">🏁 BẮT ĐẦU THI ĐẤU</button>
         </section>
-      ) : (
-        <section className="relative z-10 mx-auto max-w-3xl">
-          <div className={`overflow-hidden rounded-3xl border-2 border-white/20 bg-gradient-to-br ${room.color} shadow-2xl`}>
-            <div className="relative px-5 py-6 text-center sm:px-8">
-              <div className="absolute inset-x-8 top-4 h-2 rounded-full bg-white/20" />
-              <div className="mx-auto mt-4 max-w-xl rounded-2xl border-8 border-amber-900/70 bg-emerald-950 px-4 py-5 shadow-inner">
-                <p className="text-xs font-black tracking-widest text-amber-200">{room.board}</p>
-                <div className="mt-3 text-4xl">{room.emoji}</div>
-                <p className="mt-2 text-lg font-black text-white">{room.title}</p>
-              </div>
-              <div className="mx-auto mt-5 flex max-w-xl items-center gap-3 rounded-2xl border border-amber-200/40 bg-black/25 p-3 text-left">
-                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-amber-300 text-3xl shadow-lg">🎙️</div>
-                <div className="min-w-0 flex-1"><p className="font-black text-amber-200">MC – Người dẫn chương trình</p><p className="text-xs text-white/85">MC chào lớp, đọc câu hỏi và từng phương án để bé lắng nghe.</p></div>
-                <button onClick={() => question && speak("Câu hỏi: " + question.question + ". " + question.options.map((option, index) => "Đáp án " + String.fromCharCode(65 + index) + ": " + option).join(". "))} className="shrink-0 rounded-full bg-amber-300 px-3 py-2 text-xs font-black text-slate-950">🔊 Nghe lại</button>
-              </div>
-              <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs font-bold">
-                <span className="rounded-full bg-black/20 px-3 py-2">🎒 Lớp {currentGrade}</span>
-                <span className="rounded-full bg-black/20 px-3 py-2">⭐ {score} điểm</span>
-                <span className="rounded-full bg-black/20 px-3 py-2">📝 {played} câu đã làm</span>
-              </div>
-            </div>
-            <div className="bg-slate-950/95 p-4 text-white sm:p-7">
-              {question && (
-                <>
-                  <div className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-sky-200">
-                    <span>GIỜ HỌC • LUYỆN TẬP</span><span>CÂU {played + (showResult ? 0 : 1)}</span>
-                  </div>
-                  <h2 className="mb-2 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
-                  <p className="mb-5 text-center text-xs text-sky-200">🎧 Hãy nghe MC đọc câu hỏi rồi chọn đáp án đúng nhé!</p>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    {question.options.map((option, index) => {
-                      const isCorrect = showResult && option === question.correctAnswer;
-                      const isWrong = showResult && selected === option && !isCorrect;
-                      return <button key={`${question.id}-${index}`} onClick={() => answer(option)} disabled={showResult} className={`rounded-2xl border-2 px-4 py-4 text-left font-bold transition ${isCorrect ? "border-emerald-300 bg-emerald-500 text-white" : isWrong ? "border-rose-300 bg-rose-500 text-white" : "border-white/15 bg-white/5 hover:border-amber-300 hover:bg-white/10"} disabled:cursor-default`}>
-                        <span className="mr-3 inline-grid h-8 w-8 place-items-center rounded-lg bg-white/15">{String.fromCharCode(65 + index)}</span>{option}
-                      </button>;
-                    })}
-                  </div>
-                  {showResult && (
-                    <div className={`mt-5 rounded-2xl p-4 text-center ${correct ? "bg-emerald-500/15 text-emerald-200" : "bg-amber-500/15 text-amber-100"}`}>
-                      <p className="text-lg font-black">{correct ? "🎉 Chính xác! Con giỏi lắm!" : "💪 Cố gắng nhé! Mình cùng học tiếp nào."}</p>
-                      <p className="mt-2 text-sm">{question.explanation}</p>
-                      <button onClick={nextQuestion} className="mt-4 rounded-full bg-amber-300 px-7 py-3 font-black text-slate-950 shadow-lg hover:bg-amber-200">CÂU TIẾP THEO →</button>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+      )}
+
+      {phase === "countdown" && (
+        <section className="mx-auto mt-5 max-w-xl rounded-3xl border border-amber-200/40 bg-white/10 p-5 text-center">
+          <p className="text-sm font-black tracking-widest text-amber-200">TẤT CẢ THÍ SINH SẴN SÀNG</p>
+          <div className="my-2 text-7xl font-black tabular-nums text-amber-300">{countdown > 0 ? countdown : "🚀"}</div>
+          <p className="font-bold">Chuẩn bị bước vào phần thi!</p>
+        </section>
+      )}
+
+      {phase === "playing" && question && (
+        <section className="mx-auto mt-5 max-w-3xl rounded-3xl border border-sky-200/30 bg-white/10 p-4 sm:p-6">
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-black text-amber-200">
+            <span>🎲 CÂU HỎI NGẪU NHIÊN • {subject.toUpperCase()}</span>
+            <span>CÂU {questionIndex}</span>
           </div>
-          <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <button onClick={backToRooms} className="rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-bold hover:bg-white/20">🏫 Về sảnh chọn phòng</button>
-            <button onClick={() => enterRoom(room)} className="rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-bold hover:bg-white/20">↻ Học lại phòng này</button>
+          <h2 className="mt-4 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
+          <div className="mt-5 grid gap-3 sm:grid-cols-2">
+            {question.options.map((option, index) => {
+              const right = selected !== null && option === question.correctAnswer;
+              const wrong = selected === option && !right;
+              return <button key={question.id + "-" + index} onClick={() => answer(option)} disabled={selected !== null} className={`rounded-2xl border-2 px-4 py-4 text-left font-bold transition ${right ? "border-emerald-300 bg-emerald-500 text-white" : wrong ? "border-rose-300 bg-rose-500 text-white" : "border-white/20 bg-slate-950/45 hover:border-amber-300"} disabled:cursor-default`}>
+                <span className="mr-3 inline-grid h-8 w-8 place-items-center rounded-lg bg-white/15">{String.fromCharCode(65 + index)}</span>{option}
+              </button>;
+            })}
           </div>
+          {selected !== null && (
+            <div className={`mt-5 rounded-2xl p-4 text-center ${correct ? "bg-emerald-500/20 text-emerald-100" : "bg-amber-500/20 text-amber-100"}`}>
+              <p className="text-lg font-black">{correct ? "🎉 Chính xác! Con giỏi lắm!" : "💪 Cố gắng nhé! Cùng thử câu tiếp theo."}</p>
+              <p className="mt-1 text-sm">{question.explanation}</p>
+              <p className="mt-2 text-xs">Điểm của con: {score} • Đã trả lời: {answered} câu</p>
+              <button onClick={nextQuestion} className="mt-4 rounded-full bg-amber-300 px-7 py-3 font-black text-slate-950">CÂU TIẾP THEO • CẢ ĐẤU TRƯỜNG →</button>
+            </div>
+          )}
         </section>
       )}
     </main>
