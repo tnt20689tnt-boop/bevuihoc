@@ -8,7 +8,9 @@ type Question = {
   hint: string;
 };
 
-const LESSONS: Record<string, { title: string; emoji: string; intro: string; questions: Question[] }> = {
+type Lesson = { title: string; emoji: string; intro: string; questions: Question[] };
+
+const LESSONS: Record<"math" | "vietnamese" | "english", Lesson> = {
   math: {
     title: "Toán học",
     emoji: "🔢",
@@ -59,12 +61,12 @@ export const Route = createFileRoute("/_authenticated/hoc/$subject")({
 
 function LessonRoom() {
   const { subject } = Route.useParams();
-  const lesson = LESSONS[subject] ?? LESSONS.math;
+  const lesson: Lesson = (LESSONS as Record<string, Lesson | undefined>)[subject] ?? LESSONS.math;
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
-  const question = lesson.questions[index];
+  const question: Question = lesson.questions[index] ?? (lesson.questions[0] as Question);
   const answered = selected !== null;
   const correct = selected === question.answer;
 
