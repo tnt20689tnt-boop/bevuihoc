@@ -63,7 +63,8 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
       .on("broadcast", { event: "move" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
         const incoming = payload as CampusPeer;
-        if (incoming.id === id || incoming.roomId !== roomId || typeof incoming.id !== "string") return;\n        if (!Number.isFinite(incoming.x) || !Number.isFinite(incoming.z) || Math.hypot(incoming.x, incoming.z) > ROOMS[roomId].radius + 1) return;
+        if (incoming.id === id || incoming.roomId !== roomId || typeof incoming.id !== "string") return;
+        if (!Number.isFinite(incoming.x) || !Number.isFinite(incoming.z) || Math.hypot(incoming.x, incoming.z) > ROOMS[roomId].radius + 1) return;
         setPeers((current) => {
           const old = current.find((peer) => peer.id === incoming.id);
           if (old && Number(old.seq ?? 0) > Number(incoming.seq ?? 0)) return current;
