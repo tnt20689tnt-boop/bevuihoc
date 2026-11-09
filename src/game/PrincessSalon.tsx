@@ -40,7 +40,7 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
   }
 
   function randomLook() {
-    const pick = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)];
+    const pick = <T,>(items: [T, ...T[]]): T => items[Math.floor(Math.random() * items.length)] ?? items[0];
     setMakeup({
       lipstick: pick(palettes.lipstick).value,
       blush: pick(palettes.blush).value,
