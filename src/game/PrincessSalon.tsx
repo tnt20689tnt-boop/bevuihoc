@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { GameShell } from "@/components/AppShell";
-import { AvatarBadge } from "@/components/AvatarBadge";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Avatar } from "@/lib/avatar";
@@ -24,11 +22,7 @@ export const Route = createFileRoute("/_authenticated/salon")({
   component: SalonRoute,
 });
 
-function SalonRoute() {
-  return <GameShell>{(profile) => <PrincessSalon profile={profile} />}</GameShell>;
-}
-
-function PrincessSalon({ profile }: { profile: Profile }) {
+export function PrincessSalon({ profile }: { profile: Profile }) {
   const saved = profile.avatar as SalonAvatar;
   const [makeup, setMakeup] = useState<Makeup>(saved.makeup ?? defaults);
   const [tab, setTab] = useState<keyof typeof palettes>("lipstick");
