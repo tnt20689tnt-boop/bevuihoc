@@ -12,7 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenticated/bang-xep-hang'
+import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'\nimport { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenticated/bang-xep-hang'
 import { Route as AuthenticatedHoSoRouteImport } from './routes/_authenticated/ho-so'
 import { Route as AuthenticatedNhanVatRouteImport } from './routes/_authenticated/nhan-vat'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
@@ -37,7 +37,7 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedBangXepHangRoute =
+const AuthenticatedArenaRoute = AuthenticatedArenaRouteImport.update({\n  id: '/arena',\n  path: '/arena',\n  getParentRoute: () => AuthenticatedRouteRoute,\n} as any)\nconst AuthenticatedBangXepHangRoute =
   AuthenticatedBangXepHangRouteImport.update({
     id: '/bang-xep-hang',
     path: '/bang-xep-hang',
@@ -123,7 +123,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
+  '/_authenticated/arena': typeof AuthenticatedArenaRoute\n  '/_authenticated/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/_authenticated/ho-so': typeof AuthenticatedHoSoRoute
   '/_authenticated/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -168,7 +168,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/_authenticated/bang-xep-hang'
+    | '/_authenticated/arena'\n    | '/_authenticated/bang-xep-hang'
     | '/_authenticated/ho-so'
     | '/_authenticated/nhan-vat'
     | '/_authenticated/quan-tri'
@@ -209,7 +209,7 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/bang-xep-hang': {
+    '/_authenticated/arena': {\n      id: '/_authenticated/arena'\n      path: '/arena'\n      fullPath: '/arena'\n      preLoaderRoute: typeof AuthenticatedArenaRouteImport\n      parentRoute: typeof AuthenticatedRouteRoute\n    }\n    '/_authenticated/bang-xep-hang': {
       id: '/_authenticated/bang-xep-hang'
       path: '/bang-xep-hang'
       fullPath: '/bang-xep-hang'
