@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { GoogleButton } from "@/components/GoogleButton";
+import { AppleButton } from "@/components/AppleButton";
 import { useSession } from "@/hooks/use-player";
 
 export const Route = createFileRoute("/auth")({
@@ -37,7 +38,7 @@ function AuthPage() {
             <div className="rounded-xl bg-white p-3"><span className="block text-2xl">🏫</span>Vào trường</div>
           </div>
         </div>
-        <GoogleButton className="w-full justify-center" label="Đăng nhập bằng Google" />
+        <div className="space-y-3">\n          <GoogleButton className="w-full justify-center" label="Đăng nhập bằng Google" />\n          <AppleButton className="w-full justify-center" />\n        </div>
         <p className="mt-4 text-xs leading-5 text-slate-500">Tài khoản phụ huynh dùng để lưu hồ sơ và thành tích. Bé xuất hiện trong game bằng tên nhân vật.</p>
         <Link to="/" className="mt-6 inline-flex text-sm font-bold text-emerald-700 hover:text-emerald-900">← Trang chủ</Link>
       </section>
