@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GameShell } from "@/components/AppShell";
 import type { Profile } from "@/hooks/use-player";
@@ -25,40 +25,49 @@ const LETTERS = ["a", "ă", "â", "b", "c", "d", "đ", "e", "ê", "g", "h", "i",
 const VI_WORDS = ["bé", "bà", "ba", "mẹ", "bố", "cá", "gà", "hoa", "nhà", "mèo", "chó", "bút", "vở", "sách", "trường", "bạn", "đẹp", "ngoan", "chăm", "học"];
 const SHAPES = ["hình tròn", "hình vuông", "hình tam giác", "hình chữ nhật"];
 
-function makeQuestions(subject: Subject, level: number): Question[] {
-  const tier = Math.floor((level - 1) / 10);
+function shuffle<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j]!, result[i]!];
+  }
+  return result;
+}
+function pick<T>(items: T[]): T {
+  return items[Math.floor(Math.random() * items.length)]!;
+}
+function makeQuestions(subject: Subject, level: number, grade: number, seen: Set<string>): Question[] {
+  // Khối lớp quyết định điểm xuất phát; mỗi 10 cấp lại tăng độ khó.
+  const tier = Math.min(9, Math.floor((level - 1) / 10) + Math.max(0, grade - 1));
   const make = (prompt: string, answer: string, pool: string[], hint: string): Question => {
-    const options = [answer, ...pool.filter(v => v !== answer)].slice(0, 4);
-    while (options.length < 4) options.push(String(options.length + 1));
-    const shuffled = [...options].sort((a,b) => a.localeCompare(b, "vi") * ((level % 2) ? 1 : -1));
-    return { prompt, choices: shuffled, answer: shuffled.indexOf(answer), hint };
+    const choices = shuffle([answer, ...shuffle([...new Set(pool.filter(v => v !== answer))]).slice(0, 3)]);
+    return { prompt, choices, answer: choices.indexOf(answer), hint };
   };
+  let questions: Question[] = [];
   if (subject === "math") {
     const max = [5, 10, 20, 30, 50, 100, 200, 500, 1000, 10000][tier]!;
-    const a = 1 + ((level * 3) % Math.max(2, Math.floor(max / 2)));
-    const b = 1 + ((level * 7) % Math.max(2, Math.floor(max / 2)));
-    const sum = a + b;
-    const diff = Math.max(0, Math.max(a,b) - Math.min(a,b));
-    const questions: Question[] = [
-      make(`Số ${a} + ${b} bằng bao nhiêu?`, String(sum), [String(sum+1), String(Math.max(0,sum-1)), String(sum+2)], `Ta đếm thêm ${b} bước từ số ${a}.`),
-      make(`Số lớn hơn trong hai số ${a} và ${b} là số nào?`, String(Math.max(a,b)), [String(Math.min(a,b)), String(Math.max(a,b)+1), String(Math.max(0,Math.min(a,b)-1))], "So sánh hai số, số có giá trị lớn hơn là đáp án."),
-      make(`Lấy ${Math.max(a,b)} trừ ${Math.min(a,b)} còn bao nhiêu?`, String(diff), [String(diff+1), String(diff+2), String(Math.max(0,diff-1))], "Lấy số lớn trừ số bé."),
-      make(`Có ${a} quả táo, thêm ${b} quả. Có tất cả bao nhiêu quả?`, String(sum), [String(sum+2), String(Math.max(0,sum-1)), String(sum+3)], "Phép cộng giúp tìm tất cả số đồ vật."),
-      make(`Hình nào có 3 cạnh?`, "hình tam giác", SHAPES, "Hình tam giác có 3 cạnh.")
+    const a = 1 + Math.floor(Math.random() * Math.max(2, Math.floor(max / 2)));
+    const b = 1 + Math.floor(Math.random() * Math.max(2, Math.floor(max / 2)));
+    const big = Math.max(a, b), small = Math.min(a, b), sum = a + b, diff = big - small;
+    const distract = (answer: number) => [String(answer + 1), String(Math.max(0, answer - 1)), String(answer + 2), String(answer + 3)];
+    questions = [
+      make(`${a} + ${b} bằng bao nhiêu?`, String(sum), distract(sum), `Đếm thêm ${b} bước từ ${a}.`),
+      make(`Số nào lớn hơn: ${a} hay ${b}?`, String(big), [String(small), String(big + 1), String(Math.max(0, small - 1)), String(big + 2)], "So sánh giá trị của hai số nhé."),
+      make(`${big} - ${small} bằng bao nhiêu?`, String(diff), distract(diff), "Lấy số lớn trừ số bé."),
+      make(`Có ${a} quả táo, mẹ cho thêm ${b} quả. Có tất cả bao nhiêu quả?`, String(sum), distract(sum), "Muốn tìm tất cả, bé dùng phép cộng."),
+      tier >= 6
+        ? make(`${small * 2} chia 2 bằng bao nhiêu?`, String(small), [String(small + 1), String(Math.max(0, small - 1)), String(small * 2), String(small + 2)], "Chia thành hai phần bằng nhau.")
+        : tier >= 4
+          ? make(`${small} nhân 2 bằng bao nhiêu?`, String(small * 2), [String(small + 1), String(small * 3), String(small * 2 + 1), String(small)], "Nhân 2 là cộng số đó với chính nó.")
+          : make(`Hình nào có 3 cạnh?`, "hình tam giác", SHAPES, "Hình tam giác có 3 cạnh.")
     ];
-    if (tier >= 2) questions[4] = make(`Số ${Math.max(a,b)} - ${Math.min(a,b)} bằng bao nhiêu?`, String(diff), [String(diff+1), String(diff+2), String(Math.max(0,diff-1))], "Thực hiện phép trừ.");
-    if (tier >= 4) questions[4] = make(` ${Math.min(a,b)} × 2 bằng bao nhiêu?`, String(Math.min(a,b)*2), [String(Math.min(a,b)+2), String(Math.min(a,b)*3), String(Math.min(a,b)*2+1)], "Nhân 2 là cộng số đó với chính nó.");
-    if (tier >= 6) questions[4] = make(` ${Math.min(a,b)*2} ÷ 2 bằng bao nhiêu?`, String(Math.min(a,b)), [String(Math.min(a,b)+1), String(Math.max(1,Math.min(a,b)-1)), String(Math.min(a,b)*2)], "Chia 2 là tách thành hai phần bằng nhau.");
-    return questions;
-  }
-  if (subject === "vietnamese") {
-    const letter = LETTERS[(level - 1) % LETTERS.length]!;
-    const word = VI_WORDS[(level - 1) % VI_WORDS.length]!;
-    const nextLetter = LETTERS[level % LETTERS.length]!;
-    const questions: Question[] = [
+  } else if (subject === "vietnamese") {
+    const letter = pick(LETTERS);
+    const word = pick(VI_WORDS);
+    questions = [
       make("Chữ nào đứng đầu bảng chữ cái tiếng Việt?", "a", ["b", "c", "d"], "Chữ a đứng đầu bảng chữ cái tiếng Việt."),
-      make(`Chữ ${letter} là chữ gì?`, letter, [nextLetter, "m", "o"], "Hãy quan sát và nhận biết mặt chữ."),
-      make(`Từ nào có tiếng “${word}”?`, word, ["hoa", "mèo", "bút"], "Đọc chậm từng tiếng để nhận ra từ."),
+      make(`Đây là chữ gì: “${letter}”?`, letter, shuffle(LETTERS.filter(x => x !== letter)).slice(0, 3), "Quan sát hình dáng của chữ nhé."),
+      make(`Chọn từ “${word}” được viết đúng.`, word, shuffle(VI_WORDS.filter(x => x !== word)).slice(0, 3), "Bé đọc chậm từng tiếng để nhận ra từ."),
       make("Từ nào chỉ người?", "mẹ", ["bàn", "hoa", "bút"], "Mẹ là từ chỉ người."),
       make("Cuối câu hỏi thường có dấu gì?", "dấu hỏi (?)", ["dấu chấm (.)", "dấu phẩy (,)", "dấu chấm than (!)"], "Câu hỏi kết thúc bằng dấu hỏi.")
     ];
@@ -66,23 +75,30 @@ function makeQuestions(subject: Subject, level: number): Question[] {
     if (tier >= 4) questions[1] = make("Từ nào chỉ hoạt động?", "chạy", ["bông hoa", "màu đỏ", "hiền lành"], "Chạy là từ chỉ hoạt động.");
     if (tier >= 6) questions[2] = make("Từ trái nghĩa với “cao” là gì?", "thấp", ["dài", "to", "rộng"], "Cao và thấp là hai từ trái nghĩa.");
     if (tier >= 8) questions[3] = make("Trong câu “Lan đang đọc sách”, ai đọc sách?", "Lan", ["sách", "đang", "bạn Nam"], "Lan là người thực hiện hoạt động đọc.");
-    return questions;
+  } else {
+    const pair = pick(WORDS);
+    const other = pick(WORDS.filter(w => w[0] !== pair[0]));
+    const pool = WORDS.map(w => w[1]);
+    questions = [
+      make(`“${pair[0]}” nghĩa là gì?`, pair[1], pool, `${pair[0]} có nghĩa là ${pair[1]}.`),
+      make("“Hello” có nghĩa là gì?", "Xin chào", ["Tạm biệt", "Cảm ơn", "Xin lỗi"], "Hello dùng để chào hỏi."),
+      make("“Thank you” có nghĩa là gì?", "Cảm ơn", ["Xin chào", "Tạm biệt", "Xin lỗi"], "Thank you nghĩa là cảm ơn."),
+      make("Màu “red” là màu gì?", "Màu đỏ", ["Màu xanh", "Màu vàng", "Màu tím"], "Red nghĩa là màu đỏ."),
+      make(`Từ nào có nghĩa là “${other[1]}”?`, other[0], WORDS.filter(w => w[0] !== other[0]).slice(0, 3).map(w => w[0]), `${other[0]} nghĩa là ${other[1]}.`)
+    ];
+    if (tier >= 2) questions[1] = make("“Good morning” nghĩa là gì?", "Chào buổi sáng", ["Chúc ngủ ngon", "Tạm biệt", "Chào buổi tối"], "Good morning là lời chào buổi sáng.");
+    if (tier >= 4) questions[2] = make("Chọn câu đúng:", "I am a student.", ["I is a student.", "I are a student.", "I be a student."], "Với I, ta dùng am.");
+    if (tier >= 6) questions[3] = make("“I like apples” nghĩa là gì?", "Tôi thích táo", ["Tôi ăn bánh", "Tôi có một con mèo", "Tôi đi học"], "I like nghĩa là tôi thích.");
+    if (tier >= 8) questions[4] = make("Điền từ: She ___ happy.", "is", ["am", "are", "be"], "She đi với is.");
   }
-  const pair = WORDS[(level - 1) % WORDS.length]!;
-  const next = WORDS[level % WORDS.length]!;
-  const pool = WORDS.map(w => w[1]);
-  const questions: Question[] = [
-    make(`“${pair[0]}” nghĩa là gì?`, pair[1], pool, ` ${pair[0]} có nghĩa là ${pair[1]}.`),
-    make("“Hello” có nghĩa là gì?", "Xin chào", ["Tạm biệt", "Cảm ơn", "Xin lỗi"], "Hello dùng để chào hỏi."),
-    make("“Thank you” có nghĩa là gì?", "Cảm ơn", ["Xin chào", "Tạm biệt", "Xin lỗi"], "Thank you nghĩa là cảm ơn."),
-    make("Màu “red” là màu gì?", "Màu đỏ", ["Màu xanh", "Màu vàng", "Màu tím"], "Red nghĩa là màu đỏ."),
-    make(`Từ nào có nghĩa là “${next[1]}”?`, next[0], WORDS.filter(w => w[0] !== next[0]).slice(0,3).map(w => w[0]), `${next[0]} nghĩa là ${next[1]}.`)
-  ];
-  if (tier >= 2) questions[1] = make("“Good morning” nghĩa là gì?", "Chào buổi sáng", ["Chúc ngủ ngon", "Tạm biệt", "Chào buổi tối"], "Good morning là lời chào buổi sáng.");
-  if (tier >= 4) questions[2] = make("Chọn câu đúng:", "I am a student.", ["I is a student.", "I are a student.", "I be a student."], "Với I, ta dùng am.");
-  if (tier >= 6) questions[3] = make("“I like apples” nghĩa là gì?", "Tôi thích táo", ["Tôi ăn bánh", "Tôi có một con mèo", "Tôi đi học"], "I like nghĩa là tôi thích.");
-  if (tier >= 8) questions[4] = make("Điền từ: She ___ happy.", "is", ["am", "are", "be"], "She đi với is.");
-  return questions;
+  // Tránh lặp câu trong một bộ và ưu tiên câu chưa từng xuất hiện ở cấp này.
+  const unique = new Map<string, Question>();
+  for (const q of shuffle(questions)) if (!unique.has(q.prompt)) unique.set(q.prompt, q);
+  const fresh = [...unique.values()].filter(q => !seen.has(q.prompt));
+  const chosen = shuffle(fresh).slice(0, 5);
+  const fallback = shuffle([...unique.values()].filter(q => !chosen.some(c => c.prompt === q.prompt)));
+  while (chosen.length < 5 && fallback.length) chosen.push(fallback.pop()!);
+  return shuffle(chosen);
 }
 
 export const Route = createFileRoute("/_authenticated/hoc/$subject")({
@@ -95,18 +111,25 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const subject: Subject = rawSubject === "vietnamese" || rawSubject === "english" ? rawSubject : "math";
   const meta = SUBJECTS[subject];
   const [level, setLevel] = useState<number | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const seenByLevel = useRef(new Map<string, Set<string>>());
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
   const [earnedPoints, setEarnedPoints] = useState(0);
   const [savingPoints, setSavingPoints] = useState(false);
-  const questions = level ? makeQuestions(subject, level) : [];
   const question = questions[index];
   const answered = selected !== null;
   const correct = selected === question?.answer;
 
   function startLevel(value: number) {
+    const key = `${profile.grade}-${subject}-${value}`;
+    const seen = seenByLevel.current.get(key) ?? new Set<string>();
+    const nextSet = makeQuestions(subject, value, profile.grade, seen);
+    nextSet.forEach(q => seen.add(q.prompt));
+    seenByLevel.current.set(key, seen);
+    setQuestions(nextSet);
     setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
   }
   function chooseAnswer(choice: number) {
