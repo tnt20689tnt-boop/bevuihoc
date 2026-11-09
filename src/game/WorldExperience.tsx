@@ -80,6 +80,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
         roomId={roomId}
         fromRoom={fromRoom}
         avatar={profile.avatar}
+        profile={profile}
         touchRef={touchRef}
         onNearbyPortal={setNearbyPortal}
         onEnterPortal={enterPortal}
