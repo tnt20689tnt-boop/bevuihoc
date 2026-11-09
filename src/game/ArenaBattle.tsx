@@ -1,332 +1,160 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { generateQuestion, type Question, type Subject } from "./learningEngine";
 
-type Player = "p1" | "p2";
-type GameState = "idle" | "playing" | "finished";
-type Outcome = Player | "tie";
-
-type MatchRecord = {
-  id: string;
-  date: string;
-  grade: number;
-  winnerName: string;
-  winnerScore: number;
-  winnerTime: number;
-  loserName: string;
-  loserScore: number;
-  loserTime: number;
-  isTie: boolean;
+type Room = {
+  subject: Subject;
+  title: string;
+  subtitle: string;
+  emoji: string;
+  color: string;
+  board: string;
+  activities: string[];
 };
 
-const QUESTION_SECONDS = 10;
-const QUESTION_COUNT = 10;
+const ROOMS: Room[] = [
+  { subject: "math", title: "PHÒNG TOÁN HỌC", subtitle: "Khám phá những con số và thử thách tư duy", emoji: "➗", color: "from-sky-500 to-blue-700", board: "BẢNG CON SỐ", activities: ["Phép cộng – trừ", "Bảng nhân – chia", "Hình học & tư duy"] },
+  { subject: "vietnamese", title: "PHÒNG TIẾNG VIỆT", subtitle: "Làm quen chữ cái, từ ngữ và những câu chuyện", emoji: "📖", color: "from-emerald-500 to-green-700", board: "GÓC TIẾNG VIỆT", activities: ["Chính tả", "Từ đồng nghĩa – trái nghĩa", "Đọc hiểu & ngữ pháp"] },
+  { subject: "english", title: "PHÒNG TIẾNG ANH", subtitle: "Học từ vựng và mẫu câu tiếng Anh thật vui", emoji: "🔤", color: "from-orange-500 to-rose-600", board: "ENGLISH CORNER", activities: ["Từ vựng", "Mẫu câu cơ bản", "Đọc hiểu tiếng Anh"] },
+];
 
-function Contestant({ color, name, mood }: { color: string; name: string; mood: "happy" | "sad" | "ready" }) {
+type Props = { currentGrade: number; onExit?: () => void };
+
+export function ArenaBattle({ currentGrade, onExit }: Props) {
+  const [room, setRoom] = useState<Room | null>(null);
+  const [question, setQuestion] = useState<Question | null>(null);
+  const [score, setScore] = useState(0);
+  const [played, setPlayed] = useState(0);
+  const [selected, setSelected] = useState<string | null>(null);
+  const [showResult, setShowResult] = useState(false);
+
+  const enterRoom = (nextRoom: Room) => {
+    setRoom(nextRoom);
+    setScore(0);
+    setPlayed(0);
+    setSelected(null);
+    setShowResult(false);
+    setQuestion(generateQuestion(nextRoom.subject, currentGrade, 50));
+  };
+
+  const answer = (value: string) => {
+    if (!question || selected !== null) return;
+    setSelected(value);
+    setShowResult(true);
+    setPlayed((n) => n + 1);
+    if (value === question.correctAnswer) setScore((n) => n + 1);
+  };
+
+  const nextQuestion = () => {
+    if (!room) return;
+    setQuestion(generateQuestion(room.subject, currentGrade, 50));
+    setSelected(null);
+    setShowResult(false);
+  };
+
+  const backToRooms = () => {
+    setRoom(null);
+    setQuestion(null);
+    setSelected(null);
+    setShowResult(false);
+  };
+
+  const correct = !!question && selected === question.correctAnswer;
+
   return (
-    <div className="flex flex-col items-center">
-      <svg viewBox="0 0 100 125" className="h-28 w-24 drop-shadow-xl" role="img" aria-label={name}>
-        <path d="M20 48 Q17 9 50 9 Q83 9 80 48 L77 66 L23 66Z" fill="#4a2c2a" />
-        <circle cx="50" cy="53" r="29" fill="#fcd1ba" />
-        <circle cx="39" cy="49" r="3.5" fill="#202020" />
-        <circle cx="61" cy="49" r="3.5" fill="#202020" />
-        {mood === "happy" ? <path d="M39 64 Q50 77 61 64" stroke="#713f36" strokeWidth="3" fill="none" strokeLinecap="round" /> : mood === "sad" ? <path d="M39 70 Q50 59 61 70" stroke="#713f36" strokeWidth="3" fill="none" strokeLinecap="round" /> : <path d="M41 65 Q50 68 59 65" stroke="#713f36" strokeWidth="3" fill="none" strokeLinecap="round" />}
-        <path d="M24 88 Q50 75 76 88 L86 124 H14Z" fill={color} />
-        <path d="M25 94 L8 111 M75 94 L92 111" stroke="#fcd1ba" strokeWidth="9" strokeLinecap="round" />
-      </svg>
-      <span className="mt-1 rounded-full border border-white/20 bg-white/15 px-4 py-1 text-sm font-black text-white">{name}</span>
-    </div>
-  );
-}
-
-function Host() {
-  return (
-    <div className="flex flex-col items-center drop-shadow-lg">
-      <svg viewBox="0 0 100 145" className="h-28 w-20" aria-label="Người dẫn chương trình">
-        <path d="M26 51 Q23 20 50 20 Q77 20 74 51" fill="#252525" />
-        <circle cx="50" cy="53" r="24" fill="#f5c9ae" />
-        <circle cx="41" cy="52" r="2.5" /><circle cx="59" cy="52" r="2.5" />
-        <path d="M41 64 Q50 71 59 64" stroke="#713f36" strokeWidth="2.5" fill="none" />
-        <path d="M26 84 L74 84 L88 137 H12Z" fill="#be123c" />
-        <path d="M45 84 L50 103 L55 84" fill="white" />
-        <path d="M77 75 L85 70 L89 103" stroke="#d1d5db" strokeWidth="4" fill="none" />
-        <circle cx="86" cy="68" r="7" fill="#374151" />
-      </svg>
-      <span className="rounded-full border border-red-300 bg-red-600 px-4 py-1 text-xs font-black tracking-widest text-white">MC</span>
-    </div>
-  );
-}
-
-const CROWD_COLORS = ["#ef4444", "#3b82f6", "#f59e0b", "#10b981", "#8b5cf6", "#ec4899"];
-
-function Audience() {
-  return (
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-24 items-end justify-center gap-1 overflow-hidden opacity-80 sm:h-32">
-      {Array.from({ length: 28 }, (_, index) => (
-        <div key={index} className="flex shrink-0 animate-bounce flex-col items-center" style={{ animationDelay: `${(index % 7) * 0.13}s`, animationDuration: "1.8s" }}>
-          <span className="h-5 w-5 rounded-full bg-[#fcd1ba] sm:h-7 sm:w-7" />
-          <span className="h-8 w-7 rounded-t-lg sm:h-12 sm:w-10" style={{ backgroundColor: CROWD_COLORS[index % CROWD_COLORS.length] }} />
+    <main className="relative min-h-[calc(100dvh-5rem)] overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-950 via-slate-900 to-sky-950 p-4 text-white sm:p-7">
+      <div className="pointer-events-none absolute -left-20 top-20 h-64 w-64 rounded-full bg-sky-400/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-0 h-72 w-72 rounded-full bg-amber-300/10 blur-3xl" />
+      <header className="relative z-10 mb-6 flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <p className="text-xs font-black tracking-[.28em] text-amber-300">BÉ VUI HỌC • LỚP {currentGrade}</p>
+          <h1 className="mt-1 text-2xl font-black sm:text-3xl">🏆 ĐẤU TRƯỜNG TRI THỨC</h1>
+          <p className="mt-1 text-sm text-sky-100/80">{room ? room.title : "Chọn lớp học mà con muốn khám phá hôm nay!"}</p>
         </div>
-      ))}
-    </div>
-  );
-}
+        {room ? (
+          <button onClick={backToRooms} className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold hover:bg-white/20">← Chọn phòng khác</button>
+        ) : onExit ? (
+          <button onClick={onExit} className="rounded-full border border-white/25 bg-white/10 px-4 py-2 text-sm font-bold hover:bg-white/20">← Quay lại</button>
+        ) : null}
+      </header>
 
-type ArenaBattleProps = { currentGrade: number; onExit?: () => void };
-
-export function ArenaBattle({ currentGrade, onExit }: ArenaBattleProps) {
-  const [questions, setQuestions] = useState<Question[]>([]);
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(QUESTION_SECONDS);
-  const [gameState, setGameState] = useState<GameState>("idle");
-  const [p1Score, setP1Score] = useState(0);
-  const [p2Score, setP2Score] = useState(0);
-  const [p1Time, setP1Time] = useState(0);
-  const [p2Time, setP2Time] = useState(0);
-  const [p1Answer, setP1Answer] = useState<string | null>(null);
-  const [p2Answer, setP2Answer] = useState<string | null>(null);
-  const [expired, setExpired] = useState(false);
-  const [feedback, setFeedback] = useState("Hai thí sinh đã sẵn sàng chưa?");
-  const [leaderboard, setLeaderboard] = useState<MatchRecord[]>([]);
-  const startAt = useRef(0);
-  const answersRef = useRef<{ p1: string | null; p2: string | null }>({ p1: null, p2: null });
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const advanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const currentQuestion = questions[questionIndex];
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("arena_leaderboard");
-      const records: MatchRecord[] = saved ? JSON.parse(saved) : [];
-      setLeaderboard(records.filter((record) => record.grade === currentGrade).slice(0, 10));
-    } catch {
-      setLeaderboard([]);
-    }
-  }, [currentGrade]);
-
-  const stopTimers = useCallback(() => {
-    if (timerRef.current) clearInterval(timerRef.current);
-    if (advanceRef.current) clearTimeout(advanceRef.current);
-    timerRef.current = null;
-    advanceRef.current = null;
-  }, []);
-
-  const winner: Outcome = p1Score > p2Score ? "p1" : p2Score > p1Score ? "p2" : p1Time < p2Time ? "p1" : p2Time < p1Time ? "p2" : "tie";
-
-  const advanceQuestion = useCallback(() => {
-    stopTimers();
-    if (questionIndex >= questions.length - 1) {
-      setGameState("finished");
-      setFeedback("Trận đấu đã kết thúc!");
-      const outcome: Outcome =
-        p1Score > p2Score ? "p1" :
-        p2Score > p1Score ? "p2" :
-        p1Time < p2Time ? "p1" :
-        p2Time < p1Time ? "p2" : "tie";
-      const record: MatchRecord = {
-        id: `${Date.now()}`,
-        date: new Date().toLocaleDateString("vi-VN") + " " + new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
-        grade: currentGrade,
-        winnerName: outcome === "p1" ? "Bạn 1" : outcome === "p2" ? "Bạn 2" : "Hòa",
-        winnerScore: outcome === "p2" ? p2Score : p1Score,
-        winnerTime: outcome === "p2" ? p2Time : p1Time,
-        loserName: outcome === "p1" ? "Bạn 2" : "Bạn 1",
-        loserScore: outcome === "p1" ? p2Score : p1Score,
-        loserTime: outcome === "p1" ? p2Time : p1Time,
-        isTie: outcome === "tie",
-      };
-      try {
-        const all: MatchRecord[] = JSON.parse(localStorage.getItem("arena_leaderboard") || "[]");
-        const updated = [record, ...all].slice(0, 30);
-        localStorage.setItem("arena_leaderboard", JSON.stringify(updated));
-        setLeaderboard(updated.filter((item) => item.grade === currentGrade).slice(0, 10));
-      } catch {
-        setFeedback("Trận đấu xong nhưng chưa lưu được bảng thành tích trên thiết bị.");
-      }
-      return;
-    }
-    setQuestionIndex((index) => index + 1);
-  }, [questionIndex, questions.length, stopTimers, p1Score, p2Score, p1Time, p2Time, currentGrade]);
-
-  const beginQuestion = useCallback(() => {
-    answersRef.current = { p1: null, p2: null };
-    setP1Answer(null);
-    setP2Answer(null);
-    setExpired(false);
-    setTimeLeft(QUESTION_SECONDS);
-    startAt.current = Date.now();
-    setFeedback("Nhanh tay chọn đáp án chính xác!");
-    stopTimers();
-    timerRef.current = setInterval(() => {
-      const remaining = Math.max(0, QUESTION_SECONDS - Math.floor((Date.now() - startAt.current) / 1000));
-      setTimeLeft(remaining);
-      if (remaining <= 0) {
-        stopTimers();
-        setExpired(true);
-        setFeedback("Hết giờ! MC công bố đáp án.");
-        advanceRef.current = setTimeout(() => advanceQuestion(), 1400);
-      }
-    }, 150);
-  }, [advanceQuestion, stopTimers]);
-
-  useEffect(() => {
-    if (gameState === "playing" && currentQuestion) beginQuestion();
-    return stopTimers;
-  }, [gameState, questionIndex, currentQuestion, beginQuestion, stopTimers]);
-
-  useEffect(() => () => stopTimers(), [stopTimers]);
-
-  const startGame = () => {
-    stopTimers();
-    // Tự động luân phiên 3 môn: Toán → Tiếng Việt → Tiếng Anh.
-    // 10 câu sẽ có 4 câu Toán, 3 câu Tiếng Việt và 3 câu Tiếng Anh.
-    const subjects: Subject[] = ["math", "vietnamese", "english"];
-    const mixedQuestions = Array.from({ length: QUESTION_COUNT }, (_, index) =>
-      generateQuestion(subjects[index % subjects.length], currentGrade, 50)
-    );
-    setQuestions(mixedQuestions);
-    setQuestionIndex(0);
-    setP1Score(0);
-    setP2Score(0);
-    setP1Time(0);
-    setP2Time(0);
-    answersRef.current = { p1: null, p2: null };
-    setP1Answer(null);
-    setP2Answer(null);
-    setGameState("playing");
-  };
-
-  const handleAnswer = (player: Player, answer: string) => {
-    if (gameState !== "playing" || expired || !currentQuestion || answersRef.current[player]) return;
-    const elapsed = Math.min(QUESTION_SECONDS, (Date.now() - startAt.current) / 1000);
-    answersRef.current[player] = answer;
-    if (player === "p1") setP1Answer(answer);
-    else setP2Answer(answer);
-
-    if (answer === currentQuestion.correctAnswer) {
-      if (player === "p1") {
-        setP1Score((score) => score + 1);
-        setP1Time((time) => time + elapsed);
-      } else {
-        setP2Score((score) => score + 1);
-        setP2Time((time) => time + elapsed);
-      }
-      setFeedback(player === "p1" ? "Bạn 1 trả lời chính xác!" : "Bạn 2 trả lời chính xác!");
-    } else {
-      setFeedback(player === "p1" ? "Bạn 1 chưa chính xác!" : "Bạn 2 chưa chính xác!");
-    }
-
-    const other = player === "p1" ? "p2" : "p1";
-    if (answersRef.current[other] !== null) {
-      stopTimers();
-      advanceRef.current = setTimeout(() => advanceQuestion(), 1300);
-    }
-  };
-
-  const getMood = (player: Player): "happy" | "sad" | "ready" => {
-    if (gameState !== "finished") return "ready";
-    if (winner === "tie") return "ready";
-    return winner === player ? "happy" : "sad";
-  };
-
-  return (
-    <main className="relative flex min-h-[calc(100dvh-5rem)] w-full flex-col overflow-hidden rounded-2xl bg-[#090d25] font-sans text-white">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[420px] bg-[radial-gradient(ellipse_at_top,rgba(250,204,21,0.28),transparent_65%)]" />
-      <div className="absolute inset-x-0 top-0 h-28 border-b-4 border-yellow-500/40 bg-gradient-to-b from-indigo-950 to-transparent" />
-      <div className="absolute left-1/2 top-24 h-64 w-[min(90%,800px)] -translate-x-1/2 rounded-full bg-amber-300/10 blur-3xl" />
-      <div className="relative z-10 flex items-center justify-between gap-2 px-4 py-3 sm:px-8">
-        <div><p className="text-xs font-bold tracking-[0.25em] text-yellow-300">BÉ VUI HỌC</p><h1 className="text-lg font-black sm:text-2xl">ĐẤU TRƯỜNG TRÍ TUỆ</h1></div>
-        <div className="rounded-full border border-yellow-400/40 bg-black/30 px-3 py-1 text-xs font-bold text-yellow-200">2 THÍ SINH • 10 CÂU</div>
-      </div>
-
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col items-center justify-between gap-4 px-3 pb-28 pt-1 sm:px-6 sm:pb-32">
-        <div className="flex w-full items-center justify-center gap-4 sm:gap-10">
-          <div className="hidden sm:block"><Contestant color="#be123c" name="MC" mood="ready" /></div>
-          <div className="text-center"><Host /><p className="mt-1 text-sm font-bold text-amber-200">Sân khấu đang nóng lên!</p></div>
-          <div className="hidden sm:block"><div className="rounded-2xl border border-yellow-400/30 bg-indigo-950/70 px-4 py-3 text-center"><div className="text-xs text-indigo-200">ĐANG THI ĐẤU</div><div className="text-2xl font-black text-yellow-300">{gameState === "playing" ? `${questionIndex + 1}/10` : "★"}</div></div></div>
-        </div>
-
-        {gameState === "idle" && (
-          <section className="z-20 my-4 w-full max-w-xl rounded-3xl border border-yellow-300/40 bg-indigo-950/90 p-5 text-center shadow-2xl sm:p-8">
-            <div className="mb-3 text-5xl">🏆</div><h2 className="text-2xl font-black text-yellow-300 sm:text-3xl">Sẵn sàng tranh tài?</h2>
-            <p className="my-3 text-sm text-indigo-100">Hai thí sinh cùng trả lời một bộ câu hỏi. Mỗi câu có 10 giây, đúng được 1 điểm.</p>
-            <div className="mb-3 rounded-full border border-yellow-400/50 bg-yellow-400/10 px-4 py-2 text-sm font-black text-yellow-200">🔥 ĐANG THI ĐẤU: LỚP {currentGrade}</div>
-            <div className="mb-3 flex flex-wrap justify-center gap-2 text-xs font-bold"><span className="rounded-full bg-blue-500/20 px-3 py-1 text-blue-200">➗ Toán</span><span className="rounded-full bg-emerald-500/20 px-3 py-1 text-emerald-200">📖 Tiếng Việt</span><span className="rounded-full bg-orange-500/20 px-3 py-1 text-orange-200">🔤 Tiếng Anh</span></div>
-            <p className="text-xs text-indigo-200">10 câu hỏi tự động luân phiên cả 3 môn • Không cần chọn môn</p>
-            <button onClick={startGame} className="mt-5 w-full rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 px-8 py-3 text-lg font-black text-slate-950 shadow-lg transition hover:scale-[1.02]">BẮT ĐẦU THI ĐẤU</button>
-            {onExit && <button onClick={onExit} className="mt-3 text-sm font-bold text-indigo-200 underline hover:text-white">← Quay lại</button>}
-            <div className="mt-5 rounded-2xl border border-white/15 bg-black/20 p-4 text-left">
-              <h3 className="mb-3 text-center font-black text-yellow-200">🏆 BẢNG THÀNH TÍCH LỚP {currentGrade}</h3>
-              {leaderboard.length === 0 ? <p className="py-3 text-center text-sm text-indigo-200">Chưa có trận đấu nào ở lớp này. Hãy là người đầu tiên!</p> : <div className="max-h-48 space-y-2 overflow-y-auto">
-                {leaderboard.map((record, index) => <div key={record.id} className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs">
-                  <div className="mb-1 flex justify-between text-indigo-200"><span>Trận gần đây #{index + 1}</span><span>{record.date}</span></div>
-                  {record.isTie ? <p className="text-center font-bold text-blue-200">🤝 Hòa {record.winnerScore} - {record.loserScore}</p> : <div className="flex justify-between gap-2"><span className="font-bold text-emerald-300">🏆 {record.winnerName}: {record.winnerScore} điểm</span><span className="text-indigo-100">{record.loserName}: {record.loserScore}</span></div>}
-                </div>)}
-              </div>}
-            </div>
-          </section>
-        )}
-
-        {gameState === "playing" && currentQuestion && (
-          <section className="z-20 w-full max-w-4xl rounded-3xl border border-white/20 bg-slate-950/80 p-4 text-center shadow-2xl backdrop-blur-md sm:p-6">
-            <div className="mb-3 flex items-center justify-between text-xs font-bold text-indigo-100 sm:text-sm">
-              <span>LỚP {currentGrade} • CÂU {questionIndex + 1} / {questions.length}</span><span className="rounded-full bg-white/10 px-3 py-1">{currentQuestion.subject === "math" ? "➗ TOÁN" : currentQuestion.subject === "vietnamese" ? "📖 TIẾNG VIỆT" : "🔤 TIẾNG ANH"}</span>
-              <span className={timeLeft <= 3 ? "animate-pulse text-red-400" : "text-yellow-300"}>⏱ {timeLeft} GIÂY</span>
-            </div>
-            <div className="mx-auto mb-3 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-yellow-300 transition-all" style={{ width: `${(timeLeft / QUESTION_SECONDS) * 100}%` }} /></div>
-            <h2 className="mb-4 text-xl font-black leading-snug sm:text-3xl">{currentQuestion.question}</h2>
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              {currentQuestion.options.map((option, index) => {
-                const selectedByP1 = p1Answer === option;
-                const selectedByP2 = p2Answer === option;
-                const revealed = expired || p1Answer !== null && p2Answer !== null;
-                const correct = revealed && option === currentQuestion.correctAnswer;
-                return <div key={`${currentQuestion.id}-${index}`} className={`rounded-xl border-2 px-2 py-3 text-sm font-bold sm:px-4 sm:py-4 sm:text-lg ${correct ? "border-emerald-300 bg-emerald-500 text-white" : "border-white/15 bg-white/5 text-white"} ${selectedByP1 ? "ring-2 ring-blue-400" : ""} ${selectedByP2 ? "ring-2 ring-pink-400" : ""}`}>
-                  <span className="mr-2 text-yellow-300">{String.fromCharCode(65 + index)}.</span>{option}
-                  <div className="mt-1 flex justify-center gap-1">{selectedByP1 && <span className="rounded bg-blue-600 px-2 text-[10px]">BẠN 1</span>}{selectedByP2 && <span className="rounded bg-pink-600 px-2 text-[10px]">BẠN 2</span>}</div>
-                </div>;
-              })}
-            </div>
-            <p className="mt-3 min-h-5 text-sm font-bold text-yellow-200">{feedback}</p>
-          </section>
-        )}
-
-        <div className="z-20 grid w-full max-w-4xl grid-cols-2 items-end gap-3 sm:gap-12">
-          {(["p1", "p2"] as Player[]).map((player) => {
-            const isP1 = player === "p1";
-            const answer = isP1 ? p1Answer : p2Answer;
-            const score = isP1 ? p1Score : p2Score;
-            const color = isP1 ? "#2563eb" : "#db2777";
-            return <div key={player} className="flex flex-col items-center">
-              <div className={`mb-2 rounded-full border px-4 py-1 text-sm font-black shadow-lg sm:px-6 sm:py-2 sm:text-lg ${isP1 ? "border-blue-300 bg-blue-700" : "border-pink-300 bg-pink-700"}`}>{isP1 ? "BẠN 1" : "BẠN 2"} • {score} điểm</div>
-              <Contestant color={color} name={isP1 ? "Thí sinh xanh" : "Thí sinh hồng"} mood={getMood(player)} />
-              <div className={`mt-2 grid w-full max-w-[230px] grid-cols-4 gap-1 rounded-t-2xl border-x-4 border-t-4 p-2 shadow-2xl sm:gap-2 sm:p-3 ${isP1 ? "border-blue-300 bg-gradient-to-b from-blue-800 to-blue-950" : "border-pink-300 bg-gradient-to-b from-pink-800 to-pink-950"}`}>
-                {(currentQuestion?.options ?? ["A", "B", "C", "D"]).map((option, index) => <button key={index} onClick={() => handleAnswer(player, option)} disabled={gameState !== "playing" || !!answer || expired} className={`aspect-square rounded-lg text-sm font-black transition sm:text-lg ${answer === option ? "bg-yellow-300 text-slate-950" : isP1 ? "bg-blue-500/70 text-white hover:bg-blue-400" : "bg-pink-500/70 text-white hover:bg-pink-400"} disabled:cursor-not-allowed disabled:opacity-60`}>{String.fromCharCode(65 + index)}</button>)}
+      {!room ? (
+        <section className="relative z-10">
+          <div className="mx-auto mb-7 max-w-2xl text-center">
+            <div className="mb-3 text-6xl">🏫</div>
+            <h2 className="text-xl font-black text-amber-200 sm:text-2xl">NGÔI TRƯỜNG TRI THỨC</h2>
+            <p className="mt-2 text-sm text-sky-100">Ba cánh cửa đang chờ con. Hãy chọn một phòng để bước vào lớp và bắt đầu thử thách nhé!</p>
+          </div>
+          <div className="mx-auto grid max-w-5xl gap-5 md:grid-cols-3">
+            {ROOMS.map((item) => (
+              <button key={item.subject} onClick={() => enterRoom(item)} className="group overflow-hidden rounded-3xl border-2 border-white/20 bg-white/10 text-left shadow-2xl transition hover:-translate-y-1 hover:border-amber-300/80 hover:bg-white/15">
+                <div className={`relative flex h-40 items-center justify-center bg-gradient-to-br ${item.color}`}>
+                  <div className="absolute inset-x-5 top-5 h-2 rounded-full bg-white/25" />
+                  <div className="absolute bottom-0 left-5 right-5 h-5 rounded-t-xl border-x-4 border-t-4 border-amber-100/70 bg-amber-900/30" />
+                  <span className="text-7xl drop-shadow-lg transition group-hover:scale-110">{item.emoji}</span>
+                  <span className="absolute right-4 top-4 rounded-full bg-black/20 px-3 py-1 text-xs font-black">LỚP {currentGrade}</span>
+                </div>
+                <div className="p-5">
+                  <h3 className="text-lg font-black text-amber-200">{item.title}</h3>
+                  <p className="mt-2 min-h-10 text-sm text-sky-100/90">{item.subtitle}</p>
+                  <div className="mt-4 space-y-2">
+                    {item.activities.map((activity) => <div key={activity} className="flex items-center gap-2 text-xs font-semibold text-white/80"><span className="text-emerald-300">✓</span>{activity}</div>)}
+                  </div>
+                  <div className="mt-5 rounded-xl bg-white/15 px-4 py-3 text-center text-sm font-black group-hover:bg-amber-300 group-hover:text-slate-950">VÀO LỚP HỌC →</div>
+                </div>
+              </button>
+            ))}
+          </div>
+          <p className="mt-7 text-center text-xs text-sky-100/60">Mỗi phòng có bộ câu hỏi riêng, tự điều chỉnh theo khối lớp của con.</p>
+        </section>
+      ) : (
+        <section className="relative z-10 mx-auto max-w-3xl">
+          <div className={`overflow-hidden rounded-3xl border-2 border-white/20 bg-gradient-to-br ${room.color} shadow-2xl`}>
+            <div className="relative px-5 py-6 text-center sm:px-8">
+              <div className="absolute inset-x-8 top-4 h-2 rounded-full bg-white/20" />
+              <div className="mx-auto mt-4 max-w-xl rounded-2xl border-8 border-amber-900/70 bg-emerald-950 px-4 py-5 shadow-inner">
+                <p className="text-xs font-black tracking-widest text-amber-200">{room.board}</p>
+                <div className="mt-3 text-4xl">{room.emoji}</div>
+                <p className="mt-2 text-lg font-black text-white">{room.title}</p>
               </div>
-              <p className="mt-1 text-[10px] text-indigo-200 sm:text-xs">{answer ? "Đã khóa đáp án" : "Chọn A • B • C • D"}</p>
-            </div>;
-          })}
-        </div>
-
-        {gameState === "finished" && (
-          <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/85 p-3 backdrop-blur-md">
-            <div className="w-full max-w-xl rounded-3xl border-2 border-yellow-400 bg-gradient-to-b from-indigo-900 to-slate-950 p-5 text-center shadow-2xl sm:p-8">
-              <div className="text-5xl">🏆</div><h2 className="my-2 text-3xl font-black text-yellow-300">KẾT QUẢ CHUNG CUỘC</h2>
-              <p className="mb-5 text-sm text-indigo-100">{winner === "tie" ? "Hai thí sinh hòa nhau!" : winner === "p1" ? "Bạn 1 là nhà vô địch!" : "Bạn 2 là nhà vô địch!"}</p>
-              <div className="grid grid-cols-2 gap-3">
-                {(["p1", "p2"] as Player[]).map((player) => {
-                  const win = winner === player;
-                  const score = player === "p1" ? p1Score : p2Score;
-                  const seconds = player === "p1" ? p1Time : p2Time;
-                  return <div key={player} className={`rounded-2xl border p-3 ${win ? "border-emerald-300 bg-emerald-500/15" : "border-white/20 bg-white/5"}`}><div className="text-4xl">{winner === "tie" ? "🤝" : win ? "😄" : "😢"}</div><div className="font-black">{player === "p1" ? "BẠN 1" : "BẠN 2"}</div><div className="mt-1 text-lg font-black text-yellow-200">{score} điểm</div><div className="text-xs text-indigo-200">Thời gian đúng: {seconds.toFixed(1)} giây</div>{win && <div className="mt-2 text-xs font-black text-emerald-300">CHIẾN THẮNG</div>}</div>;
-                })}
+              <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs font-bold">
+                <span className="rounded-full bg-black/20 px-3 py-2">🎒 Lớp {currentGrade}</span>
+                <span className="rounded-full bg-black/20 px-3 py-2">⭐ {score} điểm</span>
+                <span className="rounded-full bg-black/20 px-3 py-2">📝 {played} câu đã làm</span>
               </div>
-              <p className="mt-4 text-xs text-indigo-200">Nếu bằng điểm, thí sinh có tổng thời gian trả lời đúng ngắn hơn sẽ thắng.</p>
-              <button onClick={() => { setGameState("idle"); setQuestions([]); }} className="mt-5 rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 px-8 py-3 font-black text-slate-950">THI ĐẤU LẠI</button>
+            </div>
+            <div className="bg-slate-950/95 p-4 text-white sm:p-7">
+              {question && (
+                <>
+                  <div className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-sky-200">
+                    <span>GIỜ HỌC • LUYỆN TẬP</span><span>CÂU {played + (showResult ? 0 : 1)}</span>
+                  </div>
+                  <h2 className="mb-6 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                    {question.options.map((option, index) => {
+                      const isCorrect = showResult && option === question.correctAnswer;
+                      const isWrong = showResult && selected === option && !isCorrect;
+                      return <button key={`${question.id}-${index}`} onClick={() => answer(option)} disabled={showResult} className={`rounded-2xl border-2 px-4 py-4 text-left font-bold transition ${isCorrect ? "border-emerald-300 bg-emerald-500 text-white" : isWrong ? "border-rose-300 bg-rose-500 text-white" : "border-white/15 bg-white/5 hover:border-amber-300 hover:bg-white/10"} disabled:cursor-default`}>
+                        <span className="mr-3 inline-grid h-8 w-8 place-items-center rounded-lg bg-white/15">{String.fromCharCode(65 + index)}</span>{option}
+                      </button>;
+                    })}
+                  </div>
+                  {showResult && (
+                    <div className={`mt-5 rounded-2xl p-4 text-center ${correct ? "bg-emerald-500/15 text-emerald-200" : "bg-amber-500/15 text-amber-100"}`}>
+                      <p className="text-lg font-black">{correct ? "🎉 Chính xác! Con giỏi lắm!" : "💪 Cố gắng nhé! Mình cùng học tiếp nào."}</p>
+                      <p className="mt-2 text-sm">{question.explanation}</p>
+                      <button onClick={nextQuestion} className="mt-4 rounded-full bg-amber-300 px-7 py-3 font-black text-slate-950 shadow-lg hover:bg-amber-200">CÂU TIẾP THEO →</button>
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           </div>
-        )}
-      </div>
-      <Audience />
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <button onClick={backToRooms} className="rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-bold hover:bg-white/20">🏫 Về sảnh chọn phòng</button>
+            <button onClick={() => enterRoom(room)} className="rounded-full border border-white/25 bg-white/10 px-5 py-3 text-sm font-bold hover:bg-white/20">↻ Học lại phòng này</button>
+          </div>
+        </section>
+      )}
     </main>
   );
 }
