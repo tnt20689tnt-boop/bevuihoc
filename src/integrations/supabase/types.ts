@@ -554,6 +554,10 @@ export type Database = {
         Args: { p_note: string; p_points: number; p_user: string }
         Returns: undefined
       }
+      award_lesson_points: {
+        Args: { p_note?: string }
+        Returns: Json
+      }
       admin_exists: { Args: never; Returns: boolean }
       admin_players: {
         Args: never
