@@ -1,16 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComingSoon } from "@/components/ComingSoon";
+import { GameShell } from "@/components/AppShell";
+import { FootballGame } from "@/game/FootballGame";
 
 export const Route = createFileRoute("/_authenticated/san-bong")({
   head: () => ({
     meta: [
-      { title: "Sân bóng Toán học – Thế Giới Học Tập Vui Nhộn" },
-      { name: "description", content: "Sân bóng Toán học trong Thế Giới Học Tập Vui Nhộn." },
-      { property: "og:title", content: "Sân bóng Toán học – Thế Giới Học Tập Vui Nhộn" },
-      { property: "og:description", content: "Sân bóng Toán học trong Thế Giới Học Tập Vui Nhộn." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { title: "Sút bóng ghi bàn – Bé Học Vui" },
+      { name: "description", content: "Trò chơi sút bóng penalty 2D dành cho bé." },
+      { property: "og:title", content: "Sút bóng ghi bàn – Bé Học Vui" },
+      { property: "og:description", content: "Chọn góc sút, vượt qua thủ môn và ghi bàn." },
     ],
   }),
-  component: () => <ComingSoon icon="⚽" title="Sân bóng Toán học" />,
+  component: () => <GameShell>{(profile) => <FootballGame profile={profile} />}</GameShell>,
 });
