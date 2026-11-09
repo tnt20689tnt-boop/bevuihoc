@@ -33,7 +33,7 @@ export function SoundToggle({ className }: { className?: string }) {
   );
 }
 
-export function TopBar({ profile }: { profile?: Profile | null }) {
+export function TopBar({ profile }: { profile?: Profile | null | undefined }) {
   const { data: isAdmin } = useIsAdmin();
   const qc = useQueryClient();
   const navigate = useNavigate();
@@ -152,4 +152,3 @@ export function PageTitle({ icon, title, subtitle, right }: { icon: string; titl
   );
 }
 
-export { LogOut };

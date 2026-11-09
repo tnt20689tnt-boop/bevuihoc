@@ -83,8 +83,9 @@ export const sfx = {
     const notes = [523, 523, 523, 659, 784, 659, 784, 1046];
     const times = [0, 0.15, 0.3, 0.45, 0.75, 0.95, 1.1, 1.35];
     notes.forEach((f, i) => {
-      tone(f, times[i], 0.35, "triangle", 0.16);
-      tone(f / 2, times[i], 0.35, "sine", 0.08);
+      const at = times[i] ?? 0;
+      tone(f, at, 0.35, "triangle", 0.16);
+      tone(f / 2, at, 0.35, "sine", 0.08);
     });
     noise(1.35, 1.2, 0.12);
   },
