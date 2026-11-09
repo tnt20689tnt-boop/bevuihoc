@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
+import { CampusArchitecture } from "@/game/CampusArchitecture";
 import {
   ROOMS,
   type Activity,
@@ -129,7 +130,7 @@ function PlazaDecor() {
   ];
   return (
     <group>
-      <Fountain />
+      <CampusArchitecture portals={ROOMS.plaza.portals} />
       {trees.map(([x, z, scale], i) => (
         <Tree key={i} x={x} z={z} scale={scale} />
       ))}
@@ -138,39 +139,7 @@ function PlazaDecor() {
       <Bench position={[0, 0, -10]} rotation={Math.PI} />
       <FlowerBed position={[-4.7, 0, -5]} />
       <FlowerBed position={[4.7, 0, -5]} />
-      <WelcomeArch />
       <FloatingBubbles />
-    </group>
-  );
-}
-
-function Fountain() {
-  return (
-    <group position={[0, 0, 0]}>
-      <mesh position={[0, 0.18, 0]} receiveShadow castShadow>
-        <cylinderGeometry args={[2.45, 2.75, 0.35, 48]} />
-        <meshStandardMaterial color="#f6dca9" roughness={0.7} />
-      </mesh>
-      <mesh position={[0, 0.39, 0]}>
-        <cylinderGeometry args={[1.95, 2.1, 0.14, 48]} />
-        <meshStandardMaterial color="#86c8cf" roughness={0.42} />
-      </mesh>
-      <mesh position={[0, 0.55, 0]}>
-        <cylinderGeometry args={[1.65, 1.8, 0.16, 48]} />
-        <meshStandardMaterial color="#5cc8d7" roughness={0.28} metalness={0.12} />
-      </mesh>
-      <mesh position={[0, 1.1, 0]} castShadow>
-        <cylinderGeometry args={[0.38, 0.62, 1.0, 20]} />
-        <meshStandardMaterial color="#f7c858" roughness={0.55} />
-      </mesh>
-      <mesh position={[0, 1.72, 0]}>
-        <sphereGeometry args={[0.34, 24, 16]} />
-        <meshStandardMaterial color={palette.water} emissive="#2aaebc" emissiveIntensity={0.2} />
-      </mesh>
-      <mesh position={[0, 2.02, 0]}>
-        <sphereGeometry args={[0.13, 16, 12]} />
-        <meshStandardMaterial color="#e8fbff" emissive="#a7f5ff" emissiveIntensity={0.4} />
-      </mesh>
     </group>
   );
 }
@@ -252,40 +221,6 @@ function FlowerBed({ position }: { position: [number, number, number] }) {
           </mesh>
         );
       })}
-    </group>
-  );
-}
-
-function WelcomeArch() {
-  return (
-    <group position={[0, 0, 20]}>
-      <mesh position={[-2.4, 1.9, 0]} castShadow>
-        <boxGeometry args={[0.45, 3.8, 0.6]} />
-        <meshStandardMaterial color="#f1a65b" roughness={0.75} />
-      </mesh>
-      <mesh position={[2.4, 1.9, 0]} castShadow>
-        <boxGeometry args={[0.45, 3.8, 0.6]} />
-        <meshStandardMaterial color="#f1a65b" roughness={0.75} />
-      </mesh>
-      <mesh position={[0, 3.75, 0]} castShadow>
-        <boxGeometry args={[5.2, 0.55, 0.7]} />
-        <meshStandardMaterial color="#ef8d48" roughness={0.72} />
-      </mesh>
-      <Html position={[0, 3.75, 0.42]} center distanceFactor={11}>
-        <div
-          style={{
-            whiteSpace: "nowrap",
-            borderRadius: 16,
-            padding: "8px 16px",
-            color: "#ffffff",
-            background: "#e67f39",
-            font: "800 18px 'Baloo 2', sans-serif",
-            boxShadow: "0 5px 0 #a9552d",
-          }}
-        >
-          CỔNG THẾ GIỚI HỌC VUI
-        </div>
-      </Html>
     </group>
   );
 }

@@ -57,14 +57,17 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ground: ["#f3e3c3", "#e9d2a6"],
     sky: "#9fd8ff",
     blurb: "Nơi các bạn gặp nhau, chào hỏi và chọn phòng học.",
-    radius: 22,
+    radius: 29,
     portals: PLAZA_PORTALS,
     activities: [
       { x: -6, z: 6, label: "Đấu trường thi đua", icon: "⚔️", to: "/thi-dau" },
       { x: 6, z: 6, label: "Bảng xếp hạng", icon: "🏆", to: "/bang-xep-hang" },
       { x: 0, z: 9.5, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
     ],
-    obstacles: [{ x: 0, z: 0, r: 3.1 }],
+    obstacles: [
+      { x: 0, z: 0, r: 3.1 },
+      ...PLAZA_PORTALS.map((portal) => ({ x: portal.x * 1.28, z: portal.z * 1.28, r: 3.35 })),
+    ],
   },
   math: {
     id: "math",

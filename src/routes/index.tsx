@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import heroImg from "@/assets/hero-world.jpg";
+import heroImg from "@/assets/campus-hero.webp";
 import { GoogleButton } from "@/components/GoogleButton";
 import { useSession } from "@/hooks/use-player";
 import { ROOMS } from "@/game/rooms";
@@ -8,16 +8,17 @@ import { Button } from "@/components/ui/button";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Thế Giới Học Tập Vui Nhộn – Học mà chơi cho bé lớp 1–5" },
+      { title: "Thế Giới Học Vui – Khuôn viên 3D cho bé lớp 1–5" },
       {
         name: "description",
         content:
-          "Thế giới 3D trực tuyến: bé chọn nhân vật, gặp bạn bè, học Toán, Tiếng Việt, Tiếng Anh, sút bóng và thi đua bảng xếp hạng.",
+          "Bước qua cổng trường 3D, bé khám phá phòng Toán, Tiếng Việt, Tiếng Anh và các khu vui chơi an toàn.",
       },
-      { property: "og:title", content: "Thế Giới Học Tập Vui Nhộn" },
+      { property: "og:title", content: "Thế Giới Học Vui – Khuôn viên 3D" },
       {
         property: "og:description",
-        content: "Bé học Toán, Tiếng Việt, Tiếng Anh cùng bạn bè trong thế giới 3D đáng yêu.",
+        content:
+          "Khám phá sân trường 3D đầy màu sắc, học ba môn và vui chơi trong không gian an toàn.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -26,7 +27,9 @@ export const Route = createFileRoute("/")({
   component: Landing,
 });
 
-const ROOM_CARDS = (["math", "vietnamese", "english", "girls", "boys"] as const).map((id) => ROOMS[id]);
+const ROOM_CARDS = (["math", "vietnamese", "english", "girls", "boys"] as const).map(
+  (id) => ROOMS[id],
+);
 
 function Landing() {
   const session = useSession();
@@ -34,7 +37,9 @@ function Landing() {
     <div className="min-h-screen bg-gradient-sky">
       <header className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <div className="flex items-center gap-2">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-sunny text-2xl shadow-chunky">🌈</span>
+          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-gradient-sunny text-2xl shadow-chunky">
+            🌈
+          </span>
           <span className="font-display text-xl font-extrabold text-foreground">
             Thế Giới <span className="text-primary">Học Vui</span>
           </span>
@@ -61,7 +66,8 @@ function Landing() {
             <span className="text-primary">Vui Nhộn</span>
           </h1>
           <p className="mt-4 max-w-md text-lg text-muted-foreground">
-            Chọn nhân vật, gặp bạn bè trong quảng trường 3D, rồi cùng học Toán, Tiếng Việt, Tiếng Anh — mỗi câu đúng là một ngôi sao!
+            Bước qua cổng trường, chọn một tòa nhà để khám phá. Mỗi câu Toán, Tiếng Việt hay Tiếng
+            Anh đúng sẽ giúp bé gom thêm sao!
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             {session ? (
@@ -74,14 +80,15 @@ function Landing() {
           </div>
           {!session && (
             <p className="mt-3 max-w-sm text-sm text-muted-foreground">
-              Phụ huynh đăng nhập bằng tài khoản Google để tạo nhân vật cho bé. Bé dùng tên nhân vật, không hiển thị email hay tên thật.
+              Phụ huynh đăng nhập bằng tài khoản Google để tạo nhân vật cho bé. Bé dùng tên nhân
+              vật, không hiển thị email hay tên thật.
             </p>
           )}
         </div>
         <div className="relative">
           <img
             src={heroImg}
-            alt="Các bạn nhỏ vẫy tay trong quảng trường học tập đầy màu sắc"
+            alt="Hai bạn nhỏ vẫy tay giữa khuôn viên trường học 3D với các tòa nhà nhiều màu sắc"
             width={1600}
             height={912}
             className="w-full rounded-[2rem] border-4 border-card shadow-soft"
@@ -93,11 +100,20 @@ function Landing() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-14">
-        <h2 className="text-center text-3xl font-extrabold text-foreground">5 phòng phiêu lưu</h2>
+        <h2 className="text-center text-3xl font-extrabold text-foreground">
+          5 khu khám phá trong sân trường
+        </h2>
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {ROOM_CARDS.map((r) => (
             <div key={r.id} className="toy-card overflow-hidden">
-              <img src={r.image} alt={r.name} loading="lazy" width={816} height={816} className="aspect-square w-full object-cover" />
+              <img
+                src={r.image}
+                alt={r.name}
+                loading="lazy"
+                width={816}
+                height={816}
+                className="aspect-square w-full object-cover"
+              />
               <div className="p-3">
                 <h3 className="font-display text-lg font-bold">
                   {r.emoji} {r.short}
@@ -111,9 +127,21 @@ function Landing() {
 
       <section className="mx-auto grid max-w-6xl gap-4 px-4 pb-16 sm:grid-cols-3">
         {[
-          ["🧑‍🤝‍🧑", "Chơi cùng bạn bè", "Nhìn thấy nhau, vẫy tay, chúc mừng nhau bằng câu chào có sẵn — không có trò chuyện tự do."],
-          ["🏆", "Bảng xếp hạng thật", "Điểm được máy chủ kiểm tra. Xếp hạng theo ngày, tuần, tháng và từng lớp."],
-          ["👑", "Sảnh vinh danh", "Top 3 mỗi kỳ được đứng trên bục vinh quang với pháo hoa rực rỡ."],
+          [
+            "🧑‍🤝‍🧑",
+            "Chơi cùng bạn bè",
+            "Nhìn thấy nhau, vẫy tay, chúc mừng nhau bằng câu chào có sẵn — không có trò chuyện tự do.",
+          ],
+          [
+            "🏆",
+            "Bảng xếp hạng thật",
+            "Điểm được máy chủ kiểm tra. Xếp hạng theo ngày, tuần, tháng và từng lớp.",
+          ],
+          [
+            "👑",
+            "Sảnh vinh danh",
+            "Top 3 mỗi kỳ được đứng trên bục vinh quang với pháo hoa rực rỡ.",
+          ],
         ].map(([icon, t, d]) => (
           <div key={t} className="toy-card p-5">
             <div className="text-4xl">{icon}</div>
