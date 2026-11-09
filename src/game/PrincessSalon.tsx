@@ -69,30 +69,63 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
                   <div className="absolute -left-4 top-12 z-0 h-56 w-20 rounded-[50%] bg-[#8b5a45]" style={{ background: makeup.hair }} />
                   <div className="absolute -right-4 top-12 z-0 h-56 w-20 rounded-[50%] bg-[#8b5a45]" style={{ background: makeup.hair }} />
                   <div className="relative z-10">
-                    <svg viewBox="0 0 300 350" className="h-[340px] w-[290px] max-w-[78vw]" role="img" aria-label="Gương mặt công chúa anime đang được trang điểm">
+                    <svg viewBox="0 0 360 430" className="h-[390px] w-[330px] max-w-[82vw] drop-shadow-[0_14px_18px_#8b567344]" role="img" aria-label="Công chúa anime với mái tóc dài và đôi mắt long lanh">
                       <defs>
-                        <linearGradient id="princessSkin" x2="0" y2="1"><stop stopColor="#ffe8d9"/><stop offset="1" stopColor="#f6c9b8"/></linearGradient>
-                        <linearGradient id="princessHair" x2="1" y2="1"><stop stopColor={makeup.hair}/><stop offset="1" stopColor="#35223d"/></linearGradient>
+                        <linearGradient id="pSkin" x1="0" y1="0" x2="0.8" y2="1"><stop stopColor="#fff0df"/><stop offset=".58" stopColor="#ffddcf"/><stop offset="1" stopColor="#efb9ae"/></linearGradient>
+                        <linearGradient id="pHair" x1="0" y1="0" x2="1" y2="1"><stop stopColor={makeup.hair}/><stop offset=".48" stopColor={makeup.hair}/><stop offset="1" stopColor="#241b38"/></linearGradient>
+                        <linearGradient id="pShine" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff" stopOpacity=".9"/><stop offset="1" stopColor="#fff" stopOpacity="0"/></linearGradient>
+                        <linearGradient id="pDress" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ffe0f0"/><stop offset="1" stopColor="#c68bdf"/></linearGradient>
+                        <radialGradient id="pIris"><stop stopColor="#8c5a9c"/><stop offset=".55" stopColor="#573c79"/><stop offset="1" stopColor="#25233e"/></radialGradient>
+                        <filter id="pBlur"><feGaussianBlur stdDeviation="5"/></filter>
                       </defs>
-                      <path d="M55 142 Q34 30 150 27 Q266 30 245 142 L258 286 Q150 337 42 286Z" fill="url(#princessHair)"/>
-                      <path d="M70 140 Q70 70 150 67 Q230 70 230 140 L215 245 Q198 294 150 300 Q102 294 85 245Z" fill="url(#princessSkin)" stroke="#e7ae9f" strokeWidth="2"/>
-                      <path d="M70 145 Q50 48 150 38 Q244 42 232 150 Q214 112 190 102 Q150 132 91 106Z" fill="url(#princessHair)"/>
-                      <path d="M83 126 Q58 188 78 260 Q48 246 52 165Z M217 126 Q242 188 222 260 Q252 246 248 165Z" fill="url(#princessHair)"/>
-                      <path d="M91 172 Q112 151 133 173" fill="none" stroke="#684052" strokeWidth="7" strokeLinecap="round"/>
-                      <path d="M167 173 Q188 151 209 172" fill="none" stroke="#684052" strokeWidth="7" strokeLinecap="round"/>
-                      <ellipse cx="112" cy="194" rx="20" ry="27" fill={makeup.shadow} opacity=".7"/>
-                      <ellipse cx="188" cy="194" rx="20" ry="27" fill={makeup.shadow} opacity=".7"/>
-                      <ellipse cx="112" cy="195" rx="11" ry="18" fill="#56344c"/><ellipse cx="188" cy="195" rx="11" ry="18" fill="#56344c"/>
-                      <ellipse cx="112" cy="196" rx="6" ry="12" fill="#211d36"/><ellipse cx="188" cy="196" rx="6" ry="12" fill="#211d36"/>
-                      <circle cx="116" cy="187" r="5" fill="white"/><circle cx="192" cy="187" r="5" fill="white"/>
-                      <path d="M91 158 Q111 145 132 158 M168 158 Q189 145 209 158" stroke="#513342" strokeWidth="5" fill="none" strokeLinecap="round"/>
-                      <ellipse cx="82" cy="226" rx="21" ry="10" fill={makeup.blush} opacity=".65"/><ellipse cx="218" cy="226" rx="21" ry="10" fill={makeup.blush} opacity=".65"/>
-                      <path d="M145 207 Q137 220 148 222" stroke="#d9958b" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                      <path d="M130 244 Q150 232 170 244 Q150 269 130 244Z" fill={makeup.lipstick} stroke="#c65a78" strokeWidth="2"/>
-                      <path d="M137 245 Q150 240 163 245" stroke="#ffdce5" strokeWidth="3" fill="none" strokeLinecap="round"/>
-                      <path d="M65 123 Q150 82 235 123" stroke="#f6d78d" strokeWidth="7" fill="none"/>
-                      <path d="M150 38 L158 9 L166 38 L194 42 L172 58 L178 84 L150 68 L122 84 L128 58 L106 42Z" fill="#f7d36f" stroke="#fff5c7" strokeWidth="4"/>
-                      <path d="M105 300 Q150 280 195 300 L225 350 L75 350Z" fill="#f3a7c8"/>
+                      <ellipse cx="180" cy="410" rx="120" ry="15" fill="#a77baf" opacity=".18"/>
+                      <!-- long flowing hair -->
+                      <path d="M69 177 Q24 57 105 30 Q178 -9 255 30 Q342 75 293 202 Q328 285 285 374 Q265 402 238 367 L122 382 Q78 410 66 350 Q39 266 69 177Z" fill="url(#pHair)" stroke="#55334f" strokeWidth="3"/>
+                      <path d="M89 112 Q57 35 131 26 Q80 81 105 153 Q69 222 94 324 Q58 283 68 195Z" fill={makeup.hair} opacity=".8"/>
+                      <path d="M267 100 Q318 48 290 164 Q322 262 272 350 Q291 248 249 175Z" fill="#fff" opacity=".13"/>
+                      <path d="M105 45 Q147 7 197 34 Q126 29 111 112" fill="none" stroke="url(#pShine)" strokeWidth="9" strokeLinecap="round" opacity=".7"/>
+                      <!-- ears and face -->
+                      <ellipse cx="91" cy="215" rx="19" ry="29" fill="#f6c8b9"/>
+                      <ellipse cx="269" cy="215" rx="19" ry="29" fill="#f6c8b9"/>
+                      <path d="M103 132 Q105 72 180 70 Q255 72 257 132 L249 248 Q238 315 180 330 Q122 315 111 248Z" fill="url(#pSkin)" stroke="#e9b2a5" strokeWidth="2"/>
+                      <ellipse cx="90" cy="219" rx="9" ry="15" fill="#f4b8ac"/><ellipse cx="270" cy="219" rx="9" ry="15" fill="#f4b8ac"/>
+                      <!-- fringe -->
+                      <path d="M91 153 Q70 58 151 49 Q221 28 272 98 Q286 130 257 164 Q252 112 220 103 Q190 149 147 122 Q120 116 103 168Z" fill="url(#pHair)" stroke="#55334f" strokeWidth="2"/>
+                      <path d="M113 104 Q134 53 178 57 Q144 72 139 119 M190 55 Q236 59 251 112" fill="none" stroke="#fff" strokeOpacity=".24" strokeWidth="7" strokeLinecap="round"/>
+                      <!-- brows -->
+                      <path d="M119 177 Q145 158 163 176 M198 176 Q218 158 241 177" fill="none" stroke="#694356" strokeWidth="5" strokeLinecap="round"/>
+                      <!-- eyeshadow -->
+                      <path d="M113 197 Q141 176 166 197 Q141 215 113 197 M194 197 Q219 176 247 197 Q219 215 194 197" fill={makeup.shadow} opacity=".72"/>
+                      <!-- big anime eyes -->
+                      <path d="M113 202 Q139 180 165 204 Q159 238 139 240 Q117 235 113 202Z" fill="#fff"/>
+                      <path d="M195 204 Q221 180 247 202 Q243 235 221 240 Q201 238 195 204Z" fill="#fff"/>
+                      <ellipse cx="140" cy="213" rx="15" ry="23" fill="url(#pIris)"/><ellipse cx="220" cy="213" rx="15" ry="23" fill="url(#pIris)"/>
+                      <ellipse cx="140" cy="219" rx="8" ry="13" fill="#211c39"/><ellipse cx="220" cy="219" rx="8" ry="13" fill="#211c39"/>
+                      <circle cx="146" cy="201" r="7" fill="#fff"/><circle cx="226" cy="201" r="7" fill="#fff"/>
+                      <circle cx="133" cy="224" r="3.5" fill="#c9b5ff"/><circle cx="213" cy="224" r="3.5" fill="#c9b5ff"/>
+                      <path d="M112 201 Q137 177 166 199 M194 199 Q222 177 248 201" fill="none" stroke="#483047" strokeWidth="5" strokeLinecap="round"/>
+                      <path d="M119 194 l-7 -7 M128 188 l-4 -9 M239 194 l8 -7 M230 188 l4 -9" stroke="#483047" strokeWidth="3" strokeLinecap="round"/>
+                      <!-- cheeks and nose -->
+                      <ellipse cx="112" cy="253" rx="23" ry="11" fill={makeup.blush} opacity=".55" filter="url(#pBlur)"/>
+                      <ellipse cx="248" cy="253" rx="23" ry="11" fill={makeup.blush} opacity=".55" filter="url(#pBlur)"/>
+                      <path d="M180 222 Q173 241 181 245" fill="none" stroke="#d99d91" strokeWidth="2.5" strokeLinecap="round"/>
+                      <path d="M166 270 Q180 259 194 270 Q182 286 180 284 Q174 284 166 270Z" fill={makeup.lipstick}/>
+                      <path d="M170 270 Q180 266 190 270" fill="none" stroke="#ffe7ed" strokeWidth="3" strokeLinecap="round"/>
+                      <path d="M171 292 Q180 296 189 292" fill="none" stroke="#d9958c" strokeWidth="2" strokeLinecap="round"/>
+                      <!-- neck and dress -->
+                      <path d="M157 314 L157 348 L203 348 L203 314" fill="url(#pSkin)"/>
+                      <path d="M104 430 Q112 359 158 343 L180 364 L202 343 Q250 359 258 430Z" fill="url(#pDress)" stroke="#fff" strokeWidth="4"/>
+                      <path d="M157 346 L180 372 L203 346" fill="none" stroke="#fff" strokeWidth="5"/>
+                      <path d="M180 372 L168 393 L180 411 L192 393Z" fill="#f7d36f" stroke="#fff4c4" strokeWidth="3"/>
+                      <path d="M109 391 Q180 420 251 391" fill="none" stroke="#fff" strokeWidth="4" opacity=".7"/>
+                      <!-- crown -->
+                      <path d="M122 82 L112 31 L148 58 L180 12 L212 58 L248 31 L238 84Z" fill="#f7d36f" stroke="#fff4c4" strokeWidth="5" strokeLinejoin="round"/>
+                      <path d="M126 79 Q180 93 234 79" fill="none" stroke="#d89a42" strokeWidth="5"/>
+                      <circle cx="180" cy="54" r="9" fill="#ff8db7" stroke="#fff" strokeWidth="3"/>
+                      <circle cx="143" cy="65" r="6" fill="#9ce5e3" stroke="#fff" strokeWidth="2"/>
+                      <circle cx="217" cy="65" r="6" fill="#9ce5e3" stroke="#fff" strokeWidth="2"/>
+                      <!-- sparkles -->
+                      <path d="M57 135 l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5Z M302 186 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4Z" fill="#ffe18a" stroke="#fff" strokeWidth="2"/>
                     </svg>
                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-amber-200 px-4 py-1 text-2xl shadow-lg">{makeup.accessory}</div>
                   </div>
