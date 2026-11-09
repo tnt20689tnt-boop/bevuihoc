@@ -77,9 +77,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Thế Giới Học Tập Vui Nhộn" },
+      { title: "Bé Học Vui – Thành phố học tập 3D" },
       { name: "description", content: "Thế giới học tập trực tuyến 3D cho học sinh tiểu học lớp 1–5." },
-      { property: "og:title", content: "Thế Giới Học Tập Vui Nhộn" },
+      { property: "og:title", content: "Bé Học Vui – Thành phố học tập 3D" },
       { property: "og:description", content: "Thế giới học tập trực tuyến 3D cho học sinh tiểu học lớp 1–5." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
