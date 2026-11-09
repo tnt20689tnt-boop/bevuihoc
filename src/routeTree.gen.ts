@@ -12,7 +12,8 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
-import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'\nimport { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenticated/bang-xep-hang'
+import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'
+import { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenticated/bang-xep-hang'
 import { Route as AuthenticatedHoSoRouteImport } from './routes/_authenticated/ho-so'
 import { Route as AuthenticatedNhanVatRouteImport } from './routes/_authenticated/nhan-vat'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
@@ -37,7 +38,12 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AuthenticatedArenaRoute = AuthenticatedArenaRouteImport.update({\n  id: '/arena',\n  path: '/arena',\n  getParentRoute: () => AuthenticatedRouteRoute,\n} as any)\nconst AuthenticatedBangXepHangRoute =
+const AuthenticatedArenaRoute = AuthenticatedArenaRouteImport.update({
+  id: '/arena',
+  path: '/arena',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBangXepHangRoute =
   AuthenticatedBangXepHangRouteImport.update({
     id: '/bang-xep-hang',
     path: '/bang-xep-hang',
@@ -91,6 +97,7 @@ const AuthenticatedHocSubjectRoute = AuthenticatedHocSubjectRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/arena': typeof AuthenticatedArenaRoute
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByFullPath {
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
 }
 export interface FileRoutesByTo {
+  '/arena': typeof AuthenticatedArenaRoute
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
@@ -119,11 +127,13 @@ export interface FileRoutesByTo {
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
 }
 export interface FileRoutesById {
+  '/_authenticated/arena': typeof AuthenticatedArenaRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/_authenticated/arena': typeof AuthenticatedArenaRoute\n  '/_authenticated/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
+  '/_authenticated/arena': typeof AuthenticatedArenaRoute
+  '/_authenticated/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/_authenticated/ho-so': typeof AuthenticatedHoSoRoute
   '/_authenticated/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -137,6 +147,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/arena'
     | '/'
     | '/auth'
     | '/bang-xep-hang'
@@ -151,6 +162,7 @@ export interface FileRouteTypes {
     | '/hoc/$subject'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/arena'
     | '/'
     | '/auth'
     | '/bang-xep-hang'
@@ -164,11 +176,13 @@ export interface FileRouteTypes {
     | '/thi-dau'
     | '/hoc/$subject'
   id:
+    | '/_authenticated/arena'
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/_authenticated/arena'\n    | '/_authenticated/bang-xep-hang'
+    | '/_authenticated/arena'
+    | '/_authenticated/bang-xep-hang'
     | '/_authenticated/ho-so'
     | '/_authenticated/nhan-vat'
     | '/_authenticated/quan-tri'
@@ -209,7 +223,21 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_authenticated/arena': {\n      id: '/_authenticated/arena'\n      path: '/arena'\n      fullPath: '/arena'\n      preLoaderRoute: typeof AuthenticatedArenaRouteImport\n      parentRoute: typeof AuthenticatedRouteRoute\n    }\n    '/_authenticated/bang-xep-hang': {
+    '/_authenticated/arena': {
+      id: '/_authenticated/arena'
+      path: '/arena'
+      fullPath: '/arena'
+      preLoaderRoute: typeof AuthenticatedArenaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/arena': {
+      id: '/_authenticated/arena'
+      path: '/arena'
+      fullPath: '/arena'
+      preLoaderRoute: typeof AuthenticatedArenaRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/bang-xep-hang': {
       id: '/_authenticated/bang-xep-hang'
       path: '/bang-xep-hang'
       fullPath: '/bang-xep-hang'
@@ -283,6 +311,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedArenaRoute: typeof AuthenticatedArenaRoute
   AuthenticatedBangXepHangRoute: typeof AuthenticatedBangXepHangRoute
   AuthenticatedHoSoRoute: typeof AuthenticatedHoSoRoute
   AuthenticatedNhanVatRoute: typeof AuthenticatedNhanVatRoute
@@ -296,6 +325,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedArenaRoute: AuthenticatedArenaRoute,
   AuthenticatedBangXepHangRoute: AuthenticatedBangXepHangRoute,
   AuthenticatedHoSoRoute: AuthenticatedHoSoRoute,
   AuthenticatedNhanVatRoute: AuthenticatedNhanVatRoute,
