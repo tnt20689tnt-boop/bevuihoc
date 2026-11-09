@@ -38,7 +38,10 @@ function AuthPage() {
             <div className="rounded-xl bg-white p-3"><span className="block text-2xl">🏫</span>Vào trường</div>
           </div>
         </div>
-        <div className="space-y-3">\n          <GoogleButton className="w-full justify-center" label="Đăng nhập bằng Google" />\n          <AppleButton className="w-full justify-center" />\n        </div>
+        <div className="space-y-3">
+          <GoogleButton className="w-full justify-center" label="Đăng nhập bằng Google" />
+          <AppleButton className="w-full justify-center" />
+        </div>
         <p className="mt-4 text-xs leading-5 text-slate-500">Tài khoản phụ huynh dùng để lưu hồ sơ và thành tích. Bé xuất hiện trong game bằng tên nhân vật.</p>
         <Link to="/" className="mt-6 inline-flex text-sm font-bold text-emerald-700 hover:text-emerald-900">← Trang chủ</Link>
       </section>
