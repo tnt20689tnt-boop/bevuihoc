@@ -280,7 +280,7 @@ function FountainWater() {
           key={i}
           ref={(node) => { jets.current[i] = node; }}
           position={[0, 0.82, 0]}
-          rotation={[0, 0, (i / 4) * Math.PI * 2]}
+          rotation={[Math.sin((i / 4) * Math.PI * 2) * 0.22, 0, Math.cos((i / 4) * Math.PI * 2) * 0.22]}
         >
           <cylinderGeometry args={[0.055, 0.075, 1.5, 10]} />
           <meshStandardMaterial color="#baf7ff" emissive="#4ad8f0" emissiveIntensity={0.5} transparent opacity={0.82} roughness={0.18} />
