@@ -117,7 +117,9 @@ function SchoolBuilding({
 function ArenaHouse({ position, rotation, room }: { position: [number, number, number]; rotation: number; room: (typeof ROOMS)[keyof typeof ROOMS] }) {
   return (
     <group position={position} rotation={[0, rotation, 0]}>
-      <mesh position={[0, 1.55, 0]} castShadow receiveShadow><boxGeometry args={[7.4, 3.1, 5.2]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
+      <mesh position={[-3.55, 1.55, 0]} castShadow receiveShadow><boxGeometry args={[0.3, 3.1, 5.2]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
+      <mesh position={[3.55, 1.55, 0]} castShadow receiveShadow><boxGeometry args={[0.3, 3.1, 5.2]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
+      <mesh position={[0, 1.55, -2.48]} castShadow receiveShadow><boxGeometry args={[7.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
       <mesh position={[-2.5, 1.55, 2.63]} castShadow><boxGeometry args={[2.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
       <mesh position={[2.5, 1.55, 2.63]} castShadow><boxGeometry args={[2.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
       <mesh position={[0, 2.95, 2.63]} castShadow><boxGeometry args={[2.6, 0.3, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
