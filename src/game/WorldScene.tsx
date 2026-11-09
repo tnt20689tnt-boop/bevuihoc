@@ -78,7 +78,7 @@ export function WorldScene(props: WorldSceneProps) {
           onEnter={() => props.onEnterPortal(portal)}
         />
       ))}
-      {room.activities.map((activity) => (
+      {room.id !== "plaza" && room.activities.map((activity) => (
         <ActivityMarker
           key={`${activity.label}-${activity.x}-${activity.z}`}
           activity={activity}
