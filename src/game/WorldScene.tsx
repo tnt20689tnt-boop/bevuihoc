@@ -678,6 +678,7 @@ function PlayerController({
   const { camera } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
+  const facingYaw = useRef(position.current.ry ?? 0);
   const sitting = useRef(false);
   const benchSpots = [
     { x: -8, z: 1, rotation: 0.42 },
@@ -707,7 +708,8 @@ function PlayerController({
         const { bench } = nearestBench;
         positionRef.current.x = bench.x + Math.sin(bench.rotation) * 0.95;
         positionRef.current.z = bench.z + Math.cos(bench.rotation) * 0.95;
-        if (character.current) character.current.rotation.y = bench.rotation + Math.PI;
+        facingYaw.current = bench.rotation + Math.PI;
+        if (character.current) character.current.rotation.y = facingYaw.current;
         sitting.current = true;
         animation.current.motion = "sit";
       } else {
@@ -775,7 +777,8 @@ function PlayerController({
       if (!blocked(nextX, position.current.z)) position.current.x = nextX;
       if (!blocked(position.current.x, nextZ)) position.current.z = nextZ;
       animation.current.motion = keys.has("shift") ? "run" : "walk";
-      if (character.current) character.current.rotation.y = Math.atan2(dx, dz);
+      facingYaw.current = Math.atan2(dx, dz);
+      if (character.current) character.current.rotation.y = facingYaw.current;
     } else {
       animation.current.motion = sitting.current ? "sit" : "idle";
     }
@@ -797,9 +800,16 @@ function PlayerController({
       nearbyHandler.current(nearest);
     }
 
-    desiredCamera.current.set(position.current.x, 9.2, position.current.z + 12.4);
-    camera.position.lerp(desiredCamera.current, 1 - Math.exp(-3.6 * dt));
-    lookTarget.current.set(position.current.x, 0.9, position.current.z - 0.8);
+    // Third-person follow camera: stay behind the direction the child is facing.
+    // Smoothly follows turns without mouse dragging or camera-relative movement.
+    const cameraDistance = 12.4;
+    desiredCamera.current.set(
+      position.current.x - Math.sin(facingYaw.current) * cameraDistance,
+      9.2,
+      position.current.z - Math.cos(facingYaw.current) * cameraDistance,
+    );
+    camera.position.lerp(desiredCamera.current, 1 - Math.exp(-4.2 * dt));
+    lookTarget.current.set(position.current.x, 0.95, position.current.z);
     camera.lookAt(lookTarget.current);
   });
 
