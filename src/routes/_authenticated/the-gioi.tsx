@@ -1,16 +1,28 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ComingSoon } from "@/components/ComingSoon";
+import { GameShell } from "@/components/AppShell";
+import { WorldExperience } from "@/game/WorldExperience";
 
 export const Route = createFileRoute("/_authenticated/the-gioi")({
   head: () => ({
     meta: [
-      { title: "Thế giới online – Thế Giới Học Tập Vui Nhộn" },
-      { name: "description", content: "Thế giới online trong Thế Giới Học Tập Vui Nhộn." },
-      { property: "og:title", content: "Thế giới online – Thế Giới Học Tập Vui Nhộn" },
-      { property: "og:description", content: "Thế giới online trong Thế Giới Học Tập Vui Nhộn." },
+      { title: "Thế Giới Học Vui – Sảnh khám phá 3D" },
+      {
+        name: "description",
+        content:
+          "Khám phá sảnh 3D, bước qua các cổng đến phòng Toán, Tiếng Việt, Tiếng Anh và khu vui chơi.",
+      },
+      { property: "og:title", content: "Thế Giới Học Vui – Sảnh khám phá 3D" },
+      {
+        property: "og:description",
+        content: "Khám phá sảnh 3D cùng các phòng học và khu vui chơi dành cho bé.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
   }),
-  component: () => <ComingSoon icon="🌍" title="Thế giới online" />,
+  component: WorldRoute,
 });
+
+function WorldRoute() {
+  return <GameShell fullBleed>{(profile) => <WorldExperience profile={profile} />}</GameShell>;
+}

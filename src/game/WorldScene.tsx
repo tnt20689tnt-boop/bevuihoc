@@ -1,0 +1,729 @@
+import { Html } from "@react-three/drei";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { useEffect, useRef, type MutableRefObject } from "react";
+import * as THREE from "three";
+import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
+import {
+  ROOMS,
+  type Activity,
+  type Portal,
+  type RoomDef,
+  type RoomId,
+  spawnPoint,
+} from "@/game/rooms";
+import type { Avatar } from "@/lib/avatar";
+
+export type MovementInput = { x: number; z: number };
+
+type WorldSceneProps = {
+  roomId: RoomId;
+  fromRoom: RoomId | null;
+  avatar: Avatar;
+  touchRef: MutableRefObject<MovementInput>;
+  onNearbyPortal: (portal: Portal | null) => void;
+  onEnterPortal: (portal: Portal) => void;
+  onInteract: () => void;
+  onActivity: (activity: Activity) => void;
+};
+
+const palette = {
+  ink: "#23324b",
+  cream: "#fff7df",
+  wood: "#a96b3c",
+  leaf: "#67bd72",
+  leafLight: "#9bdb8e",
+  water: "#69d9e6",
+  gold: "#ffd166",
+};
+
+export function WorldScene(props: WorldSceneProps) {
+  const room = ROOMS[props.roomId];
+  return (
+    <Canvas
+      shadows
+      dpr={[1, 1.5]}
+      camera={{ position: [0, 10, 15], fov: 43, near: 0.1, far: 100 }}
+      gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
+      className="absolute inset-0"
+    >
+      <color attach="background" args={[room.sky]} />
+      <fog attach="fog" args={[room.sky, 28, 62]} />
+      <ambientLight intensity={1.25} />
+      <hemisphereLight args={["#f8fbff", "#927451", 1.05]} />
+      <directionalLight
+        position={[-8, 17, 9]}
+        intensity={2.1}
+        castShadow
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
+        shadow-camera-far={50}
+        shadow-camera-left={-28}
+        shadow-camera-right={28}
+        shadow-camera-top={28}
+        shadow-camera-bottom={-28}
+      />
+      <WorldFloor room={room} />
+      {room.id === "plaza" ? <PlazaDecor /> : <RoomDecor room={room} />}
+      {room.portals.map((portal) => (
+        <PortalGate
+          key={`${room.id}-${portal.to}`}
+          portal={portal}
+          active={props.roomId !== "plaza"}
+          onEnter={() => props.onEnterPortal(portal)}
+        />
+      ))}
+      {room.activities.map((activity) => (
+        <ActivityMarker
+          key={`${activity.label}-${activity.x}-${activity.z}`}
+          activity={activity}
+          onActivate={() => props.onActivity(activity)}
+        />
+      ))}
+      <PlayerController
+        key={`${props.roomId}-${props.fromRoom ?? "start"}`}
+        room={room}
+        fromRoom={props.fromRoom}
+        avatar={props.avatar}
+        touchRef={props.touchRef}
+        onNearbyPortal={props.onNearbyPortal}
+        onInteract={props.onInteract}
+      />
+    </Canvas>
+  );
+}
+
+function WorldFloor({ room }: { room: RoomDef }) {
+  return (
+    <group>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[room.radius, 96]} />
+        <meshStandardMaterial color={room.ground[0]} roughness={0.96} />
+      </mesh>
+      <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry
+          args={[room.id === "plaza" ? 5.2 : 3.8, room.id === "plaza" ? 7.4 : 4.1, 96]}
+        />
+        <meshStandardMaterial color={room.ground[1]} roughness={0.95} />
+      </mesh>
+      {room.id === "plaza" && (
+        <mesh position={[0, 0.018, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          <ringGeometry args={[8.5, 9.05, 96]} />
+          <meshStandardMaterial color="#fff4ce" roughness={1} />
+        </mesh>
+      )}
+      {room.id === "boys" && <FootballPitch />}
+    </group>
+  );
+}
+
+function PlazaDecor() {
+  const trees: [number, number, number][] = [
+    [-12, -9, 1.05],
+    [-11, 8, 0.9],
+    [11, -8, 0.95],
+    [12, 8, 1.08],
+    [-7, -13, 0.82],
+    [7, -13, 0.82],
+    [-7, 13, 0.82],
+    [7, 13, 0.82],
+  ];
+  return (
+    <group>
+      <Fountain />
+      {trees.map(([x, z, scale], i) => (
+        <Tree key={i} x={x} z={z} scale={scale} />
+      ))}
+      <Bench position={[-8, 0, 1]} rotation={0.42} />
+      <Bench position={[8, 0, 1]} rotation={-0.42} />
+      <Bench position={[0, 0, -10]} rotation={Math.PI} />
+      <FlowerBed position={[-4.7, 0, -5]} />
+      <FlowerBed position={[4.7, 0, -5]} />
+      <WelcomeArch />
+      <FloatingBubbles />
+    </group>
+  );
+}
+
+function Fountain() {
+  return (
+    <group position={[0, 0, 0]}>
+      <mesh position={[0, 0.18, 0]} receiveShadow castShadow>
+        <cylinderGeometry args={[2.45, 2.75, 0.35, 48]} />
+        <meshStandardMaterial color="#f6dca9" roughness={0.7} />
+      </mesh>
+      <mesh position={[0, 0.39, 0]}>
+        <cylinderGeometry args={[1.95, 2.1, 0.14, 48]} />
+        <meshStandardMaterial color="#86c8cf" roughness={0.42} />
+      </mesh>
+      <mesh position={[0, 0.55, 0]}>
+        <cylinderGeometry args={[1.65, 1.8, 0.16, 48]} />
+        <meshStandardMaterial color="#5cc8d7" roughness={0.28} metalness={0.12} />
+      </mesh>
+      <mesh position={[0, 1.1, 0]} castShadow>
+        <cylinderGeometry args={[0.38, 0.62, 1.0, 20]} />
+        <meshStandardMaterial color="#f7c858" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 1.72, 0]}>
+        <sphereGeometry args={[0.34, 24, 16]} />
+        <meshStandardMaterial color={palette.water} emissive="#2aaebc" emissiveIntensity={0.2} />
+      </mesh>
+      <mesh position={[0, 2.02, 0]}>
+        <sphereGeometry args={[0.13, 16, 12]} />
+        <meshStandardMaterial color="#e8fbff" emissive="#a7f5ff" emissiveIntensity={0.4} />
+      </mesh>
+    </group>
+  );
+}
+
+function Tree({ x, z, scale = 1 }: { x: number; z: number; scale?: number }) {
+  return (
+    <group position={[x, 0, z]} scale={scale}>
+      <mesh position={[0, 0.75, 0]} castShadow>
+        <cylinderGeometry args={[0.16, 0.24, 1.5, 9]} />
+        <meshStandardMaterial color="#98623d" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 1.75, 0]} castShadow>
+        <sphereGeometry args={[0.85, 18, 14]} />
+        <meshStandardMaterial color={palette.leaf} roughness={0.9} />
+      </mesh>
+      <mesh position={[-0.42, 1.48, 0.12]} castShadow>
+        <sphereGeometry args={[0.47, 16, 12]} />
+        <meshStandardMaterial color={palette.leafLight} roughness={0.9} />
+      </mesh>
+      <mesh position={[0.42, 1.42, -0.12]} castShadow>
+        <sphereGeometry args={[0.5, 16, 12]} />
+        <meshStandardMaterial color="#51ad65" roughness={0.9} />
+      </mesh>
+      <mesh position={[0, 0.08, 0]} receiveShadow>
+        <cylinderGeometry args={[0.62, 0.7, 0.14, 24]} />
+        <meshStandardMaterial color="#d9c28e" roughness={0.96} />
+      </mesh>
+    </group>
+  );
+}
+
+function Bench({
+  position,
+  rotation = 0,
+}: {
+  position: [number, number, number];
+  rotation?: number;
+}) {
+  return (
+    <group position={position} rotation={[0, rotation, 0]}>
+      <mesh position={[0, 0.5, 0]} castShadow>
+        <boxGeometry args={[2.1, 0.16, 0.62]} />
+        <meshStandardMaterial color={palette.wood} roughness={0.8} />
+      </mesh>
+      {[
+        [-0.72, 0.25, 0],
+        [0.72, 0.25, 0],
+      ].map(([x, y, z], i) => (
+        <mesh key={i} position={[x ?? 0, y ?? 0, z ?? 0]} castShadow>
+          <boxGeometry args={[0.15, 0.5, 0.42]} />
+          <meshStandardMaterial color="#71482f" roughness={0.8} />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.76, -0.25]} castShadow>
+        <boxGeometry args={[2.1, 0.62, 0.14]} />
+        <meshStandardMaterial color={palette.wood} roughness={0.8} />
+      </mesh>
+    </group>
+  );
+}
+
+function FlowerBed({ position }: { position: [number, number, number] }) {
+  const flowers = ["#ff7894", "#ffd166", "#a98bfa", "#ffffff"];
+  return (
+    <group position={position}>
+      <mesh position={[0, 0.14, 0]} receiveShadow>
+        <cylinderGeometry args={[1.35, 1.45, 0.28, 24]} />
+        <meshStandardMaterial color="#c78b5c" roughness={0.95} />
+      </mesh>
+      {Array.from({ length: 8 }).map((_, i) => {
+        const a = (i / 8) * Math.PI * 2;
+        return (
+          <mesh key={i} position={[Math.cos(a) * 0.85, 0.45, Math.sin(a) * 0.7]} castShadow>
+            <sphereGeometry args={[0.23, 12, 10]} />
+            <meshStandardMaterial
+              color={flowers[i % flowers.length] ?? "#ffffff"}
+              roughness={0.62}
+            />
+          </mesh>
+        );
+      })}
+    </group>
+  );
+}
+
+function WelcomeArch() {
+  return (
+    <group position={[0, 0, 20]}>
+      <mesh position={[-2.4, 1.9, 0]} castShadow>
+        <boxGeometry args={[0.45, 3.8, 0.6]} />
+        <meshStandardMaterial color="#f1a65b" roughness={0.75} />
+      </mesh>
+      <mesh position={[2.4, 1.9, 0]} castShadow>
+        <boxGeometry args={[0.45, 3.8, 0.6]} />
+        <meshStandardMaterial color="#f1a65b" roughness={0.75} />
+      </mesh>
+      <mesh position={[0, 3.75, 0]} castShadow>
+        <boxGeometry args={[5.2, 0.55, 0.7]} />
+        <meshStandardMaterial color="#ef8d48" roughness={0.72} />
+      </mesh>
+      <Html position={[0, 3.75, 0.42]} center distanceFactor={11}>
+        <div
+          style={{
+            whiteSpace: "nowrap",
+            borderRadius: 16,
+            padding: "8px 16px",
+            color: "#ffffff",
+            background: "#e67f39",
+            font: "800 18px 'Baloo 2', sans-serif",
+            boxShadow: "0 5px 0 #a9552d",
+          }}
+        >
+          CỔNG THẾ GIỚI HỌC VUI
+        </div>
+      </Html>
+    </group>
+  );
+}
+
+function FloatingBubbles() {
+  return (
+    <group>
+      {[
+        [-4, 3.4, 3, "⭐"],
+        [4, 3.1, 2.5, "🌼"],
+        [-7, 2.6, -2, "✦"],
+        [7, 3.2, -1, "☁️"],
+      ].map(([x, y, z, icon], i) => (
+        <Html key={i} position={[Number(x), Number(y), Number(z)]} center distanceFactor={13}>
+          <span style={{ fontSize: 26, filter: "drop-shadow(0 4px 5px #0003)" }}>
+            {String(icon)}
+          </span>
+        </Html>
+      ))}
+    </group>
+  );
+}
+
+function RoomDecor({ room }: { room: RoomDef }) {
+  return (
+    <group>
+      <mesh position={[0, 1.65, -10.5]} castShadow>
+        <boxGeometry args={[7.2, 3.4, 0.5]} />
+        <meshStandardMaterial color={room.color} roughness={0.72} />
+      </mesh>
+      <mesh position={[0, 1.65, -10.19]}>
+        <boxGeometry args={[6.65, 2.85, 0.08]} />
+        <meshStandardMaterial color={room.id === "boys" ? "#e9fff2" : "#fffdf2"} roughness={0.8} />
+      </mesh>
+      <Html position={[0, 2.25, -10.05]} center distanceFactor={10}>
+        <div
+          style={{
+            width: 280,
+            textAlign: "center",
+            color: palette.ink,
+            font: "800 24px 'Baloo 2', sans-serif",
+            textShadow: "0 1px 0 white",
+          }}
+        >
+          {room.emoji} {room.short}
+        </div>
+      </Html>
+      {room.id === "math" && <MathProps />}
+      {room.id === "vietnamese" && <VietnameseProps />}
+      {room.id === "english" && <EnglishProps />}
+      {room.id === "girls" && <GirlsProps />}
+      {room.id === "boys" && <GoalProps />}
+      <RoomPlants />
+    </group>
+  );
+}
+
+function MathProps() {
+  return (
+    <group position={[0, 0, -6]}>
+      {[
+        [-3, "➕"],
+        [0, "7"],
+        [3, "×"],
+      ].map(([x, label], i) => (
+        <LetterCube
+          key={i}
+          x={Number(x)}
+          label={String(label)}
+          color={["#72b7f2", "#ffcf63", "#ff8d9e"][i] ?? "#72b7f2"}
+        />
+      ))}
+    </group>
+  );
+}
+
+function VietnameseProps() {
+  return (
+    <group position={[0, 0.8, -6]}>
+      <mesh position={[-0.68, 0.35, 0]} rotation={[0, 0, -0.12]} castShadow>
+        <boxGeometry args={[1.65, 0.16, 1.35]} />
+        <meshStandardMaterial color="#fff3cf" roughness={0.75} />
+      </mesh>
+      <mesh position={[0.68, 0.35, 0]} rotation={[0, 0, 0.12]} castShadow>
+        <boxGeometry args={[1.65, 0.16, 1.35]} />
+        <meshStandardMaterial color="#fff9e9" roughness={0.75} />
+      </mesh>
+      <Html position={[0, 1.05, 0.05]} center distanceFactor={10}>
+        <div style={{ color: "#a34d6c", font: "800 34px 'Baloo 2', sans-serif" }}>Ă Â Ê</div>
+      </Html>
+    </group>
+  );
+}
+
+function EnglishProps() {
+  return (
+    <group position={[0, 0, -6]}>
+      {[
+        [-2.4, "A", "#ff8d9e"],
+        [0, "B", "#66cfa0"],
+        [2.4, "C", "#73b5f5"],
+      ].map(([x, label, color], i) => (
+        <LetterCube key={i} x={Number(x)} label={String(label)} color={String(color)} />
+      ))}
+    </group>
+  );
+}
+
+function LetterCube({ x, label, color }: { x: number; label: string; color: string }) {
+  return (
+    <group position={[x, 0.85, 0]}>
+      <mesh castShadow>
+        <boxGeometry args={[1.55, 1.55, 1.4]} />
+        <meshStandardMaterial color={color} roughness={0.55} />
+      </mesh>
+      <Html position={[0, 0, 0.74]} center distanceFactor={9}>
+        <span
+          style={{
+            color: "#ffffff",
+            font: "900 42px 'Baloo 2', sans-serif",
+            textShadow: "0 2px 5px #0004",
+          }}
+        >
+          {label}
+        </span>
+      </Html>
+    </group>
+  );
+}
+
+function GirlsProps() {
+  return (
+    <group position={[0, 0, -6]}>
+      <mesh position={[-2.2, 1.2, 0]} castShadow>
+        <cylinderGeometry args={[0.72, 0.72, 0.16, 32]} />
+        <meshStandardMaterial color="#f5bfd5" roughness={0.58} />
+      </mesh>
+      <mesh position={[-2.2, 2.1, -0.35]} castShadow>
+        <boxGeometry args={[0.2, 1.8, 0.2]} />
+        <meshStandardMaterial color="#d9ad87" roughness={0.7} />
+      </mesh>
+      <mesh position={[-2.2, 2.2, -0.23]}>
+        <boxGeometry args={[1.25, 1.5, 0.08]} />
+        <meshStandardMaterial color="#ffc9df" metalness={0.18} roughness={0.3} />
+      </mesh>
+      <FlowerBed position={[2.1, 0, 0.2]} />
+      <Html position={[0, 1.3, 0.2]} center distanceFactor={10}>
+        <div style={{ color: "#ce4e86", font: "800 25px 'Baloo 2', sans-serif" }}>
+          ✨ Tự chọn phong cách ✨
+        </div>
+      </Html>
+    </group>
+  );
+}
+
+function FootballPitch() {
+  return (
+    <group position={[0, 0.025, -1]}>
+      <mesh rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[12, 16]} />
+        <meshStandardMaterial color="#67bd72" roughness={1} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.008, 0]}>
+        <ringGeometry args={[3.2, 3.28, 48]} />
+        <meshStandardMaterial color="#f5fff0" />
+      </mesh>
+      <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[0.08, 16]} />
+        <meshStandardMaterial color="#f5fff0" />
+      </mesh>
+    </group>
+  );
+}
+
+function GoalProps() {
+  return (
+    <group position={[0, 0, -8.4]}>
+      {[-2.2, 2.2].map((x) => (
+        <mesh key={x} position={[x, 1.2, 0]} castShadow>
+          <cylinderGeometry args={[0.12, 0.12, 2.4, 12]} />
+          <meshStandardMaterial color="#ffffff" roughness={0.45} />
+        </mesh>
+      ))}
+      <mesh position={[0, 2.34, 0]} castShadow>
+        <boxGeometry args={[4.5, 0.18, 0.18]} />
+        <meshStandardMaterial color="#ffffff" roughness={0.45} />
+      </mesh>
+      <mesh position={[0, 0.45, -0.08]}>
+        <sphereGeometry args={[0.42, 24, 20]} />
+        <meshStandardMaterial color="#fffefa" roughness={0.56} />
+      </mesh>
+    </group>
+  );
+}
+
+function RoomPlants() {
+  return (
+    <group>
+      <Tree x={-10} z={-7} scale={0.75} />
+      <Tree x={10} z={-7} scale={0.75} />
+      <FlowerBed position={[-8, 0, 3]} />
+      <FlowerBed position={[8, 0, 3]} />
+    </group>
+  );
+}
+
+function PortalGate({
+  portal,
+  active,
+  onEnter,
+}: {
+  portal: Portal;
+  active: boolean;
+  onEnter: () => void;
+}) {
+  const destination = ROOMS[portal.to];
+  const rotation = Math.atan2(-portal.x, -portal.z);
+  return (
+    <group position={[portal.x, 0, portal.z]} rotation={[0, rotation, 0]}>
+      <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[1.72, 40]} />
+        <meshStandardMaterial color={destination.color} roughness={0.65} />
+      </mesh>
+      <mesh position={[-1.15, 1.27, 0]} castShadow>
+        <boxGeometry args={[0.34, 2.55, 0.55]} />
+        <meshStandardMaterial color={destination.color} roughness={0.58} />
+      </mesh>
+      <mesh position={[1.15, 1.27, 0]} castShadow>
+        <boxGeometry args={[0.34, 2.55, 0.55]} />
+        <meshStandardMaterial color={destination.color} roughness={0.58} />
+      </mesh>
+      <mesh position={[0, 2.52, 0]} castShadow>
+        <torusGeometry args={[1.15, 0.18, 12, 32, Math.PI]} />
+        <meshStandardMaterial color={destination.color} roughness={0.48} metalness={0.06} />
+      </mesh>
+      <mesh position={[0, 1.25, -0.02]}>
+        <planeGeometry args={[2.0, 2.45]} />
+        <meshStandardMaterial
+          color={destination.color}
+          transparent
+          opacity={active ? 0.38 : 0.24}
+          side={THREE.DoubleSide}
+          emissive={destination.color}
+          emissiveIntensity={0.13}
+        />
+      </mesh>
+      <Html position={[0, 3.35, 0]} center distanceFactor={11} style={{ pointerEvents: "auto" }}>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onEnter();
+          }}
+          style={{
+            minWidth: 120,
+            whiteSpace: "nowrap",
+            border: "2px solid #ffffffcc",
+            borderRadius: 16,
+            padding: "7px 12px",
+            color: "#26344b",
+            background: "#ffffffed",
+            font: "800 15px 'Baloo 2', sans-serif",
+            boxShadow: "0 5px 14px #1b2c4633",
+            cursor: "pointer",
+          }}
+        >
+          <span style={{ fontSize: 20, marginRight: 6 }}>{destination.emoji}</span>
+          {destination.short}
+          <span style={{ display: "block", font: "700 10px 'Nunito', sans-serif", opacity: 0.68 }}>
+            {portal.to === "plaza" ? "Quay về sảnh" : "Chạm để khám phá"}
+          </span>
+        </button>
+      </Html>
+    </group>
+  );
+}
+
+function ActivityMarker({ activity, onActivate }: { activity: Activity; onActivate: () => void }) {
+  return (
+    <group position={[activity.x, 0, activity.z]}>
+      <mesh position={[0, 0.18, 0]} receiveShadow>
+        <cylinderGeometry args={[0.8, 0.9, 0.28, 24]} />
+        <meshStandardMaterial color={palette.gold} roughness={0.62} />
+      </mesh>
+      <mesh position={[0, 0.9, 0]} castShadow>
+        <cylinderGeometry args={[0.42, 0.53, 1.2, 20]} />
+        <meshStandardMaterial color="#f3a14a" roughness={0.55} />
+      </mesh>
+      <Html position={[0, 1.85, 0]} center distanceFactor={10} style={{ pointerEvents: "auto" }}>
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            onActivate();
+          }}
+          style={{
+            maxWidth: 190,
+            whiteSpace: "nowrap",
+            border: "2px solid #ffffff",
+            borderRadius: 14,
+            padding: "6px 11px",
+            color: "#26344b",
+            background: "#fff9e7",
+            font: "800 13px 'Baloo 2', sans-serif",
+            boxShadow: "0 4px 12px #1b2c4630",
+            cursor: "pointer",
+          }}
+        >
+          <span style={{ fontSize: 18, marginRight: 5 }}>{activity.icon}</span>
+          {activity.label}
+        </button>
+      </Html>
+    </group>
+  );
+}
+
+function PlayerController({
+  room,
+  fromRoom,
+  avatar,
+  touchRef,
+  onNearbyPortal,
+  onInteract,
+}: {
+  room: RoomDef;
+  fromRoom: RoomId | null;
+  avatar: Avatar;
+  touchRef: MutableRefObject<MovementInput>;
+  onNearbyPortal: (portal: Portal | null) => void;
+  onInteract: () => void;
+}) {
+  const character = useRef<THREE.Group>(null);
+  const position = useRef(spawnPoint(room.id, fromRoom));
+  const held = useRef(new Set<string>());
+  const animation = useRef<AnimState>(makeAnimState());
+  const activePortal = useRef<string | null>(null);
+  const nearbyHandler = useRef(onNearbyPortal);
+  const interactHandler = useRef(onInteract);
+  const { camera } = useThree();
+  const desiredCamera = useRef(new THREE.Vector3());
+  const lookTarget = useRef(new THREE.Vector3());
+
+  useEffect(() => {
+    nearbyHandler.current = onNearbyPortal;
+  }, [onNearbyPortal]);
+  useEffect(() => {
+    interactHandler.current = onInteract;
+  }, [onInteract]);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const key = event.key.toLowerCase();
+      if (
+        ["w", "a", "s", "d", "arrowup", "arrowdown", "arrowleft", "arrowright", "shift"].includes(
+          key,
+        )
+      ) {
+        event.preventDefault();
+        held.current.add(key);
+      }
+      if (!event.repeat && (key === "e" || key === " ")) {
+        event.preventDefault();
+        interactHandler.current();
+      }
+    };
+    const onKeyUp = (event: KeyboardEvent) => held.current.delete(event.key.toLowerCase());
+    const clearKeys = () => held.current.clear();
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
+    window.addEventListener("blur", clearKeys);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
+      window.removeEventListener("blur", clearKeys);
+    };
+  }, []);
+
+  useFrame((_, rawDelta) => {
+    const dt = Math.min(rawDelta, 0.05);
+    const keys = held.current;
+    let dx =
+      Number(keys.has("d") || keys.has("arrowright")) -
+      Number(keys.has("a") || keys.has("arrowleft")) +
+      touchRef.current.x;
+    let dz =
+      Number(keys.has("s") || keys.has("arrowdown")) -
+      Number(keys.has("w") || keys.has("arrowup")) +
+      touchRef.current.z;
+    const magnitude = Math.hypot(dx, dz);
+    if (magnitude > 1) {
+      dx /= magnitude;
+      dz /= magnitude;
+    }
+    const moving = Math.hypot(dx, dz) > 0.04;
+    const speed = keys.has("shift") ? 6.4 : 4.2;
+    if (moving) {
+      const nextX = position.current.x + dx * speed * dt;
+      const nextZ = position.current.z + dz * speed * dt;
+      const blocked = (x: number, z: number) => {
+        if (Math.hypot(x, z) > room.radius - 0.8) return true;
+        return room.obstacles.some(
+          (obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52,
+        );
+      };
+      if (!blocked(nextX, position.current.z)) position.current.x = nextX;
+      if (!blocked(position.current.x, nextZ)) position.current.z = nextZ;
+      animation.current.motion = keys.has("shift") ? "run" : "walk";
+      if (character.current) character.current.rotation.y = Math.atan2(dx, dz);
+    } else {
+      animation.current.motion = "idle";
+    }
+    if (character.current) {
+      character.current.position.set(position.current.x, 0, position.current.z);
+    }
+
+    const nearest =
+      room.portals
+        .map((portal) => ({
+          portal,
+          distance: Math.hypot(position.current.x - portal.x, position.current.z - portal.z),
+        }))
+        .filter((item) => item.distance < 3.45)
+        .sort((a, b) => a.distance - b.distance)[0]?.portal ?? null;
+    const portalId = nearest?.to ?? null;
+    if (portalId !== activePortal.current) {
+      activePortal.current = portalId;
+      nearbyHandler.current(nearest);
+    }
+
+    desiredCamera.current.set(position.current.x, 9.2, position.current.z + 12.4);
+    camera.position.lerp(desiredCamera.current, 1 - Math.exp(-3.6 * dt));
+    lookTarget.current.set(position.current.x, 0.9, position.current.z - 0.8);
+    camera.lookAt(lookTarget.current);
+  });
+
+  return (
+    <group ref={character} rotation={[0, position.current.ry, 0]}>
+      <Character3D avatar={avatar} state={animation} />
+    </group>
+  );
+}

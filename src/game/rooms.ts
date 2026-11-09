@@ -37,7 +37,9 @@ export type RoomDef = {
 // Plaza portals sit on a ring; each room's exit portal is at +z.
 const RING = 17;
 const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / 5; // first portal straight "north" (-z)
-export const PLAZA_PORTALS: Portal[] = (["math", "vietnamese", "english", "girls", "boys"] as RoomId[]).map((to, i) => ({
+export const PLAZA_PORTALS: Portal[] = (
+  ["math", "vietnamese", "english", "girls", "boys"] as RoomId[]
+).map((to, i) => ({
   to,
   x: Math.round(Math.cos(ang(i)) * RING * 100) / 100,
   z: Math.round(Math.sin(ang(i)) * RING * 100) / 100,
@@ -76,7 +78,16 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     blurb: "Cộng, trừ, nhân, chia, hình học và toán có lời văn.",
     radius: 14,
     portals: [EXIT],
-    activities: [{ x: 0, z: -5, label: "Vào học Toán", icon: "🔢", to: "/hoc/$subject", params: { subject: "math" } }],
+    activities: [
+      {
+        x: 0,
+        z: -5,
+        label: "Vào học Toán",
+        icon: "🔢",
+        to: "/hoc/$subject",
+        params: { subject: "math" },
+      },
+    ],
     obstacles: [{ x: 0, z: -10, r: 2.2 }],
   },
   vietnamese: {
@@ -92,7 +103,14 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     radius: 14,
     portals: [EXIT],
     activities: [
-      { x: 0, z: -5, label: "Vào học Tiếng Việt", icon: "📖", to: "/hoc/$subject", params: { subject: "vietnamese" } },
+      {
+        x: 0,
+        z: -5,
+        label: "Vào học Tiếng Việt",
+        icon: "📖",
+        to: "/hoc/$subject",
+        params: { subject: "vietnamese" },
+      },
     ],
     obstacles: [
       { x: 7, z: -3, r: 2.2 },
@@ -112,7 +130,14 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     radius: 14,
     portals: [EXIT],
     activities: [
-      { x: 0, z: -5, label: "Vào học Tiếng Anh", icon: "🌍", to: "/hoc/$subject", params: { subject: "english" } },
+      {
+        x: 0,
+        z: -5,
+        label: "Vào học Tiếng Anh",
+        icon: "🌍",
+        to: "/hoc/$subject",
+        params: { subject: "english" },
+      },
     ],
     obstacles: [
       { x: -7, z: -4, r: 1.8 },
@@ -166,5 +191,5 @@ export function spawnPoint(to: RoomId, from: RoomId | null): { x: number; z: num
     }
     return { x: (Math.random() - 0.5) * 6, z: 7 + Math.random() * 2, ry: Math.PI };
   }
-  return { x: (Math.random() - 0.5) * 3, z: 8, ry: Math.PI };
+  return { x: (Math.random() - 0.5) * 3, z: 5, ry: Math.PI };
 }
