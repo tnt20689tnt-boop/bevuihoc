@@ -60,7 +60,7 @@ export const LEVEL_TITLES = [
   "Huyền thoại",
 ];
 export function levelTitle(level: number): string {
-  return LEVEL_TITLES[Math.min(LEVEL_TITLES.length - 1, Math.max(0, level - 1))];
+  return LEVEL_TITLES[Math.min(LEVEL_TITLES.length - 1, Math.max(0, level - 1))] ?? "Mầm non";
 }
 
 export const PERIODS = {
@@ -93,7 +93,9 @@ export function shuffle<T>(arr: T[]): T[] {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+    const tmp = a[i] as T;
+    a[i] = a[j] as T;
+    a[j] = tmp;
   }
   return a;
 }

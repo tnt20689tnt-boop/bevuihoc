@@ -109,7 +109,7 @@ function Hair({ a }: { a: Avatar }) {
             [0.1, 0.42, -0.2, -0.3],
             [-0.1, 0.42, -0.2, 0.3],
             [0, 0.38, 0.28, 0],
-          ].map(([x, y, z, rz], i) => (
+          ].map(([x = 0, y = 0, z = 0, rz = 0], i) => (
             <mesh key={i} position={[x, y, z]} rotation={[z > 0.2 ? 0.6 : 0, 0, rz]}>
               <coneGeometry args={[0.1, 0.24, 8]} />
               <Mat c={c} />

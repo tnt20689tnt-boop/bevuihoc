@@ -97,9 +97,9 @@ export function defaultAvatar(gender: Gender): Avatar {
   return gender === "boy"
     ? {
         gender,
-        skin: SKIN_TONES[1],
+        skin: "#f6c9a0",
         hair: "short",
-        hairColor: HAIR_COLORS[0],
+        hairColor: "#2b1d16",
         eyes: "round",
         mouth: "smile",
         outfit: "tshirt",
@@ -110,9 +110,9 @@ export function defaultAvatar(gender: Gender): Avatar {
       }
     : {
         gender,
-        skin: SKIN_TONES[0],
+        skin: "#ffe0c7",
         hair: "pigtails",
-        hairColor: HAIR_COLORS[1],
+        hairColor: "#5a3825",
         eyes: "sparkle",
         mouth: "smile",
         outfit: "dress",
@@ -124,7 +124,7 @@ export function defaultAvatar(gender: Gender): Avatar {
 }
 
 function pick<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+  return arr[Math.floor(Math.random() * arr.length)] as T;
 }
 
 export function randomAvatar(gender: Gender): Avatar {
