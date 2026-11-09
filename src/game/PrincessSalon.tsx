@@ -54,24 +54,24 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(ellipse_at_15%_5%,#fff_0%,transparent_32%),linear-gradient(135deg,#ffe7f1,#f4e9ff_52%,#fff1d9)] p-3 text-slate-800 sm:p-6">
-      <div className="mx-auto max-w-6xl">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <div className="h-[calc(100dvh-4rem)] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(ellipse_at_15%_5%,#fff_0%,transparent_32%),linear-gradient(135deg,#ffe7f1,#f4e9ff_52%,#fff1d9)] p-2 text-slate-800 sm:p-3">
+      <div className="mx-auto flex h-full max-w-6xl flex-col">
+        <div className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-2">
           <div><p className="text-xs font-black uppercase tracking-[.2em] text-pink-600">Princess beauty studio</p><h1 className="text-3xl font-black text-fuchsia-950 sm:text-4xl">💄 Salon Công Chúa</h1><p className="font-semibold text-fuchsia-800/75">Chọn màu xinh xắn và tự tay trang điểm cho nàng công chúa anime!</p></div>
           <Link to="/the-gioi" className="rounded-2xl border-2 border-white bg-white/85 px-4 py-3 font-extrabold text-fuchsia-800 shadow-lg">← Về sân trường</Link>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1.2fr)_minmax(320px,.8fr)]">
-          <section className="relative overflow-hidden rounded-[2rem] border-[6px] border-white bg-gradient-to-b from-violet-100 via-pink-100 to-amber-50 p-4 shadow-[0_18px_50px_#9d5a9b30] sm:p-6">
+        <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(0,.9fr)] gap-2 sm:gap-3">
+          <section className="relative flex min-h-0 flex-col overflow-hidden rounded-2xl border-2 border-white bg-gradient-to-b from-violet-100 via-pink-100 to-amber-50 p-1.5 shadow-[0_18px_50px_#9d5a9b30] sm:rounded-[2rem] sm:border-4 sm:p-3">
             <div className="absolute left-5 top-5 text-2xl">✨</div><div className="absolute right-7 top-8 text-3xl">🌷</div>
-            <div className="mx-auto max-w-[520px] rounded-[48%_48%_38%_38%] border-[12px] border-amber-200 bg-gradient-to-b from-[#fff9f0] to-[#f9dce9] p-3 shadow-[inset_0_0_0_5px_#fff,0_12px_25px_#b77a8b40]">
-              <div className="relative grid min-h-[390px] place-items-center overflow-hidden rounded-[48%_48%_35%_35%] bg-[radial-gradient(ellipse_at_50%_38%,#fff_0%,#ffe7f0_56%,#e7d8ff_100%)]">
+            <div className="mx-auto flex min-h-0 w-full max-w-[520px] flex-1 flex-col rounded-[48%_48%_38%_38%] border-4 border-amber-200 bg-gradient-to-b from-[#fff9f0] to-[#f9dce9] p-1.5 shadow-[inset_0_0_0_3px_#fff,0_12px_25px_#b77a8b40] sm:border-8 sm:p-2">
+              <div className="relative grid min-h-0 flex-1 place-items-center overflow-hidden rounded-[48%_48%_35%_35%] bg-[radial-gradient(ellipse_at_50%_38%,#fff_0%,#ffe7f0_56%,#e7d8ff_100%)]">
                 <div className="absolute left-7 top-8 text-2xl">✦</div><div className="absolute right-8 top-14 text-xl">✧</div>
                 <div className="relative mt-3">
                   <div className="absolute -left-4 top-12 z-0 h-56 w-20 rounded-[50%] bg-[#8b5a45]" style={{ background: makeup.hair }} />
                   <div className="absolute -right-4 top-12 z-0 h-56 w-20 rounded-[50%] bg-[#8b5a45]" style={{ background: makeup.hair }} />
                   <div className="relative z-10">
-                    <svg viewBox="0 0 360 430" className="h-[390px] w-[330px] max-w-[82vw] drop-shadow-[0_14px_18px_#8b567344]" role="img" aria-label="Công chúa anime với mái tóc dài và đôi mắt long lanh">
+                    <svg viewBox="0 0 360 430" className="h-[min(46vh,330px)] w-auto max-w-[95%] drop-shadow-[0_14px_18px_#8b567344]" role="img" aria-label="Công chúa anime với mái tóc dài và đôi mắt long lanh">
                       <defs>
                         <linearGradient id="pSkin" x1="0" y1="0" x2="0.8" y2="1"><stop stopColor="#fff0df"/><stop offset=".58" stopColor="#ffddcf"/><stop offset="1" stopColor="#efb9ae"/></linearGradient>
                         <linearGradient id="pHair" x1="0" y1="0" x2="1" y2="1"><stop stopColor={makeup.hair}/><stop offset=".48" stopColor={makeup.hair}/><stop offset="1" stopColor="#241b38"/></linearGradient>
@@ -131,46 +131,47 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
                       <path d="M57 135 l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5Z M302 186 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4Z" fill="#ffe18a" stroke="#fff" strokeWidth="2"/>
                     </svg>
                     <div className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-amber-200 px-4 py-1 text-2xl shadow-lg">{makeup.accessory}</div>
+                    <div className="absolute bottom-10 -right-8 z-20 flex rotate-[-12deg] items-end drop-shadow-lg" aria-label="Đang cầm dụng cụ trang điểm"><span className="text-4xl sm:text-5xl">🤚</span><span className="-ml-5 mb-5 text-4xl sm:text-5xl">{tab === "lipstick" ? "💄" : tab === "eyeliner" ? "🖊️" : tab === "blush" ? "🫧" : tab === "shadow" ? "🎨" : "💇"}</span></div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="mx-auto mt-[-2px] w-[86%] rounded-b-[2rem] border-x-8 border-b-8 border-amber-300 bg-gradient-to-b from-[#d9a5c4] to-[#a66d9c] p-4 text-center text-white shadow-xl">
+            <div className="mx-auto mt-1 w-[86%] shrink-0 rounded-b-2xl border-x-4 border-b-4 border-amber-300 bg-gradient-to-b from-[#d9a5c4] to-[#a66d9c] p-1.5 text-center text-white shadow-xl sm:p-2">
               <div className="text-xs font-black uppercase tracking-[.3em] text-pink-100">Gương trang điểm</div><div className="mt-1 font-black">Công chúa {profile.display_name}</div>
             </div>
-            <div className="mt-4 flex flex-wrap justify-center gap-2"><button onClick={randomLook} className="rounded-xl bg-white px-4 py-2 font-extrabold text-fuchsia-800 shadow">🎲 Phối đồ ngẫu nhiên</button><button onClick={() => { setMakeup(defaults); setDone(false); }} className="rounded-xl bg-white/75 px-4 py-2 font-extrabold text-slate-700 shadow">↺ Làm lại</button></div>
+            <div className="mt-2 flex shrink-0 flex-wrap justify-center gap-1.5"><button onClick={randomLook} className="rounded-xl bg-white px-4 py-2 font-extrabold text-fuchsia-800 shadow">🎲 Phối đồ ngẫu nhiên</button><button onClick={() => { setMakeup(defaults); setDone(false); }} className="rounded-xl bg-white/75 px-4 py-2 font-extrabold text-slate-700 shadow">↺ Làm lại</button></div>
           </section>
 
-          <section className="rounded-[2rem] border-4 border-white bg-white/90 p-4 shadow-[0_18px_50px_#9d5a9b24] sm:p-5">
+          <section className="flex min-h-0 flex-col overflow-hidden rounded-2xl border-2 border-white bg-white/90 p-1.5 shadow-[0_18px_50px_#9d5a9b24] sm:rounded-[2rem] sm:border-4 sm:p-3">
 
-            <div className="mb-3 flex items-center gap-3"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-pink-100 text-2xl">🪞</span><div><h2 className="text-xl font-black text-fuchsia-950">Bàn trang điểm</h2><p className="text-sm font-semibold text-slate-500">Bấm vào món đồ để cầm lên trang điểm</p></div></div>
-            <div className="rounded-[1.5rem] border-[5px] border-[#e7b7a0] bg-gradient-to-b from-[#f9dfcf] to-[#d69c83] p-3 shadow-[inset_0_5px_10px_#fff8,0_8px_0_#b87968]">
-              <div className="grid grid-cols-5 gap-2">
+            <div className="mb-1 flex shrink-0 items-center gap-2"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-pink-100 text-2xl">🪞</span><div><h2 className="text-xl font-black text-fuchsia-950">Bàn trang điểm</h2><p className="text-sm font-semibold text-slate-500">Bấm vào món đồ để cầm lên trang điểm</p></div></div>
+            <div className="flex min-h-0 flex-1 flex-col rounded-xl border-2 border-[#e7b7a0] bg-gradient-to-b from-[#f9dfcf] to-[#d69c83] p-1.5 shadow-[inset_0_5px_10px_#fff8,0_4px_0_#b87968] sm:rounded-[1.5rem] sm:border-4 sm:p-2">
+              <div className="grid shrink-0 grid-cols-5 gap-1 sm:gap-2">
                 {([
                   { id: "lipstick", icon: "💄", label: "Son môi" },
                   { id: "eyeliner", icon: "🖊️", label: "Bút kẻ mi" },
                   { id: "blush", icon: "🫧", label: "Bông phấn" },
                   { id: "shadow", icon: "🎨", label: "Phấn mắt" },
                   { id: "hair", icon: "💇", label: "Tóc" },
-                ] as const).map(item => <button key={item.id} onClick={() => setTab(item.id)} className={"flex min-h-[92px] flex-col items-center justify-center rounded-xl border-2 px-1 py-2 transition-all " + (tab === item.id ? "z-10 scale-110 border-fuchsia-500 bg-white shadow-[0_8px_18px_#9d347e55]" : "border-[#fff8] bg-[#fff9] hover:-translate-y-1")}>
+                ] as const).map(item => <button key={item.id} onClick={() => setTab(item.id)} className={"flex min-h-[62px] flex-col items-center justify-center rounded-lg border-2 px-0.5 py-1 transition-all sm:min-h-[76px] sm:rounded-xl sm:py-2 " + (tab === item.id ? "z-10 scale-110 border-fuchsia-500 bg-white shadow-[0_8px_18px_#9d347e55]" : "border-[#fff8] bg-[#fff9] hover:-translate-y-1")}>
                   <span className={"text-3xl " + (tab === item.id && item.id === "blush" ? "animate-bounce" : "")}>{item.icon}</span><span className="mt-1 text-[11px] font-black text-fuchsia-950">{item.label}</span>{tab === item.id && <span className="text-[10px] font-black text-fuchsia-600">ĐANG CẦM</span>}
                 </button>)}
               </div>
-              <div className="mt-3 rounded-xl border-2 border-white/80 bg-[#fff8f1] p-3 shadow-inner">
-                <div className="mb-2 flex items-center gap-2">
-                  <span className={"grid h-16 w-16 place-items-center rounded-2xl bg-white text-5xl shadow-md " + (tab === "blush" ? "animate-bounce" : "scale-110")}>{tab === "lipstick" ? "💄" : tab === "eyeliner" ? "🖊️" : tab === "blush" ? "🫧" : tab === "shadow" ? "🎨" : "💇"}</span>
+              <div className="mt-1 flex min-h-0 flex-1 flex-col rounded-xl border-2 border-white/80 bg-[#fff8f1] p-1.5 shadow-inner sm:mt-2 sm:p-2">
+                <div className="mb-1 flex shrink-0 items-center gap-2">
+                  <span className={"grid h-10 w-10 place-items-center rounded-xl bg-white text-3xl shadow-md sm:h-12 sm:w-12 sm:text-4xl " + (tab === "blush" ? "animate-bounce" : "scale-110")}>{tab === "lipstick" ? "💄" : tab === "eyeliner" ? "🖊️" : tab === "blush" ? "🫧" : tab === "shadow" ? "🎨" : "💇"}</span>
                   <div><h3 className="font-black text-fuchsia-950">{tab === "lipstick" ? "Son môi – chấm lên đôi môi" : tab === "eyeliner" ? "Bút kẻ mi – tô viền mắt" : tab === "blush" ? "Bông phấn – phẩy nhẹ hai má" : tab === "shadow" ? "Phấn mắt – tô màu bầu mắt" : "Lược và màu tóc"}</h3><p className="text-xs font-semibold text-slate-500">Chọn màu bên dưới, công chúa sẽ đổi ngay trên gương.</p></div>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
-                  {palettes[tab].map(item => <button key={item.value} onClick={() => { setMakeup(current => ({ ...current, [tab]: item.value })); setDone(false); }} className={"flex items-center gap-2 rounded-xl border-2 p-2 text-left text-sm font-bold " + (makeup[tab] === item.value ? "border-fuchsia-500 bg-white shadow" : "border-white bg-white/60")}><span className="h-8 w-8 shrink-0 rounded-full border-2 border-white shadow" style={{ background: item.value }}/>{item.name}{makeup[tab] === item.value && <span className="ml-auto text-fuchsia-600">✓</span>}</button>)}
+                <div className="grid min-h-0 grid-cols-2 gap-1.5 overflow-hidden sm:gap-2">
+                  {palettes[tab].map(item => <button key={item.value} onClick={() => { setMakeup(current => ({ ...current, [tab]: item.value })); setDone(false); }} className={"flex items-center gap-2 rounded-lg border-2 p-1 text-left text-xs font-bold sm:rounded-xl sm:p-2 sm:text-sm " + (makeup[tab] === item.value ? "border-fuchsia-500 bg-white shadow" : "border-white bg-white/60")}><span className="h-6 w-6 shrink-0 rounded-full sm:h-8 sm:w-8 border-2 border-white shadow" style={{ background: item.value }}/>{item.name}{makeup[tab] === item.value && <span className="ml-auto text-fuchsia-600">✓</span>}</button>)}
                 </div>
               </div>
-              <div className="mt-3 flex flex-wrap items-center justify-between gap-2"><span className="text-xs font-black text-[#6c3c35]">✨ Đồ nghề của công chúa</span><button onClick={() => setTab("lipstick")} className="rounded-full bg-white/90 px-3 py-1 text-xs font-black text-fuchsia-800">Đổi sang son 💄</button></div>
+              <div className="mt-1 flex shrink-0 flex-wrap items-center justify-between gap-1 sm:mt-2"><span className="text-xs font-black text-[#6c3c35]">✨ Đồ nghề của công chúa</span><button onClick={() => setTab("lipstick")} className="rounded-full bg-white/90 px-3 py-1 text-xs font-black text-fuchsia-800">Đổi sang son 💄</button></div>
             </div>
-            <div className="mt-3 rounded-2xl border-2 border-amber-100 bg-amber-50 p-3"><h3 className="mb-2 font-black text-amber-900">👑 Phụ kiện công chúa</h3><div className="flex flex-wrap gap-2">{["👑", "🌸", "🎀", "✨", "🦋", "💎"].map(item => <button key={item} onClick={() => { setMakeup(current => ({ ...current, accessory: item })); setDone(false); }} className={"grid h-10 w-10 place-items-center rounded-xl border-2 bg-white text-xl " + (makeup.accessory === item ? "border-amber-400 shadow-md" : "border-white")}>{item}</button>)}</div></div>
-            <button disabled={saving} onClick={() => void saveLook()} className="mt-5 w-full rounded-2xl bg-gradient-to-r from-pink-500 to-fuchsia-600 px-5 py-4 text-lg font-black text-white shadow-[0_5px_0_#9d347e] disabled:opacity-60">{saving ? "Đang lưu..." : "💖 Lưu diện mạo công chúa"}</button>
+            <div className="mt-1 shrink-0 rounded-xl border-2 border-amber-100 bg-amber-50 p-1.5 sm:mt-2 sm:p-2"><h3 className="mb-2 font-black text-amber-900">👑 Phụ kiện công chúa</h3><div className="flex flex-wrap gap-2">{["👑", "🌸", "🎀", "✨", "🦋", "💎"].map(item => <button key={item} onClick={() => { setMakeup(current => ({ ...current, accessory: item })); setDone(false); }} className={"grid h-10 w-10 place-items-center rounded-xl border-2 bg-white text-xl " + (makeup.accessory === item ? "border-amber-400 shadow-md" : "border-white")}>{item}</button>)}</div></div>
+            <button disabled={saving} onClick={() => void saveLook()} className="mt-2 w-full shrink-0 rounded-xl bg-gradient-to-r from-pink-500 to-fuchsia-600 px-3 py-2 text-sm font-black text-white shadow-[0_4px_0_#9d347e] disabled:opacity-60 sm:py-3 sm:text-base">{saving ? "Đang lưu..." : "💖 Lưu diện mạo công chúa"}</button>
             {done && <p className="mt-3 text-center font-bold text-emerald-700">✨ Đã lưu phong cách của bé!</p>}
-            <p className="mt-3 text-center text-xs font-semibold text-slate-400">Bé có thể đổi màu son, phấn má, phấn mắt và tóc bất cứ lúc nào.</p>
+            <p className="mt-1 shrink-0 text-center text-[10px] font-semibold text-slate-400">Bé có thể đổi màu son, phấn má, phấn mắt và tóc bất cứ lúc nào.</p>
           </section>
         </div>
       </div>
