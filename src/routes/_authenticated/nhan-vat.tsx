@@ -93,7 +93,7 @@ function CharacterCreator() {
     let alive = true;
     void supabase.auth.getUser().then(({ data }) => {
       if (!alive) return;
-      const fullName = data.user?.user_metadata?.full_name;
+      const fullName = data.user?.user_metadata?.["full_name"];
       if (typeof fullName === "string" && fullName.trim()) setName(fullName.trim().slice(0, 20));
       else setName(suggestName());
     });
