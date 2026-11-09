@@ -5,10 +5,10 @@ import { GameShell } from "@/components/AppShell";
 export const Route = createFileRoute("/_authenticated/arena")({
   head: () => ({
     meta: [
-      { title: "Đấu Trường Trí Tuệ – Bé Vui Học" },
-      { name: "description", content: "Hai thí sinh cùng tranh tài qua các câu hỏi Toán, Tiếng Việt và Tiếng Anh." },
+      { title: "Đấu Trường Tri Thức – Bé Vui Học" },
+      { name: "description", content: "Ba phòng học Toán, Tiếng Việt và Tiếng Anh dành cho học sinh." },
       { property: "og:title", content: "Đấu Trường Trí Tuệ – Bé Vui Học" },
-      { property: "og:description", content: "Sân chơi kiến thức dành cho hai thí sinh." },
+      { property: "og:description", content: "Chọn phòng học và chinh phục thử thách kiến thức theo khối lớp." },
     ],
   }),
   component: () => <GameShell>{(profile) => <ArenaBattle currentGrade={profile.grade} onExit={() => window.history.back()} />}</GameShell>,
