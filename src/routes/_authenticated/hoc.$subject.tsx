@@ -82,7 +82,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
     if (choice === question.answer) {
       setScore((value) => value + 1);
       setSavingPoints(true);
-      void supabase.from("point_events").insert({
+      void Promise.resolve(supabase.from("point_events").insert({
         user_id: profile.id,
         grade: profile.grade,
         reason: "lesson_practice",
@@ -90,7 +90,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
         correct: 1,
         goals: 0,
         note: `${lesson.title} - câu ${index + 1}`,
-      }).then(({ error }) => {
+      })).then(({ error }) => {
         if (error) {
           toast.error("Chưa lưu được điểm. Bé thử lại sau nhé!");
         } else {
