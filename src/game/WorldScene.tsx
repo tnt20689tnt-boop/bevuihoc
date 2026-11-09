@@ -3,6 +3,7 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
+import { CampusMultiplayer } from "@/game/CampusMultiplayer";
 import { CampusArchitecture } from "@/game/CampusArchitecture";
 import {
   ROOMS,
@@ -13,6 +14,7 @@ import {
   spawnPoint,
 } from "@/game/rooms";
 import type { Avatar } from "@/lib/avatar";
+import type { Profile } from "@/hooks/use-player";
 
 export type MovementInput = { x: number; z: number };
 
@@ -20,6 +22,7 @@ type WorldSceneProps = {
   roomId: RoomId;
   fromRoom: RoomId | null;
   avatar: Avatar;
+  profile: Profile;
   touchRef: MutableRefObject<MovementInput>;
   onNearbyPortal: (portal: Portal | null) => void;
   onEnterPortal: (portal: Portal) => void;
@@ -39,6 +42,7 @@ const palette = {
 
 export function WorldScene(props: WorldSceneProps) {
   const room = ROOMS[props.roomId];
+  const playerPosition = useRef(spawnPoint(room.id, props.fromRoom));
   return (
     <Canvas
       shadows
@@ -80,9 +84,11 @@ export function WorldScene(props: WorldSceneProps) {
           onActivate={() => props.onActivity(activity)}
         />
       ))}
+      <CampusMultiplayer roomId={room.id} profile={props.profile} positionRef={playerPosition} />
       <PlayerController
         key={`${props.roomId}-${props.fromRoom ?? "start"}`}
         room={room}
+        positionRef={playerPosition}
         fromRoom={props.fromRoom}
         avatar={props.avatar}
         touchRef={props.touchRef}
@@ -541,6 +547,7 @@ function PlayerController({
   room,
   fromRoom,
   avatar,
+  positionRef,
   touchRef,
   onNearbyPortal,
   onInteract,
@@ -548,12 +555,16 @@ function PlayerController({
   room: RoomDef;
   fromRoom: RoomId | null;
   avatar: Avatar;
+  positionRef: MutableRefObject<ReturnType<typeof spawnPoint>>;
   touchRef: MutableRefObject<MovementInput>;
   onNearbyPortal: (portal: Portal | null) => void;
   onInteract: () => void;
 }) {
   const character = useRef<THREE.Group>(null);
-  const position = useRef(spawnPoint(room.id, fromRoom));
+  const position = positionRef;
+  useEffect(() => {
+    position.current = spawnPoint(room.id, fromRoom);
+  }, [room.id, fromRoom, position]);
   const held = useRef(new Set<string>());
   const animation = useRef<AnimState>(makeAnimState());
   const activePortal = useRef<string | null>(null);
