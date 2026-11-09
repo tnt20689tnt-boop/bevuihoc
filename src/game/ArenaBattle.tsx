@@ -5,6 +5,19 @@ type Player = "p1" | "p2";
 type GameState = "idle" | "playing" | "finished";
 type Outcome = Player | "tie";
 
+type MatchRecord = {
+  id: string;
+  date: string;
+  grade: number;
+  winnerName: string;
+  winnerScore: number;
+  winnerTime: number;
+  loserName: string;
+  loserScore: number;
+  loserTime: number;
+  isTie: boolean;
+};
+
 const QUESTION_SECONDS = 10;
 const QUESTION_COUNT = 10;
 
@@ -58,9 +71,10 @@ function Audience() {
   );
 }
 
-export function ArenaBattle() {
+type ArenaBattleProps = { currentGrade: number; onExit?: () => void };
+
+export function ArenaBattle({ currentGrade, onExit }: ArenaBattleProps) {
   const [subject, setSubject] = useState<Subject>("math");
-  const [grade, setGrade] = useState(2);
   const [level, setLevel] = useState(50);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -74,11 +88,22 @@ export function ArenaBattle() {
   const [p2Answer, setP2Answer] = useState<string | null>(null);
   const [expired, setExpired] = useState(false);
   const [feedback, setFeedback] = useState("Hai thí sinh đã sẵn sàng chưa?");
+  const [leaderboard, setLeaderboard] = useState<MatchRecord[]>([]);
   const startAt = useRef(0);
   const answersRef = useRef<{ p1: string | null; p2: string | null }>({ p1: null, p2: null });
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const advanceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentQuestion = questions[questionIndex];
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("arena_leaderboard");
+      const records: MatchRecord[] = saved ? JSON.parse(saved) : [];
+      setLeaderboard(records.filter((record) => record.grade === currentGrade).slice(0, 10));
+    } catch {
+      setLeaderboard([]);
+    }
+  }, [currentGrade]);
 
   const stopTimers = useCallback(() => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -94,10 +119,35 @@ export function ArenaBattle() {
     if (questionIndex >= questions.length - 1) {
       setGameState("finished");
       setFeedback("Trận đấu đã kết thúc!");
+      const outcome: Outcome =
+        p1Score > p2Score ? "p1" :
+        p2Score > p1Score ? "p2" :
+        p1Time < p2Time ? "p1" :
+        p2Time < p1Time ? "p2" : "tie";
+      const record: MatchRecord = {
+        id: `${Date.now()}`,
+        date: new Date().toLocaleDateString("vi-VN") + " " + new Date().toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" }),
+        grade: currentGrade,
+        winnerName: outcome === "p1" ? "Bạn 1" : outcome === "p2" ? "Bạn 2" : "Hòa",
+        winnerScore: outcome === "p2" ? p2Score : p1Score,
+        winnerTime: outcome === "p2" ? p2Time : p1Time,
+        loserName: outcome === "p1" ? "Bạn 2" : "Bạn 1",
+        loserScore: outcome === "p1" ? p2Score : p1Score,
+        loserTime: outcome === "p1" ? p2Time : p1Time,
+        isTie: outcome === "tie",
+      };
+      try {
+        const all: MatchRecord[] = JSON.parse(localStorage.getItem("arena_leaderboard") || "[]");
+        const updated = [record, ...all].slice(0, 30);
+        localStorage.setItem("arena_leaderboard", JSON.stringify(updated));
+        setLeaderboard(updated.filter((item) => item.grade === currentGrade).slice(0, 10));
+      } catch {
+        setFeedback("Trận đấu xong nhưng chưa lưu được bảng thành tích trên thiết bị.");
+      }
       return;
     }
     setQuestionIndex((index) => index + 1);
-  }, [questionIndex, questions.length, stopTimers]);
+  }, [questionIndex, questions.length, stopTimers, p1Score, p2Score, p1Time, p2Time, currentGrade]);
 
   const beginQuestion = useCallback(() => {
     answersRef.current = { p1: null, p2: null };
@@ -129,9 +179,9 @@ export function ArenaBattle() {
 
   const startGame = () => {
     stopTimers();
-    const generated = generateLevelQuestions(subject, grade, level, QUESTION_COUNT);
+    const generated = generateLevelQuestions(subject, currentGrade, level, QUESTION_COUNT);
     const complete = [...generated];
-    while (complete.length < QUESTION_COUNT) complete.push(generateQuestion(subject, grade, level));
+    while (complete.length < QUESTION_COUNT) complete.push(generateQuestion(subject, currentGrade, level));
     setQuestions(complete.slice(0, QUESTION_COUNT));
     setQuestionIndex(0);
     setP1Score(0);
@@ -198,19 +248,28 @@ export function ArenaBattle() {
           <section className="z-20 my-4 w-full max-w-xl rounded-3xl border border-yellow-300/40 bg-indigo-950/90 p-5 text-center shadow-2xl sm:p-8">
             <div className="mb-3 text-5xl">🏆</div><h2 className="text-2xl font-black text-yellow-300 sm:text-3xl">Sẵn sàng tranh tài?</h2>
             <p className="my-3 text-sm text-indigo-100">Hai thí sinh cùng trả lời một bộ câu hỏi. Mỗi câu có 10 giây, đúng được 1 điểm.</p>
-            <div className="grid grid-cols-3 gap-2 text-left">
+            <div className="mb-3 rounded-full border border-yellow-400/50 bg-yellow-400/10 px-4 py-2 text-sm font-black text-yellow-200">🔥 ĐANG THI ĐẤU: LỚP {currentGrade}</div><div className="grid grid-cols-2 gap-2 text-left">
               <label className="text-xs font-bold text-indigo-200">Môn học<select value={subject} onChange={(e) => setSubject(e.target.value as Subject)} className="mt-1 w-full rounded-xl bg-white p-2 text-sm font-bold text-slate-900"><option value="math">Toán</option><option value="vietnamese">Tiếng Việt</option><option value="english">Tiếng Anh</option></select></label>
-              <label className="text-xs font-bold text-indigo-200">Khối lớp<select value={grade} onChange={(e) => setGrade(Number(e.target.value))} className="mt-1 w-full rounded-xl bg-white p-2 text-sm font-bold text-slate-900">{[1,2,3,4,5].map((n) => <option key={n} value={n}>Lớp {n}</option>)}</select></label>
               <label className="text-xs font-bold text-indigo-200">Level<input type="number" min={1} max={100} value={level} onChange={(e) => setLevel(Math.max(1, Math.min(100, Number(e.target.value) || 1)))} className="mt-1 w-full rounded-xl bg-white p-2 text-sm font-bold text-slate-900" /></label>
             </div>
             <button onClick={startGame} className="mt-5 w-full rounded-full bg-gradient-to-r from-yellow-400 to-orange-500 px-8 py-3 text-lg font-black text-slate-950 shadow-lg transition hover:scale-[1.02]">BẮT ĐẦU THI ĐẤU</button>
+            {onExit && <button onClick={onExit} className="mt-3 text-sm font-bold text-indigo-200 underline hover:text-white">← Quay lại</button>}
+            <div className="mt-5 rounded-2xl border border-white/15 bg-black/20 p-4 text-left">
+              <h3 className="mb-3 text-center font-black text-yellow-200">🏆 BẢNG THÀNH TÍCH LỚP {currentGrade}</h3>
+              {leaderboard.length === 0 ? <p className="py-3 text-center text-sm text-indigo-200">Chưa có trận đấu nào ở lớp này. Hãy là người đầu tiên!</p> : <div className="max-h-48 space-y-2 overflow-y-auto">
+                {leaderboard.map((record, index) => <div key={record.id} className="rounded-xl border border-white/10 bg-white/5 p-3 text-xs">
+                  <div className="mb-1 flex justify-between text-indigo-200"><span>Trận gần đây #{index + 1}</span><span>{record.date}</span></div>
+                  {record.isTie ? <p className="text-center font-bold text-blue-200">🤝 Hòa {record.winnerScore} - {record.loserScore}</p> : <div className="flex justify-between gap-2"><span className="font-bold text-emerald-300">🏆 {record.winnerName}: {record.winnerScore} điểm</span><span className="text-indigo-100">{record.loserName}: {record.loserScore}</span></div>}
+                </div>)}
+              </div>}
+            </div>
           </section>
         )}
 
         {gameState === "playing" && currentQuestion && (
           <section className="z-20 w-full max-w-4xl rounded-3xl border border-white/20 bg-slate-950/80 p-4 text-center shadow-2xl backdrop-blur-md sm:p-6">
             <div className="mb-3 flex items-center justify-between text-xs font-bold text-indigo-100 sm:text-sm">
-              <span>CÂU {questionIndex + 1} / {questions.length}</span>
+              <span>LỚP {currentGrade} • CÂU {questionIndex + 1} / {questions.length}</span>
               <span className={timeLeft <= 3 ? "animate-pulse text-red-400" : "text-yellow-300"}>⏱ {timeLeft} GIÂY</span>
             </div>
             <div className="mx-auto mb-3 h-2 overflow-hidden rounded-full bg-white/10"><div className="h-full rounded-full bg-gradient-to-r from-emerald-400 to-yellow-300 transition-all" style={{ width: `${(timeLeft / QUESTION_SECONDS) * 100}%` }} /></div>
