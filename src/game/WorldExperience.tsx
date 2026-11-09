@@ -13,6 +13,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
   const [roomId, setRoomId] = useState<RoomId>("plaza");
   const [fromRoom, setFromRoom] = useState<RoomId | null>(null);
   const [nearbyPortal, setNearbyPortal] = useState<Portal | null>(null);
+  const [selectedPeer, setSelectedPeer] = useState<{ id: string; name: string } | null>(null);
   const touchRef = useRef<MovementInput>({ x: 0, z: 0 });
   const pressedDirections = useRef(new Set<Direction>());
   const joystickInput = useRef({ x: 0, z: 0 });
@@ -94,8 +95,14 @@ export function WorldExperience({ profile }: { profile: Profile }) {
         onEnterPortal={enterPortal}
         onInteract={() => enterPortal()}
         onActivity={goToActivity}
+        onSelectPeer={setSelectedPeer}
       />
-      <CampusVoiceChat roomId={roomId} profile={profile} />
+      <CampusVoiceChat
+        roomId={roomId}
+        profile={profile}
+        selectedPeer={selectedPeer}
+        onPeerInviteHandled={() => setSelectedPeer(null)}
+      />
       <CampusHUD
         profile={profile}
         roomId={roomId}
