@@ -11,5 +11,5 @@ export const Route = createFileRoute("/_authenticated/arena")({
       { property: "og:description", content: "Sân chơi kiến thức dành cho hai thí sinh." },
     ],
   }),
-  component: () => <GameShell>{() => <ArenaBattle />}</GameShell>,
+  component: () => <GameShell>{(profile) => <ArenaBattle currentGrade={profile.grade} onExit={() => window.history.back()} />}</GameShell>,
 });
