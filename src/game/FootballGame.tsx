@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/hooks/use-player";
+import { takeFootballShot } from "@/game/football.functions";
+import type { FootballDirection } from "@/lib/football-scoring";
 import { toast } from "sonner";
 
-type Direction = "left" | "center" | "right";
-
-const directions: { id: Direction; label: string; arrow: string }[] = [
+const directions: { id: FootballDirection; label: string; arrow: string }[] = [
   { id: "left", label: "Góc trái", arrow: "↖" },
   { id: "center", label: "Chính giữa", arrow: "↑" },
   { id: "right", label: "Góc phải", arrow: "↗" },
@@ -16,8 +15,8 @@ export function FootballGame({ profile }: { profile: Profile }) {
   const [goals, setGoals] = useState(0);
   const [shots, setShots] = useState(0);
   const [points, setPoints] = useState(0);
-  const [direction, setDirection] = useState<Direction>("center");
-  const [keeper, setKeeper] = useState<Direction | null>(null);
+  const [direction, setDirection] = useState<FootballDirection>("center");
+  const [keeper, setKeeper] = useState<FootballDirection | null>(null);
   const [result, setResult] = useState<"goal" | "saved" | null>(null);
   const [shooting, setShooting] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -25,40 +24,34 @@ export function FootballGame({ profile }: { profile: Profile }) {
   async function shoot() {
     if (shooting || saving) return;
     setShooting(true);
+    setSaving(true);
     setResult(null);
-    const keeperDirection = directions[Math.floor(Math.random() * directions.length)]!.id;
-    setKeeper(keeperDirection);
-    await new Promise((resolve) => window.setTimeout(resolve, 450));
-    const scored = direction !== keeperDirection;
     setShots((value) => value + 1);
-    setResult(scored ? "goal" : "saved");
+    try {
+      const outcome = await takeFootballShot({ data: { direction } });
+      setSaving(false);
+      setKeeper(outcome.goalkeeperDirection);
+      await new Promise((resolve) => window.setTimeout(resolve, 450));
+      setResult(outcome.scored ? "goal" : "saved");
 
-    if (scored) {
-      try {
-        setSaving(true);
-        const { error } = await supabase.from("point_events").insert({
-          user_id: profile.id,
-          grade: profile.grade,
-          points: 10,
-          correct: 1,
-          goals: 1,
-          reason: "football_goal",
-          note: "Ghi bàn trong trò chơi Sút bóng",
-        });
-        if (error) throw error;
+      if (outcome.scored) {
         setGoals((value) => value + 1);
-        setPoints((value) => value + 10);
+        setPoints((value) => value + outcome.points);
         toast.success("Ghi bàn! Bé được cộng 10 điểm ⚽");
-      } catch {
-        toast.error("Bóng đã vào lưới nhưng chưa lưu được điểm. Bé thử lại sau nhé!");
-      } finally {
-        setSaving(false);
+        if (outcome.newBadges.length > 0) {
+          toast.success("Bé vừa đạt thêm huy hiệu mới!");
+        }
       }
+
+      await new Promise((resolve) => window.setTimeout(resolve, 950));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Chưa lưu được kết quả. Bé thử lại nhé!");
+    } finally {
+      setSaving(false);
+      setResult(null);
+      setKeeper(null);
+      setShooting(false);
     }
-    await new Promise((resolve) => window.setTimeout(resolve, 950));
-    setResult(null);
-    setKeeper(null);
-    setShooting(false);
   }
 
   function resetGame() {
@@ -114,7 +107,7 @@ export function FootballGame({ profile }: { profile: Profile }) {
             <div className="mx-auto mt-3 grid max-w-xl grid-cols-3 gap-2">
               {directions.map((d) => <button key={d.id} type="button" disabled={shooting || saving} onClick={() => setDirection(d.id)} className={`rounded-2xl border-2 px-2 py-3 font-black transition disabled:opacity-50 ${direction === d.id ? "border-amber-300 bg-amber-300 text-emerald-950 shadow-lg" : "border-white/30 bg-white/10 text-white hover:bg-white/20"}`}><span className="block text-3xl">{d.arrow}</span><span className="text-sm">{d.label}</span></button>)}
             </div>
-            <button type="button" disabled={shooting || saving} onClick={() => void shoot()} className="mt-4 w-full max-w-xl rounded-2xl bg-gradient-to-r from-amber-300 to-yellow-400 px-6 py-4 text-xl font-black text-emerald-950 shadow-[0_5px_0_#b7791f] transition active:translate-y-1 active:shadow-none disabled:opacity-60">{saving ? "Đang lưu điểm..." : shooting ? "Đang sút..." : "⚽ SÚT BÓNG NGAY!"}</button>
+            <button type="button" disabled={shooting || saving} onClick={() => void shoot()} className="mt-4 w-full max-w-xl rounded-2xl bg-gradient-to-r from-amber-300 to-yellow-400 px-6 py-4 text-xl font-black text-emerald-950 shadow-[0_5px_0_#b7791f] transition active:translate-y-1 active:shadow-none disabled:opacity-60">{saving ? "Đang ghi nhận kết quả..." : shooting ? "Đang sút..." : "⚽ SÚT BÓNG NGAY!"}</button>
             <button type="button" disabled={shooting || saving} onClick={resetGame} className="mt-3 rounded-xl px-4 py-2 text-sm font-bold text-emerald-100 underline decoration-emerald-300 underline-offset-4 disabled:opacity-50">Chơi lại lượt tính điểm</button>
             <p className="mt-3 text-xs text-emerald-100/80">Mỗi bàn thắng được cộng 10 điểm vào bảng xếp hạng. Hãy chọn góc sút thật khéo!</p>
           </div>
