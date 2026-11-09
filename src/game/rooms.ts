@@ -1,0 +1,170 @@
+import mathImg from "@/assets/room-math.jpg";
+import vietImg from "@/assets/room-vietnamese.jpg";
+import engImg from "@/assets/room-english.jpg";
+import salonImg from "@/assets/room-salon.jpg";
+import footballImg from "@/assets/room-football.jpg";
+
+export type RoomId = "plaza" | "math" | "vietnamese" | "english" | "girls" | "boys";
+export const ROOM_IDS: RoomId[] = ["plaza", "math", "vietnamese", "english", "girls", "boys"];
+
+export type Activity = {
+  x: number;
+  z: number;
+  label: string;
+  icon: string;
+  to: "/hoc/$subject" | "/salon" | "/san-bong" | "/thi-dau" | "/bang-xep-hang" | "/sanh-vinh-danh";
+  params?: { subject: string };
+};
+
+export type Portal = { to: RoomId; x: number; z: number };
+
+export type RoomDef = {
+  id: RoomId;
+  name: string;
+  short: string;
+  emoji: string;
+  color: string; // 3D accent color
+  ground: [string, string]; // base + pattern
+  sky: string;
+  image?: string;
+  blurb: string;
+  radius: number;
+  portals: Portal[];
+  activities: Activity[];
+  obstacles: { x: number; z: number; r: number }[];
+};
+
+// Plaza portals sit on a ring; each room's exit portal is at +z.
+const RING = 17;
+const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / 5; // first portal straight "north" (-z)
+export const PLAZA_PORTALS: Portal[] = (["math", "vietnamese", "english", "girls", "boys"] as RoomId[]).map((to, i) => ({
+  to,
+  x: Math.round(Math.cos(ang(i)) * RING * 100) / 100,
+  z: Math.round(Math.sin(ang(i)) * RING * 100) / 100,
+}));
+
+const EXIT: Portal = { to: "plaza", x: 0, z: 11 };
+
+export const ROOMS: Record<RoomId, RoomDef> = {
+  plaza: {
+    id: "plaza",
+    name: "Quảng trường trung tâm",
+    short: "Quảng trường",
+    emoji: "⛲",
+    color: "#ffb347",
+    ground: ["#f3e3c3", "#e9d2a6"],
+    sky: "#9fd8ff",
+    blurb: "Nơi các bạn gặp nhau, chào hỏi và chọn phòng học.",
+    radius: 22,
+    portals: PLAZA_PORTALS,
+    activities: [
+      { x: -6, z: 6, label: "Đấu trường thi đua", icon: "⚔️", to: "/thi-dau" },
+      { x: 6, z: 6, label: "Bảng xếp hạng", icon: "🏆", to: "/bang-xep-hang" },
+      { x: 0, z: 9.5, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
+    ],
+    obstacles: [{ x: 0, z: 0, r: 3.1 }],
+  },
+  math: {
+    id: "math",
+    name: "Phòng Toán học",
+    short: "Toán",
+    emoji: "🔢",
+    color: "#4f8ef7",
+    ground: ["#d8e8ff", "#c2d8fb"],
+    sky: "#a9d4ff",
+    image: mathImg,
+    blurb: "Cộng, trừ, nhân, chia, hình học và toán có lời văn.",
+    radius: 14,
+    portals: [EXIT],
+    activities: [{ x: 0, z: -5, label: "Vào học Toán", icon: "🔢", to: "/hoc/$subject", params: { subject: "math" } }],
+    obstacles: [{ x: 0, z: -10, r: 2.2 }],
+  },
+  vietnamese: {
+    id: "vietnamese",
+    name: "Phòng Tiếng Việt",
+    short: "Tiếng Việt",
+    emoji: "📖",
+    color: "#f5b730",
+    ground: ["#fff1cc", "#fbe3a3"],
+    sky: "#ffe2a8",
+    image: vietImg,
+    blurb: "Luyện đọc, chính tả, từ vựng, ngữ pháp và đọc hiểu.",
+    radius: 14,
+    portals: [EXIT],
+    activities: [
+      { x: 0, z: -5, label: "Vào học Tiếng Việt", icon: "📖", to: "/hoc/$subject", params: { subject: "vietnamese" } },
+    ],
+    obstacles: [
+      { x: 7, z: -3, r: 2.2 },
+      { x: 0, z: -10, r: 2.2 },
+    ],
+  },
+  english: {
+    id: "english",
+    name: "Phòng Tiếng Anh",
+    short: "Tiếng Anh",
+    emoji: "🌍",
+    color: "#3fbf6f",
+    ground: ["#dcf5df", "#c4ebc9"],
+    sky: "#a8e6ff",
+    image: engImg,
+    blurb: "Chữ cái, số đếm, màu sắc, con vật và câu giao tiếp.",
+    radius: 14,
+    portals: [EXIT],
+    activities: [
+      { x: 0, z: -5, label: "Vào học Tiếng Anh", icon: "🌍", to: "/hoc/$subject", params: { subject: "english" } },
+    ],
+    obstacles: [
+      { x: -7, z: -4, r: 1.8 },
+      { x: 7, z: -4, r: 1.6 },
+    ],
+  },
+  girls: {
+    id: "girls",
+    name: "Khu vui chơi bé gái – Salon làm đẹp",
+    short: "Salon",
+    emoji: "💄",
+    color: "#ff6fa8",
+    ground: ["#ffe1ee", "#ffcce2"],
+    sky: "#ffd6ea",
+    image: salonImg,
+    blurb: "Trang điểm, làm tóc và thay trang phục cho cô bé anime.",
+    radius: 14,
+    portals: [EXIT],
+    activities: [{ x: 0, z: -5, label: "Vào Salon làm đẹp", icon: "💄", to: "/salon" }],
+    obstacles: [{ x: 0, z: -10, r: 2.4 }],
+  },
+  boys: {
+    id: "boys",
+    name: "Khu vui chơi bé trai – Sân bóng Toán học",
+    short: "Sân bóng",
+    emoji: "⚽",
+    color: "#1fb5a8",
+    ground: ["#7ccf6a", "#6cc35a"],
+    sky: "#a9dcff",
+    image: footballImg,
+    blurb: "Trả lời đúng để sút bóng vào gôn và ghi bàn.",
+    radius: 14,
+    portals: [EXIT],
+    activities: [{ x: 0, z: -5, label: "Ra sân sút bóng", icon: "⚽", to: "/san-bong" }],
+    obstacles: [],
+  },
+};
+
+export function isRoomId(v: unknown): v is RoomId {
+  return typeof v === "string" && (ROOM_IDS as string[]).includes(v);
+}
+
+/** Where a player appears when entering `to` from `from`. */
+export function spawnPoint(to: RoomId, from: RoomId | null): { x: number; z: number; ry: number } {
+  if (to === "plaza") {
+    const p = PLAZA_PORTALS.find((pp) => pp.to === from);
+    if (p) {
+      const len = Math.hypot(p.x, p.z);
+      const k = (len - 3) / len; // just inside the portal, toward the fountain
+      return { x: p.x * k, z: p.z * k, ry: Math.atan2(-p.x, -p.z) };
+    }
+    return { x: (Math.random() - 0.5) * 6, z: 7 + Math.random() * 2, ry: Math.PI };
+  }
+  return { x: (Math.random() - 0.5) * 3, z: 8, ry: Math.PI };
+}
