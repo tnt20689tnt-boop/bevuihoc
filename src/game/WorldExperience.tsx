@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CampusHUD } from "@/game/CampusHUD";
 import { CampusVoiceChat } from "@/game/CampusVoiceChat";
@@ -11,6 +11,10 @@ type Direction = "up" | "down" | "left" | "right";
 export function WorldExperience({ profile }: { profile: Profile }) {
   const navigate = useNavigate();
   const [roomId, setRoomId] = useState<RoomId>("plaza");
+
+  useEffect(() => {
+    if (roomId === "arena") void navigate({ to: "/arena" });
+  }, [roomId, navigate]);
   const [fromRoom, setFromRoom] = useState<RoomId | null>(null);
   const [nearbyPortal, setNearbyPortal] = useState<Portal | null>(null);
   const [selectedPeer, setSelectedPeer] = useState<{ id: string; name: string } | null>(null);
@@ -52,7 +56,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
   const goToActivity = useCallback(
     (activity: Activity) => {
       if (activity.to === "/thi-dau") {
-        enterPortal({ to: "arena", x: 0, z: 0 });
+        void navigate({ to: "/arena" });
         return;
       }
       if (activity.to === "/hoc/$subject") {
@@ -64,7 +68,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
       }
       void navigate({ to: activity.to as never });
     },
-    [enterPortal, navigate],
+    [navigate],
   );
 
   const returnToPlaza = useCallback(() => {
