@@ -29,6 +29,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
   const identityRef = useRef("");
   const seqRef = useRef(0);
   const lastSentRef = useRef(0);
+  const lastSentPositionRef = useRef<Position | null>(null);
   const peersRef = useRef(peers);
   peersRef.current = peers;
 
@@ -108,9 +109,14 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
     const channel = channelRef.current;
     if (!channel) return;
     const now = performance.now();
-    if (now - lastSentRef.current < 120) return;
-    lastSentRef.current = now;
     const p = positionRef.current;
+    const previous = lastSentPositionRef.current;
+    const moved = !previous || Math.hypot(p.x - previous.x, p.z - previous.z) > 0.035;
+    const turned = !previous || Math.abs(Math.atan2(Math.sin(p.ry - previous.ry), Math.cos(p.ry - previous.ry))) > 0.08;
+    // Avoid flooding Realtime while idle; send a heartbeat so peers can still detect us.
+    if (now - lastSentRef.current < 120 || (!moved && !turned && now - lastSentRef.current < 1800)) return;
+    lastSentRef.current = now;
+    lastSentPositionRef.current = { x: p.x, z: p.z, ry: p.ry };
     const seq = ++seqRef.current;
     void channel.send({
       type: "broadcast",
