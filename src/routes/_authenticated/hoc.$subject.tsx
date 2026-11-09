@@ -135,6 +135,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
               <div className="text-2xl">⭐</div>
               <div className="font-display text-xl font-extrabold">{score}/{lesson.questions.length}</div>
               <div className="text-xs font-bold text-muted-foreground">Số câu đúng</div>
+              <div className="mt-1 text-xs font-extrabold text-primary">+{earnedPoints} điểm đã lưu</div>
             </div>
           </div>
 
