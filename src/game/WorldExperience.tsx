@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { CampusHUD } from "@/game/CampusHUD";
+import { CampusVoiceChat } from "@/game/CampusVoiceChat";
 import { WorldScene, type MovementInput } from "@/game/WorldScene";
 import { type Activity, type Portal, type RoomId } from "@/game/rooms";
 import type { Profile } from "@/hooks/use-player";
@@ -94,6 +95,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
         onInteract={() => enterPortal()}
         onActivity={goToActivity}
       />
+      <CampusVoiceChat roomId={roomId} profile={profile} />
       <CampusHUD
         profile={profile}
         roomId={roomId}
