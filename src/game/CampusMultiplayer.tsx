@@ -19,9 +19,10 @@ type Props = {
   roomId: RoomId;
   profile: Profile;
   positionRef: MutableRefObject<Position>;
+  onSelectPeer: (peer: { id: string; name: string }) => void;
 };
 
-export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
+export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }: Props) {
   const [peers, setPeers] = useState<CampusPeer[]>([]);
   const publicNameRef = useRef(profile.display_name);
   publicNameRef.current = profile.display_name?.trim() || "Bạn học";
@@ -35,9 +36,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
 
   useEffect(() => {
     let alive = true;
-    const id = typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `guest-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const id = profile.id;
     identityRef.current = id;
     setPeers([]);
 
@@ -103,7 +102,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
       if (channelRef.current === channel) channelRef.current = null;
       void supabase.removeChannel(channel);
     };
-  }, [roomId, profile.avatar, profile.display_name, positionRef]);
+  }, [roomId, profile.id, profile.avatar, profile.display_name, positionRef]);
 
   useFrame(() => {
     const channel = channelRef.current;
@@ -138,13 +137,13 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
   return (
     <group>
       {peers.map((peer) => (
-        <RemoteCampusAvatar key={peer.id} peer={peer} />
+        <RemoteCampusAvatar key={peer.id} peer={peer} onSelectPeer={onSelectPeer} />
       ))}
     </group>
   );
 }
 
-function RemoteCampusAvatar({ peer }: { peer: CampusPeer }) {
+function RemoteCampusAvatar({ peer, onSelectPeer }: { peer: CampusPeer; onSelectPeer: Props["onSelectPeer"] }) {
   const group = useRef<THREE.Group>(null);
   const target = useRef(new THREE.Vector3(peer.x, 0, peer.z));
   const previous = useRef(new THREE.Vector3(peer.x, 0, peer.z));
@@ -171,7 +170,14 @@ function RemoteCampusAvatar({ peer }: { peer: CampusPeer }) {
   });
 
   return (
-    <group ref={group} position={[peer.x, 0, peer.z]} rotation={[0, peer.rot, 0]}>
+    <group
+      ref={group}
+      position={[peer.x, 0, peer.z]}
+      rotation={[0, peer.rot, 0]}
+      onClick={(event) => { event.stopPropagation(); onSelectPeer({ id: peer.id, name: peer.name || "Bạn học" }); }}
+      onPointerOver={() => { document.body.style.cursor = "pointer"; }}
+      onPointerOut={() => { document.body.style.cursor = "auto"; }}
+    >
       <Character3D avatar={avatar} state={animation} />
       <Html position={[0, 2.05, 0]} center distanceFactor={12} style={{ pointerEvents: "none" }}>
         <span style={{
