@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { generateQuestion, type Question, type Subject } from "./learningEngine";
 
 type Room = {
@@ -60,6 +60,27 @@ export function ArenaBattle({ currentGrade, onExit }: Props) {
 
   const correct = !!question && selected === question.correctAnswer;
 
+  const speak = (text: string) => {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = room?.subject === "english" ? "en-US" : "vi-VN";
+    utterance.rate = 0.9;
+    utterance.pitch = 1.05;
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find((voice) => room?.subject === "english" ? voice.lang.toLowerCase().startsWith("en") : voice.lang.toLowerCase().startsWith("vi"));
+    if (preferred) utterance.voice = preferred;
+    window.speechSynthesis.speak(utterance);
+  };
+
+  useEffect(() => {
+    if (!room || !question) return;
+    const intro = room.subject === "english" ? "Welcome to English class. I am your host. Listen carefully to the question." : "Xin chào các con! MC đã sẵn sàng. Chúng ta cùng bắt đầu " + room.title.toLowerCase() + " nhé!";
+    const optionsText = question.options.map((option, index) => "Đáp án " + String.fromCharCode(65 + index) + ": " + option).join(". ");
+    speak(intro + " " + question.question + ". " + optionsText);
+    return () => { if ("speechSynthesis" in window) window.speechSynthesis.cancel(); };
+  }, [room, question]);
+
   return (
     <main className="relative min-h-[calc(100dvh-5rem)] overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-950 via-slate-900 to-sky-950 p-4 text-white sm:p-7">
       <div className="pointer-events-none absolute -left-20 top-20 h-64 w-64 rounded-full bg-sky-400/10 blur-3xl" />
@@ -116,6 +137,11 @@ export function ArenaBattle({ currentGrade, onExit }: Props) {
                 <div className="mt-3 text-4xl">{room.emoji}</div>
                 <p className="mt-2 text-lg font-black text-white">{room.title}</p>
               </div>
+              <div className="mx-auto mt-5 flex max-w-xl items-center gap-3 rounded-2xl border border-amber-200/40 bg-black/25 p-3 text-left">
+                <div className="grid h-14 w-14 shrink-0 place-items-center rounded-full bg-amber-300 text-3xl shadow-lg">🎙️</div>
+                <div className="min-w-0 flex-1"><p className="font-black text-amber-200">MC – Người dẫn chương trình</p><p className="text-xs text-white/85">MC chào lớp, đọc câu hỏi và từng phương án để bé lắng nghe.</p></div>
+                <button onClick={() => question && speak("Câu hỏi: " + question.question + ". " + question.options.map((option, index) => "Đáp án " + String.fromCharCode(65 + index) + ": " + option).join(". "))} className="shrink-0 rounded-full bg-amber-300 px-3 py-2 text-xs font-black text-slate-950">🔊 Nghe lại</button>
+              </div>
               <div className="mt-5 flex flex-wrap justify-center gap-2 text-xs font-bold">
                 <span className="rounded-full bg-black/20 px-3 py-2">🎒 Lớp {currentGrade}</span>
                 <span className="rounded-full bg-black/20 px-3 py-2">⭐ {score} điểm</span>
@@ -128,7 +154,8 @@ export function ArenaBattle({ currentGrade, onExit }: Props) {
                   <div className="mb-4 flex items-center justify-between gap-2 text-xs font-bold text-sky-200">
                     <span>GIỜ HỌC • LUYỆN TẬP</span><span>CÂU {played + (showResult ? 0 : 1)}</span>
                   </div>
-                  <h2 className="mb-6 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
+                  <h2 className="mb-2 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
+                  <p className="mb-5 text-center text-xs text-sky-200">🎧 Hãy nghe MC đọc câu hỏi rồi chọn đáp án đúng nhé!</p>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     {question.options.map((option, index) => {
                       const isCorrect = showResult && option === question.correctAnswer;
