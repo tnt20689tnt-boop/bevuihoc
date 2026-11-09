@@ -675,18 +675,9 @@ function PlayerController({
   const activePortal = useRef<string | null>(null);
   const nearbyHandler = useRef(onNearbyPortal);
   const interactHandler = useRef(onInteract);
-  const { camera, gl } = useThree();
+  const { camera } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
-  // Match Chùa Tâm An's orbit camera: yaw, elevation pitch, and zoom distance.
-  const cameraYaw = useRef(0);
-  const cameraPitch = useRef(0.42);
-  const cameraDistance = useRef(12.5);
-  const dragPointer = useRef<number | null>(null);
-  const lastPointer = useRef({ x: 0, y: 0 });
   const lookTarget = useRef(new THREE.Vector3());
-  const smoothedTarget = useRef(new THREE.Vector3());
-  const smoothedCamera = useRef(new THREE.Vector3());
-  const cameraInitialized = useRef(false);
   const sitting = useRef(false);
   const benchSpots = [
     { x: -8, z: 1, rotation: 0.42 },
@@ -791,20 +782,19 @@ function PlayerController({
   useFrame((_, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05);
     const keys = held.current;
-    const rightInput =
+    let dx =
       Number(keys.has("d") || keys.has("arrowright")) -
       Number(keys.has("a") || keys.has("arrowleft")) +
       touchRef.current.x;
-    const forwardInput =
-      Number(keys.has("w") || keys.has("arrowup")) -
+    let dz =
       Number(keys.has("s") || keys.has("arrowdown")) -
+      Number(keys.has("w") || keys.has("arrowup")) +
       touchRef.current.z;
-    const magnitude = Math.hypot(rightInput, forwardInput);
-    const right = magnitude > 1 ? rightInput / magnitude : rightInput;
-    const forward = magnitude > 1 ? forwardInput / magnitude : forwardInput;
-    // Movement follows the camera heading, as it does in Chùa Tâm An.
-    const dx = -Math.sin(cameraYaw.current) * forward + Math.cos(cameraYaw.current) * right;
-    const dz = -Math.cos(cameraYaw.current) * forward - Math.sin(cameraYaw.current) * right;
+    const magnitude = Math.hypot(dx, dz);
+    if (magnitude > 1) {
+      dx /= magnitude;
+      dz /= magnitude;
+    }
     const moving = Math.hypot(dx, dz) > 0.04;
     if (moving && sitting.current) sitting.current = false;
     const speed = keys.has("shift") ? 6.4 : 4.2;
@@ -842,25 +832,10 @@ function PlayerController({
       nearbyHandler.current(nearest);
     }
 
-    const cp = Math.cos(cameraPitch.current);
-    desiredCamera.current.set(
-      position.current.x + Math.sin(cameraYaw.current) * cameraDistance.current * cp,
-      position.current.y + 1.6 + Math.sin(cameraPitch.current) * cameraDistance.current,
-      position.current.z + Math.cos(cameraYaw.current) * cameraDistance.current * cp,
-    );
-    lookTarget.current.set(position.current.x, 0.9, position.current.z);
-    const safeFollowAlpha = 1 - Math.exp(-dt * 48);
-    const lookAlpha = 1 - Math.exp(-dt * 56);
-    if (!cameraInitialized.current) {
-      smoothedTarget.current.copy(lookTarget.current);
-      smoothedCamera.current.copy(desiredCamera.current);
-      cameraInitialized.current = true;
-    } else {
-      smoothedTarget.current.lerp(lookTarget.current, lookAlpha);
-      smoothedCamera.current.lerp(desiredCamera.current, safeFollowAlpha);
-    }
-    camera.position.copy(smoothedCamera.current);
-    camera.lookAt(smoothedTarget.current);
+    desiredCamera.current.set(position.current.x, 9.2, position.current.z + 12.4);
+    camera.position.lerp(desiredCamera.current, 1 - Math.exp(-3.6 * dt));
+    lookTarget.current.set(position.current.x, 0.9, position.current.z - 0.8);
+    camera.lookAt(lookTarget.current);
   });
 
   return (
