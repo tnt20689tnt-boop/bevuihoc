@@ -19,7 +19,12 @@ const ICE_SERVERS: RTCConfiguration = {
   iceServers: [{ urls: "stun:stun.l.google.com:19302" }],
 };
 
-export function CampusVoiceChat({ roomId, profile }: { roomId: RoomId; profile: Profile }) {
+export function CampusVoiceChat({ roomId, profile, selectedPeer, onPeerInviteHandled }: {
+  roomId: RoomId;
+  profile: Profile;
+  selectedPeer: VoiceMember | null;
+  onPeerInviteHandled: () => void;
+}) {
   const [expanded, setExpanded] = useState(false);
   const [members, setMembers] = useState<VoiceMember[]>([]);
   const [incoming, setIncoming] = useState<VoiceMember[]>([]);
@@ -116,9 +121,7 @@ export function CampusVoiceChat({ roomId, profile }: { roomId: RoomId; profile: 
 
   useEffect(() => {
     let alive = true;
-    const id = typeof crypto !== "undefined" && "randomUUID" in crypto
-      ? crypto.randomUUID()
-      : `voice-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const id = profile.id;
     identityRef.current = id;
     activeRef.current.clear();
     setMembers([]);
@@ -227,13 +230,20 @@ export function CampusVoiceChat({ roomId, profile }: { roomId: RoomId; profile: 
       activeRef.current.clear();
       void supabase.removeChannel(channel);
     };
-  }, [roomId]);
+  }, [roomId, profile.id]);
 
   const invite = async (person: VoiceMember) => {
     if (outgoing.includes(person.id) || active.includes(person.id)) return;
     setOutgoing((list) => [...list, person.id]);
     await sendSignal({ target: person.id, from: identityRef.current, kind: "invite", name: nameRef.current });
   };
+
+  useEffect(() => {
+    if (!selectedPeer || selectedPeer.id === profile.id) return;
+    setExpanded(true);
+    void invite(selectedPeer);
+    onPeerInviteHandled();
+  }, [selectedPeer?.id]);
 
   const acceptInvite = async (person: VoiceMember) => {
     setIncoming((list) => list.filter((item) => item.id !== person.id));
