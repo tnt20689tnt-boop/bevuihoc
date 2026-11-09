@@ -31,7 +31,8 @@ BEGIN
 
   RETURN jsonb_build_object('points', 10);
 END;
-$$;
+$;
+--> statement-breakpoint
 
 REVOKE ALL ON FUNCTION public.award_lesson_points(text) FROM PUBLIC;
 REVOKE ALL ON FUNCTION public.award_lesson_points(text) FROM anon;
