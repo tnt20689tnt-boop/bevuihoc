@@ -4,7 +4,7 @@ import { useEffect, useRef, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
 import { CampusMultiplayer } from "@/game/CampusMultiplayer";
-import { CampusArchitecture } from "@/game/CampusArchitecture";
+import { PlazaUpgrade3D } from "@/game/PlazaUpgrade3D";
 import {
   ROOMS,
   type Activity,
@@ -70,7 +70,7 @@ export function WorldScene(props: WorldSceneProps) {
         shadow-camera-bottom={-28}
       />
       <WorldFloor room={room} />
-      {room.id === "plaza" ? <PlazaDecor /> : <RoomDecor room={room} />}
+      {room.id === "plaza" ? <PlazaUpgrade3D /> : <RoomDecor room={room} />}
       {room.portals.map((portal) => (
         <PortalGate
           key={`${room.id}-${portal.to}`}
