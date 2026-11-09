@@ -28,6 +28,7 @@ type WorldSceneProps = {
   onEnterPortal: (portal: Portal) => void;
   onInteract: () => void;
   onActivity: (activity: Activity) => void;
+  onSelectPeer: (peer: { id: string; name: string }) => void;
 };
 
 const palette = {
@@ -85,7 +86,7 @@ export function WorldScene(props: WorldSceneProps) {
           onActivate={() => props.onActivity(activity)}
         />
       ))}
-      <CampusMultiplayer roomId={room.id} profile={props.profile} positionRef={playerPosition} />
+      <CampusMultiplayer roomId={room.id} profile={props.profile} positionRef={playerPosition} onSelectPeer={props.onSelectPeer} />
       <PlayerController
         key={`${props.roomId}-${props.fromRoom ?? "start"}`}
         room={room}
