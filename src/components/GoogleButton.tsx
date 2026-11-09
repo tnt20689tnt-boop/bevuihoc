@@ -18,7 +18,7 @@ export function GoogleButton({ className, label = "Tiếp tục với Google" }:
         return;
       }
       if (result.redirected) return;
-      window.location.assign("/the-gioi");
+      window.location.assign("/nhan-vat");
     } catch (error) {
       console.error("Google sign-in failed", error);
       toast.error("Không kết nối được Google. Phụ huynh kiểm tra mạng rồi thử lại nhé.");
