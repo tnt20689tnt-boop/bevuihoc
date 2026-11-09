@@ -570,8 +570,12 @@ function PlayerController({
   const activePortal = useRef<string | null>(null);
   const nearbyHandler = useRef(onNearbyPortal);
   const interactHandler = useRef(onInteract);
-  const { camera } = useThree();
+  const { camera, gl } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
+  const cameraYaw = useRef(0);
+  const cameraPolar = useRef(Math.atan2(12.4, 9.2));
+  const dragPointer = useRef<number | null>(null);
+  const lastPointer = useRef({ x: 0, y: 0 });
   const lookTarget = useRef(new THREE.Vector3());
 
   useEffect(() => {
@@ -580,6 +584,36 @@ function PlayerController({
   useEffect(() => {
     interactHandler.current = onInteract;
   }, [onInteract]);
+  useEffect(() => {
+    const canvas = gl.domElement;
+    const onPointerDown = (event: PointerEvent) => {
+      if (event.button !== 0) return;
+      dragPointer.current = event.pointerId;
+      lastPointer.current = { x: event.clientX, y: event.clientY };
+      canvas.setPointerCapture(event.pointerId);
+    };
+    const onPointerMove = (event: PointerEvent) => {
+      if (dragPointer.current !== event.pointerId) return;
+      const dx = event.clientX - lastPointer.current.x;
+      const dy = event.clientY - lastPointer.current.y;
+      lastPointer.current = { x: event.clientX, y: event.clientY };
+      cameraYaw.current -= dx * 0.006;
+      cameraPolar.current = THREE.MathUtils.clamp(cameraPolar.current + dy * 0.0045, 0.28, 1.42);
+    };
+    const stopDrag = (event: PointerEvent) => {
+      if (dragPointer.current === event.pointerId) dragPointer.current = null;
+    };
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove);
+    canvas.addEventListener("pointerup", stopDrag);
+    canvas.addEventListener("pointercancel", stopDrag);
+    return () => {
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", stopDrag);
+      canvas.removeEventListener("pointercancel", stopDrag);
+    };
+  }, [gl]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
@@ -661,7 +695,13 @@ function PlayerController({
       nearbyHandler.current(nearest);
     }
 
-    desiredCamera.current.set(position.current.x, 9.2, position.current.z + 12.4);
+    const cameraDistance = 15.44;
+    const horizontalDistance = Math.sin(cameraPolar.current) * cameraDistance;
+    desiredCamera.current.set(
+      position.current.x + Math.sin(cameraYaw.current) * horizontalDistance,
+      Math.cos(cameraPolar.current) * cameraDistance,
+      position.current.z + Math.cos(cameraYaw.current) * horizontalDistance,
+    );
     camera.position.lerp(desiredCamera.current, 1 - Math.exp(-3.6 * dt));
     lookTarget.current.set(position.current.x, 0.9, position.current.z - 0.8);
     camera.lookAt(lookTarget.current);
