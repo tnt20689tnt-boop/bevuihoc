@@ -114,10 +114,10 @@ function LessonRoom({ profile }: { profile: Profile }) {
     setSelected(choice);
     if (choice === question.answer) {
       setScore(v => v + 1); setSavingPoints(true);
-      void supabase.from("point_events").insert({
+      void Promise.resolve(supabase.from("point_events").insert({
         user_id: profile.id, grade: profile.grade, reason: "lesson_practice",
         points: 10, correct: 1, goals: 0, note: `${meta.title} - cấp ${level} - câu ${index + 1}`,
-      }).then(({ error }) => {
+      })).then(({ error }) => {
         if (error) toast.error("Chưa lưu được điểm. Bé thử lại sau nhé!");
         else { setEarnedPoints(v => v + 10); toast.success("+10 điểm học tập ⭐"); }
       }).finally(() => setSavingPoints(false));
