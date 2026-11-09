@@ -40,13 +40,13 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
   }
 
   function randomLook() {
-    const pick = <T,>(items: [T, ...T[]]): T => items[Math.floor(Math.random() * items.length)] ?? items[0];
+    const pick = <T,>(items: T[]): T | undefined => items[Math.floor(Math.random() * items.length)];
     setMakeup({
-      lipstick: pick(palettes.lipstick).value,
-      blush: pick(palettes.blush).value,
-      shadow: pick(palettes.shadow).value,
-      hair: pick(palettes.hair).value,
-      accessory: pick(["👑", "🌸", "🎀", "✨"]),
+      lipstick: pick(palettes.lipstick)?.value ?? defaults.lipstick,
+      blush: pick(palettes.blush)?.value ?? defaults.blush,
+      shadow: pick(palettes.shadow)?.value ?? defaults.shadow,
+      hair: pick(palettes.hair)?.value ?? defaults.hair,
+      accessory: pick(["👑", "🌸", "🎀", "✨"]) ?? defaults.accessory,
     });
     setDone(false);
   }
