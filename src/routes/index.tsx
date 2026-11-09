@@ -22,7 +22,7 @@ function GameEntry() {
 
   useEffect(() => {
     if (session === undefined) return;
-    navigate({ to: session ? "/the-gioi" : "/auth", replace: true });
+    navigate({ to: session ? "/nhan-vat" : "/auth", replace: true });
   }, [session, navigate]);
 
   return (
