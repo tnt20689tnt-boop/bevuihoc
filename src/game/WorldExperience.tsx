@@ -14,6 +14,14 @@ export function WorldExperience({ profile }: { profile: Profile }) {
   const [nearbyPortal, setNearbyPortal] = useState<Portal | null>(null);
   const touchRef = useRef<MovementInput>({ x: 0, z: 0 });
   const pressedDirections = useRef(new Set<Direction>());
+  const joystickInput = useRef({ x: 0, z: 0 });
+
+  const syncMovement = useCallback(() => {
+    touchRef.current = {
+      x: Number(pressedDirections.current.has("right")) - Number(pressedDirections.current.has("left")) + joystickInput.current.x,
+      z: Number(pressedDirections.current.has("down")) - Number(pressedDirections.current.has("up")) + joystickInput.current.z,
+    };
+  }, []);
 
   const enterPortal = useCallback(
     (portal?: Portal) => {
@@ -31,14 +39,13 @@ export function WorldExperience({ profile }: { profile: Profile }) {
   const setDirection = useCallback((direction: Direction, isPressed: boolean) => {
     if (isPressed) pressedDirections.current.add(direction);
     else pressedDirections.current.delete(direction);
-    touchRef.current = {
-      x:
-        Number(pressedDirections.current.has("right")) -
-        Number(pressedDirections.current.has("left")),
-      z:
-        Number(pressedDirections.current.has("down")) - Number(pressedDirections.current.has("up")),
-    };
-  }, []);
+    syncMovement();
+  }, [syncMovement]);
+
+  const setJoystick = useCallback((x: number, z: number) => {
+    joystickInput.current = { x, z };
+    syncMovement();
+  }, [syncMovement]);
 
   const goToActivity = useCallback(
     (activity: Activity) => {
@@ -95,7 +102,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
         onReturnToPlaza={returnToPlaza}
         onGoToRoom={goToRoom}
         onActivity={goToActivity}
-        onDirection={setDirection}
+        onMove={setJoystick}
       />
     </div>
   );
