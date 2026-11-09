@@ -8,7 +8,7 @@ import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
 import { reconcilePresencePlayers, type PresenceSyncPlayer } from "@/game/multiplayerState";
 import { toAvatar } from "@/lib/avatar";
 import type { Profile } from "@/hooks/use-player";
-import type { RoomId } from "@/game/rooms";
+import { ROOMS, type RoomId } from "@/game/rooms";
 
 type Position = { x: number; z: number; ry: number };
 type CampusPeer = PresenceSyncPlayer & {
@@ -23,6 +23,8 @@ type Props = {
 
 export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
   const [peers, setPeers] = useState<CampusPeer[]>([]);
+  const publicNameRef = useRef<string | null>(null);
+  if (!publicNameRef.current) publicNameRef.current = `Bạn học ${Math.floor(1000 + Math.random() * 9000)}`;
   const channelRef = useRef<RealtimeChannel | null>(null);
   const identityRef = useRef("");
   const seqRef = useRef(0);
@@ -51,7 +53,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
         id,
         Date.now(),
       );
-      setPeers(next.filter((peer) => peer.roomId === roomId));
+      setPeers(next.filter((peer) => peer.roomId === roomId && Math.hypot(peer.x, peer.z) <= ROOMS[roomId].radius + 1));
     };
 
     channel
@@ -61,7 +63,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
       .on("broadcast", { event: "move" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
         const incoming = payload as CampusPeer;
-        if (incoming.id === id || incoming.roomId !== roomId || typeof incoming.id !== "string") return;
+        if (incoming.id === id || incoming.roomId !== roomId || typeof incoming.id !== "string") return;\n        if (!Number.isFinite(incoming.x) || !Number.isFinite(incoming.z) || Math.hypot(incoming.x, incoming.z) > ROOMS[roomId].radius + 1) return;
         setPeers((current) => {
           const old = current.find((peer) => peer.id === incoming.id);
           if (old && Number(old.seq ?? 0) > Number(incoming.seq ?? 0)) return current;
@@ -83,7 +85,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
         const p = positionRef.current;
         await channel.track({
           id,
-          name: profile.display_name.slice(0, 24),
+          name: publicNameRef.current,
           avatar: profile.avatar,
           roomId,
           x: p.x,
@@ -99,7 +101,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
       if (channelRef.current === channel) channelRef.current = null;
       void supabase.removeChannel(channel);
     };
-  }, [roomId, profile.id, profile.display_name, profile.avatar, positionRef]);
+  }, [roomId, profile.avatar, positionRef]);
 
   useFrame(() => {
     const channel = channelRef.current;
@@ -114,7 +116,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
       event: "move",
       payload: {
         id: identityRef.current,
-        name: profile.display_name.slice(0, 24),
+        name: publicNameRef.current,
         avatar: profile.avatar,
         roomId,
         x: p.x,
