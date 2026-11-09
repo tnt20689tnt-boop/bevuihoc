@@ -201,8 +201,15 @@ export function CampusHUD({
 
       <div className="pointer-events-none absolute bottom-5 right-4 hidden items-center gap-2 rounded-xl border border-white/80 bg-[#fffdf7]/85 px-3 py-2 text-xs font-bold text-slate-700 shadow-lg backdrop-blur-lg md:flex">
         <Move size={15} className="text-emerald-700" /> Di chuyển: WASD / ↑↓←→{" "}
-        <span className="text-slate-400">·</span> Tương tác: E
+        <span className="text-slate-400">·</span> E: Ngồi ghế / tương tác
       </div>
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new Event("campus-interact"))}
+        className="pointer-events-auto absolute bottom-8 right-5 rounded-2xl border-2 border-white/90 bg-[#fffdf7]/95 px-4 py-3 text-sm font-extrabold text-emerald-900 shadow-lg backdrop-blur-lg md:hidden"
+      >
+        🪑 Ngồi / đứng
+      </button>
 
       {nearbyPortal && (
         <div className="pointer-events-auto absolute bottom-48 left-1/2 w-[min(88vw,25rem)] -translate-x-1/2 rounded-2xl border border-white/90 bg-[#fffdf7]/95 p-3 shadow-[0_16px_40px_-16px_rgba(29,48,73,.55)] backdrop-blur-xl sm:bottom-8 sm:p-4">
