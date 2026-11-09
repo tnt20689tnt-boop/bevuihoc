@@ -17,11 +17,6 @@ const palettes = {
 
 const defaults: Makeup = { lipstick: "#f06b91", blush: "#ff9bb4", shadow: "#b99be8", hair: "#5a3825", accessory: "👑" };
 
-export const Route = createFileRoute("/_authenticated/salon")({
-  head: () => ({ meta: [{ title: "Salon công chúa – Bé Học Vui" }, { name: "description", content: "Trò chơi trang điểm công chúa anime 2D." }] }),
-  component: SalonRoute,
-});
-
 export function PrincessSalon({ profile }: { profile: Profile }) {
   const saved = profile.avatar as SalonAvatar;
   const [makeup, setMakeup] = useState<Makeup>(saved.makeup ?? defaults);
