@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { lovable } from "@/integrations/lovable";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
 export function AppleButton({ className, label = "Đăng nhập bằng Apple" }: { className?: string; label?: string }) {
   const [busy, setBusy] = useState(false);
@@ -19,6 +20,13 @@ export function AppleButton({ className, label = "Đăng nhập bằng Apple" }:
         return;
       }
       if (result.redirected) return;
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Apple chưa được bật trong cài đặt đăng nhập của dự án. Vui lòng bật Apple trong Lovable Cloud rồi thử lại.");
+        setBusy(false);
+        return;
+      }
       window.location.assign("/nhan-vat");
     } catch (error) {
       console.error("Apple sign-in failed", error);
