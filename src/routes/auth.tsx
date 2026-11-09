@@ -6,12 +6,8 @@ import { useSession } from "@/hooks/use-player";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Đăng nhập – Thế Giới Học Tập Vui Nhộn" },
-      { name: "description", content: "Phụ huynh đăng nhập bằng Google để bé vào thế giới học tập." },
-      { property: "og:title", content: "Đăng nhập – Thế Giới Học Tập Vui Nhộn" },
-      { property: "og:description", content: "Phụ huynh đăng nhập bằng Google để bé vào thế giới học tập." },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { title: "Đăng nhập – Bé Học Vui" },
+      { name: "description", content: "Phụ huynh đăng nhập để bé tạo nhân vật và bước vào trường học 3D." },
     ],
   }),
   component: AuthPage,
@@ -25,25 +21,26 @@ function AuthPage() {
   }, [session, navigate]);
 
   return (
-    <div className="grid min-h-screen place-items-center bg-gradient-sky px-4">
-      <div className="toy-card w-full max-w-md p-8 text-center">
-        <div className="animate-float text-6xl">🎒</div>
-        <h1 className="mt-3 text-3xl font-extrabold">Chào mừng bé!</h1>
-        <p className="mt-2 text-muted-foreground">
-          Nhờ bố mẹ đăng nhập bằng Google để tạo nhân vật và lưu điểm của bé nhé.
-        </p>
-        <div className="mt-6 flex justify-center">
-          <GoogleButton />
+    <main className="relative grid min-h-screen place-items-center overflow-hidden bg-[radial-gradient(ellipse_at_15%_10%,#d8f4ff_0%,transparent_38%),radial-gradient(ellipse_at_90%_0%,#fff0c9_0%,transparent_38%),linear-gradient(145deg,#f5fbff,#e8f8f1)] px-4 py-10">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40" style={{ backgroundImage: "radial-gradient(#83b9a7 1px,transparent 1px)", backgroundSize: "24px 24px" }} />
+      <section className="relative w-full max-w-[460px] overflow-hidden rounded-[2rem] border-4 border-white bg-white/95 p-7 text-center shadow-[0_28px_80px_-28px_rgba(35,74,83,.38)] sm:p-10">
+        <div className="absolute inset-x-0 top-0 h-2 bg-gradient-to-r from-emerald-400 via-sky-400 to-amber-300" />
+        <div className="mx-auto grid h-20 w-20 place-items-center rounded-[1.7rem] bg-gradient-to-br from-amber-200 to-orange-300 text-5xl shadow-[0_7px_0_#d98e43]">🎒</div>
+        <p className="mt-7 text-xs font-black uppercase tracking-[.24em] text-emerald-700">BÉ HỌC VUI · TRƯỜNG HỌC 3D</p>
+        <h1 className="mt-3 font-display text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">Chào mừng trở lại!</h1>
+        <p className="mx-auto mt-3 max-w-sm text-sm leading-6 text-slate-600">Phụ huynh đăng nhập trước, sau đó bé tự chọn tên, kiểu tóc, trang phục và tạo nhân vật của mình.</p>
+        <div className="my-7 rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 text-left">
+          <p className="font-extrabold text-emerald-950">🌟 Hành trình của bé</p>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center text-xs font-bold text-slate-600">
+            <div className="rounded-xl bg-white p-3"><span className="block text-2xl">🔐</span>Đăng nhập</div>
+            <div className="rounded-xl bg-white p-3"><span className="block text-2xl">🧒</span>Tạo nhân vật</div>
+            <div className="rounded-xl bg-white p-3"><span className="block text-2xl">🏫</span>Vào trường</div>
+          </div>
         </div>
-        <ul className="mt-6 space-y-1 text-left text-sm text-muted-foreground">
-          <li>🔒 Bé chỉ hiển thị bằng tên nhân vật, không lộ email.</li>
-          <li>💬 Chỉ dùng câu chào có sẵn, không có trò chuyện tự do.</li>
-          <li>⭐ Điểm số do máy chủ chấm, không ai sửa được.</li>
-        </ul>
-        <Link to="/" className="mt-6 inline-block text-sm font-semibold text-primary">
-          ← Về trang chủ
-        </Link>
-      </div>
-    </div>
+        <GoogleButton className="w-full justify-center" label="Đăng nhập bằng Google" />
+        <p className="mt-4 text-xs leading-5 text-slate-500">Tài khoản phụ huynh dùng để lưu hồ sơ và thành tích. Bé xuất hiện trong game bằng tên nhân vật.</p>
+        <Link to="/" className="mt-6 inline-flex text-sm font-bold text-emerald-700 hover:text-emerald-900">← Trang chủ</Link>
+      </section>
+    </main>
   );
 }
