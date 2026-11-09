@@ -30,9 +30,7 @@ export function CampusVoiceChat({ roomId, profile }: { roomId: RoomId; profile: 
   const connectionsRef = useRef(new Map<string, RTCPeerConnection>());
   const audioRef = useRef(new Map<string, HTMLAudioElement>());
   const pendingIceRef = useRef(new Map<string, RTCIceCandidateInit[]>());
-  const membersRef = useRef<VoiceMember[]>([]);
   nameRef.current = profile.display_name?.trim() || "Bạn học";
-  membersRef.current = members;
 
   useEffect(() => {
     let alive = true;
@@ -248,7 +246,7 @@ export function CampusVoiceChat({ roomId, profile }: { roomId: RoomId; profile: 
   };
 
   return (
-    <section className="pointer-events-auto absolute right-3 top-[4.2rem] z-20 w-[min(19rem,calc(100vw-1.5rem))] rounded-2xl border border-white/80 bg-[#fffdf7]/95 p-3 shadow-xl backdrop-blur-xl sm:right-5 sm:top-[4.7rem]">
+    <section className="pointer-events-auto absolute bottom-32 right-3 z-20 w-[min(19rem,calc(100vw-1.5rem))] rounded-2xl border border-white/80 bg-[#fffdf7]/95 p-3 shadow-xl backdrop-blur-xl sm:bottom-5 sm:left-5 sm:right-auto">
       <div className="flex items-center gap-2">
         <span className="grid h-9 w-9 place-items-center rounded-xl bg-emerald-100 text-emerald-800">
           <Users size={18} />
