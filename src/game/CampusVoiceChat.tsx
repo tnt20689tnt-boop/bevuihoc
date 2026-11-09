@@ -92,8 +92,8 @@ export function CampusVoiceChat({ roomId, profile }: { roomId: RoomId; profile: 
         }
       };
       pc.ontrack = (event) => {
-        const stream = event.streams[0];
-        if (!stream || !alive) return;
+        const stream = event.streams[0] ?? new MediaStream([event.track]);
+        if (!alive) return;
         let audio = audioRef.current.get(peerId);
         if (!audio) {
           audio = document.createElement("audio");
