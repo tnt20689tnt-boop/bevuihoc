@@ -3,6 +3,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { profileQueryKey, type Profile } from "@/hooks/use-player";
 import { AvatarBadge } from "@/components/AvatarBadge";
 import {
   ACCESSORIES,
@@ -127,17 +128,32 @@ function CharacterCreator() {
         void navigate({ to: "/auth", replace: true });
         return;
       }
-      const { error: saveError } = await supabase.from("profiles").upsert({
-        id: auth.user.id,
-        display_name: name.trim().replace(/\s+/g, " "),
-        gender,
-        grade,
-        avatar: { ...avatar, gender },
-      });
+      const cleanName = name.trim().replace(/\s+/g, " ");
+      const savedAvatar: Avatar = { ...defaultAvatar(gender), ...avatar, gender };
+      const { data: saved, error: saveError } = await supabase
+        .from("profiles")
+        .upsert({
+          id: auth.user.id,
+          display_name: cleanName,
+          gender,
+          grade,
+          avatar: savedAvatar,
+        })
+        .select("id, display_name, gender, grade, avatar")
+        .single();
       if (saveError) throw saveError;
-      await queryClient.invalidateQueries({ queryKey: ["profile", "me"] });
+      // Seed the saved profile before navigation so a stale cached null
+      // cannot send the child back to this form.
+      queryClient.setQueryData<Profile>(profileQueryKey, {
+        id: saved.id,
+        display_name: saved.display_name,
+        gender: saved.gender as Gender,
+        grade: saved.grade,
+        avatar: { ...savedAvatar, ...(saved.avatar as Partial<Avatar>), gender },
+      });
+      void queryClient.invalidateQueries({ queryKey: profileQueryKey });
       toast.success("Tạo nhân vật thành công! Chào mừng bé đến trường 🎉");
-      void navigate({ to: "/the-gioi", replace: true });
+      await navigate({ to: "/the-gioi", replace: true });
     } catch (cause) {
       const message = cause instanceof Error ? cause.message : "Không lưu được nhân vật. Bé thử lại nhé.";
       setError(message);
