@@ -1,33 +1,53 @@
 import { useState } from "react";
-import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Avatar } from "@/lib/avatar";
 import type { Profile } from "@/hooks/use-player";
 
-type Makeup = { lipstick: string; blush: string; shadow: string; eyeliner?: string; hair: string; accessory: string };
-type SalonAvatar = Avatar & { makeup?: Makeup };
+type Makeup = { lipstick: string; blush: string; shadow: string; eyeliner?: string; hair: string; accessory?: string };
+type SalonAvatar = Avatar & { makeup?: Makeup; hairColor?: string };
 
-const palettes = {
-  eyeliner: [{ name: "Đen huyền", value: "#35243d" }, { name: "Nâu mềm", value: "#795044" }, { name: "Tím mộng", value: "#76518f" }, { name: "Xanh đêm", value: "#345b78" }],
-  lipstick: [{ name: "Hồng đào", value: "#f06b91" }, { name: "Đỏ cherry", value: "#d94367" }, { name: "Hồng kẹo", value: "#ff91b7" }, { name: "Cam san hô", value: "#f28b70" }, { name: "Tím mộng mơ", value: "#ad75c9" }],
-  blush: [{ name: "Phấn hồng", value: "#ff9bb4" }, { name: "Đào", value: "#ffb18e" }, { name: "Hồng baby", value: "#f6a4d0" }, { name: "Tự nhiên", value: "#e9a18b" }],
-  shadow: [{ name: "Tím lilac", value: "#b99be8" }, { name: "Hồng ngọt", value: "#f3a4ca" }, { name: "Xanh ngọc", value: "#83d5d0" }, { name: "Vàng ánh kim", value: "#f4ce79" }, { name: "Nâu caramel", value: "#bd927d" }],
-  hair: [{ name: "Nâu socola", value: "#5a3825" }, { name: "Đen huyền", value: "#28202a" }, { name: "Vàng mật ong", value: "#e3b04b" }, { name: "Hồng pastel", value: "#e887ad" }, { name: "Tím lavender", value: "#9877c9" }],
+const defaults = {
+  lip: "#ff6b81",
+  eye: "transparent",
+  blush: "transparent",
+  hair: "#fbbf24",
 };
 
-const defaults: Makeup = { lipstick: "#f06b91", blush: "#ff9bb4", shadow: "#b99be8", eyeliner: "#35243d", hair: "#5a3825", accessory: "👑" };
+const hairColors = ["#fbbf24", "#78350f", "#f472b6", "#3b82f6", "#000000"];
+const eyeColors = ["transparent", "#8b5cf6", "#ec4899", "#10b981", "#f59e0b"];
+const blushColors = ["transparent", "#fca5a5", "#fb923c", "#f472b6"];
+const lipColors = ["#ff0000", "#ff6b81", "#d946ef", "#f97316", "#be123c"];
 
 export function PrincessSalon({ profile }: { profile: Profile }) {
   const saved = profile.avatar as SalonAvatar;
-  const [makeup, setMakeup] = useState<Makeup>(saved.makeup ?? defaults);
-  const [tab, setTab] = useState<keyof typeof palettes>("lipstick");
+  const [lipColor, setLipColor] = useState(saved.makeup?.lipstick ?? defaults.lip);
+  const [eyeColor, setEyeColor] = useState(saved.makeup?.shadow ?? defaults.eye);
+  const [blushColor, setBlushColor] = useState(saved.makeup?.blush ?? defaults.blush);
+  const [hairColor, setHairColor] = useState(saved.makeup?.hair ?? saved.hairColor ?? defaults.hair);
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
 
+  const playSound = () => {};
+  const handleLipChange = (color: string) => { setLipColor(color); setDone(false); playSound(); };
+  const handleEyeChange = (color: string) => { setEyeColor(color); setDone(false); playSound(); };
+  const handleBlushChange = (color: string) => { setBlushColor(color); setDone(false); playSound(); };
+  const handleHairChange = (color: string) => { setHairColor(color); setDone(false); playSound(); };
+
   async function saveLook() {
     setSaving(true);
-    const nextAvatar = { ...saved, hairColor: makeup.hair, accessory: "none", makeup };
+    const nextAvatar: SalonAvatar = {
+      ...saved,
+      hairColor,
+      makeup: {
+        ...(saved.makeup ?? {}),
+        lipstick: lipColor,
+        shadow: eyeColor,
+        blush: blushColor,
+        hair: hairColor,
+        accessory: saved.makeup?.accessory ?? "👑",
+      },
+    };
     try {
       const { error } = await supabase.from("profiles").update({ avatar: nextAvatar }).eq("id", profile.id);
       if (error) throw error;
@@ -40,141 +60,73 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
     }
   }
 
-  function randomLook() {
-    const pick = <T,>(items: T[]) => items[Math.floor(Math.random() * items.length)];
-    setMakeup({
-      lipstick: pick(palettes.lipstick).value,
-      blush: pick(palettes.blush).value,
-      shadow: pick(palettes.shadow).value,
-      eyeliner: pick(palettes.eyeliner).value,
-      hair: pick(palettes.hair).value,
-      accessory: pick(["👑", "🌸", "🎀", "✨"]),
-    });
+  function resetLook() {
+    setLipColor(defaults.lip);
+    setEyeColor(defaults.eye);
+    setBlushColor(defaults.blush);
+    setHairColor(defaults.hair);
     setDone(false);
   }
 
   return (
-    <div className="h-[calc(100dvh-4rem)] overflow-hidden rounded-b-[2rem] bg-[radial-gradient(ellipse_at_15%_5%,#fff_0%,transparent_32%),linear-gradient(135deg,#ffe7f1,#f4e9ff_52%,#fff1d9)] p-2 text-slate-800 sm:p-3">
-      <div className="mx-auto flex h-full max-w-6xl flex-col">
-        <div className="mb-2 flex shrink-0 flex-wrap items-center justify-between gap-2">
-          <div><p className="text-xs font-black uppercase tracking-[.2em] text-pink-600">Princess beauty studio</p><h1 className="text-3xl font-black text-fuchsia-950 sm:text-4xl">💄 Salon Công Chúa</h1><p className="font-semibold text-fuchsia-800/75">Chọn màu xinh xắn và tự tay trang điểm cho nàng công chúa anime!</p></div>
-          <Link to="/the-gioi" className="rounded-2xl border-2 border-white bg-white/85 px-4 py-3 font-extrabold text-fuchsia-800 shadow-lg">← Về sân trường</Link>
-        </div>
+    <div className="relative flex h-[calc(100dvh-4rem)] w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-pink-200 via-pink-100 to-purple-200 px-2 py-2 font-sans">
+      <h1 className="z-10 mb-2 shrink-0 text-center text-xl font-extrabold text-pink-600 drop-shadow-md sm:text-3xl">
+        👑 Tiệm Trang Điểm Công Chúa 👑
+      </h1>
 
-        <div className="grid min-h-0 flex-1 grid-cols-[minmax(0,1fr)_minmax(0,.9fr)] gap-2 sm:gap-3">
-          <section className="relative flex min-h-0 flex-col overflow-hidden rounded-2xl border-2 border-white bg-gradient-to-b from-violet-100 via-pink-100 to-amber-50 p-1.5 shadow-[0_18px_50px_#9d5a9b30] sm:rounded-[2rem] sm:border-4 sm:p-3">
-            <div className="absolute left-5 top-5 text-2xl">✨</div><div className="absolute right-7 top-8 text-3xl">🌷</div>
-            <div className="mx-auto flex min-h-0 w-full max-w-[520px] flex-1 flex-col rounded-[48%_48%_38%_38%] border-4 border-amber-200 bg-gradient-to-b from-[#fff9f0] to-[#f9dce9] p-1.5 shadow-[inset_0_0_0_3px_#fff,0_12px_25px_#b77a8b40] sm:border-8 sm:p-2">
-              <div className="relative grid min-h-0 flex-1 place-items-center overflow-hidden rounded-[48%_48%_35%_35%] bg-[radial-gradient(ellipse_at_50%_38%,#fff_0%,#ffe7f0_56%,#e7d8ff_100%)]">
-                <div className="absolute left-7 top-8 text-2xl">✦</div><div className="absolute right-8 top-14 text-xl">✧</div>
-                <div className="relative mt-3">
-                  <div className="absolute -left-4 top-12 z-0 h-56 w-20 rounded-[50%] bg-[#8b5a45]" style={{ background: makeup.hair }} />
-                  <div className="absolute -right-4 top-12 z-0 h-56 w-20 rounded-[50%] bg-[#8b5a45]" style={{ background: makeup.hair }} />
-                  <div className="relative z-10">
-                    <svg viewBox="0 0 360 430" className="h-[min(46vh,330px)] w-auto max-w-[95%] drop-shadow-[0_14px_18px_#8b567344]" role="img" aria-label="Công chúa anime với mái tóc dài và đôi mắt long lanh">
-                      <defs>
-                        <linearGradient id="pSkin" x1="0" y1="0" x2="0.8" y2="1"><stop stopColor="#fff0df"/><stop offset=".58" stopColor="#ffddcf"/><stop offset="1" stopColor="#efb9ae"/></linearGradient>
-                        <linearGradient id="pHair" x1="0" y1="0" x2="1" y2="1"><stop stopColor={makeup.hair}/><stop offset=".48" stopColor={makeup.hair}/><stop offset="1" stopColor="#241b38"/></linearGradient>
-                        <linearGradient id="pShine" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#fff" stopOpacity=".9"/><stop offset="1" stopColor="#fff" stopOpacity="0"/></linearGradient>
-                        <linearGradient id="pDress" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#ffe0f0"/><stop offset="1" stopColor="#c68bdf"/></linearGradient>
-                        <radialGradient id="pIris"><stop stopColor="#8c5a9c"/><stop offset=".55" stopColor="#573c79"/><stop offset="1" stopColor="#25233e"/></radialGradient>
-                        <filter id="pBlur"><feGaussianBlur stdDeviation="5"/></filter>
-                      </defs>
-                      <ellipse cx="180" cy="410" rx="120" ry="15" fill="#a77baf" opacity=".18"/>
-                      {/* long flowing hair */}
-                      <path d="M69 177 Q24 57 105 30 Q178 -9 255 30 Q342 75 293 202 Q328 285 285 374 Q265 402 238 367 L122 382 Q78 410 66 350 Q39 266 69 177Z" fill="url(#pHair)" stroke="#55334f" strokeWidth="3"/>
-                      <path d="M89 112 Q57 35 131 26 Q80 81 105 153 Q69 222 94 324 Q58 283 68 195Z" fill={makeup.hair} opacity=".8"/>
-                      <path d="M267 100 Q318 48 290 164 Q322 262 272 350 Q291 248 249 175Z" fill="#fff" opacity=".13"/>
-                      <path d="M105 45 Q147 7 197 34 Q126 29 111 112" fill="none" stroke="url(#pShine)" strokeWidth="9" strokeLinecap="round" opacity=".7"/>
-                      {/* ears and face */}
-                      <ellipse cx="91" cy="215" rx="19" ry="29" fill="#f6c8b9"/>
-                      <ellipse cx="269" cy="215" rx="19" ry="29" fill="#f6c8b9"/>
-                      <path d="M103 132 Q105 72 180 70 Q255 72 257 132 L249 248 Q238 315 180 330 Q122 315 111 248Z" fill="url(#pSkin)" stroke="#e9b2a5" strokeWidth="2"/>
-                      <ellipse cx="90" cy="219" rx="9" ry="15" fill="#f4b8ac"/><ellipse cx="270" cy="219" rx="9" ry="15" fill="#f4b8ac"/>
-                      {/* fringe */}
-                      <path d="M91 153 Q70 58 151 49 Q221 28 272 98 Q286 130 257 164 Q252 112 220 103 Q190 149 147 122 Q120 116 103 168Z" fill="url(#pHair)" stroke="#55334f" strokeWidth="2"/>
-                      <path d="M113 104 Q134 53 178 57 Q144 72 139 119 M190 55 Q236 59 251 112" fill="none" stroke="#fff" strokeOpacity=".24" strokeWidth="7" strokeLinecap="round"/>
-                      {/* brows */}
-                      <path d="M119 177 Q145 158 163 176 M198 176 Q218 158 241 177" fill="none" stroke="#694356" strokeWidth="5" strokeLinecap="round"/>
-                      {/* eyeshadow */}
-                      <path d="M113 197 Q141 176 166 197 Q141 215 113 197 M194 197 Q219 176 247 197 Q219 215 194 197" fill={makeup.shadow} opacity=".72"/>
-                      {/* big anime eyes */}
-                      <path d="M113 202 Q139 180 165 204 Q159 238 139 240 Q117 235 113 202Z" fill="#fff"/>
-                      <path d="M195 204 Q221 180 247 202 Q243 235 221 240 Q201 238 195 204Z" fill="#fff"/>
-                      <ellipse cx="140" cy="213" rx="15" ry="23" fill="url(#pIris)"/><ellipse cx="220" cy="213" rx="15" ry="23" fill="url(#pIris)"/>
-                      <ellipse cx="140" cy="219" rx="8" ry="13" fill="#211c39"/><ellipse cx="220" cy="219" rx="8" ry="13" fill="#211c39"/>
-                      <circle cx="146" cy="201" r="7" fill="#fff"/><circle cx="226" cy="201" r="7" fill="#fff"/>
-                      <circle cx="133" cy="224" r="3.5" fill="#c9b5ff"/><circle cx="213" cy="224" r="3.5" fill="#c9b5ff"/>
-                      <path d="M112 201 Q137 177 166 199 M194 199 Q222 177 248 201" fill="none" stroke={makeup.eyeliner ?? "#35243d"} strokeWidth="5" strokeLinecap="round"/>
-                      <path d="M116 199 l-10 -9 M124 191 l-5 -11 M135 187 l-1 -12 M161 193 l7 -8 M244 199 l10 -9 M236 191 l5 -11 M225 187 l1 -12 M199 193 l-7 -8" fill="none" stroke={makeup.eyeliner ?? "#35243d"} strokeWidth="3.5" strokeLinecap="round"/>
-                      <path d="M119 194 l-7 -7 M128 188 l-4 -9 M239 194 l8 -7 M230 188 l4 -9" stroke="#483047" strokeWidth="3" strokeLinecap="round"/>
-                      {/* cheeks and nose */}
-                      <ellipse cx="112" cy="253" rx="23" ry="11" fill={makeup.blush} opacity=".55" filter="url(#pBlur)"/>
-                      <ellipse cx="248" cy="253" rx="23" ry="11" fill={makeup.blush} opacity=".55" filter="url(#pBlur)"/>
-                      <path d="M180 222 Q173 241 181 245" fill="none" stroke="#d99d91" strokeWidth="2.5" strokeLinecap="round"/>
-                      <path d="M166 270 Q180 259 194 270 Q182 286 180 284 Q174 284 166 270Z" fill={makeup.lipstick}/>
-                      <path d="M170 270 Q180 266 190 270" fill="none" stroke="#ffe7ed" strokeWidth="3" strokeLinecap="round"/>
-                      <path d="M171 292 Q180 296 189 292" fill="none" stroke="#d9958c" strokeWidth="2" strokeLinecap="round"/>
-                      {/* neck and dress */}
-                      <path d="M157 314 L157 348 L203 348 L203 314" fill="url(#pSkin)"/>
-                      <path d="M104 430 Q112 359 158 343 L180 364 L202 343 Q250 359 258 430Z" fill="url(#pDress)" stroke="#fff" strokeWidth="4"/>
-                      <path d="M157 346 L180 372 L203 346" fill="none" stroke="#fff" strokeWidth="5"/>
-                      <path d="M180 372 L168 393 L180 411 L192 393Z" fill="#f7d36f" stroke="#fff4c4" strokeWidth="3"/>
-                      <path d="M109 391 Q180 420 251 391" fill="none" stroke="#fff" strokeWidth="4" opacity=".7"/>
-                      {/* crown */}
-                      <path d="M122 82 L112 31 L148 58 L180 12 L212 58 L248 31 L238 84Z" fill="#f7d36f" stroke="#fff4c4" strokeWidth="5" strokeLinejoin="round"/>
-                      <path d="M126 79 Q180 93 234 79" fill="none" stroke="#d89a42" strokeWidth="5"/>
-                      <circle cx="180" cy="54" r="9" fill="#ff8db7" stroke="#fff" strokeWidth="3"/>
-                      <circle cx="143" cy="65" r="6" fill="#9ce5e3" stroke="#fff" strokeWidth="2"/>
-                      <circle cx="217" cy="65" r="6" fill="#9ce5e3" stroke="#fff" strokeWidth="2"/>
-                      {/* sparkles */}
-                      <path d="M57 135 l5 13 13 5 -13 5 -5 13 -5 -13 -13 -5 13 -5Z M302 186 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4Z" fill="#ffe18a" stroke="#fff" strokeWidth="2"/>
-                    </svg>
-                    <div className="absolute -top-2 left-1/2 -translate-x-1/2 rounded-full border-2 border-white bg-amber-200 px-4 py-1 text-2xl shadow-lg">{makeup.accessory}</div>
-                    <div className="absolute bottom-10 -right-8 z-20 flex rotate-[-12deg] items-end drop-shadow-lg" aria-label="Đang cầm dụng cụ trang điểm"><span className="text-4xl sm:text-5xl">🤚</span><span className="-ml-5 mb-5 text-4xl sm:text-5xl">{tab === "lipstick" ? "💄" : tab === "eyeliner" ? "🖊️" : tab === "blush" ? "🫧" : tab === "shadow" ? "🎨" : "💇"}</span></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="mx-auto mt-1 w-[86%] shrink-0 rounded-b-2xl border-x-4 border-b-4 border-amber-300 bg-gradient-to-b from-[#d9a5c4] to-[#a66d9c] p-1.5 text-center text-white shadow-xl sm:p-2">
-              <div className="text-xs font-black uppercase tracking-[.3em] text-pink-100">Gương trang điểm</div><div className="mt-1 font-black">Công chúa {profile.display_name}</div>
-            </div>
-            <div className="mt-2 flex shrink-0 flex-wrap justify-center gap-1.5"><button onClick={randomLook} className="rounded-xl bg-white px-4 py-2 font-extrabold text-fuchsia-800 shadow">🎲 Phối đồ ngẫu nhiên</button><button onClick={() => { setMakeup(defaults); setDone(false); }} className="rounded-xl bg-white/75 px-4 py-2 font-extrabold text-slate-700 shadow">↺ Làm lại</button></div>
-          </section>
+      <div className="relative flex min-h-0 w-full max-w-4xl flex-1 overflow-hidden rounded-2xl border-4 border-[#5c3a21] bg-[#8b5a2b] shadow-2xl sm:rounded-3xl sm:border-8">
+        <section className="relative flex w-1/2 min-w-0 items-center justify-center overflow-hidden bg-gradient-to-b from-[#fdfbfb] to-[#ebedee]">
+          <div className="absolute inset-2 rounded-[50%_50%_50%_50%_/_60%_60%_40%_40%] border-4 border-yellow-500 shadow-[inset_0_0_20px_rgba(0,0,0,0.1)] sm:inset-4 sm:border-[12px]" />
+          <svg viewBox="0 0 200 250" className="z-0 h-full w-full max-h-full translate-y-3 drop-shadow-xl" role="img" aria-label="Công chúa đang soi gương">
+            <path d="M 50 100 Q 30 200 50 230 Q 100 250 150 230 Q 170 200 150 100 Z" fill={hairColor} />
+            <rect x="85" y="180" width="30" height="40" fill="#fcd1ba" />
+            <path d="M 60 230 Q 100 200 140 230 L 160 250 L 40 250 Z" fill="#f9a8d4" />
+            <ellipse cx="100" cy="140" rx="45" ry="55" fill="#fcd1ba" />
+            <path d="M 55 100 Q 70 70 100 80 Q 130 70 145 100 Q 140 120 120 100 Q 100 85 80 100 Q 60 120 55 100 Z" fill={hairColor} />
+            <path d="M 55 100 Q 50 150 40 180 Q 60 170 55 100" fill={hairColor} />
+            <path d="M 145 100 Q 150 150 160 180 Q 140 170 145 100" fill={hairColor} />
+            <path d="M 70 120 Q 80 115 90 120 M 130 120 Q 120 115 110 120" fill="none" stroke="#5c3a21" strokeWidth="3" strokeLinecap="round" />
+            <ellipse cx="80" cy="135" rx="10" ry="14" fill="#fff" /><ellipse cx="120" cy="135" rx="10" ry="14" fill="#fff" />
+            <ellipse cx="80" cy="135" rx="6" ry="8" fill="#3b82f6" /><ellipse cx="120" cy="135" rx="6" ry="8" fill="#3b82f6" />
+            <circle cx="82" cy="133" r="2" fill="#fff" /><circle cx="122" cy="133" r="2" fill="#fff" />
+            <path d="M 70 135 Q 80 125 90 135 M 110 135 Q 120 125 130 135" fill="none" stroke="#000" strokeWidth="2" />
+            {eyeColor !== "transparent" && <><ellipse cx="80" cy="125" rx="12" ry="6" fill={eyeColor} opacity="0.6" /><ellipse cx="120" cy="125" rx="12" ry="6" fill={eyeColor} opacity="0.6" /></>}
+            {blushColor !== "transparent" && <><ellipse cx="65" cy="155" rx="12" ry="8" fill={blushColor} opacity="0.5" filter="blur(2px)" /><ellipse cx="135" cy="155" rx="12" ry="8" fill={blushColor} opacity="0.5" filter="blur(2px)" /></>}
+            <path d="M 98 150 Q 100 155 102 150" fill="none" stroke="#d1a38e" strokeWidth="2" strokeLinecap="round" />
+            <path d="M 85 170 Q 100 160 115 170 Q 100 185 85 170 Z" fill={lipColor} />
+            <path d="M 85 170 Q 100 165 115 170" fill="none" stroke="#be123c" strokeWidth="1" />
+            <path d="M 75 70 L 85 40 L 100 60 L 115 40 L 125 70 Z" fill="#fbbf24" stroke="#d97706" strokeWidth="2" strokeLinejoin="round" />
+            <circle cx="100" cy="50" r="4" fill="#ef4444" /><circle cx="85" cy="55" r="3" fill="#3b82f6" /><circle cx="115" cy="55" r="3" fill="#3b82f6" />
+          </svg>
+          <div className="absolute left-1/2 top-3 flex -translate-x-1/2 gap-2 sm:top-4 sm:gap-4"><div className="h-2.5 w-2.5 rounded-full bg-yellow-200 shadow-[0_0_10px_#fde047] sm:h-4 sm:w-4" /><div className="h-2.5 w-2.5 rounded-full bg-yellow-200 shadow-[0_0_10px_#fde047] sm:h-4 sm:w-4" /></div>
+        </section>
 
-          <section className="flex min-h-0 flex-col overflow-hidden rounded-2xl border-2 border-white bg-white/90 p-1.5 shadow-[0_18px_50px_#9d5a9b24] sm:rounded-[2rem] sm:border-4 sm:p-3">
-
-            <div className="mb-1 flex shrink-0 items-center gap-2"><span className="grid h-12 w-12 place-items-center rounded-2xl bg-pink-100 text-2xl">🪞</span><div><h2 className="text-xl font-black text-fuchsia-950">Bàn trang điểm</h2><p className="text-sm font-semibold text-slate-500">Bấm vào món đồ để cầm lên trang điểm</p></div></div>
-            <div className="flex min-h-0 flex-1 flex-col rounded-xl border-2 border-[#e7b7a0] bg-gradient-to-b from-[#f9dfcf] to-[#d69c83] p-1.5 shadow-[inset_0_5px_10px_#fff8,0_4px_0_#b87968] sm:rounded-[1.5rem] sm:border-4 sm:p-2">
-              <div className="grid shrink-0 grid-cols-5 gap-1 sm:gap-2">
-                {([
-                  { id: "lipstick", icon: "💄", label: "Son môi" },
-                  { id: "eyeliner", icon: "🖊️", label: "Bút kẻ mi" },
-                  { id: "blush", icon: "🫧", label: "Bông phấn" },
-                  { id: "shadow", icon: "🎨", label: "Phấn mắt" },
-                  { id: "hair", icon: "💇", label: "Tóc" },
-                ] as const).map(item => <button key={item.id} onClick={() => setTab(item.id)} className={"flex min-h-[62px] flex-col items-center justify-center rounded-lg border-2 px-0.5 py-1 transition-all sm:min-h-[76px] sm:rounded-xl sm:py-2 " + (tab === item.id ? "z-10 scale-110 border-fuchsia-500 bg-white shadow-[0_8px_18px_#9d347e55]" : "border-[#fff8] bg-[#fff9] hover:-translate-y-1")}>
-                  <span className={"text-3xl " + (tab === item.id && item.id === "blush" ? "animate-bounce" : "")}>{item.icon}</span><span className="mt-1 text-[11px] font-black text-fuchsia-950">{item.label}</span>{tab === item.id && <span className="text-[10px] font-black text-fuchsia-600">ĐANG CẦM</span>}
-                </button>)}
-              </div>
-              <div className="mt-1 flex min-h-0 flex-1 flex-col rounded-xl border-2 border-white/80 bg-[#fff8f1] p-1.5 shadow-inner sm:mt-2 sm:p-2">
-                <div className="mb-1 flex shrink-0 items-center gap-2">
-                  <span className={"grid h-10 w-10 place-items-center rounded-xl bg-white text-3xl shadow-md sm:h-12 sm:w-12 sm:text-4xl " + (tab === "blush" ? "animate-bounce" : "scale-110")}>{tab === "lipstick" ? "💄" : tab === "eyeliner" ? "🖊️" : tab === "blush" ? "🫧" : tab === "shadow" ? "🎨" : "💇"}</span>
-                  <div><h3 className="font-black text-fuchsia-950">{tab === "lipstick" ? "Son môi – chấm lên đôi môi" : tab === "eyeliner" ? "Bút kẻ mi – tô viền mắt" : tab === "blush" ? "Bông phấn – phẩy nhẹ hai má" : tab === "shadow" ? "Phấn mắt – tô màu bầu mắt" : "Lược và màu tóc"}</h3><p className="text-xs font-semibold text-slate-500">Chọn màu bên dưới, công chúa sẽ đổi ngay trên gương.</p></div>
-                </div>
-                <div className="grid min-h-0 grid-cols-2 gap-1.5 overflow-hidden sm:gap-2">
-                  {palettes[tab].map(item => <button key={item.value} onClick={() => { setMakeup(current => ({ ...current, [tab]: item.value })); setDone(false); }} className={"flex items-center gap-2 rounded-lg border-2 p-1 text-left text-xs font-bold sm:rounded-xl sm:p-2 sm:text-sm " + (makeup[tab] === item.value ? "border-fuchsia-500 bg-white shadow" : "border-white bg-white/60")}><span className="h-6 w-6 shrink-0 rounded-full sm:h-8 sm:w-8 border-2 border-white shadow" style={{ background: item.value }}/>{item.name}{makeup[tab] === item.value && <span className="ml-auto text-fuchsia-600">✓</span>}</button>)}
-                </div>
-              </div>
-              <div className="mt-1 flex shrink-0 flex-wrap items-center justify-between gap-1 sm:mt-2"><span className="text-xs font-black text-[#6c3c35]">✨ Đồ nghề của công chúa</span><button onClick={() => setTab("lipstick")} className="rounded-full bg-white/90 px-3 py-1 text-xs font-black text-fuchsia-800">Đổi sang son 💄</button></div>
-            </div>
-            <div className="mt-1 shrink-0 rounded-xl border-2 border-amber-100 bg-amber-50 p-1.5 sm:mt-2 sm:p-2"><h3 className="mb-2 font-black text-amber-900">👑 Phụ kiện công chúa</h3><div className="flex flex-wrap gap-2">{["👑", "🌸", "🎀", "✨", "🦋", "💎"].map(item => <button key={item} onClick={() => { setMakeup(current => ({ ...current, accessory: item })); setDone(false); }} className={"grid h-10 w-10 place-items-center rounded-xl border-2 bg-white text-xl " + (makeup.accessory === item ? "border-amber-400 shadow-md" : "border-white")}>{item}</button>)}</div></div>
-            <button disabled={saving} onClick={() => void saveLook()} className="mt-2 w-full shrink-0 rounded-xl bg-gradient-to-r from-pink-500 to-fuchsia-600 px-3 py-2 text-sm font-black text-white shadow-[0_4px_0_#9d347e] disabled:opacity-60 sm:py-3 sm:text-base">{saving ? "Đang lưu..." : "💖 Lưu diện mạo công chúa"}</button>
-            {done && <p className="mt-3 text-center font-bold text-emerald-700">✨ Đã lưu phong cách của bé!</p>}
-            <p className="mt-1 shrink-0 text-center text-[10px] font-semibold text-slate-400">Bé có thể đổi màu son, phấn má, phấn mắt và tóc bất cứ lúc nào.</p>
-          </section>
-        </div>
+        <section className="relative flex w-1/2 min-w-0 flex-col justify-between bg-gradient-to-b from-[#fbcfe8] to-[#f472b6] p-2 pb-8 sm:p-6 sm:pb-10">
+          <div>
+            <h2 className="mb-1 text-xs font-bold text-white drop-shadow-md sm:mb-2 sm:text-lg">💇‍♀️ Đổi màu tóc</h2>
+            <div className="flex flex-wrap gap-1.5 sm:gap-3">{hairColors.map(color => <button key={color} aria-label={"Màu tóc " + color} onClick={() => handleHairChange(color)} className="h-6 w-6 rounded-full border-2 border-white shadow-lg transition-transform hover:scale-110 sm:h-10 sm:w-10" style={{ backgroundColor: color }} />)}</div>
+          </div>
+          <div>
+            <h2 className="mb-1 text-xs font-bold text-white drop-shadow-md sm:mb-2 sm:text-lg">🎨 Phấn mắt</h2>
+            <div className="flex flex-wrap gap-1.5 sm:gap-3">{eyeColors.map(color => <button key={color} aria-label={"Phấn mắt " + color} onClick={() => handleEyeChange(color)} className="flex h-6 w-6 items-center justify-center rounded-md border-2 border-white shadow-lg sm:h-10 sm:w-10" style={{ backgroundColor: color === "transparent" ? "#e5e7eb" : color }}>{color === "transparent" && <span className="text-[7px] text-gray-500 sm:text-xs">Xóa</span>}</button>)}</div>
+          </div>
+          <div>
+            <h2 className="mb-1 text-xs font-bold text-white drop-shadow-md sm:mb-2 sm:text-lg">🌸 Má hồng</h2>
+            <div className="flex flex-wrap gap-1.5 sm:gap-3">{blushColors.map(color => <button key={color} aria-label={"Má hồng " + color} onClick={() => handleBlushChange(color)} className="flex h-6 w-6 items-center justify-center rounded-full border-2 border-white shadow-lg sm:h-10 sm:w-10" style={{ backgroundColor: color === "transparent" ? "#e5e7eb" : color }}>{color === "transparent" && <span className="text-[7px] text-gray-500 sm:text-xs">Xóa</span>}</button>)}</div>
+          </div>
+          <div>
+            <h2 className="mb-1 text-xs font-bold text-white drop-shadow-md sm:mb-2 sm:text-lg">💄 Son môi</h2>
+            <div className="flex items-end gap-1.5 sm:gap-4">{lipColors.map(color => <button key={color} aria-label={"Son môi " + color} onClick={() => handleLipChange(color)} className="group relative h-12 w-5 transition-transform hover:-translate-y-2 sm:h-20 sm:w-8"><span className="absolute bottom-0 h-7 w-full rounded-b-md border border-gray-600 bg-gray-800 shadow-md sm:h-12" /><span className="absolute bottom-7 h-4 w-full rounded-t-lg shadow-inner sm:bottom-12 sm:h-6" style={{ backgroundColor: color }} /><span className="absolute right-0.5 top-0 h-2 w-1 bg-white/40 sm:h-4 sm:w-2" /></button>)}</div>
+          </div>
+          <div className="absolute bottom-0 left-0 h-5 w-full bg-[#5c3a21] shadow-[0_-5px_15px_rgba(0,0,0,0.3)] sm:h-8" />
+        </section>
       </div>
+
+      <div className="z-10 mt-2 flex shrink-0 items-center gap-2">
+        <button onClick={resetLook} className="rounded-full border-2 border-pink-300 bg-white px-4 py-2 text-sm font-bold text-pink-500 shadow-lg transition-colors hover:bg-pink-50 sm:px-6 sm:text-base">🔄 Chơi lại từ đầu</button>
+        <button disabled={saving} onClick={() => void saveLook()} className="rounded-full bg-gradient-to-r from-pink-500 to-fuchsia-600 px-4 py-2 text-sm font-bold text-white shadow-lg disabled:opacity-60 sm:px-6 sm:text-base">{saving ? "Đang lưu..." : "💖 Lưu công chúa"}</button>
+      </div>
+      {done && <p className="mt-1 text-xs font-bold text-emerald-700">✨ Đã lưu diện mạo công chúa!</p>}
     </div>
   );
 }
