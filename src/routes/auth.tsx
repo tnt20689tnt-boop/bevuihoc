@@ -17,7 +17,7 @@ function AuthPage() {
   const session = useSession();
   const navigate = useNavigate();
   useEffect(() => {
-    if (session) navigate({ to: "/the-gioi", replace: true });
+    if (session) navigate({ to: "/nhan-vat", replace: true });
   }, [session, navigate]);
 
   return (
