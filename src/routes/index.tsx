@@ -118,7 +118,7 @@ function Landing() {
           </div>
           <div className="mt-9 grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
             {ROOM_CARDS.map((room, index) => (
-              <article key={room.id} className="group overflow-hidden rounded-[1.6rem] border border-slate-100 bg-[#fbfdff] shadow-[0_8px_28px_-18px_rgba(29,55,75,.28)] transition duration-300 hover:-translate-y-2 hover:shadow-[0_20px_38px_-18px_rgba(29,55,75,.3)]">
+              <Link key={room.id} to={session ? "/the-gioi" : "/auth"} aria-label={`Khám phá khu ${room.short}`} className="group block overflow-hidden rounded-[1.6rem] border border-slate-100 bg-[#fbfdff] shadow-[0_8px_28px_-18px_rgba(29,55,75,.28)] transition duration-300 hover:-translate-y-2 hover:shadow-[0_20px_38px_-18px_rgba(29,55,75,.3)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-emerald-300">
                 <div className="relative overflow-hidden">
                   <img src={room.image} alt={room.name} loading="lazy" width={816} height={816} className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105" />
                   <span className="absolute left-3 top-3 rounded-full border border-white/80 bg-white/90 px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-700">0{index + 1}</span>
@@ -128,7 +128,7 @@ function Landing() {
                   <p className="mt-1 min-h-10 text-sm leading-5 text-slate-500">{room.blurb}</p>
                   <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3 text-xs font-extrabold text-emerald-700"><span>Khám phá khu này</span><span className="transition group-hover:translate-x-1">↗</span></div>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>
