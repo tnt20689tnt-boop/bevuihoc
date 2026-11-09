@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { GameShell } from "@/components/AppShell";
+import type { Profile } from "@/hooks/use-player";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 type Question = {
   prompt: string;
@@ -56,16 +60,18 @@ export const Route = createFileRoute("/_authenticated/hoc/$subject")({
       { name: "description", content: "Luyện tập Toán, Tiếng Việt và Tiếng Anh trong thế giới Bé Học Vui." },
     ],
   }),
-  component: LessonRoom,
+  component: () => <GameShell>{(profile) => <LessonRoom profile={profile} />}</GameShell>,
 });
 
-function LessonRoom() {
+function LessonRoom({ profile }: { profile: Profile }) {
   const { subject } = Route.useParams();
   const lesson: Lesson = (LESSONS as Record<string, Lesson | undefined>)[subject] ?? LESSONS.math;
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [earnedPoints, setEarnedPoints] = useState(0);
+  const [savingPoints, setSavingPoints] = useState(false);
   const question: Question = lesson.questions[index] ?? (lesson.questions[0] as Question);
   const answered = selected !== null;
   const correct = selected === question.answer;
@@ -73,7 +79,26 @@ function LessonRoom() {
   function chooseAnswer(choice: number) {
     if (answered || finished) return;
     setSelected(choice);
-    if (choice === question.answer) setScore((value) => value + 1);
+    if (choice === question.answer) {
+      setScore((value) => value + 1);
+      setSavingPoints(true);
+      void supabase.from("point_events").insert({
+        user_id: profile.id,
+        grade: profile.grade,
+        reason: "lesson_practice",
+        points: 10,
+        correct: 1,
+        goals: 0,
+        note: `${lesson.title} - câu ${index + 1}`,
+      }).then(({ error }) => {
+        if (error) {
+          toast.error("Chưa lưu được điểm. Bé thử lại sau nhé!");
+        } else {
+          setEarnedPoints((value) => value + 10);
+          toast.success("+10 điểm học tập ⭐");
+        }
+      }).finally(() => setSavingPoints(false));
+    }
   }
 
   function nextQuestion() {
@@ -89,6 +114,7 @@ function LessonRoom() {
     setIndex(0);
     setSelected(null);
     setScore(0);
+    setEarnedPoints(0);
     setFinished(false);
   }
 
@@ -120,7 +146,7 @@ function LessonRoom() {
             <div className="py-10 text-center">
               <div className="text-6xl">{score === lesson.questions.length ? "🏆" : score >= 3 ? "🌟" : "💪"}</div>
               <h2 className="mt-4 text-3xl font-extrabold">Hoàn thành rồi!</h2>
-              <p className="mt-2 text-lg text-muted-foreground">Bé trả lời đúng <strong className="text-primary">{score}/{lesson.questions.length}</strong> câu.</p>
+              <p className="mt-2 text-lg text-muted-foreground">Bé trả lời đúng <strong className="text-primary">{score}/{lesson.questions.length}</strong> câu.</p>\n              <p className="mt-1 font-extrabold text-primary">⭐ Bé đã tích lũy {earnedPoints} điểm trong bài học này.</p>
               <p className="mt-1 text-muted-foreground">{score === lesson.questions.length ? "Xuất sắc! Bé đã trả lời đúng tất cả." : "Cố gắng thêm nhé, mỗi lần luyện tập bé sẽ tiến bộ hơn!"}</p>
               <div className="mt-7 flex flex-wrap justify-center gap-3">
                 <button onClick={restart} className="rounded-xl bg-primary px-6 py-3 font-display font-extrabold text-primary-foreground shadow-chunky">Học lại</button>
@@ -154,7 +180,7 @@ function LessonRoom() {
                   <p className="mt-1 text-sm">{question.hint}</p>
                 </div>
               )}
-              <div className="mt-6 flex justify-end">
+              {savingPoints && <p className="mt-3 text-right text-sm font-semibold text-primary">Đang lưu điểm học tập…</p>}\n              <div className="mt-6 flex justify-end">
                 <button onClick={nextQuestion} disabled={!answered} className="rounded-xl bg-primary px-6 py-3 font-display font-extrabold text-primary-foreground shadow-chunky disabled:cursor-not-allowed disabled:opacity-40">
                   {index === lesson.questions.length - 1 ? "Xem kết quả" : "Câu tiếp theo →"}
                 </button>
