@@ -50,6 +50,7 @@ export function WorldScene(props: WorldSceneProps) {
       camera={{ position: [0, 10, 15], fov: 43, near: 0.1, far: 100 }}
       gl={{ antialias: true, alpha: false, powerPreference: "high-performance" }}
       className="absolute inset-0"
+      style={{ touchAction: "none" }}
     >
       <color attach="background" args={[room.sky]} />
       <fog attach="fog" args={[room.sky, 28, 62]} />
@@ -572,11 +573,16 @@ function PlayerController({
   const interactHandler = useRef(onInteract);
   const { camera, gl } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
+  // Match Chùa Tâm An's orbit camera: yaw, elevation pitch, and zoom distance.
   const cameraYaw = useRef(0);
-  const cameraPolar = useRef(Math.atan2(12.4, 9.2));
+  const cameraPitch = useRef(0.42);
+  const cameraDistance = useRef(12.5);
   const dragPointer = useRef<number | null>(null);
   const lastPointer = useRef({ x: 0, y: 0 });
   const lookTarget = useRef(new THREE.Vector3());
+  const smoothedTarget = useRef(new THREE.Vector3());
+  const smoothedCamera = useRef(new THREE.Vector3());
+  const cameraInitialized = useRef(false);
 
   useEffect(() => {
     nearbyHandler.current = onNearbyPortal;
@@ -597,21 +603,27 @@ function PlayerController({
       const dx = event.clientX - lastPointer.current.x;
       const dy = event.clientY - lastPointer.current.y;
       lastPointer.current = { x: event.clientX, y: event.clientY };
+      // Same calibrated drag response as Chùa Tâm An.
       cameraYaw.current -= dx * 0.006;
-      cameraPolar.current = THREE.MathUtils.clamp(cameraPolar.current + dy * 0.0045, 0.28, 1.42);
+      cameraPitch.current = THREE.MathUtils.clamp(cameraPitch.current + dy * 0.004, 0.05, 1.3);
     };
     const stopDrag = (event: PointerEvent) => {
       if (dragPointer.current === event.pointerId) dragPointer.current = null;
+    };
+    const onWheel = (event: WheelEvent) => {
+      cameraDistance.current = THREE.MathUtils.clamp(cameraDistance.current + event.deltaY * 0.01, 4, 40);
     };
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
     canvas.addEventListener("pointerup", stopDrag);
     canvas.addEventListener("pointercancel", stopDrag);
+    canvas.addEventListener("wheel", onWheel, { passive: true });
     return () => {
       canvas.removeEventListener("pointerdown", onPointerDown);
       canvas.removeEventListener("pointermove", onPointerMove);
       canvas.removeEventListener("pointerup", stopDrag);
       canvas.removeEventListener("pointercancel", stopDrag);
+      canvas.removeEventListener("wheel", onWheel);
     };
   }, [gl]);
 
@@ -646,19 +658,20 @@ function PlayerController({
   useFrame((_, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05);
     const keys = held.current;
-    let dx =
+    const rightInput =
       Number(keys.has("d") || keys.has("arrowright")) -
       Number(keys.has("a") || keys.has("arrowleft")) +
       touchRef.current.x;
-    let dz =
+    const forwardInput =
+      Number(keys.has("w") || keys.has("arrowup")) -
       Number(keys.has("s") || keys.has("arrowdown")) -
-      Number(keys.has("w") || keys.has("arrowup")) +
       touchRef.current.z;
-    const magnitude = Math.hypot(dx, dz);
-    if (magnitude > 1) {
-      dx /= magnitude;
-      dz /= magnitude;
-    }
+    const magnitude = Math.hypot(rightInput, forwardInput);
+    const right = magnitude > 1 ? rightInput / magnitude : rightInput;
+    const forward = magnitude > 1 ? forwardInput / magnitude : forwardInput;
+    // Movement follows the camera heading, as it does in Chùa Tâm An.
+    const dx = -Math.sin(cameraYaw.current) * forward + Math.cos(cameraYaw.current) * right;
+    const dz = -Math.cos(cameraYaw.current) * forward - Math.sin(cameraYaw.current) * right;
     const moving = Math.hypot(dx, dz) > 0.04;
     const speed = keys.has("shift") ? 6.4 : 4.2;
     if (moving) {
@@ -695,16 +708,25 @@ function PlayerController({
       nearbyHandler.current(nearest);
     }
 
-    const cameraDistance = 15.44;
-    const horizontalDistance = Math.sin(cameraPolar.current) * cameraDistance;
+    const cp = Math.cos(cameraPitch.current);
     desiredCamera.current.set(
-      position.current.x + Math.sin(cameraYaw.current) * horizontalDistance,
-      Math.cos(cameraPolar.current) * cameraDistance,
-      position.current.z + Math.cos(cameraYaw.current) * horizontalDistance,
+      position.current.x + Math.sin(cameraYaw.current) * cameraDistance.current * cp,
+      position.current.y + 1.6 + Math.sin(cameraPitch.current) * cameraDistance.current,
+      position.current.z + Math.cos(cameraYaw.current) * cameraDistance.current * cp,
     );
-    camera.position.lerp(desiredCamera.current, 1 - Math.exp(-3.6 * dt));
-    lookTarget.current.set(position.current.x, 0.9, position.current.z - 0.8);
-    camera.lookAt(lookTarget.current);
+    lookTarget.current.set(position.current.x, 0.9, position.current.z);
+    const safeFollowAlpha = 1 - Math.exp(-dt * 48);
+    const lookAlpha = 1 - Math.exp(-dt * 56);
+    if (!cameraInitialized.current) {
+      smoothedTarget.current.copy(lookTarget.current);
+      smoothedCamera.current.copy(desiredCamera.current);
+      cameraInitialized.current = true;
+    } else {
+      smoothedTarget.current.lerp(lookTarget.current, lookAlpha);
+      smoothedCamera.current.lerp(desiredCamera.current, safeFollowAlpha);
+    }
+    camera.position.copy(smoothedCamera.current);
+    camera.lookAt(smoothedTarget.current);
   });
 
   return (
