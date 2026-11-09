@@ -738,6 +738,27 @@ function PlayerController({
   }, [gl]);
 
   useEffect(() => {
+    const interact = () => {
+      const nearestBench = room.id === "plaza"
+        ? benchSpots
+            .map((bench) => ({ bench, distance: Math.hypot(positionRef.current.x - bench.x, positionRef.current.z - bench.z) }))
+            .sort((a, b) => a.distance - b.distance)[0]
+        : undefined;
+      if (sitting.current) {
+        sitting.current = false;
+        animation.current.motion = "idle";
+      } else if (nearestBench && nearestBench.distance < 2.7) {
+        const { bench } = nearestBench;
+        positionRef.current.x = bench.x + Math.sin(bench.rotation) * 0.95;
+        positionRef.current.z = bench.z + Math.cos(bench.rotation) * 0.95;
+        if (character.current) character.current.rotation.y = bench.rotation + Math.PI;
+        sitting.current = true;
+        animation.current.motion = "sit";
+      } else {
+        interactHandler.current();
+      }
+    };
+    const onTouchInteract = () => interact();
     const onKeyDown = (event: KeyboardEvent) => {
       const key = event.key.toLowerCase();
       if (
@@ -750,33 +771,18 @@ function PlayerController({
       }
       if (!event.repeat && (key === "e" || key === " ")) {
         event.preventDefault();
-        const nearestBench = room.id === "plaza"
-          ? benchSpots
-              .map((bench) => ({ bench, distance: Math.hypot(positionRef.current.x - bench.x, positionRef.current.z - bench.z) }))
-              .sort((a, b) => a.distance - b.distance)[0]
-          : undefined;
-        if (sitting.current) {
-          sitting.current = false;
-          animation.current.motion = "idle";
-        } else if (nearestBench && nearestBench.distance < 2.7) {
-          const { bench } = nearestBench;
-          positionRef.current.x = bench.x + Math.sin(bench.rotation) * 0.95;
-          positionRef.current.z = bench.z + Math.cos(bench.rotation) * 0.95;
-          if (character.current) character.current.rotation.y = bench.rotation + Math.PI;
-          sitting.current = true;
-          animation.current.motion = "sit";
-        } else {
-          interactHandler.current();
-        }
+        interact();
       }
     };
     const onKeyUp = (event: KeyboardEvent) => held.current.delete(event.key.toLowerCase());
     const clearKeys = () => held.current.clear();
     window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("campus-interact", onTouchInteract);
     window.addEventListener("keyup", onKeyUp);
     window.addEventListener("blur", clearKeys);
     return () => {
       window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("campus-interact", onTouchInteract);
       window.removeEventListener("keyup", onKeyUp);
       window.removeEventListener("blur", clearKeys);
     };
