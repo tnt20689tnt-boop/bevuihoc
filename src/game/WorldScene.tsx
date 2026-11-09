@@ -71,7 +71,7 @@ export function WorldScene(props: WorldSceneProps) {
       />
       <WorldFloor room={room} />
       {room.id === "plaza" ? <PlazaUpgrade3D /> : <RoomDecor room={room} />}
-      {room.portals.map((portal) => (
+      {room.portals.map((portal) => portal.to === "arena" ? null : (
         <PortalGate
           key={`${room.id}-${portal.to}`}
           portal={portal}
@@ -122,6 +122,7 @@ function WorldFloor({ room }: { room: RoomDef }) {
         </mesh>
       )}
       {room.id === "boys" && <FootballPitch />}
+      {room.id === "arena" && <mesh position={[0, 0.035, -1.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[13, 18]} /><meshStandardMaterial color="#b98555" roughness={0.82} /></mesh>
     </group>
   );
 }
@@ -358,6 +359,7 @@ function FloatingBubbles() {
 }
 
 function RoomDecor({ room }: { room: RoomDef }) {
+  if (room.id === "arena") return <ArenaRoomDecor />;
   return (
     <group>
       <mesh position={[0, 1.65, -10.5]} castShadow>
@@ -386,7 +388,37 @@ function RoomDecor({ room }: { room: RoomDef }) {
       {room.id === "english" && <EnglishProps />}
       {room.id === "girls" && <GirlsProps />}
       {room.id === "boys" && <GoalProps />}
-      <RoomPlants />
+      {room.id !== "arena" && <RoomPlants />}
+    </group>
+  );
+}
+
+
+function ArenaRoomDecor() {
+  const seatColumns = [-3.8, 0, 3.8];
+  return (
+    <group>
+      <mesh position={[-6.55, 2, -1.5]} castShadow><boxGeometry args={[0.35, 4, 18]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[6.55, 2, -1.5]} castShadow><boxGeometry args={[0.35, 4, 18]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[0, 2, -10.45]} castShadow><boxGeometry args={[13.4, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[-4.1, 2, 7.45]} castShadow><boxGeometry args={[5.2, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[4.1, 2, 7.45]} castShadow><boxGeometry args={[5.2, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[0, 3.82, 7.45]}><boxGeometry args={[3, 0.36, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[0, 4.25, -1.5]} rotation={[0.18, 0, 0]}><boxGeometry args={[13.8, 0.28, 18.8]} /><meshStandardMaterial color="#a94f35" transparent opacity={0.25} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[0, 4.65, -1.5]}><boxGeometry args={[14, 0.22, 0.35]} /><meshStandardMaterial color="#7e3e2b" /></mesh>
+      <mesh position={[0, 2.45, -10.12]} castShadow><boxGeometry args={[8.5, 2.5, 0.28]} /><meshStandardMaterial color="#75462e" /></mesh>
+      <mesh position={[0, 2.45, -9.94]}><boxGeometry args={[8.05, 2.05, 0.08]} /><meshStandardMaterial color="#173d55" emissive="#0b2638" emissiveIntensity={0.25} /></mesh>
+      <Html position={[0, 2.7, -9.86]} center distanceFactor={10}><div style={{ width: 420, textAlign: "center", color: "#fff5d8", font: "900 28px 'Baloo 2',sans-serif", textShadow: "0 2px 4px #0008" }}>🏆 ĐẤU TRƯỜNG TRI THỨC<div style={{ marginTop: 6, fontSize: 16, color: "#ffdf8b" }}>TOÁN HỌC • TIẾNG VIỆT • TIẾNG ANH</div></div></Html>
+      <mesh position={[0, 0.55, -7.3]} castShadow><boxGeometry args={[2.2, 1.1, 1.25]} /><meshStandardMaterial color="#b66b36" /></mesh>
+      <mesh position={[0, 1.16, -7.3]} castShadow><boxGeometry args={[2.35, 0.16, 1.35]} /><meshStandardMaterial color="#f2c66d" /></mesh>
+      <Html position={[0, 1.35, -7.25]} center distanceFactor={11}><div style={{ color: "#fff8e8", font: "900 15px 'Baloo 2',sans-serif", textShadow: "0 1px 3px #000" }}>MC</div></Html>
+      {seatColumns.map((x, col) => [0, 1, 2].map((row) => (
+        <group key={String(col) + "-" + String(row)} position={[x, 0, 1.1 + row * 1.75]}>
+          <mesh position={[0, 0.55, 0]} castShadow><boxGeometry args={[1.25, 0.18, 0.85]} /><meshStandardMaterial color={["#4c91c8", "#e2a64b", "#59a77a"][col]} /></mesh>
+          <mesh position={[0, 1.05, -0.34]} castShadow><boxGeometry args={[1.25, 0.9, 0.14]} /><meshStandardMaterial color={["#4c91c8", "#e2a64b", "#59a77a"][col]} /></mesh>
+        </group>
+      )))}
+      {[-4.5, 0, 4.5].map((x) => <group key={x} position={[x, 3.45, 2.4]}><mesh><sphereGeometry args={[0.22, 16, 12]} /><meshStandardMaterial color="#ffe5a0" emissive="#ffbf55" emissiveIntensity={0.8} /></mesh><pointLight position={[0, -0.2, 0]} color="#ffe0a0" intensity={0.55} distance={5} /></group>)}
     </group>
   );
 }
@@ -809,6 +841,11 @@ function PlayerController({
       const nextX = position.current.x + dx * speed * dt;
       const nextZ = position.current.z + dz * speed * dt;
       const blocked = (x: number, z: number) => {
+        if (room.id === "arena") {
+          if (Math.abs(x) > 6.05 || z < -10.1) return true;
+          if (z > 7.0 && Math.abs(x) > 1.45) return true;
+          return false;
+        }
         // Keep the circular campus boundary, but leave a clear walkable corridor
         // through the front gate so the outdoor spawn can enter the school.
         const insideFrontGate = room.id === "plaza" && z > 0 && z < 34.5 && Math.abs(x) < 4.35;
