@@ -1,9 +1,8 @@
-import { useState } from "react";
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, DoorOpen, Map, Move, X } from "lucide-react";
+import { useRef, useState } from "react";
+import { DoorOpen, Map, Move, X } from "lucide-react";
 import { ROOMS, ROOM_IDS, type Activity, type Portal, type RoomId } from "@/game/rooms";
 import type { Profile } from "@/hooks/use-player";
 
-type Direction = "up" | "down" | "left" | "right";
 
 type CampusHUDProps = {
   profile: Profile;
@@ -13,7 +12,7 @@ type CampusHUDProps = {
   onReturnToPlaza: () => void;
   onGoToRoom: (id: RoomId) => void;
   onActivity: (activity: Activity) => void;
-  onDirection: (direction: Direction, pressed: boolean) => void;
+  onMove: (x: number, z: number) => void;
 };
 
 const DIRECTION_BUTTONS: { direction: Direction; label: string; Icon: typeof ArrowUp }[] = [
@@ -31,9 +30,34 @@ export function CampusHUD({
   onReturnToPlaza,
   onGoToRoom,
   onActivity,
-  onDirection,
+  onMove,
 }: CampusHUDProps) {
   const [mapOpen, setMapOpen] = useState(false);
+  const joystickRef = useRef<HTMLDivElement>(null);
+  const [knob, setKnob] = useState({ x: 0, y: 0 });
+  const pointerId = useRef<number | null>(null);
+
+  const moveJoystick = (clientX: number, clientY: number) => {
+    const base = joystickRef.current;
+    if (!base) return;
+    const rect = base.getBoundingClientRect();
+    const max = rect.width * 0.34;
+    let dx = clientX - (rect.left + rect.width / 2);
+    let dy = clientY - (rect.top + rect.height / 2);
+    const distance = Math.hypot(dx, dy);
+    if (distance > max) {
+      dx = (dx / distance) * max;
+      dy = (dy / distance) * max;
+    }
+    setKnob({ x: dx, y: dy });
+    onMove(dx / max, dy / max);
+  };
+
+  const stopJoystick = () => {
+    pointerId.current = null;
+    setKnob({ x: 0, y: 0 });
+    onMove(0, 0);
+  };
   const room = ROOMS[roomId];
 
   const chooseRoom = (id: RoomId) => {
@@ -151,20 +175,34 @@ export function CampusHUD({
         </section>
       )}
 
-      <div className="pointer-events-auto absolute bottom-5 left-4 select-none md:hidden">
+      <div className="pointer-events-auto absolute bottom-6 left-5 select-none md:hidden">
         <div
-          className="grid grid-cols-3 gap-1.5 rounded-2xl border border-white/80 bg-[#fffdf7]/65 p-2 shadow-lg backdrop-blur-lg"
-          aria-label="Điều khiển di chuyển"
+          ref={joystickRef}
+          role="application"
+          aria-label="Cần điều khiển di chuyển"
+          className="grid h-[7.5rem] w-[7.5rem] touch-none place-items-center rounded-full border-2 border-white/80 bg-[#fffdf7]/45 shadow-[0_10px_28px_-12px_rgba(29,48,73,.5)] backdrop-blur-md"
+          onPointerDown={(event) => {
+            event.preventDefault();
+            pointerId.current = event.pointerId;
+            event.currentTarget.setPointerCapture(event.pointerId);
+            moveJoystick(event.clientX, event.clientY);
+          }}
+          onPointerMove={(event) => {
+            if (pointerId.current === event.pointerId) moveJoystick(event.clientX, event.clientY);
+          }}
+          onPointerUp={(event) => {
+            if (pointerId.current === event.pointerId) stopJoystick();
+          }}
+          onPointerCancel={stopJoystick}
+          onLostPointerCapture={stopJoystick}
+          onContextMenu={(event) => event.preventDefault()}
         >
-          <span />
-          <MoveButton {...DIRECTION_BUTTONS[0]!} onDirection={onDirection} />
-          <span />
-          <MoveButton {...DIRECTION_BUTTONS[1]!} onDirection={onDirection} />
-          <MoveButton {...DIRECTION_BUTTONS[2]!} onDirection={onDirection} />
-          <MoveButton {...DIRECTION_BUTTONS[3]!} onDirection={onDirection} />
+          <div className="pointer-events-none grid h-12 w-12 place-items-center rounded-full border border-white bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-[0_5px_14px_rgba(16,80,55,.38)] transition-transform duration-75" style={{ transform: `translate(${knob.x}px, ${knob.y}px)` }}>
+            <span className="h-3 w-3 rounded-full border-2 border-white/90 bg-white/30" />
+          </div>
         </div>
-        <p className="mt-1 text-center text-[9px] font-extrabold text-slate-700 drop-shadow-sm">
-          CHẠM GIỮ ĐỂ DI CHUYỂN
+        <p className="mt-2 w-[7.5rem] text-center text-[9px] font-extrabold tracking-wide text-slate-700 drop-shadow-sm">
+          KÉO ĐỂ DI CHUYỂN
         </p>
       </div>
 
@@ -206,33 +244,3 @@ export function CampusHUD({
   );
 }
 
-function MoveButton({
-  direction,
-  label,
-  Icon,
-  onDirection,
-}: {
-  direction: Direction;
-  label: string;
-  Icon: typeof ArrowUp;
-  onDirection: (direction: Direction, pressed: boolean) => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      className="grid h-11 w-11 touch-none place-items-center rounded-xl border border-white/90 bg-white/90 text-slate-700 shadow-[0_3px_0_rgba(49,65,84,.16)] active:translate-y-0.5 active:shadow-none"
-      onPointerDown={(event) => {
-        event.preventDefault();
-        event.currentTarget.setPointerCapture(event.pointerId);
-        onDirection(direction, true);
-      }}
-      onPointerUp={() => onDirection(direction, false)}
-      onPointerCancel={() => onDirection(direction, false)}
-      onLostPointerCapture={() => onDirection(direction, false)}
-      onContextMenu={(event) => event.preventDefault()}
-    >
-      <Icon size={18} strokeWidth={3} />
-    </button>
-  );
-}
