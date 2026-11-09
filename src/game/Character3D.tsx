@@ -4,7 +4,7 @@ import * as THREE from "three";
 import type { Avatar } from "@/lib/avatar";
 
 export type Emote = "wave" | "laugh" | "clap" | "dance" | "surprised" | "cheer";
-export type Motion = "idle" | "walk" | "run" | "jump" | "kick" | "dive";
+export type Motion = "idle" | "walk" | "run" | "jump" | "kick" | "dive" | "sit";
 export type AnimState = { motion: Motion; emote: Emote | null; emoteUntil: number };
 
 export const makeAnimState = (): AnimState => ({ motion: "idle", emote: null, emoteUntil: 0 });
@@ -387,6 +387,15 @@ export function Character3D({
     if (s.motion === "jump") Object.assign(tg, { lLx: -0.6, lRx: 0.3, aLz: -1.3, aRz: 1.3, aLx: 0, aRx: 0 });
     if (s.motion === "kick") Object.assign(tg, { lRx: -1.3, lLx: 0.2, aLx: -0.7, aRx: 0.5, aLz: -0.5 });
     if (s.motion === "dive") Object.assign(tg, { aLz: -2.6, aRz: 2.6, aLx: 0, aRx: 0, lLx: 0.4, lRx: -0.4 });
+    if (s.motion === "sit") Object.assign(tg, {
+      bodyY: -0.2,
+      lLx: -1.18,
+      lRx: -1.18,
+      aLx: -0.18,
+      aRx: -0.18,
+      aLz: -0.18,
+      aRz: 0.18,
+    });
 
     if (emote === "wave") Object.assign(tg, { aRz: 2.7 + Math.sin(t * 12) * 0.35, aRx: 0 });
     if (emote === "clap") {
