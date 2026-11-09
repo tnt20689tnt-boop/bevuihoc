@@ -6,15 +6,24 @@ import { cn } from "@/lib/utils";
 export function GoogleButton({ className, label = "Tiếp tục với Google" }: { className?: string; label?: string }) {
   const [busy, setBusy] = useState(false);
   async function go() {
+    if (busy) return;
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri: window.location.origin + "/auth" });
-    if (result.error) {
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/auth",
+      });
+      if (result.error) {
+        toast.error("Đăng nhập Google chưa thành công. Phụ huynh thử lại nhé.");
+        setBusy(false);
+        return;
+      }
+      if (result.redirected) return;
+      window.location.assign("/the-gioi");
+    } catch (error) {
+      console.error("Google sign-in failed", error);
+      toast.error("Không kết nối được Google. Phụ huynh kiểm tra mạng rồi thử lại nhé.");
       setBusy(false);
-      toast.error("Đăng nhập chưa thành công, phụ huynh thử lại nhé");
-      return;
     }
-    if (result.redirected) return;
-    window.location.assign("/the-gioi");
   }
   return (
     <button
