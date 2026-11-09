@@ -1,7 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { Crown, Globe2, LogOut, Shield, Swords, Trophy, Volume2, VolumeX } from "lucide-react";
+import { Crown, Globe2, LogOut, Medal, Shield, Swords, Trophy, Volume2, VolumeX } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useIsAdmin, useMyProfile, type Profile } from "@/hooks/use-player";
 import { useSettings } from "@/stores/settings";
@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { to: "/the-gioi", label: "Thế giới", icon: Globe2 },
   { to: "/thi-dau", label: "Thi đấu", icon: Swords },
+  { to: "/arena", label: "Đấu trường", icon: Medal },
   { to: "/bang-xep-hang", label: "Xếp hạng", icon: Trophy },
   { to: "/sanh-vinh-danh", label: "Vinh danh", icon: Crown },
 ] as const;
