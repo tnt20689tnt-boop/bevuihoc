@@ -4,8 +4,8 @@ import engImg from "@/assets/room-english.jpg";
 import salonImg from "@/assets/room-salon.jpg";
 import footballImg from "@/assets/room-football.jpg";
 
-export type RoomId = "plaza" | "math" | "vietnamese" | "english" | "girls" | "boys";
-export const ROOM_IDS: RoomId[] = ["plaza", "math", "vietnamese", "english", "girls", "boys"];
+export type RoomId = "plaza" | "math" | "vietnamese" | "english" | "girls" | "boys" | "arena";
+export const ROOM_IDS: RoomId[] = ["plaza", "math", "vietnamese", "english", "girls", "boys", "arena"];
 
 export type Activity = {
   x: number;
@@ -36,7 +36,7 @@ export type RoomDef = {
 
 // Plaza portals sit on a ring; each room's exit portal is at +z.
 const RING = 17;
-const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / 5; // first portal straight "north" (-z)
+const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / 6; // first portal straight "north" (-z)
 export const PLAZA_PORTALS: Portal[] = (
   ["math", "vietnamese", "english", "girls", "boys"] as RoomId[]
 ).map((to, i) => ({
@@ -66,7 +66,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
     obstacles: [
       { x: 0, z: 0, r: 3.1 },
-      ...PLAZA_PORTALS.map((portal) => ({ x: portal.x * 1.28, z: portal.z * 1.28, r: 3.35 })),
+      ...PLAZA_PORTALS.map((portal) => ({ x: portal.x * 1.28, z: portal.z * 1.28, r: portal.to === "arena" ? 2.15 : 3.35 })),
     ],
   },
   math: {
@@ -162,6 +162,21 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     activities: [{ x: 0, z: -5, label: "Vào Salon làm đẹp", icon: "💄", to: "/salon" }],
     obstacles: [{ x: 0, z: -10, r: 2.4 }],
   },
+
+  arena: {
+    id: "arena",
+    name: "Nhà thi đấu tri thức",
+    short: "Nhà thi đấu",
+    emoji: "🏆",
+    color: "#d99b45",
+    ground: ["#c9955f", "#b77d49"],
+    sky: "#b8dff4",
+    blurb: "Ngôi nhà thi đấu có bảng lớn, bục dẫn chương trình và khu vực thí sinh.",
+    radius: 14,
+    portals: [EXIT],
+    activities: [{ x: 0, z: -5.8, label: "Bắt đầu thi đấu", icon: "🏆", to: "/thi-dau" }],
+    obstacles: [],
+  },
   boys: {
     id: "boys",
     name: "Khu vui chơi bé trai – Sân bóng Toán học",
@@ -185,6 +200,7 @@ export function isRoomId(v: unknown): v is RoomId {
 
 /** Where a player appears when entering `to` from `from`. */
 export function spawnPoint(to: RoomId, from: RoomId | null): { x: number; z: number; ry: number } {
+  if (to === "arena") return { x: 0, z: 5, ry: Math.PI };
   if (to === "plaza") {
     const p = PLAZA_PORTALS.find((pp) => pp.to === from);
     if (p) {
