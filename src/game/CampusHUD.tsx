@@ -15,13 +15,6 @@ type CampusHUDProps = {
   onMove: (x: number, z: number) => void;
 };
 
-const DIRECTION_BUTTONS: { direction: Direction; label: string; Icon: typeof ArrowUp }[] = [
-  { direction: "up", label: "Đi lên", Icon: ArrowUp },
-  { direction: "left", label: "Đi sang trái", Icon: ArrowLeft },
-  { direction: "down", label: "Đi xuống", Icon: ArrowDown },
-  { direction: "right", label: "Đi sang phải", Icon: ArrowRight },
-];
-
 export function CampusHUD({
   profile,
   roomId,
