@@ -35,5 +35,7 @@ $;
 --> statement-breakpoint
 
 REVOKE ALL ON FUNCTION public.award_lesson_points(text) FROM PUBLIC;
+--> statement-breakpoint
 REVOKE ALL ON FUNCTION public.award_lesson_points(text) FROM anon;
+--> statement-breakpoint
 GRANT EXECUTE ON FUNCTION public.award_lesson_points(text) TO authenticated;
