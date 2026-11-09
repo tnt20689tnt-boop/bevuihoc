@@ -146,6 +146,10 @@ function PlazaDecor() {
       <Bench position={[0, 0, -10]} rotation={Math.PI} />
       <FlowerBed position={[-4.7, 0, -5]} />
       <FlowerBed position={[4.7, 0, -5]} />
+      <FlowerBed position={[-12, 0, -1]} />
+      <FlowerBed position={[12, 0, -1]} />
+      <GardenShrubs />
+      <FountainWater />
       <FloatingBubbles />
     </group>
   );
@@ -228,6 +232,106 @@ function FlowerBed({ position }: { position: [number, number, number] }) {
           </mesh>
         );
       })}
+    </group>
+  );
+}
+
+
+function FountainWater() {
+  const jets = useRef<(THREE.Mesh | null)[]>([]);
+  const droplets = useRef<(THREE.Mesh | null)[]>([]);
+  const ripples = useRef<(THREE.Mesh | null)[]>([]);
+  const dropletSeeds = Array.from({ length: 20 }, (_, i) => ({
+    angle: (i / 20) * Math.PI * 2,
+    radius: 0.72 + (i % 4) * 0.13,
+    speed: 0.7 + (i % 5) * 0.12,
+    phase: (i % 7) / 7,
+  }));
+  useFrame(({ clock }) => {
+    const t = clock.elapsedTime;
+    jets.current.forEach((mesh, i) => {
+      if (!mesh) return;
+      mesh.scale.y = 0.78 + Math.sin(t * 3.1 + i * 1.7) * 0.12;
+      mesh.rotation.z = Math.sin(t * 1.8 + i) * 0.035;
+    });
+    droplets.current.forEach((mesh, i) => {
+      if (!mesh) return;
+      const seed = dropletSeeds[i];
+      if (!seed) return;
+      const phase = (t * seed.speed + seed.phase) % 1;
+      const y = 1.92 - phase * 1.35;
+      const spread = seed.radius + Math.sin(phase * Math.PI) * 0.2;
+      mesh.position.set(Math.cos(seed.angle) * spread, y, Math.sin(seed.angle) * spread);
+      const size = 0.045 + Math.sin(phase * Math.PI) * 0.025;
+      mesh.scale.setScalar(size);
+    });
+    ripples.current.forEach((mesh, i) => {
+      if (!mesh) return;
+      const phase = (t * 0.48 + i * 0.34) % 1;
+      mesh.scale.setScalar(0.45 + phase * 1.3);
+      const material = mesh.material as THREE.MeshStandardMaterial;
+      material.opacity = (1 - phase) * 0.42;
+    });
+  });
+  return (
+    <group position={[0, 0.35, 0]}>
+      {[0, 1, 2, 3].map((i) => (
+        <mesh
+          key={i}
+          ref={(node) => { jets.current[i] = node; }}
+          position={[0, 0.82, 0]}
+          rotation={[0, 0, (i / 4) * Math.PI * 2]}
+        >
+          <cylinderGeometry args={[0.055, 0.075, 1.5, 10]} />
+          <meshStandardMaterial color="#baf7ff" emissive="#4ad8f0" emissiveIntensity={0.5} transparent opacity={0.82} roughness={0.18} />
+        </mesh>
+      ))}
+      {dropletSeeds.map((seed, i) => (
+        <mesh key={i} ref={(node) => { droplets.current[i] = node; }}>
+          <sphereGeometry args={[1, 10, 8]} />
+          <meshStandardMaterial color="#d8fbff" emissive="#65dff2" emissiveIntensity={0.28} roughness={0.12} />
+        </mesh>
+      ))}
+      {[0, 1, 2].map((i) => (
+        <mesh
+          key={i}
+          ref={(node) => { ripples.current[i] = node; }}
+          position={[0, 0.13 + i * 0.012, 0]}
+          rotation={[-Math.PI / 2, 0, 0]}
+        >
+          <ringGeometry args={[0.62, 0.72, 40]} />
+          <meshStandardMaterial color="#baf7ff" transparent opacity={0.4} roughness={0.2} side={THREE.DoubleSide} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function GardenShrubs() {
+  const shrubs: [number, number, string][] = [
+    [-13.5, -5, "#4d9b62"], [-13.2, -3.9, "#78bd70"], [-12.7, -5.8, "#66ad68"],
+    [13.5, -5, "#4d9b62"], [13.2, -3.9, "#78bd70"], [12.7, -5.8, "#66ad68"],
+    [-9.2, 12.8, "#6eaf68"], [-7.9, 13.2, "#4d9b62"],
+    [9.2, 12.8, "#6eaf68"], [7.9, 13.2, "#4d9b62"],
+  ];
+  return (
+    <group>
+      {shrubs.map(([x, z, color], i) => (
+        <mesh key={i} position={[x, 0.42 + (i % 3) * 0.06, z]} castShadow>
+          <sphereGeometry args={[0.62, 14, 12]} />
+          <meshStandardMaterial color={color} roughness={0.94} />
+        </mesh>
+      ))}
+      {[-1, 1].map((side) => (
+        <group key={side} position={[side * 16.1, 0, 0]}>
+          {[0, 1, 2, 3].map((i) => (
+            <mesh key={i} position={[0, 0.5, -5 + i * 3]} castShadow>
+              <cylinderGeometry args={[0.055, 0.055, 1, 8]} />
+              <meshStandardMaterial color="#d5a45f" roughness={0.72} />
+            </mesh>
+          ))}
+        </group>
+      ))}
     </group>
   );
 }
@@ -583,6 +687,12 @@ function PlayerController({
   const smoothedTarget = useRef(new THREE.Vector3());
   const smoothedCamera = useRef(new THREE.Vector3());
   const cameraInitialized = useRef(false);
+  const sitting = useRef(false);
+  const benchSpots = [
+    { x: -8, z: 1, rotation: 0.42 },
+    { x: 8, z: 1, rotation: -0.42 },
+    { x: 0, z: -10, rotation: Math.PI },
+  ];
 
   useEffect(() => {
     nearbyHandler.current = onNearbyPortal;
@@ -640,7 +750,24 @@ function PlayerController({
       }
       if (!event.repeat && (key === "e" || key === " ")) {
         event.preventDefault();
-        interactHandler.current();
+        const nearestBench = room.id === "plaza"
+          ? benchSpots
+              .map((bench) => ({ bench, distance: Math.hypot(positionRef.current.x - bench.x, positionRef.current.z - bench.z) }))
+              .sort((a, b) => a.distance - b.distance)[0]
+          : undefined;
+        if (sitting.current) {
+          sitting.current = false;
+          animation.current.motion = "idle";
+        } else if (nearestBench && nearestBench.distance < 2.7) {
+          const { bench } = nearestBench;
+          positionRef.current.x = bench.x + Math.sin(bench.rotation) * 0.95;
+          positionRef.current.z = bench.z + Math.cos(bench.rotation) * 0.95;
+          if (character.current) character.current.rotation.y = bench.rotation + Math.PI;
+          sitting.current = true;
+          animation.current.motion = "sit";
+        } else {
+          interactHandler.current();
+        }
       }
     };
     const onKeyUp = (event: KeyboardEvent) => held.current.delete(event.key.toLowerCase());
@@ -673,6 +800,7 @@ function PlayerController({
     const dx = -Math.sin(cameraYaw.current) * forward + Math.cos(cameraYaw.current) * right;
     const dz = -Math.cos(cameraYaw.current) * forward - Math.sin(cameraYaw.current) * right;
     const moving = Math.hypot(dx, dz) > 0.04;
+    if (moving && sitting.current) sitting.current = false;
     const speed = keys.has("shift") ? 6.4 : 4.2;
     if (moving) {
       const nextX = position.current.x + dx * speed * dt;
@@ -688,7 +816,7 @@ function PlayerController({
       animation.current.motion = keys.has("shift") ? "run" : "walk";
       if (character.current) character.current.rotation.y = Math.atan2(dx, dz);
     } else {
-      animation.current.motion = "idle";
+      animation.current.motion = sitting.current ? "sit" : "idle";
     }
     if (character.current) {
       character.current.position.set(position.current.x, 0, position.current.z);
