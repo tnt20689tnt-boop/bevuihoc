@@ -805,7 +805,10 @@ function PlayerController({
       const nextX = position.current.x + dx * speed * dt;
       const nextZ = position.current.z + dz * speed * dt;
       const blocked = (x: number, z: number) => {
-        if (Math.hypot(x, z) > room.radius - 0.8) return true;
+        // Keep the circular campus boundary, but leave a clear walkable corridor
+        // through the front gate so the outdoor spawn can enter the school.
+        const insideFrontGate = room.id === "plaza" && z > 0 && z < 34.5 && Math.abs(x) < 4.35;
+        if (Math.hypot(x, z) > room.radius - 0.8 && !insideFrontGate) return true;
         return room.obstacles.some(
           (obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52,
         );
