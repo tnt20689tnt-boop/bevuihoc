@@ -134,8 +134,9 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       all.forEach((player) => {
         if (player?.id && player.id !== profile.id) unique.set(player.id, player);
       });
-      unique.set(profile.id, self);
-      setPlayers([...unique.values()].sort((a, b) => a.joinedAt - b.joinedAt || a.name.localeCompare(b.name, "vi")));
+      const ownPresence = all.find((player) => player?.id === profile.id);
+      unique.set(profile.id, { ...self, joinedAt: ownPresence?.joinedAt ?? Date.now() });
+      setPlayers([...unique.values()].sort((a, b) => a.joinedAt - b.joinedAt || a.id.localeCompare(b.id)));
     };
 
     channel
