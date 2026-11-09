@@ -38,7 +38,7 @@ export type RoomDef = {
 const RING = 17;
 const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / 6; // first portal straight "north" (-z)
 export const PLAZA_PORTALS: Portal[] = (
-  ["math", "vietnamese", "english", "girls", "boys"] as RoomId[]
+  ["math", "vietnamese", "english", "girls", "boys", "arena"] as RoomId[]
 ).map((to, i) => ({
   to,
   x: Math.round(Math.cos(ang(i)) * RING * 100) / 100,
@@ -60,7 +60,6 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     radius: 29,
     portals: PLAZA_PORTALS,
     activities: [
-      { x: -6, z: 6, label: "Đấu trường thi đua", icon: "⚔️", to: "/thi-dau" },
       { x: 6, z: 6, label: "Bảng xếp hạng", icon: "🏆", to: "/bang-xep-hang" },
       { x: 0, z: 9.5, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
     ],
@@ -174,7 +173,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     blurb: "Ngôi nhà thi đấu có bảng lớn, bục dẫn chương trình và khu vực thí sinh.",
     radius: 14,
     portals: [EXIT],
-    activities: [{ x: 0, z: -5.8, label: "Bắt đầu thi đấu", icon: "🏆", to: "/thi-dau" }],
+    activities: [],
     obstacles: [],
   },
   boys: {
