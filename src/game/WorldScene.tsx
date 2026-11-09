@@ -678,7 +678,7 @@ function PlayerController({
   const { camera, gl } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
-  const cameraYaw = useRef(position.current.ry ?? 0);
+  const cameraYaw = useRef(0);
   const cameraPitch = useRef(0.48);
   const cameraDistance = useRef(12.4);
   const smoothedCamera = useRef(new THREE.Vector3());
