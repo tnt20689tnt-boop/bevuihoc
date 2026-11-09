@@ -75,7 +75,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef }: Props) {
             z: Number.isFinite(incoming.z) ? incoming.z : 0,
             rot: Number.isFinite(incoming.rot) ? incoming.rot : 0,
             updatedAt: Date.now(),
-            seq: Number.isFinite(incoming.seq) ? incoming.seq : 0,
+            seq: typeof incoming.seq === "number" && Number.isFinite(incoming.seq) ? incoming.seq : 0,
             roomId,
           };
           return [...current.filter((peer) => peer.id !== safe.id), safe];
