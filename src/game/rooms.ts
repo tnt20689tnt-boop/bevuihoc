@@ -59,9 +59,9 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     radius: 48,
     portals: PLAZA_PORTALS,
     activities: [
-      { x: -6, z: 6, label: "Đấu trường thi đua", icon: "⚔️", to: "/thi-dau" },
-      { x: 6, z: 6, label: "Bảng xếp hạng", icon: "🏆", to: "/bang-xep-hang" },
-      { x: 0, z: 9.5, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
+      { x: -13, z: 6, label: "Đấu trường thi đua", icon: "⚔️", to: "/thi-dau" },
+      { x: 13, z: 6, label: "Bảng xếp hạng", icon: "🏆", to: "/bang-xep-hang" },
+      { x: 13, z: -12, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
     ],
     obstacles: [
       { x: 0, z: 0, r: 3.1 },
