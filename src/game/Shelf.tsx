@@ -1,5 +1,5 @@
 import { Text } from "@react-three/drei";
-import type { Grade, Subject, Book } from "./libraryBooks";
+import type { Grade, Subject, Book } from "./types";
 
 type Props = { position: [number, number, number]; subject: Subject; grade: Grade; books: Book[] };
 
