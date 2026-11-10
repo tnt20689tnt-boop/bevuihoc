@@ -689,7 +689,7 @@ function PlayerController({
       animation.current.motion = keys.has("shift") ? "run" : "walk";
       if (character.current) character.current.rotation.y = Math.atan2(dx, dz);
     } else {
-      animation.current.motion = "idle";
+      if (!playingSpot) animation.current.motion = "idle";
     }
     if (playingSpot?.kind === "slide") {
       const progress = Math.min((performance.now() / 1000 - playStartedAt.current) / 2.4, 1);
