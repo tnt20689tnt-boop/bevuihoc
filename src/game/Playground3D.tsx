@@ -15,6 +15,8 @@ export type PlaySpot = {
   label: string;
   icon: string;
   seatOffset: [number, number, number];
+  /** Optional direction the child faces while seated. */
+  facing?: number;
 };
 
 export type PlaygroundCollider = { minX: number; maxX: number; minZ: number; maxZ: number };
@@ -44,11 +46,17 @@ export const PLAY_SPOTS: PlaySpot[] = [
   { id: "bench", kind: "bench", position: [9, 0, 15], radius: 1.0, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0] },
 ];
 
+const REST_BENCH_SPOTS: PlaySpot[] = [
+  { id: "bench-yard-west", kind: "bench", position: [-8, 0, 1], radius: 1.8, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [Math.sin(0.42) * 0.95, 0.25, Math.cos(0.42) * 0.95], facing: 0.42 + Math.PI },
+  { id: "bench-yard-east", kind: "bench", position: [8, 0, 1], radius: 1.8, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [Math.sin(-0.42) * 0.95, 0.25, Math.cos(-0.42) * 0.95], facing: -0.42 + Math.PI },
+  { id: "bench-yard-north", kind: "bench", position: [0, 0, -10], radius: 1.8, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0.95], facing: Math.PI },
+];
+
 export function findNearestPlaySpot(position: [number, number, number], playing: boolean): PlaySpot | null {
   if (playing) return null;
   let nearest: PlaySpot | null = null;
   let best = Infinity;
-  for (const spot of PLAY_SPOTS) {
+  for (const spot of [...PLAY_SPOTS, ...REST_BENCH_SPOTS]) {
     const distance = Math.hypot(position[0] - spot.position[0], position[2] - spot.position[2]);
     if (distance <= spot.radius && distance < best) {
       nearest = spot;
