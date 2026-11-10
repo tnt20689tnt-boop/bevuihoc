@@ -1,6 +1,6 @@
 import { Html } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { useEffect, useRef, type MutableRefObject } from "react";
+import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
 import { CampusMultiplayer } from "@/game/CampusMultiplayer";
@@ -74,7 +74,7 @@ export function WorldScene(props: WorldSceneProps) {
         shadow-camera-top={28}
         shadow-camera-bottom={-28}
       />
-      <WorldFloor room={room} />
+      {isNight && <NightSky /> }\n      <WorldFloor room={room} />\n      {isNight && <NightCampusLights roomId={room.id} /> }
       {room.id === "plaza" ? <><PlazaUpgrade3D /><Playground3D activeSpotId={props.playingSpot?.id ?? null} /></> : <RoomDecor room={room} />}
       {room.portals.map((portal) => portal.to === "arena" ? null : (
         <PortalGate
@@ -106,6 +106,81 @@ export function WorldScene(props: WorldSceneProps) {
         onNearbyPlaySpot={props.onNearbyPlaySpot}
       />
     </Canvas>
+  );
+}
+
+
+function NightSky() {
+  const stars = Array.from({ length: 150 }, (_, i) => {
+    const angle = i * 2.399963;
+    const radius = 18 + (i % 13) * 1.15;
+    return [Math.cos(angle) * radius, 10 + (i % 9) * 1.45, Math.sin(angle) * radius] as [number, number, number];
+  });
+  return (
+    <group>
+      {stars.map((position, i) => (
+        <mesh key={i} position={position}>
+          <sphereGeometry args={[i % 7 === 0 ? 0.075 : 0.035, 6, 6]} />
+          <meshBasicMaterial color={i % 5 === 0 ? "#ffe7a3" : "#dce9ff"} />
+        </mesh>
+      ))}
+    </group>
+  );
+}
+
+function NightCampusLights({ roomId }: { roomId: RoomId }) {
+  const colors = ["#ff4fa3", "#43e8ff", "#ffe15b", "#a879ff", "#65ff9a", "#ff8b45", "#ffefff"];
+  const bulbs = Array.from({ length: 112 }, (_, i) => {
+    const angle = (i / 112) * Math.PI * 2;
+    const radius = roomId === "plaza" ? 22.8 : 11.8;
+    return {
+      position: [Math.sin(angle) * radius, 2.9 + (i % 4) * 0.28, Math.cos(angle) * radius] as [number, number, number],
+      color: colors[i % colors.length]!,
+      size: i % 9 === 0 ? 0.17 : 0.105,
+    };
+  });
+  const garland = Array.from({ length: 48 }, (_, i) => {
+    const t = i / 47;
+    return {
+      position: [-13 + t * 26, 4.3 + Math.sin(t * Math.PI * 5) * 0.7, -7 + Math.sin(t * Math.PI * 2) * 5] as [number, number, number],
+      color: colors[(i * 3) % colors.length]!,
+    };
+  });
+  const lampPositions: [number, number, number][] = roomId === "plaza"
+    ? [[-15, 3, -12], [-15, 3, 0], [-15, 3, 12], [15, 3, -12], [15, 3, 0], [15, 3, 12], [-7, 3, -18], [7, 3, -18], [-7, 3, 18], [7, 3, 18]]
+    : [[-8, 3, -7], [8, 3, -7], [-8, 3, 7], [8, 3, 7]];
+  return (
+    <group>
+      {bulbs.map((bulb, i) => (
+        <mesh key={`perimeter-${i}`} position={bulb.position}>
+          <sphereGeometry args={[bulb.size, 10, 8]} />
+          <meshStandardMaterial color={bulb.color} emissive={bulb.color} emissiveIntensity={2.8} toneMapped={false} />
+        </mesh>
+      ))}
+      {garland.map((bulb, i) => (
+        <mesh key={`garland-${i}`} position={bulb.position}>
+          <sphereGeometry args={[0.11, 8, 8]} />
+          <meshBasicMaterial color={bulb.color} />
+        </mesh>
+      ))}
+      {lampPositions.map((position, i) => (
+        <group key={i} position={position}>
+          <mesh position={[0, -1.1, 0]}>
+            <cylinderGeometry args={[0.07, 0.12, 2.2, 8]} />
+            <meshStandardMaterial color="#26334f" metalness={0.55} roughness={0.38} />
+          </mesh>
+          <mesh position={[0, 0.12, 0]}>
+            <sphereGeometry args={[0.28, 12, 10]} />
+            <meshStandardMaterial color={colors[i % colors.length]} emissive={colors[i % colors.length]} emissiveIntensity={3.2} toneMapped={false} />
+          </mesh>
+          <pointLight position={[0, 0.12, 0]} color={colors[i % colors.length]} intensity={1.1} distance={8} decay={2} />
+        </group>
+      ))}
+      {roomId === "plaza" && [0, 1, 2, 3, 4, 5, 6].map((i) => {
+        const angle = (i / 7) * Math.PI * 2;
+        return <pointLight key={i} position={[Math.sin(angle) * 9, 4.2, Math.cos(angle) * 9]} color={colors[i]} intensity={0.85} distance={12} />;
+      })}
+    </group>
   );
 }
 
