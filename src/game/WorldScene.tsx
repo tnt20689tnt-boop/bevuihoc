@@ -48,6 +48,18 @@ const palette = {
 
 export function WorldScene(props: WorldSceneProps) {
   const room = ROOMS[props.roomId];
+  const [isNight, setIsNight] = useState(() => {
+    const hour = new Date().getHours();
+    return hour >= 18 || hour < 6;
+  });
+  useEffect(() => {
+    const updateTimeOfDay = () => {
+      const hour = new Date().getHours();
+      setIsNight(hour >= 18 || hour < 6);
+    };
+    const timer = window.setInterval(updateTimeOfDay, 60_000);
+    return () => window.clearInterval(timer);
+  }, []);
   const playerPosition = useRef(spawnPoint(room.id, props.fromRoom));
   return (
     <Canvas
@@ -58,13 +70,13 @@ export function WorldScene(props: WorldSceneProps) {
       className="absolute inset-0"
       style={{ touchAction: "none" }}
     >
-      <color attach="background" args={[room.sky]} />
-      <fog attach="fog" args={[room.sky, 28, 62]} />
-      <ambientLight intensity={1.25} />
-      <hemisphereLight args={["#f8fbff", "#927451", 1.05]} />
+      <color attach="background" args={[isNight ? "#101a3b" : room.sky]} />
+      <fog attach="fog" args={[isNight ? "#172044" : room.sky, isNight ? 20 : 28, isNight ? 48 : 62]} />
+      <ambientLight intensity={isNight ? 0.34 : 1.25} />
+      <hemisphereLight args={isNight ? ["#536da8", "#26304a", 0.48] : ["#f8fbff", "#927451", 1.05]} />
       <directionalLight
         position={[-8, 17, 9]}
-        intensity={2.1}
+        intensity={isNight ? 0.32 : 2.1}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -74,7 +86,9 @@ export function WorldScene(props: WorldSceneProps) {
         shadow-camera-top={28}
         shadow-camera-bottom={-28}
       />
-      {isNight && <NightSky /> }\n      <WorldFloor room={room} />\n      {isNight && <NightCampusLights roomId={room.id} /> }
+      {isNight && <NightSky />}
+      <WorldFloor room={room} />
+      {isNight && <NightCampusLights roomId={room.id} />}
       {room.id === "plaza" ? <><PlazaUpgrade3D /><Playground3D activeSpotId={props.playingSpot?.id ?? null} /></> : <RoomDecor room={room} />}
       {room.portals.map((portal) => portal.to === "arena" ? null : (
         <PortalGate
