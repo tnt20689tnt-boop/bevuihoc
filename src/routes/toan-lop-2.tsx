@@ -56,7 +56,7 @@ function ToanLop2() {
       <div>
         <a href="/toan-lop-1">← Toán lớp 1</a>
         {' · '}
-        <a href="/toan-lop-3">Toán lớp 3 →</a>
+        <a href="/tai-lieu-toan-lop-3">Tài liệu toán lớp 3 →</a>
       </div>
     </main>
   )
