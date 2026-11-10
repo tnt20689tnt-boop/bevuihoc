@@ -6,12 +6,24 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Bé Học Vui – Thế giới trường học 3D" },
+      { title: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D" },
       {
         name: "description",
-        content: "Đăng nhập, tạo nhân vật của bé và khám phá trường học 3D.",
+        content:
+          "Khám phá trường học 3D và khu vui chơi tương tác dành cho bé với xích đu, cầu trượt, nhà bóng và nhiều trò chơi hấp dẫn.",
       },
+      { name: "robots", content: "index, follow" },
+      {
+        property: "og:title",
+        content: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D",
+      },
+      {
+        property: "og:description",
+        content: "Khám phá trường học 3D và khu vui chơi tương tác dành cho bé.",
+      },
+      { property: "og:url", content: "https://bevuihoc.lovable.app/" },
     ],
+    links: [{ rel: "canonical", href: "https://bevuihoc.lovable.app/" }],
   }),
   component: GameEntry,
 });
