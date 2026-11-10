@@ -3,14 +3,17 @@
 
 ALTER TABLE public.profiles
   ADD COLUMN IF NOT EXISTS last_grade_promotion date;
+--> statement-breakpoint
 
 UPDATE public.profiles
 SET last_grade_promotion = (created_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::date
 WHERE last_grade_promotion IS NULL;
+--> statement-breakpoint
 
 ALTER TABLE public.profiles
   ALTER COLUMN last_grade_promotion SET DEFAULT (timezone('Asia/Ho_Chi_Minh', now())::date),
   ALTER COLUMN last_grade_promotion SET NOT NULL;
+--> statement-breakpoint
 
 CREATE OR REPLACE FUNCTION public.promote_my_grade_if_due()
 RETURNS smallint
@@ -66,8 +69,11 @@ BEGIN
 
   RETURN v_grade;
 END;
-$$;
+$;
+--> statement-breakpoint
 
 REVOKE ALL ON FUNCTION public.promote_my_grade_if_due() FROM PUBLIC;
+--> statement-breakpoint
 REVOKE ALL ON FUNCTION public.promote_my_grade_if_due() FROM anon;
+--> statement-breakpoint
 GRANT EXECUTE ON FUNCTION public.promote_my_grade_if_due() TO authenticated;
