@@ -29,7 +29,6 @@ type WorldSceneProps = {
   onEnterPortal: (portal: Portal) => void;
   onInteract: () => void;
   onActivity: (activity: Activity) => void;
-  nearbyPlaySpot: PlaySpot | null;
   playingSpot: PlaySpot | null;
   onNearbyPlaySpot: (spot: PlaySpot | null) => void;
 };
