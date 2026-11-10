@@ -164,8 +164,6 @@ function ArenaHouse({ position, rotation, room }: { position: [number, number, n
 function CampusGreenery({ portals }: { portals: Portal[] }) {
   const trees: [number, number][] = [
     [-12, -11],
-    [-6, -17],
-    [7, -17],
     [13, -10],
     [-5, 17],
     [5, 17],
@@ -179,8 +177,8 @@ function CampusGreenery({ portals }: { portals: Portal[] }) {
         <Tree key={`${x}-${z}-${i}`} x={x} z={z} />
       ))}
       {[
-        [-9, -2, 0],
-        [9, -2, 0],
+        [-8, 20, 0],
+        [8, 20, 0],
       ].map(([x, z], i) => (
         <mesh key={i} position={[x ?? 0, 0.16, z ?? 0]} receiveShadow>
           <cylinderGeometry args={[1.05, 1.15, 0.3, 20]} />
