@@ -19,29 +19,29 @@ export type PlaySpot = {
 
 export type PlaygroundCollider = { minX: number; maxX: number; minZ: number; maxZ: number };
 export const PLAYGROUND_COLLIDERS: PlaygroundCollider[] = [
-  { minX: 8.7, maxX: 9.3, minZ: 7.25, maxZ: 7.75 },
-  { minX: 14.05, maxX: 14.95, minZ: 6.55, maxZ: 8.55 },
-  { minX: 11.6, maxX: 13.4, minZ: 4.35, maxZ: 4.65 },
-  { minX: 9.2, maxX: 9.8, minZ: 11.65, maxZ: 12.35 },
-  { minX: 14.4, maxX: 16.6, minZ: 10.9, maxZ: 13.1 },
-  { minX: 16.6, maxX: 18.4, minZ: 4.75, maxZ: 6.25 },
-  { minX: 6.75, maxX: 8.25, minZ: 5.1, maxZ: 5.9 },
-  { minX: 15.9, maxX: 17.1, minZ: 8, maxZ: 9 },
-  { minX: 11.5, maxX: 13.5, minZ: 14, maxZ: 16 },
-  { minX: 8, maxX: 9, minZ: 14.85, maxZ: 15.15 },
+  { minX: 9.2, maxX: 9.8, minZ: 7.25, maxZ: 7.75 },
+  { minX: 14.55, maxX: 15.45, minZ: 6.55, maxZ: 8.55 },
+  { minX: 12.1, maxX: 13.9, minZ: 4.35, maxZ: 4.65 },
+  { minX: 9.7, maxX: 10.3, minZ: 11.65, maxZ: 12.35 },
+  { minX: 14.9, maxX: 17.1, minZ: 10.9, maxZ: 13.1 },
+  { minX: 17.1, maxX: 18.9, minZ: 4.75, maxZ: 6.25 },
+  { minX: 7.25, maxX: 8.75, minZ: 5.1, maxZ: 5.9 },
+  { minX: 16.4, maxX: 17.6, minZ: 8, maxZ: 9 },
+  { minX: 12, maxX: 14, minZ: 14, maxZ: 16 },
+  { minX: 8.5, maxX: 9.5, minZ: 14.85, maxZ: 15.15 },
 ];
 
 export const PLAY_SPOTS: PlaySpot[] = [
-  { id: "swing", kind: "swing", position: [9, 0, 7.5], radius: 1.6, label: "LÊN XÍCH ĐU", icon: "🎠", seatOffset: [0, 0.325, 0] },
-  { id: "slide", kind: "slide", position: [14.5, 0, 7.5], radius: 1.6, label: "CHƠI CẦU TRƯỢT", icon: "🛝", seatOffset: [0, 0.1, 0.6] },
-  { id: "seesaw", kind: "seesaw", position: [12.5, 0, 4.5], radius: 1.4, label: "CHƠI BẬP BÊNH", icon: "🐴", seatOffset: [0, 0.56, 0] },
-  { id: "spring", kind: "springRider", position: [9.5, 0, 12], radius: 1.3, label: "LÊN THÚ NHÚN", icon: "🐰", seatOffset: [0, 0.52, 0] },
-  { id: "ballpit", kind: "ballPit", position: [15.5, 0, 12], radius: 1.7, label: "VÀO NHÀ BÓNG", icon: "🏠", seatOffset: [0, 0.15, 0] },
-  { id: "house", kind: "playhouse", position: [17.5, 0, 5.5], radius: 1.6, label: "VÀO NHÀ LIÊN HOÀN", icon: "🏰", seatOffset: [0, 0, 0] },
-  { id: "tunnel", kind: "tunnel", position: [7.5, 0, 5.5], radius: 1.25, label: "CHUI ĐƯỜNG HẦM", icon: "🚇", seatOffset: [0, 0.1, 0] },
-  { id: "climber", kind: "climber", position: [16.5, 0, 8.5], radius: 1.4, label: "LEO KHUNG", icon: "🧗", seatOffset: [0, 0.2, 0] },
-  { id: "carousel", kind: "carousel", position: [12.5, 0, 15], radius: 1.6, label: "LÊN VÒNG QUAY", icon: "🎡", seatOffset: [0, 0.3, 0] },
-  { id: "bench", kind: "bench", position: [8.5, 0, 15], radius: 1.0, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0] },
+  { id: "swing", kind: "swing", position: [9.5, 0, 7.5], radius: 1.6, label: "LÊN XÍCH ĐU", icon: "🎠", seatOffset: [0, 0.325, 0] },
+  { id: "slide", kind: "slide", position: [15, 0, 7.5], radius: 1.6, label: "CHƠI CẦU TRƯỢT", icon: "🛝", seatOffset: [0, 0.1, 0.6] },
+  { id: "seesaw", kind: "seesaw", position: [13, 0, 4.5], radius: 1.4, label: "CHƠI BẬP BÊNH", icon: "🐴", seatOffset: [0, 0.56, 0] },
+  { id: "spring", kind: "springRider", position: [10, 0, 12], radius: 1.3, label: "LÊN THÚ NHÚN", icon: "🐰", seatOffset: [0, 0.52, 0] },
+  { id: "ballpit", kind: "ballPit", position: [16, 0, 12], radius: 1.7, label: "VÀO NHÀ BÓNG", icon: "🏠", seatOffset: [0, 0.15, 0] },
+  { id: "house", kind: "playhouse", position: [18, 0, 5.5], radius: 1.6, label: "VÀO NHÀ LIÊN HOÀN", icon: "🏰", seatOffset: [0, 0, 0] },
+  { id: "tunnel", kind: "tunnel", position: [8, 0, 5.5], radius: 1.25, label: "CHUI ĐƯỜNG HẦM", icon: "🚇", seatOffset: [0, 0.1, 0] },
+  { id: "climber", kind: "climber", position: [17, 0, 8.5], radius: 1.4, label: "LEO KHUNG", icon: "🧗", seatOffset: [0, 0.2, 0] },
+  { id: "carousel", kind: "carousel", position: [13, 0, 15], radius: 1.6, label: "LÊN VÒNG QUAY", icon: "🎡", seatOffset: [0, 0.3, 0] },
+  { id: "bench", kind: "bench", position: [9, 0, 15], radius: 1.0, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0] },
 ];
 
 export function findNearestPlaySpot(position: [number, number, number], playing: boolean): PlaySpot | null {
@@ -89,23 +89,23 @@ export function Playground3D({ activeSpotId }: { activeSpotId: string | null }) 
 function PlaygroundGround() {
   return (
     <group>
-      <mesh position={[9.25, 0.06, 6.75]} rotation={[0, 0.87, 0]} receiveShadow>
-        <boxGeometry args={[2.4, 0.08, 8.6]} />
+      <mesh position={[9.5, 0.06, 6.75]} rotation={[0, 0.87, 0]} receiveShadow>
+        <boxGeometry args={[2.4, 0.08, 9.2]} />
         <meshStandardMaterial color="#f4e8ce" roughness={0.96} />
       </mesh>
       <mesh position={[12, 0.06, 11.5]} rotation={[0, 0.83, 0]} receiveShadow>
         <boxGeometry args={[3.2, 0.08, 16.3]} />
         <meshStandardMaterial color="#f4e8ce" roughness={0.96} />
       </mesh>
-      <mesh position={[12.5, 0.035, 9.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-        <circleGeometry args={[7.5, 64]} />
+      <mesh position={[13, 0.035, 9.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+        <circleGeometry args={[7, 64]} />
         <meshStandardMaterial color="#a9d98a" roughness={0.98} />
       </mesh>
-      <mesh position={[12.5, 0.045, 9.5]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[7.2, 7.45, 64]} />
+      <mesh position={[13, 0.045, 9.5]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[6.7, 6.95, 64]} />
         <meshStandardMaterial color="#f5c76d" roughness={0.9} />
       </mesh>
-      <Html position={[12.5, 2.8, 9.5]} center distanceFactor={14}>
+      <Html position={[13, 2.8, 9.5]} center distanceFactor={14}>
         <div style={{ background: "#fff7df", border: "3px solid #ff9fbd", borderRadius: 18, padding: "7px 18px", color: "#9d4771", font: "900 20px 'Baloo 2', sans-serif", whiteSpace: "nowrap", boxShadow: "0 5px 12px #0002" }}>
           🎈 KHU VUI CHƠI CỦA BÉ 🎈
         </div>
@@ -119,7 +119,7 @@ function PlaygroundFence() {
     const items: [number, number][] = [];
     for (let i = 0; i < 24; i++) {
       const a = (i / 24) * Math.PI * 2;
-      items.push([12.5 + Math.cos(a) * 7.5, 9.5 + Math.sin(a) * 7.5]);
+      items.push([13 + Math.cos(a) * 7, 9.5 + Math.sin(a) * 7]);
     }
     return items;
   }, []);
@@ -135,7 +135,7 @@ function PlaygroundFence() {
         const [nx, nz] = posts[(i + 1) % posts.length] ?? [x, z];
         return (
           <mesh key={`rail-${i}`} position={[(x + nx) / 2, 0.36, (z + nz) / 2]} rotation={[0, -Math.atan2(nz - z, nx - x), 0]}>
-            <boxGeometry args={[1.97, 0.08, 0.08]} />
+            <boxGeometry args={[1.83, 0.08, 0.08]} />
             <meshStandardMaterial color="#ffb4c9" roughness={0.72} />
           </mesh>
         );
