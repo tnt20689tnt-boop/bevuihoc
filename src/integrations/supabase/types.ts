@@ -350,6 +350,7 @@ export type Database = {
           gender: string
           grade: number
           id: string
+          last_grade_promotion: string
           updated_at: string
         }
         Insert: {
@@ -359,6 +360,7 @@ export type Database = {
           gender: string
           grade: number
           id: string
+          last_grade_promotion?: string
           updated_at?: string
         }
         Update: {
@@ -368,6 +370,7 @@ export type Database = {
           gender?: string
           grade?: number
           id?: string
+          last_grade_promotion?: string
           updated_at?: string
         }
         Relationships: []
@@ -646,6 +649,10 @@ export type Database = {
       period_start: {
         Args: { p_period: string; p_ts: string }
         Returns: string
+      }
+      promote_my_grade_if_due: {
+        Args: never
+        Returns: number
       }
       start_contest: { Args: { p_contest: string }; Returns: undefined }
       start_session: {
