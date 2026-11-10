@@ -97,9 +97,9 @@ const AuthenticatedHocSubjectRoute = AuthenticatedHocSubjectRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/arena': typeof AuthenticatedArenaRoute
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/arena': typeof AuthenticatedArenaRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
@@ -112,9 +112,9 @@ export interface FileRoutesByFullPath {
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
 }
 export interface FileRoutesByTo {
-  '/arena': typeof AuthenticatedArenaRoute
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/arena': typeof AuthenticatedArenaRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
@@ -127,7 +127,6 @@ export interface FileRoutesByTo {
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
 }
 export interface FileRoutesById {
-  '/_authenticated/arena': typeof AuthenticatedArenaRoute
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
@@ -147,9 +146,9 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/arena'
     | '/'
     | '/auth'
+    | '/arena'
     | '/bang-xep-hang'
     | '/ho-so'
     | '/nhan-vat'
@@ -162,9 +161,9 @@ export interface FileRouteTypes {
     | '/hoc/$subject'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/arena'
     | '/'
     | '/auth'
+    | '/arena'
     | '/bang-xep-hang'
     | '/ho-so'
     | '/nhan-vat'
@@ -176,7 +175,6 @@ export interface FileRouteTypes {
     | '/thi-dau'
     | '/hoc/$subject'
   id:
-    | '/_authenticated/arena'
     | '__root__'
     | '/'
     | '/_authenticated'
@@ -222,13 +220,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_authenticated/arena': {
-      id: '/_authenticated/arena'
-      path: '/arena'
-      fullPath: '/arena'
-      preLoaderRoute: typeof AuthenticatedArenaRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/arena': {
       id: '/_authenticated/arena'
