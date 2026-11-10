@@ -17,6 +17,20 @@ export type PlaySpot = {
   seatOffset: [number, number, number];
 };
 
+export type PlaygroundCollider = { minX: number; maxX: number; minZ: number; maxZ: number };
+export const PLAYGROUND_COLLIDERS: PlaygroundCollider[] = [
+  { minX: 18.4, maxX: 19.6, minZ: 19.5, maxZ: 20.5 },
+  { minX: 29.1, maxX: 30.9, minZ: 18.1, maxZ: 22.1 },
+  { minX: 24.2, maxX: 27.8, minZ: 13.7, maxZ: 14.3 },
+  { minX: 19.4, maxX: 20.6, minZ: 28.3, maxZ: 29.7 },
+  { minX: 29.8, maxX: 34.2, minZ: 26.8, maxZ: 31.2 },
+  { minX: 34.2, maxX: 37.8, minZ: 14.5, maxZ: 17.5 },
+  { minX: 14.5, maxX: 17.5, minZ: 15.2, maxZ: 16.8 },
+  { minX: 32.8, maxX: 35.2, minZ: 21, maxZ: 23 },
+  { minX: 24, maxX: 28, minZ: 33, maxZ: 37 },
+  { minX: 17, maxX: 19, minZ: 34.7, maxZ: 35.3 },
+];
+
 export const PLAY_SPOTS: PlaySpot[] = [
   { id: "swing", kind: "swing", position: [19, 0, 20], radius: 3.2, label: "LÊN XÍCH ĐU", icon: "🎠", seatOffset: [0, 0.2, 0] },
   { id: "slide", kind: "slide", position: [30, 0, 20], radius: 3.2, label: "CHƠI CẦU TRƯỢT", icon: "🛝", seatOffset: [0, 0.2, 1.2] },
