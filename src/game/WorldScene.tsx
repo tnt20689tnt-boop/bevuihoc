@@ -9,6 +9,7 @@ import { findNearestPlaySpot, PLAYGROUND_COLLIDERS, Playground3D, type PlaySpot 
 import { CampusArchitecture } from "@/game/CampusArchitecture";
 import {
   ROOMS,
+  portalBuildingPosition,
   type Activity,
   type Portal,
   type RoomDef,
@@ -899,14 +900,15 @@ function PlayerController({
         if (room.obstacles.some((obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52)) return true;
         if (room.id === "plaza") {
           const buildingHit = room.portals.some((portal) => {
-            const cx = portal.x * 1.28;
-            const cz = portal.z * 1.28;
+            const [cx, cz] = portalBuildingPosition(portal);
             const yaw = Math.atan2(-cx, -cz);
+            const dx = x - cx;
+            const dz = z - cz;
+            const localX = dx * Math.cos(yaw) + dz * Math.sin(yaw);
+            const localZ = -dx * Math.sin(yaw) + dz * Math.cos(yaw);
             const halfWidth = portal.to === "arena" ? 4.25 : 4.1;
             const halfDepth = portal.to === "arena" ? 2.8 : 3.1;
-            const halfX = Math.abs(Math.cos(yaw)) * halfWidth + Math.abs(Math.sin(yaw)) * halfDepth + 0.52;
-            const halfZ = Math.abs(Math.sin(yaw)) * halfWidth + Math.abs(Math.cos(yaw)) * halfDepth + 0.52;
-            return x > cx - halfX && x < cx + halfX && z > cz - halfZ && z < cz + halfZ;
+            return Math.abs(localX) < halfWidth + 0.52 && Math.abs(localZ) < halfDepth + 0.52;
           });
           const playHit = PLAYGROUND_COLLIDERS.some((box) => x > box.minX - 0.52 && x < box.maxX + 0.52 && z > box.minZ - 0.52 && z < box.maxZ + 0.52);
           if (buildingHit || playHit) return true;
