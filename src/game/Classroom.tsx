@@ -67,7 +67,7 @@ export function Classroom({
 
       <mesh position={[0, height - 0.04, depth / 2 + 0.04]}>
         <boxGeometry args={[width, 0.045, 0.045]} />
-        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.8} toneMapped={false} />
+        <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={1.2} toneMapped={false} />
       </mesh>
       {[-1, 1].map((side) => (
         <mesh key={side} position={[(side * width) / 2, height - 0.04, 0]} rotation={[0, Math.PI / 2, 0]}>
@@ -97,10 +97,10 @@ export function Classroom({
           <meshStandardMaterial color={darkMetal} metalness={0.75} roughness={0.3} />
         </mesh>
       ))}
-      {[-0.25, 0, 0.25].map((t, i) => (
+      {[0].map((t, i) => (
         <mesh key={i} position={[width / 2 - glassW * 0.5 + t * glassW, height * 0.46, depth / 2 + 0.32]}>
           <cylinderGeometry args={[0.055, 0.055, 0.02, 10]} />
-          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={2.5} toneMapped={false} />
+          <meshStandardMaterial color={accent} emissive={accent} emissiveIntensity={2} toneMapped={false} />
         </mesh>
       ))}
       <pointLight position={[0, height * 0.88, depth / 2 + 0.8]} intensity={3.2} distance={7} decay={2} color={accent} castShadow={false} />
