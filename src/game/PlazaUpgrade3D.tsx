@@ -54,7 +54,7 @@ function RotatingSeat({ position, speed }: { position: [number, number, number];
   );
 }
 
-function FountainSpray() {
+function FountainSpray({ position }: { position: [number, number, number] }) {
   const ref = useRef<THREE.Points>(null);
   const count = 96;
   const data = useMemo(() => {
@@ -105,15 +105,15 @@ export function PlazaUpgrade3D() {
   return (
     <group>
       <CampusArchitecture portals={ROOMS.plaza.portals} />
-      <FountainSpray />
-      <RotatingSeat position={[-8.4, 0, 1.6]} speed={0.65} />
-      <RotatingSeat position={[8.4, 0, 1.6]} speed={0.52} />
-      <RotatingSeat position={[-5.8, 0, 8.2]} speed={0.72} />
-      <RotatingSeat position={[5.8, 0, 8.2]} speed={0.58} />
-      <LayeredTree position={[-16, 0, -7]} scale={1.05} />
-      <LayeredTree position={[16, 0, -7]} scale={1.05} />
-      <LayeredTree position={[-15, 0, 9]} scale={0.9} />
-      <LayeredTree position={[15, 0, 9]} scale={0.9} />
+      <FountainSpray position={[-9, 0.25, 0]} />
+      <RotatingSeat position={[-19, 0, 0]} speed={0.65} />
+      <RotatingSeat position={[19, 0, 0]} speed={0.52} />
+      <RotatingSeat position={[-9, 0, -9]} speed={0.72} />
+      <RotatingSeat position={[9, 0, -9]} speed={0.58} />
+      <LayeredTree position={[-20, 0, -3]} scale={0.9} />
+      <LayeredTree position={[20, 0, -3]} scale={0.9} />
+      
+      
       <Html position={[0, 6.15, 26.95]} center distanceFactor={14}>
         <span style={{ whiteSpace: "nowrap", color: "#fff7dc", font: "900 18px sans-serif", textShadow: "0 2px 5px #25432d", letterSpacing: 1 }}>
           TRƯỜNG BÉ HỌC VUI
