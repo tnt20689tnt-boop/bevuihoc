@@ -210,13 +210,11 @@ function NightCampusLights({ roomId }: { roomId: RoomId }) {
             <sphereGeometry args={[0.28, 12, 10]} />
             <meshStandardMaterial color={colors[i % colors.length]} emissive={colors[i % colors.length]} emissiveIntensity={3.2} toneMapped={false} />
           </mesh>
-          <pointLight position={[0, 0.12, 0]} color={colors[i % colors.length]} intensity={1.1} distance={8} decay={2} />
+          {i % 3 === 0 && (
+            <pointLight position={[0, 0.12, 0]} color={colors[i % colors.length]} intensity={0.9} distance={7} decay={2} />
+          )}
         </group>
       ))}
-      {roomId === "plaza" && [0, 1, 2, 3, 4, 5, 6].map((i) => {
-        const angle = (i / 7) * Math.PI * 2;
-        return <pointLight key={i} position={[Math.sin(angle) * 9, 4.2, Math.cos(angle) * 9]} color={colors[i]!} intensity={0.85} distance={12} />;
-      })}
     </group>
   );
 }
