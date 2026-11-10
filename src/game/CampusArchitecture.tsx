@@ -291,7 +291,7 @@ function SchoolBoundary() {
   );
 }
 
-function EntranceGate() {
+export function EntranceGate() {
   return (
     <group position={[0, 0, 26.2]}>
       {/* Hai trụ cổng lớn ốp đá, chân đế và mái chóp */}
