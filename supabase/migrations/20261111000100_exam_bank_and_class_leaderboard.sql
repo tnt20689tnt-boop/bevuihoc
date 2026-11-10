@@ -46,6 +46,15 @@ create table if not exists public.generated_exams (
   created_at timestamptz not null default now()
 );
 
+-- Snapshot riêng phía máy chủ: không cấp quyền đọc cho client để giữ kín đáp án.
+create table if not exists public.generated_exam_snapshots (
+  exam_id uuid primary key references public.generated_exams(id) on delete cascade,
+  questions jsonb not null,
+  created_at timestamptz not null default now()
+);
+alter table public.generated_exam_snapshots enable row level security;
+revoke all on public.generated_exam_snapshots from anon, authenticated;
+
 create table if not exists public.generated_exam_attempts (
   id uuid primary key default gen_random_uuid(),
   exam_id uuid not null references public.generated_exams(id) on delete cascade,
@@ -135,6 +144,19 @@ begin
   values (v_user, p_subject, p_grade, p_term, p_duration, v_ids)
   returning id into v_exam_id;
 
+  insert into public.generated_exam_snapshots(exam_id, questions)
+  select v_exam_id,
+    coalesce(jsonb_agg(jsonb_build_object(
+      'id', q.id,
+      'question_text', q.question_text,
+      'question_type', q.question_type,
+      'options', q.options,
+      'correct_answer', q.correct_answer,
+      'points', q.points
+    ) order by u.ord), '[]'::jsonb)
+  from unnest(v_ids) with ordinality as u(question_id, ord)
+  join public.question_bank q on q.id = u.question_id;
+
   return v_exam_id;
 end;
 $$;
@@ -159,10 +181,17 @@ begin
   if not found then raise exception 'Không tìm thấy đề thi'; end if;
 
   return query
-  select q.id, (u.ord - 1)::int, q.question_text, q.question_type, q.options, q.points
-  from unnest(v_exam.question_ids) with ordinality as u(question_id, ord)
-  join public.question_bank q on q.id = u.question_id
-  order by u.ord;
+  select
+    (item ->> 'id')::uuid,
+    (entry.ord - 1)::int,
+    item ->> 'question_text',
+    item ->> 'question_type',
+    item -> 'options',
+    (item ->> 'points')::int
+  from public.generated_exam_snapshots s
+  cross join lateral jsonb_array_elements(s.questions) with ordinality as entry(item, ord)
+  where s.exam_id = p_exam_id
+  order by entry.ord;
 end;
 $$;
 
@@ -196,12 +225,15 @@ begin
   end if;
 
   select
-    coalesce(sum(q.points) filter (where lower(trim(coalesce(p_answers ->> q.id::text, ''))) =
-      lower(trim(q.correct_answer))), 0),
-    coalesce(sum(q.points), 0)
+    coalesce(sum((item ->> 'points')::numeric) filter (
+      where lower(trim(coalesce(p_answers ->> (item ->> 'id'), ''))) =
+        lower(trim(item ->> 'correct_answer'))
+    ), 0),
+    coalesce(sum((item ->> 'points')::numeric), 0)
   into v_score, v_total
-  from public.question_bank q
-  where q.id = any(v_exam.question_ids);
+  from public.generated_exam_snapshots s
+  cross join lateral jsonb_array_elements(s.questions) as entry(item)
+  where s.exam_id = p_exam_id;
 
   update public.generated_exam_attempts
   set answers = coalesce(p_answers, '{}'::jsonb),
