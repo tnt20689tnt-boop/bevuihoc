@@ -4,6 +4,8 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { CampusArchitecture } from "@/game/CampusArchitecture";
 import { ROOMS } from "@/game/rooms";
+import { FountainRingLights } from "@/game/FountainRingLights";
+import { TreeFairyLights } from "@/game/TreeFairyLights";
 
 function LayeredTree({ position, scale = 1 }: { position: [number, number, number]; scale?: number }) {
   return (
@@ -162,6 +164,9 @@ export function PlazaUpgrade3D() {
         <FountainStructure />
         <FountainSpray position={[0, 0, 0]} />
       </group>
+      <FountainRingLights center={[-20, 0.02, -4]} radius={3.35} count={8} />
+      <TreeFairyLights center={[-20, 2.8, -12]} radius={1.25} count={20} />
+      <TreeFairyLights center={[20, 2.8, -3]} radius={1.25} count={20} />
       <RotatingSeat position={[-19, 0, -9]} speed={0.65} />
       <RotatingSeat position={[19, 0, 0]} speed={0.52} />
       <RotatingSeat position={[-9, 0, -9]} speed={0.72} />
