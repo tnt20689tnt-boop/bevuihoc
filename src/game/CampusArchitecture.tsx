@@ -43,7 +43,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         const length = Math.hypot(x, z);
         return (
           <group key={portal.to}>
-            <Corridor from={[0, 0, 0]} to={[x, 0, z]} width={3.2} accent={room.color} lampsPerSide={2} />
+            <Corridor from={[0, 0, 0]} to={[x, 0, z]} width={3.2} accent={room.color} />
             <SchoolBuilding position={[x, 0, z]} rotation={yaw} room={room} />
           </group>
         );
