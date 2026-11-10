@@ -8,7 +8,7 @@ type Makeup = { lipstick: string; blush: string; shadow: string; hair: string };
 type SalonAvatar = Avatar & { makeup?: Makeup; hairColor?: string; princessLooks?: Record<string, Makeup> };
 type Princess = { id: string; name: string; emoji: string; skin: string; hair: string; eyes: string; crown: string; dress: string };
 
-const PRINCESSES: Princess[] = [
+const PRINCESSES = [
   { id: "royal", name: "Hoàng Gia", emoji: "👑", skin: "#fcd1ba", hair: "#fbbf24", eyes: "#3b82f6", crown: "👑", dress: "#f9a8d4" },
   { id: "night", name: "Bí Ẩn", emoji: "🌙", skin: "#d29b7a", hair: "#1f2937", eyes: "#78350f", crown: "🌙", dress: "#8b5cf6" },
   { id: "mermaid", name: "Tiên Cá", emoji: "🧜‍♀️", skin: "#fef3c7", hair: "#f472b6", eyes: "#14b8a6", crown: "🐚", dress: "#22d3ee" },
@@ -21,7 +21,12 @@ const PRINCESSES: Princess[] = [
   { id: "red", name: "Công Chúa Đỏ", emoji: "❤️", skin: "#f8c9b5", hair: "#991b1b", eyes: "#854d0e", crown: "❤️", dress: "#ef4444" },
   { id: "angel", name: "Thiên Thần", emoji: "🪽", skin: "#ffe4e6", hair: "#fef3c7", eyes: "#60a5fa", crown: "🪽", dress: "#fff7ed" },
   { id: "rainbow", name: "Cầu Vồng", emoji: "🌈", skin: "#fcd1ba", hair: "#c084fc", eyes: "#06b6d4", crown: "🌈", dress: "#f0abfc" },
-];
+] as const satisfies readonly Princess[];
+const FIRST_PRINCESS: Princess = PRINCESSES[0];
+
+function defaultLook(p: Princess): Makeup {
+  return { lipstick: p.id === "night" ? "#be123c" : "#ff6b81", blush: "transparent", shadow: "transparent", hair: p.hair };
+}
 
 const hairColors = ["#fbbf24", "#78350f", "#1f2937", "#f472b6", "#3b82f6", "#ef4444", "#a855f7", "#10b981"];
 const eyeColors = ["transparent", "#8b5cf6", "#ec4899", "#10b981", "#f59e0b", "#3b82f6"];
@@ -39,15 +44,15 @@ function initialLooks(saved: SalonAvatar): Record<string, Makeup> {
 
 export function PrincessSalon({ profile }: { profile: Profile }) {
   const saved = profile.avatar as SalonAvatar;
-  const [activeId, setActiveId] = useState(PRINCESSES[0].id);
+  const [activeId, setActiveId] = useState<string>(FIRST_PRINCESS.id);
   const [looks, setLooks] = useState(() => initialLooks(saved));
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
-  const princess = PRINCESSES.find((p) => p.id === activeId) ?? PRINCESSES[0];
-  const look = looks[activeId];
+  const princess: Princess = PRINCESSES.find((p) => p.id === activeId) ?? FIRST_PRINCESS;
+  const look: Makeup = looks[activeId] ?? defaultLook(princess);
 
   function update(type: keyof Makeup, color: string) {
-    setLooks((prev) => ({ ...prev, [activeId]: { ...prev[activeId], [type]: color } }));
+    setLooks((prev) => ({ ...prev, [activeId]: { ...(prev[activeId] ?? defaultLook(princess)), [type]: color } }));
     setDone(false);
   }
 

@@ -31,7 +31,7 @@ const shuffleArray = <T,>(array: T[]): T[] => {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
     const j = rand(0, i);
-    [arr[i], arr[j]] = [arr[j], arr[i]];
+    [arr[i], arr[j]] = [arr[j]!, arr[i]!];
   }
   return arr;
 };
@@ -155,7 +155,7 @@ const generateMath = (grade: number, lv: number) => {
       explanation = `${a} + ${b} = ${correctVal}.`;
     } else if (type === 2) {
       const total = rand(10, 100) * 10;
-      const percent = [10, 20, 25, 50][rand(0, 3)];
+      const percent = [10, 20, 25, 50][rand(0, 3)] ?? 10;
       correctVal = (total * percent) / 100;
       questionText = `${percent}% của ${total} = ?`;
       explanation = `${total} x ${percent} : 100 = ${correctVal}.`;
@@ -216,7 +216,7 @@ const generateVietnamese = (grade: number, _lv: number): GeneratedResult => {
   else if (grade === 4) bank = [...thanhNgu, ...nguPhap];
   else bank = [...chinhTa, ...dongNghia, ...thanhNgu, ...nguPhap];
 
-  const item = bank[rand(0, bank.length - 1)];
+  const item = bank[rand(0, bank.length - 1)]!;
   const wrongs = [...new Set(item.w)].filter((w) => w !== item.a).slice(0, 3);
   while (wrongs.length < 3) wrongs.push(`Đáp án khác ${wrongs.length + 1}`);
 
@@ -270,7 +270,7 @@ const generateEnglish = (grade: number, _lv: number): GeneratedResult => {
   else if (grade === 4) bank = [...reading, ...verbs, ...grammar];
   else bank = [...vocabulary, ...grammar, ...reading, ...verbs];
 
-  const item = bank[rand(0, bank.length - 1)];
+  const item = bank[rand(0, bank.length - 1)]!;
   const wrongs = item.w.slice(0, 3);
   while (wrongs.length < 3) wrongs.push(`Other ${wrongs.length + 1}`);
 
