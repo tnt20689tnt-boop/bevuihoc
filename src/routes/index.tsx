@@ -6,8 +6,27 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "Đăng nhập – Bé Học Vui" },
-      { name: "description", content: "Đăng nhập, chọn bé trai hoặc bé gái và bắt đầu tại cổng trường Bé Học Vui." },
+      { title: "Bé Vui Học - Học Online Toán, Tiếng Anh Lớp 1 Đến Lớp 5" },
+      {
+        name: "description",
+        content:
+          "Nền tảng học online thông minh dành cho trẻ từ lớp 1 đến lớp 5. Cung cấp tài liệu, bài tập tương tác môn Toán và Tiếng Anh giúp bé vừa học vừa vui.",
+      },
+      {
+        property: "og:title",
+        content: "Bé Vui Học - Học Online Toán, Tiếng Anh Lớp 1-5",
+      },
+      {
+        property: "og:description",
+        content:
+          "Nền tảng học online thông minh cho trẻ tiểu học. Tài liệu và bài tập tương tác Toán, Tiếng Anh.",
+      },
+      { property: "og:type", content: "website" },
+      { property: "og:url", content: "https://bevuihoc.lovable.app/" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+    links: [
+      { rel: "canonical", href: "https://bevuihoc.lovable.app/" },
     ],
   }),
   component: EntryRedirect,
