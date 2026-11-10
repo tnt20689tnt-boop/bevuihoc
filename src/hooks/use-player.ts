@@ -9,6 +9,7 @@ export type Profile = {
   display_name: string;
   gender: Gender;
   grade: number;
+  last_grade_promotion: string;
   avatar: Avatar;
 };
 
@@ -35,9 +36,13 @@ export function useMyProfile() {
     queryFn: async (): Promise<Profile | null> => {
       const { data: u } = await supabase.auth.getUser();
       if (!u.user) return null;
+      // Run the promotion check server-side on every profile load. The database
+      // locks the profile row, so simultaneous logins cannot promote twice.
+      const { error: promotionError } = await supabase.rpc("promote_my_grade_if_due");
+      if (promotionError) throw promotionError;
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, display_name, gender, grade, avatar")
+        .select("id, display_name, gender, grade, last_grade_promotion, avatar")
         .eq("id", u.user.id)
         .maybeSingle();
       if (error) throw error;
