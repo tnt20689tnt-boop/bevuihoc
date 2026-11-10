@@ -165,8 +165,6 @@ function CampusGreenery({ portals }: { portals: Portal[] }) {
   const trees: [number, number][] = [
     [-12, -11],
     [13, -10],
-    [-5, 17],
-    [5, 17],
   ];
   const available = trees.filter(([x, z]) =>
     portals.every((portal) => Math.hypot(x - portal.x * 1.28, z - portal.z * 1.28) > 5.1),
