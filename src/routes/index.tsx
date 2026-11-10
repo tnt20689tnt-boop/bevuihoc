@@ -179,7 +179,11 @@ function HomePage() {
       <footer className="border-t border-sky-100 bg-white">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p><span className="font-black text-slate-800">Bé Học Vui</span> · Thế giới học tập và vui chơi 3D</p>
-          <p>© {new Date().getFullYear()} Bé Học Vui. Cùng bé học hỏi mỗi ngày.</p>
+          <div className="text-right">
+            <p className="font-extrabold text-slate-700">Mr Toàn Prodution (TNT20689TNT)</p>
+            <p className="text-xs text-slate-500">Tác giả & phát triển Bé Học Vui</p>
+            <p>© {new Date().getFullYear()} Bé Học Vui. Cùng bé học hỏi mỗi ngày.</p>
+          </div>
         </div>
       </footer>
     </main>
