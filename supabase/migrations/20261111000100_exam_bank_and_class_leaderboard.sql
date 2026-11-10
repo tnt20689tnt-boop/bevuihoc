@@ -299,6 +299,11 @@ values
 ('math',1,'mid1','cộng trừ 10','5 - 1 = ?','multiple_choice','[{"key":"A","text":"3"},{"key":"B","text":"4"},{"key":"C","text":"5"}]'::jsonb,'B',1,1),
 ('math',1,'mid1','cộng trừ 10','4 - 2 = ?','multiple_choice','[{"key":"A","text":"1"},{"key":"B","text":"2"},{"key":"C","text":"3"}]'::jsonb,'B',1,1),
 ('math',1,'mid1','cộng trừ 10','2 + 2 = ?','multiple_choice','[{"key":"A","text":"3"},{"key":"B","text":"4"},{"key":"C","text":"5"}]'::jsonb,'B',1,1),
+('math',1,'mid1','cộng trừ 10','6 - 3 = ?','multiple_choice','[{"key":"A","text":"2"},{"key":"B","text":"3"},{"key":"C","text":"4"}]'::jsonb,'B',1,1),
+('math',1,'mid1','cộng trừ 10','2 + 5 = ?','multiple_choice','[{"key":"A","text":"6"},{"key":"B","text":"7"},{"key":"C","text":"8"}]'::jsonb,'B',1,1),
+('math',1,'mid1','cộng trừ 10','8 - 4 = ?','multiple_choice','[{"key":"A","text":"3"},{"key":"B","text":"4"},{"key":"C","text":"5"}]'::jsonb,'B',1,1),
+('math',1,'mid1','so sánh số','Số nào lớn hơn: 5 hay 3?','multiple_choice','[{"key":"A","text":"3"},{"key":"B","text":"5"},{"key":"C","text":"Hai số bằng nhau"}]'::jsonb,'B',1,1),
+('math',1,'mid1','so sánh số','Số liền sau của 6 là số nào?','multiple_choice','[{"key":"A","text":"5"},{"key":"B","text":"7"},{"key":"C","text":"8"}]'::jsonb,'B',1,1),
 ('math',3,'mid1','bảng nhân','6 × 7 = ?','multiple_choice','[{"key":"A","text":"40"},{"key":"B","text":"42"},{"key":"C","text":"48"}]'::jsonb,'B',1,2),
 ('math',3,'mid1','phép chia','35 ÷ 5 = ?','multiple_choice','[{"key":"A","text":"6"},{"key":"B","text":"7"},{"key":"C","text":"8"}]'::jsonb,'B',1,2),
 ('math',3,'mid1','chia có dư','17 ÷ 5 = ? (thương, dư)','multiple_choice','[{"key":"A","text":"3 dư 2"},{"key":"B","text":"2 dư 7"},{"key":"C","text":"4 dư 1"}]'::jsonb,'A',2,3)
