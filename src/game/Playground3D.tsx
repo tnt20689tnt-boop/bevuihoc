@@ -40,7 +40,7 @@ export const PLAY_SPOTS: PlaySpot[] = [
   { id: "spring", kind: "springRider", position: [10, 0, 12], radius: 1.3, label: "LÊN THÚ NHÚN", icon: "🐰", seatOffset: [0, 0.52, 0] },
   { id: "ballpit", kind: "ballPit", position: [16, 0, 12], radius: 1.7, label: "VÀO NHÀ BÓNG", icon: "🏠", seatOffset: [0, 0.15, 0] },
   { id: "house", kind: "playhouse", position: [18, 0, 5.5], radius: 1.6, label: "VÀO NHÀ LIÊN HOÀN", icon: "🏰", seatOffset: [0, 0, 0] },
-  { id: "tunnel", kind: "tunnel", position: [8, 0, 5.5], radius: 1.25, label: "CHUI ĐƯỜNG HẦM", icon: "🚇", seatOffset: [0, 0.1, 0] },
+  { id: "tunnel", kind: "tunnel", position: [8, 0, 5.5], radius: 1.8, label: "CHUI ĐƯỜNG HẦM", icon: "🚇", seatOffset: [0, 0.1, 0] },
   { id: "climber", kind: "climber", position: [17, 0, 8.5], radius: 1.4, label: "LEO KHUNG", icon: "🧗", seatOffset: [0, 0.2, 0] },
   { id: "carousel", kind: "carousel", position: [13, 0, 15], radius: 1.6, label: "LÊN VÒNG QUAY", icon: "🎡", seatOffset: [0, 0.3, 0] },
   { id: "bench", kind: "bench", position: [9, 0, 15], radius: 1.0, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0] },
