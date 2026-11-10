@@ -15,6 +15,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
       return { name: ROOMS[portal.to].short, minX: cx - halfX, maxX: cx + halfX, minZ: cz - halfZ, maxZ: cz + halfZ };
     });
     boxes.push({ name: "Khu vui chơi", minX: 6, maxX: 20, minZ: 2.5, maxZ: 16.5 });
+    boxes.push({ name: "Đài phun nước", minX: -25.15, maxX: -18.85, minZ: -5.15, maxZ: 1.15 });
     for (let i = 0; i < boxes.length; i++) {
       for (let j = i + 1; j < boxes.length; j++) {
         const a = boxes[i];
