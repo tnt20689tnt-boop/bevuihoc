@@ -5,8 +5,6 @@ import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
 import { CampusMultiplayer } from "@/game/CampusMultiplayer";
 import { PlazaUpgrade3D } from "@/game/PlazaUpgrade3D";
-import { LanternRow } from "@/game/LanternRow";
-import { TreeFairyLights } from "@/game/TreeFairyLights";
 import { findNearestPlaySpot, PLAYGROUND_COLLIDERS, CampusSwings3D, type PlaySpot } from "@/game/Playground3D";
 import { CampusArchitecture } from "@/game/CampusArchitecture";
 import {
@@ -90,28 +88,6 @@ export function WorldScene(props: WorldSceneProps) {
       />
       {isNight && <NightSky />}
       <WorldFloor room={room} />
-      {isNight && <NightCampusLights roomId={room.id} />}
-      {room.id === "plaza" ? (
-        <>
-          <LanternRow from={[-16, 0, -15]} to={[16, 0, -15]} count={7} poleHeight={3.4} />
-          <LanternRow from={[-16, 0, 15]} to={[16, 0, 15]} count={7} poleHeight={3.4} />
-          <LanternRow from={[-16, 0, -10]} to={[-16, 0, 10]} count={5} poleHeight={3.2} />
-          <LanternRow from={[16, 0, -10]} to={[16, 0, 10]} count={5} poleHeight={3.2} />
-          <TreeFairyLights center={[-12, 2.1, -9]} radius={1.2} count={18} />
-          <TreeFairyLights center={[-11, 2.1, 8]} radius={1.1} count={18} />
-          <TreeFairyLights center={[11, 2.1, -8]} radius={1.2} count={18} />
-          <TreeFairyLights center={[12, 2.1, 8]} radius={1.2} count={18} />
-          <TreeFairyLights center={[-7, 2, -13]} radius={1} count={14} />
-          <TreeFairyLights center={[7, 2, -13]} radius={1} count={14} />
-          <TreeFairyLights center={[-7, 2, 13]} radius={1} count={14} />
-          <TreeFairyLights center={[7, 2, 13]} radius={1} count={14} />
-        </>
-      ) : (
-        <>
-          <LanternRow from={[-7, 0, -8]} to={[7, 0, -8]} count={4} poleHeight={2.8} />
-          <LanternRow from={[-7, 0, 8]} to={[7, 0, 8]} count={4} poleHeight={2.8} />
-        </>
-      )}
       {room.id === "plaza" ? <><PlazaUpgrade3D /><CampusSwings3D activeSpotId={props.playingSpot?.id ?? null} /></> : <RoomDecor room={room} />}
       {room.portals.map((portal) => portal.to === "arena" ? null : (
         <PortalGate
@@ -165,59 +141,6 @@ function NightSky() {
   );
 }
 
-function NightCampusLights({ roomId }: { roomId: RoomId }) {
-  const colors = ["#ff4fa3", "#43e8ff", "#ffe15b", "#a879ff", "#65ff9a", "#ff8b45", "#ffefff"];
-  const bulbs = Array.from({ length: 112 }, (_, i) => {
-    const angle = (i / 112) * Math.PI * 2;
-    const radius = roomId === "plaza" ? 22.8 : 11.8;
-    return {
-      position: [Math.sin(angle) * radius, 2.9 + (i % 4) * 0.28, Math.cos(angle) * radius] as [number, number, number],
-      color: colors[i % colors.length]!,
-      size: i % 9 === 0 ? 0.17 : 0.105,
-    };
-  });
-  const garland = Array.from({ length: 48 }, (_, i) => {
-    const t = i / 47;
-    return {
-      position: [-13 + t * 26, 4.3 + Math.sin(t * Math.PI * 5) * 0.7, -7 + Math.sin(t * Math.PI * 2) * 5] as [number, number, number],
-      color: colors[(i * 3) % colors.length]!,
-    };
-  });
-  const lampPositions: [number, number, number][] = roomId === "plaza"
-    ? [[-15, 3, -12], [-15, 3, 0], [-15, 3, 12], [15, 3, -12], [15, 3, 0], [15, 3, 12], [-7, 3, -18], [7, 3, -18], [-7, 3, 18], [7, 3, 18]]
-    : [[-8, 3, -7], [8, 3, -7], [-8, 3, 7], [8, 3, 7]];
-  return (
-    <group>
-      {bulbs.map((bulb, i) => (
-        <mesh key={`perimeter-${i}`} position={bulb.position}>
-          <sphereGeometry args={[bulb.size, 10, 8]} />
-          <meshStandardMaterial color={bulb.color} emissive={bulb.color} emissiveIntensity={2.8} toneMapped={false} />
-        </mesh>
-      ))}
-      {garland.map((bulb, i) => (
-        <mesh key={`garland-${i}`} position={bulb.position}>
-          <sphereGeometry args={[0.11, 8, 8]} />
-          <meshBasicMaterial color={bulb.color} />
-        </mesh>
-      ))}
-      {lampPositions.map((position, i) => (
-        <group key={i} position={position}>
-          <mesh position={[0, -1.1, 0]}>
-            <cylinderGeometry args={[0.07, 0.12, 2.2, 8]} />
-            <meshStandardMaterial color="#26334f" metalness={0.55} roughness={0.38} />
-          </mesh>
-          <mesh position={[0, 0.12, 0]}>
-            <sphereGeometry args={[0.28, 12, 10]} />
-            <meshStandardMaterial color={colors[i % colors.length]} emissive={colors[i % colors.length]} emissiveIntensity={3.2} toneMapped={false} />
-          </mesh>
-          {i % 3 === 0 && (
-            <pointLight position={[0, 0.12, 0]} color={colors[i % colors.length]} intensity={0.9} distance={7} decay={2} />
-          )}
-        </group>
-      ))}
-    </group>
-  );
-}
 
 function WorldFloor({ room }: { room: RoomDef }) {
   return (
