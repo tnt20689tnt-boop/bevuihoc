@@ -1,48 +1,185 @@
-import { useEffect } from "react";
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useSession } from "@/hooks/use-player";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
-  ssr: false,
   head: () => ({
     meta: [
-      { title: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D" },
+      { title: "Bé Học Vui - Trường Học 3D Và Khu Vui Chơi Cho Bé" },
       {
         name: "description",
         content:
-          "Khám phá trường học 3D và khu vui chơi tương tác dành cho bé với xích đu, cầu trượt, nhà bóng và nhiều trò chơi hấp dẫn.",
+          "Bé Học Vui là thế giới trường học 3D tương tác dành cho trẻ em: khám phá lớp học, học Toán, Tiếng Việt, Tiếng Anh và vui chơi với xích đu, cầu trượt, nhà bóng.",
       },
       { name: "robots", content: "index, follow" },
-      {
-        property: "og:title",
-        content: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D",
-      },
+      { property: "og:title", content: "Bé Học Vui - Trường Học 3D Và Khu Vui Chơi Cho Bé" },
       {
         property: "og:description",
-        content: "Khám phá trường học 3D và khu vui chơi tương tác dành cho bé.",
+        content:
+          "Cùng bé khám phá trường học 3D, học tập qua trò chơi và vui chơi trong khuôn viên đầy màu sắc.",
       },
       { property: "og:url", content: "https://bevuihoc.lovable.app/" },
+      { property: "og:type", content: "website" },
     ],
     links: [{ rel: "canonical", href: "https://bevuihoc.lovable.app/" }],
   }),
-  component: GameEntry,
+  component: HomePage,
 });
 
-function GameEntry() {
-  const session = useSession();
-  const navigate = useNavigate();
+const learningAreas = [
+  {
+    icon: "➕",
+    title: "Toán học",
+    description: "Làm quen với con số, phép tính và tư duy logic qua hoạt động tương tác.",
+    color: "from-sky-100 to-blue-50",
+  },
+  {
+    icon: "📚",
+    title: "Tiếng Việt",
+    description: "Luyện đọc, nhận biết từ ngữ và phát triển khả năng ngôn ngữ.",
+    color: "from-rose-100 to-pink-50",
+  },
+  {
+    icon: "🌍",
+    title: "Tiếng Anh",
+    description: "Khám phá từ vựng và kiến thức tiếng Anh theo cách gần gũi.",
+    color: "from-amber-100 to-yellow-50",
+  },
+];
 
-  useEffect(() => {
-    if (session === undefined) return;
-    navigate({ to: session ? "/nhan-vat" : "/auth", replace: true });
-  }, [session, navigate]);
+const playgroundActivities = [
+  ["🛝", "Cầu trượt"],
+  ["🎠", "Vòng quay"],
+  ["🪁", "Xích đu"],
+  ["⚽", "Trò chơi vận động"],
+  ["🏠", "Nhà vui chơi"],
+  ["🧸", "Khu vui chơi khám phá"],
+];
 
+function HomePage() {
   return (
-    <main className="grid h-dvh min-h-[360px] place-items-center bg-[linear-gradient(145deg,#e8f7ff,#fff4d8)]">
-      <div className="text-center">
-        <div className="animate-bounce text-6xl">🎒</div>
-        <p className="mt-4 font-display text-xl font-extrabold text-slate-700">Đang mở cổng trường…</p>
-      </div>
+    <main className="min-h-screen overflow-hidden bg-[#f5fbff] text-slate-800">
+      <header className="relative z-10 border-b border-sky-100 bg-white/90">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-4">
+          <a href="/" className="flex items-center gap-3" aria-label="Bé Học Vui - Trang chủ">
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-amber-100 text-3xl">🎒</span>
+            <span>
+              <span className="block font-display text-xl font-black text-slate-900">Bé Học Vui</span>
+              <span className="block text-xs font-semibold text-slate-500">Học tập · Khám phá · Vui chơi</span>
+            </span>
+          </a>
+          <Link
+            to="/auth"
+            className="rounded-full bg-emerald-600 px-5 py-3 text-sm font-extrabold text-white shadow-lg shadow-emerald-200 transition hover:bg-emerald-700"
+          >
+            Đăng nhập
+          </Link>
+        </div>
+      </header>
+
+      <section className="relative isolate">
+        <div aria-hidden="true" className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_10%_10%,#d9f3ff_0%,transparent_42%),radial-gradient(ellipse_at_90%_20%,#fff0c9_0%,transparent_38%),linear-gradient(135deg,#f4fbff,#f0fff7)]" />
+        <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 py-16 md:grid-cols-[1.1fr_.9fr] md:py-24">
+          <div>
+            <span className="inline-flex rounded-full border border-emerald-200 bg-white/80 px-4 py-2 text-sm font-extrabold text-emerald-700">
+              🌈 Thế giới học tập 3D dành cho bé
+            </span>
+            <h1 className="mt-6 max-w-2xl font-display text-4xl font-black leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+              Mỗi ngày đến trường là một <span className="text-emerald-600">chuyến phiêu lưu!</span>
+            </h1>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+              Bé Học Vui mang đến một ngôi trường 3D đầy màu sắc, nơi trẻ có thể khám phá lớp học,
+              làm quen với Toán, Tiếng Việt, Tiếng Anh và vui chơi trong khuôn viên sinh động.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link
+                to="/auth"
+                className="rounded-2xl bg-emerald-600 px-7 py-4 text-base font-black text-white shadow-xl shadow-emerald-200 transition hover:-translate-y-0.5 hover:bg-emerald-700"
+              >
+                Bắt đầu khám phá →
+              </Link>
+              <a
+                href="#kham-pha"
+                className="rounded-2xl border-2 border-sky-200 bg-white px-7 py-4 text-base font-extrabold text-sky-800 transition hover:bg-sky-50"
+              >
+                Tìm hiểu thêm
+              </a>
+            </div>
+            <p className="mt-5 text-sm text-slate-500">Phụ huynh đăng nhập để tạo hồ sơ và lưu hành trình của bé.</p>
+          </div>
+
+          <div className="relative mx-auto w-full max-w-lg">
+            <div className="absolute -inset-5 rounded-[3rem] bg-gradient-to-br from-sky-200 via-white to-amber-100 blur-xl" />
+            <div className="relative rounded-[2.5rem] border-8 border-white bg-gradient-to-br from-sky-100 via-white to-emerald-100 p-7 shadow-2xl">
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-white/90 px-4 py-2 text-sm font-black text-sky-800">🏫 Ngôi trường của bé</span>
+                <span className="text-3xl">☀️</span>
+              </div>
+              <div className="mt-8 grid grid-cols-3 gap-3">
+                <div className="rounded-2xl bg-rose-200 p-4 text-center"><div className="text-4xl">📖</div><p className="mt-2 text-xs font-black text-rose-900">Lớp học</p></div>
+                <div className="rounded-2xl bg-amber-200 p-4 text-center"><div className="text-4xl">🛝</div><p className="mt-2 text-xs font-black text-amber-900">Sân chơi</p></div>
+                <div className="rounded-2xl bg-emerald-200 p-4 text-center"><div className="text-4xl">🌳</div><p className="mt-2 text-xs font-black text-emerald-900">Khám phá</p></div>
+              </div>
+              <div className="mt-5 rounded-3xl bg-white/90 p-5 text-center shadow-lg">
+                <div className="text-6xl">🧒🏻 👧🏻</div>
+                <p className="mt-3 font-display text-xl font-black text-slate-800">Học vui mỗi ngày!</p>
+                <p className="mt-1 text-sm text-slate-500">Học tập kết hợp khám phá và vận động</p>
+              </div>
+              <div className="mt-5 flex justify-center gap-4 text-3xl" aria-hidden="true">🌼 🦋 🌈 🌻</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="kham-pha" className="mx-auto max-w-6xl px-5 py-16">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="font-extrabold uppercase tracking-[.2em] text-emerald-600">Khám phá mỗi ngày</p>
+          <h2 className="mt-3 font-display text-3xl font-black text-slate-900 sm:text-4xl">Học kiến thức mới theo cách thật vui</h2>
+          <p className="mt-4 leading-7 text-slate-600">Các khu học tập được thiết kế để bé tiếp cận kiến thức qua trải nghiệm và hoạt động tương tác.</p>
+        </div>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
+          {learningAreas.map((area) => (
+            <article key={area.title} className={`rounded-3xl border border-white bg-gradient-to-br ${area.color} p-7 shadow-lg shadow-slate-200/60`}>
+              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white text-4xl shadow">{area.icon}</div>
+              <h3 className="mt-5 font-display text-2xl font-black text-slate-900">{area.title}</h3>
+              <p className="mt-3 leading-7 text-slate-600">{area.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-white py-16">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 md:grid-cols-[.9fr_1.1fr]">
+          <div>
+            <p className="font-extrabold uppercase tracking-[.2em] text-orange-600">Giờ vui chơi</p>
+            <h2 className="mt-3 font-display text-3xl font-black text-slate-900 sm:text-4xl">Sân chơi 3D để bé thỏa sức khám phá</h2>
+            <p className="mt-4 leading-7 text-slate-600">Sau giờ học, bé có thể đi dạo trong khuôn viên và trải nghiệm các hoạt động vui chơi tương tác được bố trí trong thế giới 3D.</p>
+            <Link to="/auth" className="mt-7 inline-flex rounded-2xl bg-orange-500 px-6 py-3 font-black text-white shadow-lg shadow-orange-100 hover:bg-orange-600">Cùng bé vào trường →</Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {playgroundActivities.map(([icon, label]) => (
+              <div key={label} className="rounded-3xl border border-orange-100 bg-orange-50/80 p-5 text-center">
+                <div className="text-4xl">{icon}</div>
+                <p className="mt-3 text-sm font-extrabold text-slate-700">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl px-5 py-16 text-center">
+        <div className="rounded-[2rem] bg-gradient-to-r from-sky-100 via-emerald-100 to-amber-100 px-6 py-12 sm:px-12">
+          <div className="text-5xl">🎒 ✨ 🏫</div>
+          <h2 className="mt-5 font-display text-3xl font-black text-slate-900 sm:text-4xl">Sẵn sàng mở cánh cổng trường chưa?</h2>
+          <p className="mx-auto mt-4 max-w-xl leading-7 text-slate-600">Phụ huynh đăng nhập để bé tạo nhân vật và bắt đầu hành trình học tập, khám phá thế giới Bé Học Vui.</p>
+          <Link to="/auth" className="mt-7 inline-flex rounded-2xl bg-emerald-600 px-8 py-4 font-black text-white shadow-xl shadow-emerald-200 hover:bg-emerald-700">Bắt đầu ngay →</Link>
+        </div>
+      </section>
+
+      <footer className="border-t border-sky-100 bg-white">
+        <div className="mx-auto flex max-w-6xl flex-col gap-3 px-5 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+          <p><span className="font-black text-slate-800">Bé Học Vui</span> · Thế giới học tập và vui chơi 3D</p>
+          <p>© {new Date().getFullYear()} Bé Học Vui. Cùng bé học hỏi mỗi ngày.</p>
+        </div>
+      </footer>
     </main>
   );
 }
