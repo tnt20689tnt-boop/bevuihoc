@@ -1,4 +1,5 @@
 import { Html } from "@react-three/drei";
+import { Classroom } from "@/game/Classroom";
 import { useEffect } from "react";
 import type { Portal } from "@/game/rooms";
 import { portalBuildingPosition, ROOMS } from "@/game/rooms";
@@ -14,7 +15,6 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
       const halfZ = Math.abs(Math.sin(yaw)) * halfWidth + Math.abs(Math.cos(yaw)) * halfDepth;
       return { name: ROOMS[portal.to].short, minX: cx - halfX, maxX: cx + halfX, minZ: cz - halfZ, maxZ: cz + halfZ };
     });
-    boxes.push({ name: "Khu vui chơi", minX: 6, maxX: 20, minZ: 2.5, maxZ: 16.5 });
     boxes.push({ name: "Đài phun nước", minX: -23.15, maxX: -16.85, minZ: -7.15, maxZ: -0.85 });
     for (let i = 0; i < boxes.length; i++) {
       for (let j = i + 1; j < boxes.length; j++) {
@@ -73,51 +73,9 @@ function SchoolBuilding({
 }) {
   if (room.id === "arena") return <ArenaHouse position={position} rotation={rotation} room={room} />;
   return (
-    <group position={position} rotation={[0, rotation, 0]}>
-      {/* Thân nhà thấp, mái dốc đơn giản và hiên quay vào sân. */}
-      <mesh position={[0, 1.55, 0]} castShadow receiveShadow>
-        <boxGeometry args={[7.4, 3.1, 5.2]} />
-        <meshStandardMaterial color="#fff1d8" roughness={0.86} />
-      </mesh>
-      <mesh position={[0, 3.02, 0]} castShadow>
-        <boxGeometry args={[7.65, 0.28, 5.45]} />
-        <meshStandardMaterial color={room.color} roughness={0.76} />
-      </mesh>
-      {[-1, 1].map((side) => (
-        <mesh key={side} position={[0, 4.15, side * 1.9]} rotation={[side * 0.4, 0, 0]} castShadow>
-          <boxGeometry args={[7.9, 0.24, 3.8]} />
-          <meshStandardMaterial color={room.color} roughness={0.82} />
-        </mesh>
-      ))}
-      <mesh position={[0, 4.6, 0]} castShadow>
-        <boxGeometry args={[8.1, 0.2, 0.28]} />
-        <meshStandardMaterial color="#fff4da" roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 0.82, 2.83]} castShadow>
-        <boxGeometry args={[2.3, 1.65, 0.16]} />
-        <meshStandardMaterial color="#80533a" roughness={0.72} />
-      </mesh>
-      <mesh position={[-2.35, 1.65, 2.72]}>
-        <boxGeometry args={[1.35, 1.2, 0.12]} />
-        <meshStandardMaterial color="#b9e5e7" roughness={0.35} metalness={0.08} />
-      </mesh>
-      <mesh position={[2.35, 1.65, 2.72]}>
-        <boxGeometry args={[1.35, 1.2, 0.12]} />
-        <meshStandardMaterial color="#b9e5e7" roughness={0.35} metalness={0.08} />
-      </mesh>
-      <mesh position={[0, 0.2, 3.2]} receiveShadow castShadow>
-        <boxGeometry args={[3.1, 0.22, 1.25]} />
-        <meshStandardMaterial color="#d6b58b" roughness={0.9} />
-      </mesh>
-      <mesh position={[0, 0.12, 0]} receiveShadow>
-        <boxGeometry args={[8.15, 0.22, 6.05]} />
-        <meshStandardMaterial color="#d5b28b" roughness={0.93} />
-      </mesh>
-      <mesh position={[0, 2.75, 2.94]}>
-        <boxGeometry args={[4.45, 0.72, 0.12]} />
-        <meshStandardMaterial color={room.color} roughness={0.65} />
-      </mesh>
-      <Html position={[0, 2.77, 3.04]} center distanceFactor={13}>
+    <group>
+      <Classroom position={position} rotationY={rotation} width={7.4} depth={5.2} height={3.6} accent={room.color} />
+      <Html position={[position[0], 2.78, position[2] + 3.02]} center distanceFactor={13} rotation={[0, rotation, 0]}>
         <div
           style={{
             whiteSpace: "nowrap",
@@ -136,7 +94,6 @@ function SchoolBuilding({
     </group>
   );
 }
-
 
 function ArenaHouse({ position, rotation, room }: { position: [number, number, number]; rotation: number; room: (typeof ROOMS)[keyof typeof ROOMS] }) {
   return (
