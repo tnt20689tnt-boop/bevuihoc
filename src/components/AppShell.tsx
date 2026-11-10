@@ -129,7 +129,7 @@ export function GameShell({
   }, [isLoading, profile, navigate]);
   if (isLoading) return <LoadingScreen />;
   if (isError) {
-    const message = error instanceof Error ? error.message : "Không tải được hồ sơ học sinh.";
+    const message = error && typeof error === "object" && "message" in error ? String((error as { message: unknown }).message) : error instanceof Error ? error.message : String(error ?? "Không tải được hồ sơ học sinh.");
     return (
       <div className="grid min-h-screen place-items-center bg-gradient-sky px-4">
         <div className="w-full max-w-md rounded-3xl border-4 border-white bg-card p-6 text-center shadow-xl">
@@ -137,6 +137,7 @@ export function GameShell({
           <h1 className="mt-3 text-xl font-extrabold text-foreground">Chưa mở được thế giới</h1>
           <p className="mt-2 text-sm text-muted-foreground">Hệ thống chưa tải được hồ sơ của bé. Bé thử kết nối mạng rồi bấm tải lại nhé.</p>
           <p className="mt-3 break-words rounded-xl bg-muted p-3 text-left text-xs text-muted-foreground">{message}</p>
+          {error && typeof error === "object" && "code" in error && <p className="mt-2 text-left text-xs font-bold text-red-700">Mã lỗi: {String((error as { code: unknown }).code)}</p>}
           <button
             type="button"
             onClick={() => void refetch()}
