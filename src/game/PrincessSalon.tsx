@@ -44,13 +44,13 @@ function initialLooks(saved: SalonAvatar): Record<string, Makeup> {
   }]));
 }
 
-export function PrincessSalon({ profile }: { profile: Profile }) {
+export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Profile; initialMode?: "makeup" | "model" }) {
   const saved = profile.avatar as SalonAvatar;
   const [activeId, setActiveId] = useState<string>(FIRST_PRINCESS.id);
   const [looks, setLooks] = useState(() => initialLooks(saved));
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
-  const [activeMode, setActiveMode] = useState<"makeup" | "model">("model");
+  const [activeMode, setActiveMode] = useState<"makeup" | "model">(initialMode);
   const [modelLook, setModelLook] = useState<ModelLook>(() => saved.modelLook ?? { hair: "#8b4513", top: "#f472b6", bottom: "#8b5cf6", shoes: "#fbbf24", accessory: "👑" });
   const [stickers, setStickers] = useState<ModelSticker[]>([]);
   const [draggingSticker, setDraggingSticker] = useState<number | null>(null);
