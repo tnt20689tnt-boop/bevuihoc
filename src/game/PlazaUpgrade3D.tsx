@@ -105,12 +105,12 @@ export function PlazaUpgrade3D() {
   return (
     <group>
       <CampusArchitecture portals={ROOMS.plaza.portals} />
-      <FountainSpray position={[-9, 0.25, 0]} />
-      <RotatingSeat position={[-19, 0, 0]} speed={0.65} />
+      <FountainSpray position={[-22, 0.25, -2]} />
+      <RotatingSeat position={[-19, 0, -9]} speed={0.65} />
       <RotatingSeat position={[19, 0, 0]} speed={0.52} />
       <RotatingSeat position={[-9, 0, -9]} speed={0.72} />
       <RotatingSeat position={[9, 0, -9]} speed={0.58} />
-      <LayeredTree position={[-20, 0, -3]} scale={0.9} />
+      <LayeredTree position={[-20, 0, -12]} scale={0.9} />
       <LayeredTree position={[20, 0, -3]} scale={0.9} />
       
       
