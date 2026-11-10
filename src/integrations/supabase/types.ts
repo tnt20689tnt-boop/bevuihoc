@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      library_books: {
+        Row: {
+          color: string
+          created_at: string
+          grade: number
+          id: string
+          is_active: boolean
+          sort_order: number
+          subject: string
+          title: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          grade: number
+          id: string
+          is_active?: boolean
+          sort_order?: number
+          subject: string
+          title: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          grade?: number
+          id?: string
+          is_active?: boolean
+          sort_order?: number
+          subject?: string
+          title?: string
+        }
+        Relationships: []
+      }
       badges: {
         Row: {
           active: boolean
