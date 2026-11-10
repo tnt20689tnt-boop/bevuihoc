@@ -776,6 +776,7 @@ function PlayerController({
       animation.current.motion = "idle";
       animation.current.emote = null;
       animation.current.emoteUntil = 0;
+      if (character.current) character.current.rotation.set(0, position.current.ry, 0);
     }
     previousPlayingSpot.current = playingSpot;
   }, [playingSpot, position]);
