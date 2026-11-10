@@ -22,18 +22,18 @@ export type PlaygroundCollider = { minX: number; maxX: number; minZ: number; max
 
 // Only the six support posts are solid; the rest of the campus stays open.
 export const PLAYGROUND_COLLIDERS: PlaygroundCollider[] = [
-  { minX: -19.15, maxX: -18.85, minZ: 17.85, maxZ: 18.15 },
-  { minX: -17.15, maxX: -16.85, minZ: 17.85, maxZ: 18.15 },
-  { minX: 16.85, maxX: 17.15, minZ: 17.85, maxZ: 18.15 },
-  { minX: 18.85, maxX: 19.15, minZ: 17.85, maxZ: 18.15 },
-  { minX: -0.15, maxX: 0.15, minZ: -23.15, maxZ: -22.85 },
-  { minX: 1.85, maxX: 2.15, minZ: -23.15, maxZ: -22.85 },
+  { minX: -23.15, maxX: -22.85, minZ: 9.85, maxZ: 10.15 },
+  { minX: -21.15, maxX: -20.85, minZ: 9.85, maxZ: 10.15 },
+  { minX: 20.85, maxX: 21.15, minZ: 9.85, maxZ: 10.15 },
+  { minX: 22.85, maxX: 23.15, minZ: 9.85, maxZ: 10.15 },
+  { minX: -1.15, maxX: -0.85, minZ: 19.85, maxZ: 20.15 },
+  { minX: 0.85, maxX: 1.15, minZ: 19.85, maxZ: 20.15 },
 ];
 
 const swingCenters: [number, number, number][] = [
-  [-18, 0, 18],
-  [18, 0, 18],
-  [1, 0, -23],
+  [-22, 0, 10],
+  [22, 0, 10],
+  [0, 0, 20],
 ];
 
 // Two independent seat spots on each wide swing: six children can be seated
