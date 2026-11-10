@@ -51,7 +51,11 @@ function TaiLieuToanLop3() {
       <p>Bé Vui Học có bài tập tương tác toán lớp 3, phụ huynh xem tiến độ.</p>
 
       <h2>Tài Liệu Tải Về</h2>
-      <p>Các tệp PDF sẽ được cập nhật tại đây sau khi hoàn thiện để phụ huynh tải xuống.</p>
+      <ul>
+        <li><a href="/files/bang-nhan-chia-lop-3.html">Bảng nhân chia lớp 3 (mở để in hoặc lưu PDF)</a></li>
+        <li><a href="/files/de-on-tap-toan-lop-3.html">Đề ôn tập toán lớp 3 học kỳ 1 (mở để in hoặc lưu PDF)</a></li>
+        <li><a href="/files/bai-tap-toan-co-loi-van-lop-3.html">Bài tập toán có lời văn lớp 3 (mở để in hoặc lưu PDF)</a></li>
+      </ul>
 
       <h2>Câu Hỏi Thường Gặp</h2>
       <h3>Bé lớp 3 chưa thuộc bảng nhân có sao không?</h3>
