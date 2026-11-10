@@ -42,21 +42,15 @@ export const PLAY_SPOTS: PlaySpot[] = [
   { id: "house", kind: "playhouse", position: [18, 0, 5.5], radius: 1.6, label: "VÀO NHÀ LIÊN HOÀN", icon: "🏰", seatOffset: [0, 0, 0] },
   { id: "tunnel", kind: "tunnel", position: [8, 0, 5.5], radius: 1.8, label: "CHUI ĐƯỜNG HẦM", icon: "🚇", seatOffset: [0, 0.1, 0] },
   { id: "climber", kind: "climber", position: [17, 0, 8.5], radius: 1.4, label: "LEO KHUNG", icon: "🧗", seatOffset: [0, 0.2, 0] },
-  { id: "carousel", kind: "carousel", position: [13, 0, 15], radius: 1.6, label: "LÊN VÒNG QUAY", icon: "🎡", seatOffset: [0, 0.3, 0] },
-  { id: "bench", kind: "bench", position: [9, 0, 15], radius: 1.0, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0] },
-];
-
-const REST_BENCH_SPOTS: PlaySpot[] = [
-  { id: "bench-yard-west", kind: "bench", position: [-8, 0, 1], radius: 1.8, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [Math.sin(0.42) * 0.95, 0.25, Math.cos(0.42) * 0.95], facing: 0.42 + Math.PI },
-  { id: "bench-yard-east", kind: "bench", position: [8, 0, 1], radius: 1.8, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [Math.sin(-0.42) * 0.95, 0.25, Math.cos(-0.42) * 0.95], facing: -0.42 + Math.PI },
-  { id: "bench-yard-north", kind: "bench", position: [0, 0, -10], radius: 1.8, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0.95], facing: Math.PI },
+  { id: "carousel", kind: "carousel", position: [13, 0, 15], radius: 1.6, label: "LÊN VÒNG QUAY", icon: "🎡", seatOffset: [0, 0.45, 0] },
+  { id: "bench", kind: "bench", position: [9, 0, 15], radius: 1.8, label: "NGỒI NGHỈ", icon: "🪑", seatOffset: [0, 0.25, 0] },
 ];
 
 export function findNearestPlaySpot(position: [number, number, number], playing: boolean): PlaySpot | null {
   if (playing) return null;
   let nearest: PlaySpot | null = null;
   let best = Infinity;
-  for (const spot of [...PLAY_SPOTS, ...REST_BENCH_SPOTS]) {
+  for (const spot of PLAY_SPOTS) {
     const distance = Math.hypot(position[0] - spot.position[0], position[2] - spot.position[2]);
     if (distance <= spot.radius && distance < best) {
       nearest = spot;
