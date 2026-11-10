@@ -1,13 +1,12 @@
 import { Html } from "@react-three/drei";
 import { useEffect } from "react";
 import type { Portal } from "@/game/rooms";
-import { ROOMS } from "@/game/rooms";
+import { portalBuildingPosition, ROOMS } from "@/game/rooms";
 
 export function CampusArchitecture({ portals }: { portals: Portal[] }) {
   useEffect(() => {
     const boxes = portals.map((portal) => {
-      const cx = portal.x * 1.28;
-      const cz = portal.z * 1.28;
+      const [cx, cz] = portalBuildingPosition(portal);
       const yaw = Math.atan2(-cx, -cz);
       const halfWidth = ROOMS[portal.to].id === "arena" ? 4.25 : 4.1;
       const halfDepth = ROOMS[portal.to].id === "arena" ? 2.8 : 3.1;
@@ -36,8 +35,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         <meshStandardMaterial color="#e9d7b5" roughness={0.94} />
       </mesh>
       {portals.map((portal) => {
-        const x = portal.x * 1.28;
-        const z = portal.z * 1.28;
+        const [x, z] = portalBuildingPosition(portal);
         const room = ROOMS[portal.to];
         const yaw = Math.atan2(-x, -z);
         const length = Math.hypot(x, z);
@@ -167,7 +165,10 @@ function CampusGreenery({ portals }: { portals: Portal[] }) {
     [13, -10],
   ];
   const available = trees.filter(([x, z]) =>
-    portals.every((portal) => Math.hypot(x - portal.x * 1.28, z - portal.z * 1.28) > 5.1),
+    portals.every((portal) => {
+      const [buildingX, buildingZ] = portalBuildingPosition(portal);
+      return Math.hypot(x - buildingX, z - buildingZ) > 5.1;
+    }),
   );
   return (
     <group>
