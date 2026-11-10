@@ -7,7 +7,7 @@ import { CampusMultiplayer } from "@/game/CampusMultiplayer";
 import { PlazaUpgrade3D } from "@/game/PlazaUpgrade3D";
 import { LanternRow } from "@/game/LanternRow";
 import { TreeFairyLights } from "@/game/TreeFairyLights";
-import { findNearestPlaySpot, PLAYGROUND_COLLIDERS, Playground3D, type PlaySpot } from "@/game/Playground3D";
+import { findNearestPlaySpot, PLAYGROUND_COLLIDERS, CampusSwings3D, type PlaySpot } from "@/game/Playground3D";
 import { CampusArchitecture } from "@/game/CampusArchitecture";
 import {
   ROOMS,
@@ -112,7 +112,7 @@ export function WorldScene(props: WorldSceneProps) {
           <LanternRow from={[-7, 0, 8]} to={[7, 0, 8]} count={4} poleHeight={2.8} />
         </>
       )}
-      {room.id === "plaza" ? <><PlazaUpgrade3D /><Playground3D activeSpotId={props.playingSpot?.id ?? null} /></> : <RoomDecor room={room} />}
+      {room.id === "plaza" ? <><PlazaUpgrade3D /><CampusSwings3D activeSpotId={props.playingSpot?.id ?? null} /></> : <RoomDecor room={room} />}
       {room.portals.map((portal) => portal.to === "arena" ? null : (
         <PortalGate
           key={`${room.id}-${portal.to}`}
