@@ -37,8 +37,8 @@ export type RoomDef = {
 // Replanned campus: three learning buildings at the back and sides,
 // the princess salon on the left, and the playground on the right.
 export const PLAZA_PORTALS: Portal[] = [
-  { to: "math", x: -8.698994, z: -2.676614 },
-  { to: "vietnamese", x: 8.698994, z: -2.676614 },
+  { to: "math", x: -7.731092, z: -2.577031 },
+  { to: "vietnamese", x: 7.731092, z: -2.577031 },
   { to: "english", x: 0, z: -13.5 },
   { to: "girls", x: -8.91727, z: 6.777125 },
   { to: "boys", x: 10.052813, z: -11.599399 },
@@ -69,7 +69,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { x: 0, z: 9.5, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
     ],
     obstacles: [
-      { x: -22, z: -2, r: 3.1 },
+      { x: -20, z: -4, r: 3.1 },
       ...PLAZA_PORTALS.map((portal) => { const [x, z] = portalBuildingPosition(portal); return { x, z, r: portal.to === "arena" ? 2.15 : 3.35 }; }),
     ],
   },
