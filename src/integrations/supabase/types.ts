@@ -554,10 +554,6 @@ export type Database = {
         Args: { p_note: string; p_points: number; p_user: string }
         Returns: undefined
       }
-      award_lesson_points: {
-        Args: { p_note?: string }
-        Returns: Json
-      }
       admin_exists: { Args: never; Returns: boolean }
       admin_players: {
         Args: never
@@ -581,6 +577,7 @@ export type Database = {
         Returns: undefined
       }
       award_badges: { Args: { p_user: string }; Returns: Json }
+      award_lesson_points: { Args: { p_note?: string }; Returns: Json }
       check_my_badges: { Args: never; Returns: Json }
       claim_first_admin: { Args: never; Returns: boolean }
       close_periods: { Args: never; Returns: number }
