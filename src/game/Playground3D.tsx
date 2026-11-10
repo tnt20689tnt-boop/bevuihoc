@@ -93,10 +93,6 @@ function PlaygroundGround() {
         <boxGeometry args={[2.4, 0.08, 9.2]} />
         <meshStandardMaterial color="#f4e8ce" roughness={0.96} />
       </mesh>
-      <mesh position={[12, 0.06, 11.5]} rotation={[0, 0.83, 0]} receiveShadow>
-        <boxGeometry args={[3.2, 0.08, 16.3]} />
-        <meshStandardMaterial color="#f4e8ce" roughness={0.96} />
-      </mesh>
       <mesh position={[13, 0.035, 9.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[7, 64]} />
         <meshStandardMaterial color="#a9d98a" roughness={0.98} />
