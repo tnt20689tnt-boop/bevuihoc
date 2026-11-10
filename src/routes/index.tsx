@@ -43,6 +43,7 @@ function HomePage() {
         <p>Số đếm 1-100, cộng trừ trong phạm vi 10 và 20, hình học cơ bản.</p>
         <h3>Toán Lớp 2</h3>
         <p>Cộng trừ có nhớ, bảng nhân chia 2-5, đo lường, bài toán có lời văn.</p>
+        <p><a href="/toan-lop-2">Học toán lớp 2 ngay →</a></p>
         <h3>Toán Lớp 3</h3>
         <p>Bảng nhân chia 2-9, phép chia có dư, chu vi diện tích, toán có lời văn.</p>
         <h3>Toán Lớp 4-5</h3>
@@ -62,6 +63,7 @@ function HomePage() {
         <p>Nghe từ chọn hình, nghe câu chọn nghĩa — tăng dần độ khó.</p>
         <h3>Mẫu Câu Giao Tiếp</h3>
         <p>Chào hỏi, giới thiệu bản thân, hỏi đồ vật — bé bắt chước tự nhiên.</p>
+        <p><a href="/tieng-anh-lop-1">Học tiếng Anh lớp 1 →</a></p>
         <p><a href="/tieng-anh-lop-2">Học tiếng Anh lớp 2 →</a></p>
       </section>
 
@@ -105,6 +107,10 @@ function HomePage() {
 
       <nav aria-label="Các trang học tập">
         <a href="/toan-lop-1">Toán lớp 1</a>
+        {' · '}
+        <a href="/toan-lop-2">Toán lớp 2</a>
+        {' · '}
+        <a href="/tieng-anh-lop-1">Tiếng Anh lớp 1</a>
         {' · '}
         <a href="/tieng-anh-lop-2">Tiếng Anh lớp 2</a>
         {' · '}
