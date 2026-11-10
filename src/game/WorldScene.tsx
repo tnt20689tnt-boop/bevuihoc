@@ -880,7 +880,7 @@ function PlayerController({
     const cosYaw = Math.cos(cameraYaw.current);
     let dx = -sinYaw * inputForward + cosYaw * inputRight;
     let dz = -cosYaw * inputForward - sinYaw * inputRight;
-    const moving = !playingSpot && !sitting.current && Math.hypot(dx, dz) > 0.04;
+    const moving = !playingSpot && Math.hypot(dx, dz) > 0.04;
     if (moving && sitting.current) sitting.current = false;
     const speed = keys.has("shift") ? 6.4 : 4.2;
     if (moving) {
