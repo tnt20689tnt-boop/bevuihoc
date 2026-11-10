@@ -98,12 +98,6 @@ function HomePage() {
               >
                 Bắt đầu khám phá →
               </Link>
-              <a
-                href="#kham-pha"
-                className="rounded-2xl border-2 border-sky-200 bg-white px-7 py-4 text-base font-extrabold text-sky-800 transition hover:bg-sky-50"
-              >
-                Tìm hiểu thêm
-              </a>
             </div>
             <p className="mt-5 text-sm text-slate-500">Phụ huynh đăng nhập để tạo hồ sơ và lưu hành trình của bé.</p>
           </div>
@@ -127,42 +121,6 @@ function HomePage() {
               </div>
               <div className="mt-5 flex justify-center gap-4 text-3xl" aria-hidden="true">🌼 🦋 🌈 🌻</div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="kham-pha" className="mx-auto max-w-6xl px-5 py-16">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="font-extrabold uppercase tracking-[.2em] text-emerald-600">Khám phá mỗi ngày</p>
-          <h2 className="mt-3 font-display text-3xl font-black text-slate-900 sm:text-4xl">Học kiến thức mới theo cách thật vui</h2>
-          <p className="mt-4 leading-7 text-slate-600">Các khu học tập được thiết kế để bé tiếp cận kiến thức qua trải nghiệm và hoạt động tương tác.</p>
-        </div>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
-          {learningAreas.map((area) => (
-            <article key={area.title} className={`rounded-3xl border border-white p-7 shadow-lg shadow-slate-200/60 ${area.cardClass}`}>
-              <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white text-4xl shadow">{area.icon}</div>
-              <h3 className="mt-5 font-display text-2xl font-black text-slate-900">{area.title}</h3>
-              <p className="mt-3 leading-7 text-slate-600">{area.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-white py-16">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 px-5 md:grid-cols-[.9fr_1.1fr]">
-          <div>
-            <p className="font-extrabold uppercase tracking-[.2em] text-orange-600">Giờ vui chơi</p>
-            <h2 className="mt-3 font-display text-3xl font-black text-slate-900 sm:text-4xl">Sân chơi 3D để bé thỏa sức khám phá</h2>
-            <p className="mt-4 leading-7 text-slate-600">Sau giờ học, bé có thể đi dạo trong khuôn viên và trải nghiệm các hoạt động vui chơi tương tác được bố trí trong thế giới 3D.</p>
-            <Link to="/auth" className="mt-7 inline-flex rounded-2xl bg-orange-500 px-6 py-3 font-black text-white shadow-lg shadow-orange-100 hover:bg-orange-600">Cùng bé vào trường →</Link>
-          </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {playgroundActivities.map(([icon, label]) => (
-              <div key={label} className="rounded-3xl border border-orange-100 bg-orange-50/80 p-5 text-center">
-                <div className="text-4xl">{icon}</div>
-                <p className="mt-3 text-sm font-extrabold text-slate-700">{label}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>
