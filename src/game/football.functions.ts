@@ -37,11 +37,15 @@ function chooseGoalkeeperDirection(): FootballDirection {
 
 export const takeFootballShot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator((input: { direction: unknown }) => {
+  .validator((input: { direction: unknown; power?: unknown }) => {
     if (!input || !isFootballDirection(input.direction)) {
       throw new Error("Hướng sút không hợp lệ.");
     }
-    return { direction: input.direction };
+    const power = input.power === undefined ? 100 : input.power;
+    if (typeof power !== "number" || !Number.isFinite(power) || power < 20 || power > 100) {
+      throw new Error("Lực sút không hợp lệ.");
+    }
+    return { direction: input.direction, power };
   })
   .handler(async ({ data, context }) => {
     const userId = context.userId;
@@ -55,7 +59,10 @@ export const takeFootballShot = createServerFn({ method: "POST" })
     // The client supplies only a direction. The server picks the keeper and decides
     // whether the shot scores, so a client cannot claim a goal or choose its outcome.
     const goalkeeperDirection = chooseGoalkeeperDirection();
-    const accuracyRoll = new Uint32Array(1);\n    globalThis.crypto.getRandomValues(accuracyRoll);\n    const accuracy = accuracyRoll[0]! / 0x1_0000_0000;\n    const scored = isFootballGoal(data.direction, goalkeeperDirection) && accuracy <= data.power / 100;
+    const accuracyRoll = new Uint32Array(1);
+    globalThis.crypto.getRandomValues(accuracyRoll);
+    const accuracy = accuracyRoll[0]! / 0x1_0000_0000;
+    const scored = isFootballGoal(data.direction, goalkeeperDirection) && accuracy <= data.power / 100;
     if (!scored) {
       return { goalkeeperDirection, scored: false, points: 0, newBadges: [] as FootballBadge[] };
     }
