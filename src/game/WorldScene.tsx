@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
 import { CampusMultiplayer } from "@/game/CampusMultiplayer";
 import { CampusArchitecture } from "@/game/CampusArchitecture";
-import { findNearestPlaySpot, Playground3D, type PlaySpot } from "@/game/Playground3D";
+import { findNearestPlaySpot, PLAYGROUND_COLLIDERS, Playground3D, type PlaySpot } from "@/game/Playground3D";
 import {
   ROOMS,
   type Activity,
@@ -582,6 +582,7 @@ function PlayerController({
   const playHandler = useRef(onNearbyPlaySpot);
   const activePlayId = useRef<string | null>(null);
   const previousPlayingSpot = useRef<PlaySpot | null>(null);
+  const playStartedAt = useRef(0);
   const { camera } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
@@ -597,6 +598,7 @@ function PlayerController({
   }, [onNearbyPlaySpot]);
   useEffect(() => {
     if (playingSpot) {
+      playStartedAt.current = performance.now() / 1000;
       position.current.x = playingSpot.position[0] + playingSpot.seatOffset[0];
       position.current.z = playingSpot.position[2] + playingSpot.seatOffset[2];
       animation.current.motion = playingSpot.kind === "slide" || playingSpot.kind === "springRider" ? "jump" : "idle";
@@ -609,6 +611,7 @@ function PlayerController({
       animation.current.emoteUntil = performance.now() / 1000 + 3600;
       held.current.clear();
     } else if (previousPlayingSpot.current) {
+      held.current.clear();
       position.current.x = previousPlayingSpot.current.position[0];
       position.current.z = previousPlayingSpot.current.position[2] + 4.0;
       animation.current.motion = "idle";
@@ -669,9 +672,17 @@ function PlayerController({
       const nextZ = position.current.z + dz * speed * dt;
       const blocked = (x: number, z: number) => {
         if (Math.hypot(x, z) > room.radius - 0.8) return true;
-        return room.obstacles.some(
-          (obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52,
-        );
+        if (room.obstacles.some((obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52)) return true;
+        if (room.id === "plaza") {
+          const buildingHit = room.portals.some((portal) => {
+            const cx = portal.x * 1.28;
+            const cz = portal.z * 1.28;
+            return x > cx - 4.35 && x < cx + 4.35 && z > cz - 3.35 && z < cz + 3.35;
+          });
+          const playHit = PLAYGROUND_COLLIDERS.some((box) => x > box.minX - 0.52 && x < box.maxX + 0.52 && z > box.minZ - 0.52 && z < box.maxZ + 0.52);
+          if (buildingHit || playHit) return true;
+        }
+        return false;
       };
       if (!blocked(nextX, position.current.z)) position.current.x = nextX;
       if (!blocked(position.current.x, nextZ)) position.current.z = nextZ;
@@ -679,6 +690,17 @@ function PlayerController({
       if (character.current) character.current.rotation.y = Math.atan2(dx, dz);
     } else {
       animation.current.motion = "idle";
+    }
+    if (playingSpot?.kind === "slide") {
+      const progress = Math.min((performance.now() / 1000 - playStartedAt.current) / 2.4, 1);
+      position.current.x = playingSpot.position[0];
+      position.current.z = playingSpot.position[2] - 1.5 + progress * 3;
+      if (character.current) character.current.rotation.y = 0;
+    } else if (playingSpot?.kind === "carousel") {
+      const angle = (performance.now() / 1000 - playStartedAt.current) * 1.25;
+      position.current.x = playingSpot.position[0] + Math.cos(angle) * 1.15;
+      position.current.z = playingSpot.position[2] + Math.sin(angle) * 1.15;
+      if (character.current) character.current.rotation.y = -angle;
     }
     if (character.current) {
       character.current.position.set(position.current.x, 0, position.current.z);
