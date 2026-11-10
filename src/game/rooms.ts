@@ -37,13 +37,18 @@ export type RoomDef = {
 // Replanned campus: three learning buildings at the back and sides,
 // the princess salon on the left, and the playground on the right.
 export const PLAZA_PORTALS: Portal[] = [
-  { to: "math", x: -10.15625, z: -3.125 },
-  { to: "vietnamese", x: 10.15625, z: -3.125 },
-  { to: "english", x: 0, z: -14.0625 },
-  { to: "girls", x: -9.765625, z: 7.421875 },
-  { to: "boys", x: 10.15625, z: -11.71875 },
-  { to: "arena", x: -10.15625, z: -11.71875 },
+  { to: "math", x: -8.698994, z: -2.676614 },
+  { to: "vietnamese", x: 8.698994, z: -2.676614 },
+  { to: "english", x: 0, z: -13.5 },
+  { to: "girls", x: -8.91727, z: 6.777125 },
+  { to: "boys", x: 10.052813, z: -11.599399 },
+  { to: "arena", x: -10.052813, z: -11.599399 },
 ];
+
+export function portalBuildingPosition(portal: Portal): [number, number] {
+  const length = Math.hypot(portal.x, portal.z) || 1;
+  return [portal.x + (portal.x / length) * 4.5, portal.z + (portal.z / length) * 4.5];
+}
 
 const EXIT: Portal = { to: "plaza", x: 0, z: 11 };
 
@@ -65,7 +70,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
     obstacles: [
       { x: -9, z: 0, r: 3.1 },
-      ...PLAZA_PORTALS.map((portal) => ({ x: portal.x * 1.28, z: portal.z * 1.28, r: portal.to === "arena" ? 2.15 : 3.35 })),
+      ...PLAZA_PORTALS.map((portal) => { const [x, z] = portalBuildingPosition(portal); return { x, z, r: portal.to === "arena" ? 2.15 : 3.35 }; }),
     ],
   },
   math: {
