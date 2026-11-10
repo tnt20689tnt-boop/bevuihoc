@@ -73,9 +73,9 @@ function SchoolBuilding({
 }) {
   if (room.id === "arena") return <ArenaHouse position={position} rotation={rotation} room={room} />;
   return (
-    <group>
-      <Classroom position={position} rotationY={rotation} width={7.4} depth={5.2} height={3.6} accent={room.color} />
-      <Html position={[position[0], 2.78, position[2] + 3.02]} center distanceFactor={13} rotation={[0, rotation, 0]}>
+    <group position={position} rotation={[0, rotation, 0]}>
+      <Classroom position={[0, 0, 0]} width={7.4} depth={5.2} height={3.6} accent={room.color} />
+      <Html position={[0, 2.78, 3.02]} center distanceFactor={13}>
         <div
           style={{
             whiteSpace: "nowrap",
