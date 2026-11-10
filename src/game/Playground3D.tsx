@@ -119,7 +119,7 @@ function PlaygroundFence() {
     const items: [number, number][] = [];
     for (let i = 0; i < 24; i++) {
       const a = (i / 24) * Math.PI * 2;
-      items.push([26 + Math.cos(a) * 7.5, 9.5 + Math.sin(a) * 7.5]);
+      items.push([12.5 + Math.cos(a) * 7.5, 9.5 + Math.sin(a) * 7.5]);
     }
     return items;
   }, []);
