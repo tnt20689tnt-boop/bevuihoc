@@ -200,6 +200,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { x: -4.35, z: -4.75, r: 1.75 },
       { x: 0, z: -4.75, r: 1.75 },
       { x: 4.35, z: -4.75, r: 1.75 },
+      { x: 0, z: 1.15, r: 1.15 },
     ],
   },
   boys: {
