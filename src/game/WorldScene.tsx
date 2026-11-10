@@ -122,7 +122,7 @@ function WorldFloor({ room }: { room: RoomDef }) {
         </mesh>
       )}
       {room.id === "boys" && <FootballPitch />}
-      {room.id === "arena" && <mesh position={[0, 0.035, -1.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[13, 18]} /><meshStandardMaterial color="#b98555" roughness={0.82} /></mesh>
+      {room.id === "arena" && <mesh position={[0, 0.035, -1.5]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow><planeGeometry args={[13, 18]} /><meshStandardMaterial color="#b98555" roughness={0.82} /></mesh>}
     </group>
   );
 }
