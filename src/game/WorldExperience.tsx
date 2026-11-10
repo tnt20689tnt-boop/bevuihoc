@@ -3,6 +3,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { CampusHUD } from "@/game/CampusHUD";
 import { CampusVoiceChat } from "@/game/CampusVoiceChat";
 import { WorldScene, type MovementInput } from "@/game/WorldScene";
+import type { PlaySpot } from "@/game/Playground3D";
 import { type Activity, type Portal, type RoomId } from "@/game/rooms";
 import type { Profile } from "@/hooks/use-player";
 
@@ -17,6 +18,8 @@ export function WorldExperience({ profile }: { profile: Profile }) {
   }, [roomId, navigate]);
   const [fromRoom, setFromRoom] = useState<RoomId | null>(null);
   const [nearbyPortal, setNearbyPortal] = useState<Portal | null>(null);
+  const [nearbyPlaySpot, setNearbyPlaySpot] = useState<PlaySpot | null>(null);
+  const [playingSpot, setPlayingSpot] = useState<PlaySpot | null>(null);
   const [selectedPeer, setSelectedPeer] = useState<{ id: string; name: string } | null>(null);
   const touchRef = useRef<MovementInput>({ x: 0, z: 0 });
   const pressedDirections = useRef(new Set<Direction>());
@@ -36,11 +39,29 @@ export function WorldExperience({ profile }: { profile: Profile }) {
       setFromRoom(roomId);
       setRoomId(destination.to);
       setNearbyPortal(null);
+      setNearbyPlaySpot(null);
+      setPlayingSpot(null);
       pressedDirections.current.clear();
       touchRef.current = { x: 0, z: 0 };
     },
     [nearbyPortal, roomId],
   );
+
+  const startPlay = useCallback((spot: PlaySpot) => {
+    pressedDirections.current.clear();
+    joystickInput.current = { x: 0, z: 0 };
+    touchRef.current = { x: 0, z: 0 };
+    setNearbyPlaySpot(null);
+    setPlayingSpot(spot);
+  }, []);
+
+  const exitPlay = useCallback(() => {
+    setPlayingSpot(null);
+    setNearbyPlaySpot(null);
+    pressedDirections.current.clear();
+    joystickInput.current = { x: 0, z: 0 };
+    touchRef.current = { x: 0, z: 0 };
+  }, []);
 
   const setDirection = useCallback((direction: Direction, isPressed: boolean) => {
     if (isPressed) pressedDirections.current.add(direction);
@@ -76,6 +97,8 @@ export function WorldExperience({ profile }: { profile: Profile }) {
     setFromRoom(roomId);
     setRoomId("plaza");
     setNearbyPortal(null);
+    setNearbyPlaySpot(null);
+    setPlayingSpot(null);
     pressedDirections.current.clear();
     touchRef.current = { x: 0, z: 0 };
   }, [roomId]);
@@ -104,7 +127,19 @@ export function WorldExperience({ profile }: { profile: Profile }) {
         onInteract={() => enterPortal()}
         onActivity={goToActivity}
         onSelectPeer={setSelectedPeer}
+        playingSpot={playingSpot}
+        onNearbyPlaySpot={setNearbyPlaySpot}
       />
+      {nearbyPlaySpot && !playingSpot && roomId === "plaza" && (
+        <button type="button" onClick={() => startPlay(nearbyPlaySpot)} style={{ position: "absolute", zIndex: 40, left: "50%", bottom: "max(24px, env(safe-area-inset-bottom))", transform: "translateX(-50%)", minWidth: 220, minHeight: 58, padding: "13px 22px", border: "3px solid #fff", borderRadius: 999, color: "#fff", background: "linear-gradient(135deg,#ff6bcb,#7c4dff)", boxShadow: "0 8px 24px #7c4dff66", font: "900 17px Baloo 2, sans-serif", cursor: "pointer" }}>
+          {nearbyPlaySpot.icon} {nearbyPlaySpot.label}
+        </button>
+      )}
+      {playingSpot && (
+        <button type="button" onClick={exitPlay} style={{ position: "absolute", zIndex: 41, top: "max(16px, env(safe-area-inset-top))", right: 16, minHeight: 48, padding: "10px 18px", border: "2px solid #fff", borderRadius: 999, color: "#fff", background: "#e85d75", boxShadow: "0 5px 15px #0003", font: "900 15px Baloo 2, sans-serif", cursor: "pointer" }}>
+          ✖ THOÁT CHƠI
+        </button>
+      )}
       <CampusVoiceChat
         roomId={roomId}
         profile={profile}
