@@ -34,19 +34,38 @@ export function useMyProfile() {
   return useQuery({
     queryKey: profileQueryKey,
     queryFn: async (): Promise<Profile | null> => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return null;
-      // Run the promotion check server-side on every profile load. The database
-      // locks the profile row, so simultaneous logins cannot promote twice.
-      const { error: promotionError } = await supabase.rpc("promote_my_grade_if_due");
-      if (promotionError) throw promotionError;
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, display_name, gender, grade, last_grade_promotion, avatar")
-        .eq("id", u.user.id)
-        .maybeSingle();
-      if (error) throw error;
+      const { data: authData, error: authError } = await supabase.auth.getUser();
+      if (authError) throw authError;
+      if (!authData.user) return null;
+
+      // Load the saved student profile first. A missing or temporarily failing
+      // grade-promotion RPC must never keep a signed-in child out of the world.
+      const loadProfile = async () => {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, display_name, gender, grade, last_grade_promotion, avatar")
+          .eq("id", authData.user.id)
+          .maybeSingle();
+        if (error) throw error;
+        return data;
+      };
+
+      let data = await loadProfile();
       if (!data) return null;
+
+      // Promotion is best-effort: keep the existing profile usable even when
+      // the SQL migration/RPC has not reached the database yet.
+      const { error: promotionError } = await supabase.rpc("promote_my_grade_if_due");
+      if (!promotionError) {
+        try {
+          data = await loadProfile();
+        } catch {
+          // Preserve the already-loaded profile if the refresh fails.
+        }
+      } else {
+        console.warn("Grade promotion check skipped; profile remains available.", promotionError);
+      }
+
       const gender = data.gender as Gender;
       return { ...data, gender, avatar: toAvatar(data.avatar, gender) };
     },
