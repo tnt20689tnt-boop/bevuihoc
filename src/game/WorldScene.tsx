@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
 import { CampusMultiplayer } from "@/game/CampusMultiplayer";
 import { PlazaUpgrade3D } from "@/game/PlazaUpgrade3D";
+import { findNearestPlaySpot, PLAYGROUND_COLLIDERS, Playground3D, type PlaySpot } from "@/game/Playground3D";
 import { CampusArchitecture } from "@/game/CampusArchitecture";
 import {
   ROOMS,
@@ -30,6 +31,8 @@ type WorldSceneProps = {
   onInteract: () => void;
   onActivity: (activity: Activity) => void;
   onSelectPeer: (peer: { id: string; name: string }) => void;
+  playingSpot: PlaySpot | null;
+  onNearbyPlaySpot: (spot: PlaySpot | null) => void;
 };
 
 const palette = {
@@ -71,7 +74,7 @@ export function WorldScene(props: WorldSceneProps) {
         shadow-camera-bottom={-28}
       />
       <WorldFloor room={room} />
-      {room.id === "plaza" ? <PlazaUpgrade3D /> : <RoomDecor room={room} />}
+      {room.id === "plaza" ? <><PlazaUpgrade3D /><Playground3D activeSpotId={props.playingSpot?.id ?? null} /></> : <RoomDecor room={room} />}
       {room.portals.map((portal) => portal.to === "arena" ? null : (
         <PortalGate
           key={`${room.id}-${portal.to}`}
@@ -98,6 +101,8 @@ export function WorldScene(props: WorldSceneProps) {
         touchRef={props.touchRef}
         onNearbyPortal={props.onNearbyPortal}
         onInteract={props.onInteract}
+        playingSpot={props.playingSpot}
+        onNearbyPlaySpot={props.onNearbyPlaySpot}
       />
     </Canvas>
   );
@@ -692,6 +697,8 @@ function PlayerController({
   touchRef,
   onNearbyPortal,
   onInteract,
+  playingSpot,
+  onNearbyPlaySpot,
 }: {
   room: RoomDef;
   fromRoom: RoomId | null;
@@ -701,6 +708,8 @@ function PlayerController({
   touchRef: MutableRefObject<MovementInput>;
   onNearbyPortal: (portal: Portal | null) => void;
   onInteract: () => void;
+  playingSpot: PlaySpot | null;
+  onNearbyPlaySpot: (spot: PlaySpot | null) => void;
 }) {
   const character = useRef<THREE.Group>(null);
   const position = positionRef;
@@ -712,6 +721,11 @@ function PlayerController({
   const activePortal = useRef<string | null>(null);
   const nearbyHandler = useRef(onNearbyPortal);
   const interactHandler = useRef(onInteract);
+  const playHandler = useRef(onNearbyPlaySpot);
+  const activePlayId = useRef<string | null>(null);
+  const previousPlayingSpot = useRef<PlaySpot | null>(null);
+  const playStartedAt = useRef(0);
+  const playingRef = useRef(false);
   const { camera, gl } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
@@ -734,6 +748,36 @@ function PlayerController({
   useEffect(() => {
     interactHandler.current = onInteract;
   }, [onInteract]);
+  useEffect(() => {
+    playHandler.current = onNearbyPlaySpot;
+  }, [onNearbyPlaySpot]);
+  useEffect(() => {
+    playingRef.current = !!playingSpot;
+    if (playingSpot) {
+      playStartedAt.current = performance.now() / 1000;
+      position.current.x = playingSpot.position[0] + playingSpot.seatOffset[0];
+      position.current.z = playingSpot.position[2] + playingSpot.seatOffset[2];
+      sitting.current = false;
+      animation.current.motion = playingSpot.kind === "slide" || playingSpot.kind === "springRider" ? "jump" : "idle";
+      const emotes: Record<PlaySpot["kind"], AnimState["emote"]> = {
+        swing: "wave", slide: "cheer", seesaw: "laugh", springRider: "cheer",
+        ballPit: "laugh", playhouse: "wave", tunnel: "surprised", climber: "cheer",
+        carousel: "dance", bench: "clap",
+      };
+      animation.current.emote = emotes[playingSpot.kind];
+      animation.current.emoteUntil = performance.now() / 1000 + 3600;
+      held.current.clear();
+    } else if (previousPlayingSpot.current) {
+      held.current.clear();
+      sitting.current = false;
+      position.current.x = previousPlayingSpot.current.position[0];
+      position.current.z = previousPlayingSpot.current.position[2] + 2.2;
+      animation.current.motion = "idle";
+      animation.current.emote = null;
+      animation.current.emoteUntil = 0;
+    }
+    previousPlayingSpot.current = playingSpot;
+  }, [playingSpot, position]);
 
 
   useEffect(() => {
@@ -765,6 +809,7 @@ function PlayerController({
     canvas.addEventListener("pointercancel", onPointerUp);
     canvas.addEventListener("wheel", onWheel, { passive: true });
     const interact = () => {
+      if (playingRef.current) return;
       const nearestBench = room.id === "plaza"
         ? benchSpots
             .map((bench) => ({ bench, distance: Math.hypot(positionRef.current.x - bench.x, positionRef.current.z - bench.z) }))
@@ -835,7 +880,7 @@ function PlayerController({
     const cosYaw = Math.cos(cameraYaw.current);
     let dx = -sinYaw * inputForward + cosYaw * inputRight;
     let dz = -cosYaw * inputForward - sinYaw * inputRight;
-    const moving = Math.hypot(dx, dz) > 0.04;
+    const moving = !playingSpot && !sitting.current && Math.hypot(dx, dz) > 0.04;
     if (moving && sitting.current) sitting.current = false;
     const speed = keys.has("shift") ? 6.4 : 4.2;
     if (moving) {
@@ -851,9 +896,22 @@ function PlayerController({
         // through the front gate so the outdoor spawn can enter the school.
         const insideFrontGate = room.id === "plaza" && z > 0 && z < 34.5 && Math.abs(x) < 4.35;
         if (Math.hypot(x, z) > room.radius - 0.8 && !insideFrontGate) return true;
-        return room.obstacles.some(
-          (obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52,
-        );
+        if (room.obstacles.some((obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52)) return true;
+        if (room.id === "plaza") {
+          const buildingHit = room.portals.some((portal) => {
+            const cx = portal.x * 1.28;
+            const cz = portal.z * 1.28;
+            const yaw = Math.atan2(-cx, -cz);
+            const halfWidth = portal.to === "arena" ? 4.25 : 4.1;
+            const halfDepth = portal.to === "arena" ? 2.8 : 3.1;
+            const halfX = Math.abs(Math.cos(yaw)) * halfWidth + Math.abs(Math.sin(yaw)) * halfDepth + 0.52;
+            const halfZ = Math.abs(Math.sin(yaw)) * halfWidth + Math.abs(Math.cos(yaw)) * halfDepth + 0.52;
+            return x > cx - halfX && x < cx + halfX && z > cz - halfZ && z < cz + halfZ;
+          });
+          const playHit = PLAYGROUND_COLLIDERS.some((box) => x > box.minX - 0.52 && x < box.maxX + 0.52 && z > box.minZ - 0.52 && z < box.maxZ + 0.52);
+          if (buildingHit || playHit) return true;
+        }
+        return false;
       };
       if (!blocked(nextX, position.current.z)) position.current.x = nextX;
       if (!blocked(position.current.x, nextZ)) position.current.z = nextZ;
@@ -864,11 +922,42 @@ function PlayerController({
         const deltaYaw = THREE.MathUtils.euclideanModulo(targetYaw - currentYaw + Math.PI, Math.PI * 2) - Math.PI;
         character.current.rotation.y += deltaYaw * (1 - Math.exp(-12 * dt));
       }
-    } else {
+    } else if (!playingSpot) {
       animation.current.motion = sitting.current ? "sit" : "idle";
     }
+    let playerY = playingSpot?.seatOffset[1] ?? 0;
+    const playElapsed = performance.now() / 1000 - playStartedAt.current;
+    if (playingSpot?.kind === "swing") {
+      const angle = Math.sin(playElapsed * 2.5) * 0.42;
+      position.current.z = playingSpot.position[2] + Math.sin(angle) * 0.95;
+      playerY = 1.275 - Math.cos(angle) * 0.95;
+    } else if (playingSpot?.kind === "seesaw") {
+      playerY = 0.56 + Math.sin(playElapsed * 3) * 0.11;
+    } else if (playingSpot?.kind === "springRider") {
+      playerY = 0.525 + Math.abs(Math.sin(playElapsed * 8)) * 0.09;
+    } else if (playingSpot?.kind === "ballPit") {
+      playerY = 0.15 + Math.abs(Math.sin(playElapsed * 3)) * 0.08;
+    } else if (playingSpot?.kind === "slide") {
+      const progress = Math.min(playElapsed / 2.4, 1);
+      position.current.x = playingSpot.position[0];
+      position.current.z = playingSpot.position[2] - 0.75 + progress * 1.5;
+      if (character.current) character.current.rotation.y = 0;
+    } else if (playingSpot?.kind === "carousel") {
+      const angle = playElapsed * 1.25;
+      position.current.x = playingSpot.position[0] + Math.cos(angle) * 0.575;
+      position.current.z = playingSpot.position[2] + Math.sin(angle) * 0.575;
+      if (character.current) character.current.rotation.y = -angle;
+    }
     if (character.current) {
-      character.current.position.set(position.current.x, 0, position.current.z);
+      character.current.position.set(position.current.x, playerY, position.current.z);
+    }
+
+    const nearestPlaySpot = room.id === "plaza"
+      ? findNearestPlaySpot([position.current.x, 0, position.current.z], !!playingSpot)
+      : null;
+    if (nearestPlaySpot?.id !== activePlayId.current) {
+      activePlayId.current = nearestPlaySpot?.id ?? null;
+      playHandler.current(nearestPlaySpot);
     }
 
     const nearest =
