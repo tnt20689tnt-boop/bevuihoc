@@ -70,7 +70,13 @@ export function useGeneratedExam() {
     });
     if (rpcError) throw rpcError;
     const questions = (data ?? []) as GeneratedQuestion[];
-    return { questions, duration: 30 };
+    const { data: exam, error: examError } = await (supabase as any)
+      .from("generated_exams")
+      .select("duration_minutes")
+      .eq("id", examId)
+      .single();
+    if (examError) throw examError;
+    return { questions, duration: Number(exam?.duration_minutes ?? 30) };
   }, []);
 
   const startAttempt = useCallback(async (examId: string): Promise<string> => {
