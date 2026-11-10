@@ -13,13 +13,25 @@
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://bevuihoc.lovable.app/tieng-anh-lop-2</loc>
+    <loc>https://bevuihoc.lovable.app/toan-lop-2</loc>
     <lastmod>2026-11-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://bevuihoc.lovable.app/tai-lieu-toan-lop-3</loc>
+    <lastmod>2026-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bevuihoc.lovable.app/tieng-anh-lop-1</loc>
+    <lastmod>2026-11-11</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://bevuihoc.lovable.app/tieng-anh-lop-2</loc>
     <lastmod>2026-11-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
