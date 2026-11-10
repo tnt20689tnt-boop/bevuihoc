@@ -4,7 +4,7 @@ import * as THREE from "three";
 import type { Avatar } from "@/lib/avatar";
 
 export type Emote = "wave" | "laugh" | "clap" | "dance" | "surprised" | "cheer";
-export type Motion = "idle" | "walk" | "run" | "jump" | "kick" | "dive" | "sit";
+export type Motion = "idle" | "walk" | "run" | "jump" | "kick" | "dive" | "sit" | "crawl";
 export type AnimState = { motion: Motion; emote: Emote | null; emoteUntil: number };
 
 export const makeAnimState = (): AnimState => ({ motion: "idle", emote: null, emoteUntil: 0 });
