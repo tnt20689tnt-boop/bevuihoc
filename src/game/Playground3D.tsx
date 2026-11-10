@@ -89,6 +89,10 @@ export function Playground3D({ activeSpotId }: { activeSpotId: string | null }) 
 function PlaygroundGround() {
   return (
     <group>
+      <mesh position={[12, 0.06, 11.5]} rotation={[0, 0.83, 0]} receiveShadow>
+        <boxGeometry args={[3.2, 0.08, 16.3]} />
+        <meshStandardMaterial color="#f4e8ce" roughness={0.96} />
+      </mesh>
       <mesh position={[26, 0.035, 24]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[13.2, 64]} />
         <meshStandardMaterial color="#a9d98a" roughness={0.98} />
