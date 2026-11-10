@@ -10,7 +10,7 @@ export function Shelf({position,subject,grade,books,borrowedIds,onSelectBook}:Pr
  {[.08,.98,1.88].map(y=><mesh key={y} position={[0,y,.3]}><boxGeometry args={[3.45,.075,.08]}/><meshStandardMaterial color="#3f2c20"/></mesh>)}
  <mesh position={[0,2.68,.32]}><boxGeometry args={[3.55,.13,.1]}/><meshStandardMaterial color={color} emissive={color} emissiveIntensity={.18}/></mesh>
  {rows.map((row,r)=>row.map((book,i)=>{const active=borrowedIds.has(book.id);return <group key={book.id} position={[(i-(row.length-1)/2)*.52,.48+r*.9,.12]} onClick={e=>{e.stopPropagation();onSelectBook(book);}} onPointerOver={()=>{document.body.style.cursor="pointer";}} onPointerOut={()=>{document.body.style.cursor="default";}}>
- <mesh castShadow><boxGeometry args={[.42,.68,.34]}/><meshStandardMaterial color={book.color} emissive={active?"#ffd27a":"#000000"} emissiveIntensity={active?.8:0}/></mesh><mesh position={[0,0,.176]}><boxGeometry args={[.31,.52,.012]}/><meshStandardMaterial color="#fff1d5"/></mesh></group>;}))}
+ <mesh castShadow><boxGeometry args={[.42,.68,.34]}/><meshStandardMaterial color={book.color} emissive={active?"#ffd27a":"#000000"} emissiveIntensity={active ? 0.8 : 0}/></mesh><mesh position={[0,0,.176]}><boxGeometry args={[.31,.52,.012]}/><meshStandardMaterial color="#fff1d5"/></mesh></group>;}))}
  <mesh position={[0,3.05,.28]}><boxGeometry args={[3.3,.42,.1]}/><meshStandardMaterial color="#fff4df"/></mesh><Text position={[0,3.05,.35]} fontSize={.22} color={color} anchorX="center" anchorY="middle">{LABEL[subject]} - LỚP {grade}</Text>
  </group>;
 }
