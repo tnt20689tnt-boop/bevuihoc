@@ -381,6 +381,7 @@ export function Character3D({
       aRz: 0.12,
       bodyY: amp ? Math.abs(ph) * 0.06 : Math.sin(t * 2) * 0.012,
       bodyRy: 0,
+      bodyX: 0,
       headZ: 0,
       headX: 0,
     };
@@ -396,6 +397,19 @@ export function Character3D({
       aLz: -0.18,
       aRz: 0.18,
     });
+    if (s.motion === "crawl") {
+      const crawlPhase = Math.sin(t * 9);
+      Object.assign(tg, {
+        bodyY: -0.04,
+        bodyX: 1.12,
+        lLx: -0.28 + crawlPhase * 0.28,
+        lRx: -0.28 - crawlPhase * 0.28,
+        aLx: -1.8 + crawlPhase * 0.22,
+        aRx: -1.8 - crawlPhase * 0.22,
+        aLz: -0.08,
+        aRz: 0.08,
+      });
+    }
 
     if (emote === "wave") Object.assign(tg, { aRz: 2.7 + Math.sin(t * 12) * 0.35, aRx: 0 });
     if (emote === "clap") {
@@ -437,6 +451,7 @@ export function Character3D({
     lerp(armR.current, "z", tg.aRz);
     lerp(body.current, "y", tg.bodyY, false);
     lerp(body.current, "y", tg.bodyRy);
+    lerp(body.current, "x", tg.bodyX);
     lerp(head.current, "z", tg.headZ);
     lerp(head.current, "x", tg.headX);
   });
