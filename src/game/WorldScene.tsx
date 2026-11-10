@@ -757,7 +757,7 @@ function PlayerController({
     if (playingSpot) {
       playStartedAt.current = performance.now() / 1000;
       const isTunnel = playingSpot.kind === "tunnel";
-      position.current.x = playingSpot.position[0] + (isTunnel ? -1.75 : playingSpot.seatOffset[0]);
+      position.current.x = playingSpot.position[0] + (isTunnel ? -1.0 : playingSpot.seatOffset[0]);
       position.current.z = playingSpot.position[2] + (isTunnel ? 0 : playingSpot.seatOffset[2]);
       sitting.current = false;
       if (character.current) character.current.rotation.y = isTunnel ? Math.PI / 2 : (playingSpot.facing ?? position.current.ry);
@@ -775,7 +775,7 @@ function PlayerController({
       held.current.clear();
       sitting.current = false;
       if (previousPlayingSpot.current.kind === "tunnel") {
-        position.current.x = previousPlayingSpot.current.position[0] + 2.45;
+        position.current.x = previousPlayingSpot.current.position[0] + 1.6;
         position.current.z = previousPlayingSpot.current.position[2] + 0.65;
       } else if (previousPlayingSpot.current.kind === "bench") {
         position.current.x = previousPlayingSpot.current.position[0] + previousPlayingSpot.current.seatOffset[0] + 0.75;
@@ -964,8 +964,8 @@ function PlayerController({
       position.current.z = playingSpot.position[2] + Math.sin(angle) * 0.575;
       if (character.current) character.current.rotation.y = -angle;
     } else if (playingSpot?.kind === "tunnel") {
-      const progress = Math.min(playElapsed / 3.2, 1);
-      position.current.x = playingSpot.position[0] - 1.75 + progress * 3.5;
+      const progress = Math.min(playElapsed / 2.4, 1);
+      position.current.x = playingSpot.position[0] - 1.0 + progress * 2.0;
       position.current.z = playingSpot.position[2];
       playerY = progress < 1 ? 0.08 : 0;
       animation.current.motion = progress < 1 ? "crawl" : "idle";
