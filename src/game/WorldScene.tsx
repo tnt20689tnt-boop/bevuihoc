@@ -759,7 +759,7 @@ function PlayerController({
       position.current.x = playingSpot.position[0] + playingSpot.seatOffset[0];
       position.current.z = playingSpot.position[2] + playingSpot.seatOffset[2];
       sitting.current = false;
-      animation.current.motion = playingSpot.kind === "slide" || playingSpot.kind === "springRider" ? "jump" : "idle";
+      animation.current.motion = playingSpot.kind === "slide" || playingSpot.kind === "springRider" ? "jump" : playingSpot.kind === "bench" ? "sit" : "idle";
       const emotes: Record<PlaySpot["kind"], AnimState["emote"]> = {
         swing: "wave", slide: "cheer", seesaw: "laugh", springRider: "cheer",
         ballPit: "laugh", playhouse: "wave", tunnel: "surprised", climber: "cheer",
@@ -940,6 +940,8 @@ function PlayerController({
       playerY = 0.525 + Math.abs(Math.sin(playElapsed * 8)) * 0.09;
     } else if (playingSpot?.kind === "ballPit") {
       playerY = 0.15 + Math.abs(Math.sin(playElapsed * 3)) * 0.08;
+    } else if (playingSpot?.kind === "climber") {
+      playerY = 0.2 + (0.5 + Math.sin(playElapsed * 2.2) * 0.5) * 0.55;
     } else if (playingSpot?.kind === "slide") {
       const progress = Math.min(playElapsed / 2.4, 1);
       position.current.x = playingSpot.position[0];
