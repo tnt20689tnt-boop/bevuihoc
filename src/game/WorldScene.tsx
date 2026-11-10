@@ -89,6 +89,7 @@ export function WorldScene(props: WorldSceneProps) {
       {isNight && <NightSky />}
       <WorldFloor room={room} />
       {isNight && <NightCampusLights roomId={room.id} />}
+      <CampusLanterns roomId={room.id} isNight={isNight} />
       {room.id === "plaza" ? <><PlazaUpgrade3D /><Playground3D activeSpotId={props.playingSpot?.id ?? null} /></> : <RoomDecor room={room} />}
       {room.portals.map((portal) => portal.to === "arena" ? null : (
         <PortalGate
@@ -140,6 +141,22 @@ function NightSky() {
       ))}
     </group>
   );
+}
+
+function CampusLanterns({ roomId, isNight }: { roomId: RoomId; isNight: boolean }) {
+  const positions: [number, number, number][] = roomId === "plaza"
+    ? [[-17,4.1,-15],[-9,4.4,-17],[0,4.6,-18],[9,4.4,-17],[17,4.1,-15],[-17,4.1,0],[17,4.1,0],[-17,4.1,15],[-9,4.4,17],[0,4.6,18],[9,4.4,17],[17,4.1,15],[-5,3.8,-7],[5,3.8,-7],[-5,3.8,7],[5,3.8,7]]
+    : [[-8,3.4,-8],[0,3.8,-9],[8,3.4,-8],[-8,3.4,8],[0,3.8,9],[8,3.4,8]];
+  return <group>
+    {positions.map((position,i)=><group key={i} position={position}>
+      <mesh><cylinderGeometry args={[0.22,0.3,0.62,8]}/><meshStandardMaterial color="#b85b32" roughness={0.5} metalness={0.12}/></mesh>
+      <mesh position={[0,0.34,0]}><cylinderGeometry args={[0.17,0.22,0.08,8]}/><meshStandardMaterial color="#f4d38b" metalness={0.35} roughness={0.3}/></mesh>
+      <mesh position={[0,-0.36,0]}><cylinderGeometry args={[0.17,0.22,0.08,8]}/><meshStandardMaterial color="#f4d38b" metalness={0.35} roughness={0.3}/></mesh>
+      <mesh><sphereGeometry args={[0.16,12,10]}/><meshBasicMaterial color="#ffd98a"/></mesh>
+      <mesh><sphereGeometry args={[0.29,12,10]}/><meshBasicMaterial color="#ffc96b" transparent opacity={isNight?0.18:0.1}/></mesh>
+      {(isNight || i % 4 === 0) && <pointLight color="#ffc979" intensity={isNight?0.72:0.28} distance={isNight?8:5} decay={2}/>}
+    </group>)}
+  </group>;
 }
 
 function NightCampusLights({ roomId }: { roomId: RoomId }) {
