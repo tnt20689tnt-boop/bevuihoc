@@ -128,6 +128,7 @@ function PlaygroundFence() {
         </mesh>
       ))}
       {posts.map(([x, z], i) => {
+        if (i === 14) return null;
         const [nx, nz] = posts[(i + 1) % posts.length] ?? [x, z];
         return (
           <mesh key={`rail-${i}`} position={[(x + nx) / 2, 0.36, (z + nz) / 2]} rotation={[0, -Math.atan2(nz - z, nx - x), 0]}>
