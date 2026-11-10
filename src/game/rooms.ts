@@ -64,7 +64,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { x: 13, z: -12, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
     ],
     obstacles: [
-      { x: 0, z: 0, r: 3.1 },
+      { x: -10, z: 0, r: 3.1 },
       ...PLAZA_PORTALS.map((portal) => ({ x: portal.x * 1.28, z: portal.z * 1.28, r: 3.35 })),
     ],
   },
