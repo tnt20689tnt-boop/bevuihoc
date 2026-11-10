@@ -25,6 +25,8 @@ export function WorldExperience({ profile }: { profile: Profile }) {
       setFromRoom(roomId);
       setRoomId(destination.to);
       setNearbyPortal(null);
+      setNearbyPlaySpot(null);
+      setPlayingSpot(null);
       pressedDirections.current.clear();
       touchRef.current = { x: 0, z: 0 };
     },
@@ -76,6 +78,8 @@ export function WorldExperience({ profile }: { profile: Profile }) {
     setFromRoom(roomId);
     setRoomId("plaza");
     setNearbyPortal(null);
+    setNearbyPlaySpot(null);
+    setPlayingSpot(null);
     pressedDirections.current.clear();
     touchRef.current = { x: 0, z: 0 };
   }, [roomId]);
