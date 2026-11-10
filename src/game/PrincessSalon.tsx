@@ -50,7 +50,7 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
   const [looks, setLooks] = useState(() => initialLooks(saved));
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
-  const [activeMode, setActiveMode] = useState<"makeup" | "model">("makeup");
+  const [activeMode, setActiveMode] = useState<"makeup" | "model">("model");
   const [modelLook, setModelLook] = useState<ModelLook>(() => saved.modelLook ?? { hair: "#8b4513", top: "#f472b6", bottom: "#8b5cf6", shoes: "#fbbf24", accessory: "👑" });
   const [stickers, setStickers] = useState<ModelSticker[]>([]);
   const [draggingSticker, setDraggingSticker] = useState<number | null>(null);
@@ -111,7 +111,7 @@ export function PrincessSalon({ profile }: { profile: Profile }) {
 
   return (
     <main className="flex h-[calc(100dvh-4rem)] min-h-0 w-full flex-col items-center overflow-hidden bg-gradient-to-b from-pink-200 via-pink-100 to-purple-200 px-2 py-2 font-sans">
-      <h1 className="mb-2 shrink-0 text-center text-xl font-extrabold text-pink-600 drop-shadow-md sm:text-3xl">👑 Tiệm Trang Điểm Công Chúa 👑</h1>
+      <h1 className="mb-2 shrink-0 text-center text-xl font-extrabold text-pink-600 drop-shadow-md sm:text-3xl">{activeMode === "model" ? "👗 XƯỞNG THIẾT KẾ NGƯỜI MẪU 👗" : "👑 TIỆM TRANG ĐIỂM CÔNG CHÚA 👑"}</h1>
       <div className="mb-2 flex shrink-0 gap-2">
         <button onClick={() => setActiveMode("makeup")} className={`rounded-full px-4 py-2 text-sm font-extrabold shadow ${activeMode === "makeup" ? "bg-pink-600 text-white" : "bg-white/80 text-pink-700"}`}>💄 Trang điểm</button>
         <button onClick={() => setActiveMode("model")} className={`rounded-full px-4 py-2 text-sm font-extrabold shadow ${activeMode === "model" ? "bg-fuchsia-600 text-white" : "bg-white/80 text-pink-700"}`}>👗 Tạo người mẫu</button>
