@@ -34,16 +34,16 @@ export type RoomDef = {
   obstacles: { x: number; z: number; r: number }[];
 };
 
-// Plaza portals sit on a ring; each room's exit portal is at +z.
-const RING = 17;
-const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / 6; // first portal straight "north" (-z)
-export const PLAZA_PORTALS: Portal[] = (
-  ["math", "vietnamese", "english", "girls", "boys", "arena"] as RoomId[]
-).map((to, i) => ({
-  to,
-  x: Math.round(Math.cos(ang(i)) * RING * 100) / 100,
-  z: Math.round(Math.sin(ang(i)) * RING * 100) / 100,
-}));
+// Replanned campus: three learning buildings at the back and sides,
+// the princess salon on the left, and the playground on the right.
+export const PLAZA_PORTALS: Portal[] = [
+  { to: "math", x: -10.15625, z: -3.125 },
+  { to: "vietnamese", x: 10.15625, z: -3.125 },
+  { to: "english", x: 0, z: -14.0625 },
+  { to: "girls", x: -9.765625, z: 7.421875 },
+  { to: "boys", x: 10.15625, z: -11.71875 },
+  { to: "arena", x: -10.15625, z: -11.71875 },
+];
 
 const EXIT: Portal = { to: "plaza", x: 0, z: 11 };
 
@@ -64,7 +64,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { x: 0, z: 9.5, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
     ],
     obstacles: [
-      { x: 0, z: 0, r: 3.1 },
+      { x: -9, z: 0, r: 3.1 },
       ...PLAZA_PORTALS.map((portal) => ({ x: portal.x * 1.28, z: portal.z * 1.28, r: portal.to === "arena" ? 2.15 : 3.35 })),
     ],
   },
