@@ -29,19 +29,19 @@ const learningAreas = [
     icon: "➕",
     title: "Toán học",
     description: "Làm quen với con số, phép tính và tư duy logic qua hoạt động tương tác.",
-    color: "from-sky-100 to-blue-50",
+    cardClass: "bg-gradient-to-br from-sky-100 to-blue-50",
   },
   {
     icon: "📚",
     title: "Tiếng Việt",
     description: "Luyện đọc, nhận biết từ ngữ và phát triển khả năng ngôn ngữ.",
-    color: "from-rose-100 to-pink-50",
+    cardClass: "bg-gradient-to-br from-rose-100 to-pink-50",
   },
   {
     icon: "🌍",
     title: "Tiếng Anh",
     description: "Khám phá từ vựng và kiến thức tiếng Anh theo cách gần gũi.",
-    color: "from-amber-100 to-yellow-50",
+    cardClass: "bg-gradient-to-br from-amber-100 to-yellow-50",
   },
 ];
 
@@ -137,7 +137,7 @@ function HomePage() {
         </div>
         <div className="mt-10 grid gap-5 md:grid-cols-3">
           {learningAreas.map((area) => (
-            <article key={area.title} className={`rounded-3xl border border-white bg-gradient-to-br ${area.color} p-7 shadow-lg shadow-slate-200/60`}>
+            <article key={area.title} className={`rounded-3xl border border-white p-7 shadow-lg shadow-slate-200/60 ${area.cardClass}`}>
               <div className="grid h-16 w-16 place-items-center rounded-2xl bg-white text-4xl shadow">{area.icon}</div>
               <h3 className="mt-5 font-display text-2xl font-black text-slate-900">{area.title}</h3>
               <p className="mt-3 leading-7 text-slate-600">{area.description}</p>
