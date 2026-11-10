@@ -1,6 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({
+  // Keep this route client-rendered to avoid SSR failures from browser-only app dependencies.
+  ssr: false,
   head: () => ({
     meta: [
       { title: "Bé Học Vui - Trường Học 3D Và Khu Vui Chơi Cho Bé" },
