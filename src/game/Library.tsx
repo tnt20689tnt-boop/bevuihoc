@@ -1,5 +1,4 @@
 import { Text } from "@react-three/drei";
-import * as THREE from "three";
 import type { Grade, Subject } from "./libraryBooks";
 import type { Book } from "./libraryBooks";
 import { Shelf } from "./Shelf";
