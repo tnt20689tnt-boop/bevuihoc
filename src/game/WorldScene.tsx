@@ -961,6 +961,10 @@ function PlayerController({
         // through the front gate so the outdoor spawn can enter the school.
         const insideFrontGate = room.id === "plaza" && z > 0 && z < 34.5 && Math.abs(x) < 4.35;
         if (Math.hypot(x, z) > room.radius - 0.8 && !insideFrontGate) return true;
+        if (room.id === "library") {
+          if (Math.abs(x) > 6.25 || z < -5.25) return true;
+          if (z > 5.5 && Math.abs(x) > 3.05) return true;
+        }
         if (room.obstacles.some((obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52)) return true;
         if (room.id === "plaza") {
           const buildingHit = room.portals.some((portal) => {
