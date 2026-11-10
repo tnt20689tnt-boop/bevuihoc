@@ -611,7 +611,7 @@ function PlayerController({
       held.current.clear();
     } else if (previousPlayingSpot.current) {
       position.current.x = previousPlayingSpot.current.position[0];
-      position.current.z = previousPlayingSpot.current.position[2] + 2.2;
+      position.current.z = previousPlayingSpot.current.position[2] + 4.0;
       animation.current.motion = "idle";
       animation.current.emote = null;
       animation.current.emoteUntil = 0;
@@ -711,7 +711,7 @@ function PlayerController({
     camera.position.lerp(desiredCamera.current, 1 - Math.exp(-3.6 * dt));
     lookTarget.current.set(position.current.x, 0.9, position.current.z - 0.8);
     camera.lookAt(lookTarget.current);
-  }, [playingSpot, room, camera, position, touchRef]);
+  });
 
   return (
     <group ref={character} rotation={[0, position.current.ry, 0]}>
