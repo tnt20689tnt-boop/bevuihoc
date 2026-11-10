@@ -652,6 +652,7 @@ function PlayerController({
   useFrame((_, rawDelta) => {
     const dt = Math.min(rawDelta, 0.05);
     const keys = held.current;
+    let playerY = playingSpot?.seatOffset[1] ?? 0;
     let dx =
       Number(keys.has("d") || keys.has("arrowright")) -
       Number(keys.has("a") || keys.has("arrowleft")) +
@@ -691,7 +692,18 @@ function PlayerController({
     } else {
       if (!playingSpot) animation.current.motion = "idle";
     }
-    if (playingSpot?.kind === "slide") {
+    const playElapsed = performance.now() / 1000 - playStartedAt.current;
+    if (playingSpot?.kind === "swing") {
+      const swingAngle = Math.sin(playElapsed * 2.5) * 0.42;
+      position.current.z = playingSpot.position[2] + Math.sin(swingAngle) * 1.9;
+      playerY = 2.55 - Math.cos(swingAngle) * 1.9;
+    } else if (playingSpot?.kind === "seesaw") {
+      playerY = 1.12 + Math.sin(playElapsed * 3) * 0.22;
+    } else if (playingSpot?.kind === "springRider") {
+      playerY = 1.05 + Math.abs(Math.sin(playElapsed * 8)) * 0.18;
+    } else if (playingSpot?.kind === "ballPit") {
+      playerY = 0.3 + Math.abs(Math.sin(playElapsed * 3)) * 0.16;
+    } else if (playingSpot?.kind === "slide") {
       const progress = Math.min((performance.now() / 1000 - playStartedAt.current) / 2.4, 1);
       position.current.x = playingSpot.position[0];
       position.current.z = playingSpot.position[2] - 1.5 + progress * 3;
@@ -703,7 +715,7 @@ function PlayerController({
       if (character.current) character.current.rotation.y = -angle;
     }
     if (character.current) {
-      character.current.position.set(position.current.x, 0, position.current.z);
+      character.current.position.set(position.current.x, playerY, position.current.z);
     }
 
     const nearestPlaySpot = room.id === "plaza"
