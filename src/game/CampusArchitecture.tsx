@@ -1,5 +1,6 @@
 import { Html } from "@react-three/drei";
 import { Classroom } from "@/game/Classroom";
+import { Corridor } from "@/game/Corridor";
 import { useEffect } from "react";
 import type { Portal } from "@/game/rooms";
 import { portalBuildingPosition, ROOMS } from "@/game/rooms";
@@ -42,14 +43,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         const length = Math.hypot(x, z);
         return (
           <group key={portal.to}>
-            <mesh
-              position={[x / 2, 0.045, z / 2]}
-              rotation={[-Math.PI / 2, 0, -Math.atan2(z, x)]}
-              receiveShadow
-            >
-              <planeGeometry args={[3.2, length]} />
-              <meshStandardMaterial color="#f4e8ce" roughness={0.96} />
-            </mesh>
+            <Corridor from={[0, 0, 0]} to={[x, 0, z]} width={3.2} accent={room.color} lampsPerSide={2} />
             <SchoolBuilding position={[x, 0, z]} rotation={yaw} room={room} />
           </group>
         );
