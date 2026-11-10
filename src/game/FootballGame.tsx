@@ -56,7 +56,7 @@ export function FootballGame({ profile }: { profile: Profile }) {
     setOutcome(null);
     setShotDirection(aim);
     try {
-      const result = await takeFootballShot({ data: { direction: aim } });
+      const result = await takeFootballShot({ data: { direction: aim, power } });
       const nextPlayerScore = playerScore + (result.scored ? 1 : 0);
       setPlayerScore(nextPlayerScore);
       setKeeperDirection(result.goalkeeperDirection);
