@@ -182,6 +182,7 @@ export interface FileRouteTypes {
     | '/sanh-vinh-danh'
     | '/the-gioi'
     | '/thi-dau'
+    | '/tao-nguoi-mau'
     | '/hoc/$subject'
   id:
     | '__root__'
