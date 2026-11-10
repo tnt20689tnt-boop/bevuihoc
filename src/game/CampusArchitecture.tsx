@@ -55,7 +55,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         );
       })}
       <CampusGreenery portals={portals} />
-      <CentralLandmark position={[-22, 0, -2]} />
+      <CentralLandmark position={[-20, 0, -4]} />
       <SchoolBoundary />
       <EntranceGate />
     </group>
