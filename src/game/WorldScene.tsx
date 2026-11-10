@@ -940,7 +940,7 @@ function PlayerController({
     } else if (playingSpot?.kind === "slide") {
       const progress = Math.min(playElapsed / 2.4, 1);
       position.current.x = playingSpot.position[0];
-      position.current.z = playingSpot.position[2] - 0.75 + progress * 1.5;
+      position.current.z = playingSpot.position[2] - 0.35 + progress * 1.4;
       if (character.current) character.current.rotation.y = 0;
     } else if (playingSpot?.kind === "carousel") {
       const angle = playElapsed * 1.25;
