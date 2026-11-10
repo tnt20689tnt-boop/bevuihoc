@@ -4,8 +4,8 @@ import engImg from "@/assets/room-english.jpg";
 import salonImg from "@/assets/room-salon.jpg";
 import footballImg from "@/assets/room-football.jpg";
 
-export type RoomId = "plaza" | "math" | "vietnamese" | "english" | "girls" | "boys" | "arena";
-export const ROOM_IDS: RoomId[] = ["plaza", "math", "vietnamese", "english", "girls", "boys", "arena"];
+export type RoomId = "plaza" | "math" | "vietnamese" | "english" | "girls" | "boys" | "arena" | "library";
+export const ROOM_IDS: RoomId[] = ["plaza", "math", "vietnamese", "english", "girls", "boys", "arena", "library"];
 
 export type Activity = {
   x: number;
@@ -42,6 +42,7 @@ export const PLAZA_PORTALS: Portal[] = [
   { to: "girls", x: -8.91727, z: 6.777125 },
   { to: "boys", x: 10.052813, z: -11.599399 },
   { to: "arena", x: -10.052813, z: -11.599399 },
+  { to: "library", x: 16, z: 1 },
 ];
 
 export function portalBuildingPosition(portal: Portal): [number, number] {
@@ -182,6 +183,24 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     portals: [EXIT],
     activities: [],
     obstacles: [],
+  },
+  library: {
+    id: "library",
+    name: "Thư viện Bé Vui Học",
+    short: "Thư viện",
+    emoji: "📚",
+    color: "#b98555",
+    ground: ["#ead8bd", "#d8bd99"],
+    sky: "#dcecff",
+    blurb: "Không gian đọc sách Toán, Tiếng Việt và Tiếng Anh theo lớp của bé.",
+    radius: 16,
+    portals: [EXIT],
+    activities: [],
+    obstacles: [
+      { x: -4.35, z: -4.75, r: 1.75 },
+      { x: 0, z: -4.75, r: 1.75 },
+      { x: 4.35, z: -4.75, r: 1.75 },
+    ],
   },
   boys: {
     id: "boys",
