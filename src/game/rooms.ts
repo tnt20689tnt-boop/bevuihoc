@@ -212,8 +212,8 @@ export function spawnPoint(to: RoomId, from: RoomId | null): { x: number; z: num
       const k = (len - 3) / len; // just inside the portal, toward the fountain
       return { x: p.x * k, z: p.z * k, ry: Math.atan2(-p.x, -p.z) };
     }
-    // Người chơi bắt đầu ở ngoài cổng trường, nhìn vào sân trường.
-    return { x: (Math.random() - 0.5) * 2, z: 32 + Math.random() * 1.5, ry: Math.PI };
+    // Khi vào quảng trường từ menu/cổng trường, xuất hiện ngay trong sân gần đài phun nước.
+    return { x: (Math.random() - 0.5) * 2, z: 8 + Math.random() * 1.5, ry: Math.PI };
   }
   return { x: (Math.random() - 0.5) * 3, z: 5, ry: Math.PI };
 }
