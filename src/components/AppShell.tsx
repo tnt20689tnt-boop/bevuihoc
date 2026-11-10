@@ -122,12 +122,43 @@ export function GameShell({
   className?: string;
   fullBleed?: boolean;
 }) {
-  const { data: profile, isLoading } = useMyProfile();
+  const { data: profile, isLoading, isError, error, refetch } = useMyProfile();
   const navigate = useNavigate();
   useEffect(() => {
     if (!isLoading && profile === null) navigate({ to: "/nhan-vat", replace: true });
   }, [isLoading, profile, navigate]);
-  if (isLoading || !profile) return <LoadingScreen />;
+  if (isLoading) return <LoadingScreen />;
+  if (isError) {
+    const message = error instanceof Error ? error.message : "Không tải được hồ sơ học sinh.";
+    return (
+      <div className="grid min-h-screen place-items-center bg-gradient-sky px-4">
+        <div className="w-full max-w-md rounded-3xl border-4 border-white bg-card p-6 text-center shadow-xl">
+          <div className="text-5xl">🛠️</div>
+          <h1 className="mt-3 text-xl font-extrabold text-foreground">Chưa mở được thế giới</h1>
+          <p className="mt-2 text-sm text-muted-foreground">Hệ thống chưa tải được hồ sơ của bé. Bé thử kết nối mạng rồi bấm tải lại nhé.</p>
+          <p className="mt-3 break-words rounded-xl bg-muted p-3 text-left text-xs text-muted-foreground">{message}</p>
+          <button
+            type="button"
+            onClick={() => void refetch()}
+            className="mt-4 w-full rounded-xl bg-primary px-5 py-3 font-display font-extrabold text-primary-foreground shadow-chunky"
+          >
+            Thử tải lại
+          </button>
+          <button
+            type="button"
+            onClick={async () => {
+              await supabase.auth.signOut();
+              window.location.assign("/auth");
+            }}
+            className="mt-2 w-full rounded-xl border-2 border-border px-5 py-3 font-display font-bold text-foreground"
+          >
+            Quay lại đăng nhập
+          </button>
+        </div>
+      </div>
+    );
+  }
+  if (!profile) return <LoadingScreen text="Đang chuẩn bị nhân vật…" />;
   return (
     <div className={cn("flex min-h-screen flex-col bg-background", fullBleed && "h-dvh min-h-0 overflow-hidden")}>
       <TopBar profile={profile} />
