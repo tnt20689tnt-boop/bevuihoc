@@ -756,14 +756,17 @@ function PlayerController({
     playingRef.current = !!playingSpot;
     if (playingSpot) {
       playStartedAt.current = performance.now() / 1000;
-      position.current.x = playingSpot.position[0] + playingSpot.seatOffset[0];
-      position.current.z = playingSpot.position[2] + playingSpot.seatOffset[2];
+      const isTunnel = playingSpot.kind === "tunnel";
+      position.current.x = playingSpot.position[0] + (isTunnel ? -1.75 : playingSpot.seatOffset[0]);
+      position.current.z = playingSpot.position[2] + (isTunnel ? 0 : playingSpot.seatOffset[2]);
       sitting.current = false;
-      animation.current.motion = playingSpot.kind === "slide" || playingSpot.kind === "springRider" ? "jump" : playingSpot.kind === "bench" ? "sit" : "idle";
+      if (character.current) character.current.rotation.y = isTunnel ? Math.PI / 2 : (playingSpot.facing ?? position.current.ry);
+      const seatedKinds: PlaySpot["kind"][] = ["swing", "seesaw", "springRider", "carousel", "bench"];
+      animation.current.motion = isTunnel ? "crawl" : seatedKinds.includes(playingSpot.kind) ? "sit" : playingSpot.kind === "slide" ? "jump" : "idle";
       const emotes: Record<PlaySpot["kind"], AnimState["emote"]> = {
         swing: "wave", slide: "cheer", seesaw: "laugh", springRider: "cheer",
-        ballPit: "laugh", playhouse: "wave", tunnel: "surprised", climber: "cheer",
-        carousel: "dance", bench: "clap",
+        ballPit: "laugh", playhouse: "wave", tunnel: null, climber: "cheer",
+        carousel: "wave", bench: null,
       };
       animation.current.emote = emotes[playingSpot.kind];
       animation.current.emoteUntil = performance.now() / 1000 + 3600;
@@ -771,8 +774,16 @@ function PlayerController({
     } else if (previousPlayingSpot.current) {
       held.current.clear();
       sitting.current = false;
-      position.current.x = previousPlayingSpot.current.position[0];
-      position.current.z = previousPlayingSpot.current.position[2] + 2.2;
+      if (previousPlayingSpot.current.kind === "tunnel") {
+        position.current.x = previousPlayingSpot.current.position[0] + 2.45;
+        position.current.z = previousPlayingSpot.current.position[2] + 0.65;
+      } else if (previousPlayingSpot.current.kind === "bench") {
+        position.current.x = previousPlayingSpot.current.position[0] + previousPlayingSpot.current.seatOffset[0] + 0.75;
+        position.current.z = previousPlayingSpot.current.position[2] + previousPlayingSpot.current.seatOffset[2] + 0.75;
+      } else {
+        position.current.x = previousPlayingSpot.current.position[0];
+        position.current.z = previousPlayingSpot.current.position[2] + 2.2;
+      }
       animation.current.motion = "idle";
       animation.current.emote = null;
       animation.current.emoteUntil = 0;
@@ -952,6 +963,13 @@ function PlayerController({
       position.current.x = playingSpot.position[0] + Math.cos(angle) * 0.575;
       position.current.z = playingSpot.position[2] + Math.sin(angle) * 0.575;
       if (character.current) character.current.rotation.y = -angle;
+    } else if (playingSpot?.kind === "tunnel") {
+      const progress = Math.min(playElapsed / 3.2, 1);
+      position.current.x = playingSpot.position[0] - 1.75 + progress * 3.5;
+      position.current.z = playingSpot.position[2];
+      playerY = progress < 1 ? 0.08 : 0;
+      animation.current.motion = progress < 1 ? "crawl" : "idle";
+      if (character.current) character.current.rotation.y = Math.PI / 2;
     }
     if (character.current) {
       character.current.position.set(position.current.x, playerY, position.current.z);
