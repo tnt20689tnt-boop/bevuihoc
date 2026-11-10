@@ -15,7 +15,7 @@ export function Shelf({ position, subject, grade, books }: Props) {
         <boxGeometry args={[3.55, 2.7, 0.55]} />
         <meshStandardMaterial color="#68472f" roughness={0.82} />
       </mesh>
-      {[-1.22, -0.32, 0.58, 1.48].map((y) => (
+      {[0.08, 0.98, 1.88].map((y) => (
         <mesh key={y} position={[0, y, 0.3]}>
           <boxGeometry args={[3.45, 0.075, 0.08]} />
           <meshStandardMaterial color="#3f2c20" />
@@ -26,7 +26,7 @@ export function Shelf({ position, subject, grade, books }: Props) {
         <meshStandardMaterial color={color} emissive={color} emissiveIntensity={0.18} />
       </mesh>
       {rows.map((rowBooks, row) => rowBooks.map((book, i) => (
-        <group key={book.id} position={[(i - (rowBooks.length - 1) / 2) * 0.52, -0.83 + row * 0.9, 0.12]}>
+        <group key={book.id} position={[(i - (rowBooks.length - 1) / 2) * 0.52, 0.48 + row * 0.9, 0.12]}>
           <mesh castShadow>
             <boxGeometry args={[0.42, 0.68, 0.34]} />
             <meshStandardMaterial color={book.color} roughness={0.72} />
