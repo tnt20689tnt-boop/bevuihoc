@@ -34,16 +34,15 @@ export type RoomDef = {
   obstacles: { x: number; z: number; r: number }[];
 };
 
-// Plaza portals sit on a ring; each room's exit portal is at +z.
-const RING = 17;
-const ang = (i: number) => -Math.PI / 2 + (i * 2 * Math.PI) / 5; // first portal straight "north" (-z)
-export const PLAZA_PORTALS: Portal[] = (
-  ["math", "vietnamese", "english", "girls", "boys"] as RoomId[]
-).map((to, i) => ({
-  to,
-  x: Math.round(Math.cos(ang(i)) * RING * 100) / 100,
-  z: Math.round(Math.sin(ang(i)) * RING * 100) / 100,
-}));
+// Portal gates are placed in front of the matching buildings. The central
+// entrance corridor (x = -6..6) remains completely open.
+export const PLAZA_PORTALS: Portal[] = [
+  { to: "math", x: -17.2, z: -7.8 },
+  { to: "vietnamese", x: 17.2, z: -7.8 },
+  { to: "english", x: 0, z: -26.6 },
+  { to: "girls", x: -20.3, z: 18.75 },
+  { to: "boys", x: 29.7, z: -19.8 },
+];
 
 const EXIT: Portal = { to: "plaza", x: 0, z: 11 };
 
@@ -57,7 +56,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ground: ["#f3e3c3", "#e9d2a6"],
     sky: "#9fd8ff",
     blurb: "Nơi các bạn gặp nhau, chào hỏi và chọn phòng học.",
-    radius: 29,
+    radius: 48,
     portals: PLAZA_PORTALS,
     activities: [
       { x: -6, z: 6, label: "Đấu trường thi đua", icon: "⚔️", to: "/thi-dau" },
