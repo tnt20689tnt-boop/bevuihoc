@@ -84,6 +84,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "Khám phá trường học 3D và khu vui chơi tương tác dành cho bé với xích đu, cầu trượt, nhà bóng, vòng quay và nhiều hoạt động học tập vui nhộn.",
       },
       { name: "robots", content: "index, follow" },
+      { name: "google-site-verification", content: "4Nw8sSOwIwbfwhg-ozFEKXwAyUBXvFODQpFTBhbc44w" },
       { property: "og:title", content: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D" },
       {
         property: "og:description",
