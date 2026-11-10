@@ -145,11 +145,11 @@ function PlazaDecor() {
       {trees.map(([x, z, scale], i) => (
         <Tree key={i} x={x} z={z} scale={scale} />
       ))}
-      <Bench position={[-8, 0, 1]} rotation={0.42} />
-      <Bench position={[8, 0, 1]} rotation={-0.42} />
-      <Bench position={[0, 0, -10]} rotation={Math.PI} />
-      <FlowerBed position={[-4.7, 0, -5]} />
-      <FlowerBed position={[4.7, 0, -5]} />
+      <Bench position={[-14, 0, 1]} rotation={0.42} />
+      <Bench position={[14, 0, 1]} rotation={-0.42} />
+      <Bench position={[-13, 0, -15]} rotation={Math.PI} />
+      <FlowerBed position={[-8, 0, -5]} />
+      <FlowerBed position={[8, 0, -5]} />
       <FloatingBubbles />
     </group>
   );
