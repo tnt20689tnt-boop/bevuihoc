@@ -55,7 +55,7 @@ export const takeFootballShot = createServerFn({ method: "POST" })
     // The client supplies only a direction. The server picks the keeper and decides
     // whether the shot scores, so a client cannot claim a goal or choose its outcome.
     const goalkeeperDirection = chooseGoalkeeperDirection();
-    const scored = isFootballGoal(data.direction, goalkeeperDirection);
+    const accuracyRoll = new Uint32Array(1);\n    globalThis.crypto.getRandomValues(accuracyRoll);\n    const accuracy = accuracyRoll[0]! / 0x1_0000_0000;\n    const scored = isFootballGoal(data.direction, goalkeeperDirection) && accuracy <= data.power / 100;
     if (!scored) {
       return { goalkeeperDirection, scored: false, points: 0, newBadges: [] as FootballBadge[] };
     }
