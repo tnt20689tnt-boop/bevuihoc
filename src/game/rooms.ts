@@ -163,7 +163,10 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     blurb: "Trang điểm, làm tóc và thay trang phục cho cô bé anime.",
     radius: 14,
     portals: [EXIT],
-    activities: [\n      { x: -2.1, z: -5, label: "Vào Salon làm đẹp", icon: "💄", to: "/salon" },\n      { x: 3.6, z: -5, label: "Tạo người mẫu", icon: "👗", to: "/tao-nguoi-mau" },\n    ],
+    activities: [
+      { x: -2.1, z: -5, label: "Vào Salon làm đẹp", icon: "💄", to: "/salon" },
+      { x: 3.6, z: -5, label: "Tạo người mẫu", icon: "👗", to: "/tao-nguoi-mau" },
+    ],
     obstacles: [{ x: 0, z: -10, r: 2.4 }],
   },
 
