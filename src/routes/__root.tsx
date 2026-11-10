@@ -77,15 +77,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
-      { title: "Bé Học Vui – Thành phố học tập 3D" },
-      { name: "description", content: "Thế giới học tập trực tuyến 3D cho học sinh tiểu học lớp 1–5." },
-      { property: "og:title", content: "Bé Học Vui – Thành phố học tập 3D" },
-      { property: "og:description", content: "Thế giới học tập trực tuyến 3D cho học sinh tiểu học lớp 1–5." },
+      { title: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D" },
+      {
+        name: "description",
+        content:
+          "Khám phá trường học 3D và khu vui chơi tương tác dành cho bé với xích đu, cầu trượt, nhà bóng, vòng quay và nhiều hoạt động học tập vui nhộn.",
+      },
+      { name: "robots", content: "index, follow" },
+      { property: "og:title", content: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D" },
+      {
+        property: "og:description",
+        content: "Khám phá trường học 3D và khu vui chơi tương tác dành cho bé.",
+      },
+      { property: "og:url", content: "https://bevuihoc.lovable.app/" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#ffb347" },
     ],
     links: [
+      { rel: "canonical", href: "https://bevuihoc.lovable.app/" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
