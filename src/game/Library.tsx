@@ -3,11 +3,11 @@ import {Text} from "@react-three/drei";
 import {Shelf} from "./Shelf";
 import {ReadingTable} from "./ReadingTable";
 import {useLibrary} from "@/hooks/useLibrary";
-import {BookPopup} from "@/components/BookPopup";
+import {BookPopup} from "@/components/BookPopup";\nimport {BookReader} from "@/components/BookReader";
 import type {Book,Grade,Subject} from "./types";
 type Props={currentGrade:Grade};
 export function Library({currentGrade}:Props){
- const {books,loans,borrowBook,returnBook}=useLibrary(currentGrade);const [selected,setSelected]=useState<Book|null>(null);
+ const {books,loans,borrowBook,returnBook}=useLibrary(currentGrade);const [selected,setSelected]=useState<Book|null>(null);const [readingBookId,setReadingBookId]=useState<string|null>(null);
  const shelves:{subject:Subject;x:number}[]=[{subject:"math",x:-4.35},{subject:"viet",x:0},{subject:"english",x:4.35}];
  const visible=useMemo(()=>books.filter(b=>b.grade===currentGrade),[books,currentGrade]);const borrowed=useMemo(()=>new Set(loans.map(l=>l.book_id)),[loans]);
  const loan=selected?loans.find(l=>l.book_id===selected.id):undefined;const active=selected?(books.find(b=>b.id===selected.id)??selected):null;
@@ -22,6 +22,6 @@ export function Library({currentGrade}:Props){
  <Text position={[0,2.82,5.78]} fontSize={.19} color="#8b674b" anchorX="center" anchorY="middle">MỖI CUỐN SÁCH - MỘT HÀNH TRÌNH KHÁM PHÁ</Text>
  {shelves.map(s=><Shelf key={s.subject} position={[s.x,0,-4.75]} subject={s.subject} grade={currentGrade} books={visible.filter(b=>b.subject===s.subject)} borrowedIds={borrowed} onSelectBook={setSelected}/>)}
  <ReadingTable position={[0,0,1.15]}/><pointLight position={[0,3.7,0]} intensity={1.8} distance={17} color="#fff0d4"/><pointLight position={[0,2.7,4.6]} intensity={.8} distance={9} color="#ffe2ad"/>
- {active&&<BookPopup book={active} loan={loan} onClose={()=>setSelected(null)} onBorrow={borrowBook} onReturn={returnBook}/>}
+ {active&&<BookPopup book={active} loan={loan} onClose={()=>setSelected(null)} onBorrow={borrowBook} onReturn={returnBook} onRead={id=>{setReadingBookId(id);setSelected(null);}}/>}{readingBookId&&<BookReader bookId={readingBookId} onClose={()=>setReadingBookId(null)}/>}
  </group>;
 }
