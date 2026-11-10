@@ -519,11 +519,29 @@ function GirlsProps() {
         <meshStandardMaterial color="#ffc9df" metalness={0.18} roughness={0.3} />
       </mesh>
       <FlowerBed position={[2.1, 0, 0.2]} />
-      <Html position={[0, 1.3, 0.2]} center distanceFactor={10}>
-        <div style={{ color: "#ce4e86", font: "800 25px 'Baloo 2', sans-serif" }}>
-          ✨ Tự chọn phong cách ✨
+      <Html position={[-2.2, 3.25, -0.15]} center distanceFactor={10}>
+        <div style={{ color: "#ce4e86", font: "900 19px 'Baloo 2', sans-serif", whiteSpace: "nowrap", background: "#fff4fa", border: "2px solid #fff", borderRadius: 12, padding: "3px 10px", boxShadow: "0 3px 10px #7c315533" }}>
+          💄 SALON LÀM ĐẸP
         </div>
       </Html>
+      <group position={[3.7, 0, -6]}>
+        <mesh position={[0, 1.1, 0]} castShadow><boxGeometry args={[3.3, 2.2, 0.22]} /><meshStandardMaterial color="#d95d9a" roughness={0.55} /></mesh>
+        <mesh position={[0, 1.1, 0.14]}><boxGeometry args={[3.05, 1.95, 0.08]} /><meshStandardMaterial color="#fff1f8" roughness={0.45} /></mesh>
+        <mesh position={[0, 2.35, 0]}><boxGeometry args={[3.65, 0.18, 0.32]} /><meshStandardMaterial color="#d9a7bf" /></mesh>
+        <mesh position={[-1.1, 1.35, 0.28]} castShadow><cylinderGeometry args={[0.12, 0.12, 1.8, 16]} /><meshStandardMaterial color="#c58aa6" /></mesh>
+        <mesh position={[1.1, 1.35, 0.28]} castShadow><cylinderGeometry args={[0.12, 0.12, 1.8, 16]} /><meshStandardMaterial color="#c58aa6" /></mesh>
+        {[-0.72, 0, 0.72].map((x, i) => (
+          <group key={i} position={[x, 1.3, 0.42]}>
+            <mesh position={[0, 0.1, 0]} castShadow><coneGeometry args={[0.42, 0.85, 4]} /><meshStandardMaterial color={["#f472b6", "#a78bfa", "#60a5fa"][i]} /></mesh>
+            <mesh position={[0, 0.72, 0]}><sphereGeometry args={[0.19, 16, 12]} /><meshStandardMaterial color="#ffe0c9" /></mesh>
+          </group>
+        ))}
+        <Html position={[0, 3.05, 0.2]} center distanceFactor={10}>
+          <div style={{ color: "#8a48b5", font: "900 19px 'Baloo 2', sans-serif", whiteSpace: "nowrap", background: "#fff", border: "2px solid #fff", borderRadius: 12, padding: "3px 10px", boxShadow: "0 3px 10px #7c315533" }}>
+            👗 XƯỞNG THIẾT KẾ NGƯỜI MẪU
+          </div>
+        </Html>
+      </group>
     </group>
   );
 }
