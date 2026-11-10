@@ -1,8 +1,33 @@
 import { Html } from "@react-three/drei";
+import { useEffect } from "react";
 import type { Portal } from "@/game/rooms";
 import { ROOMS } from "@/game/rooms";
 
 export function CampusArchitecture({ portals }: { portals: Portal[] }) {
+  useEffect(() => {
+    const boxes = portals.map((portal) => {
+      const cx = portal.x * 1.28;
+      const cz = portal.z * 1.28;
+      const yaw = Math.atan2(-cx, -cz);
+      const halfWidth = ROOMS[portal.to].id === "arena" ? 4.25 : 4.1;
+      const halfDepth = ROOMS[portal.to].id === "arena" ? 2.8 : 3.1;
+      const halfX = Math.abs(Math.cos(yaw)) * halfWidth + Math.abs(Math.sin(yaw)) * halfDepth;
+      const halfZ = Math.abs(Math.sin(yaw)) * halfWidth + Math.abs(Math.cos(yaw)) * halfDepth;
+      return { name: ROOMS[portal.to].short, minX: cx - halfX, maxX: cx + halfX, minZ: cz - halfZ, maxZ: cz + halfZ };
+    });
+    boxes.push({ name: "Khu vui chơi", minX: 6, maxX: 20, minZ: 2.5, maxZ: 16.5 });
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i];
+        const b = boxes[j];
+        if (a && b && a.minX < b.maxX && a.maxX > b.minX && a.minZ < b.maxZ && a.maxZ > b.minZ) {
+          console.warn(`[Campus AABB] Hai khu vực bị chồng lấn: ${a.name} / ${b.name}`);
+        }
+      }
+    }
+    const entranceCorridor = boxes.filter((box) => box.minX < 6 && box.maxX > -6 && box.maxZ > 0 && box.minZ < 26.5);
+    if (entranceCorridor.length) console.warn("[Campus AABB] Công trình chắn trục cổng - sân:", entranceCorridor.map((box) => box.name));
+  }, [portals]);
   return (
     <group>
       {/* Sân lát đá ấm và các lối đi tỏa đến từng khu học tập. */}
@@ -31,7 +56,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         );
       })}
       <CampusGreenery portals={portals} />
-      <CentralLandmark />
+      <CentralLandmark position={[-9, 0, 0]} />
       <SchoolBoundary />
       <EntranceGate />
     </group>
@@ -142,10 +167,6 @@ function CampusGreenery({ portals }: { portals: Portal[] }) {
     [-6, -17],
     [7, -17],
     [13, -10],
-    [-15, 4],
-    [15, 4],
-    [-12, 13],
-    [11, 13],
     [-5, 17],
     [5, 17],
   ];
@@ -160,8 +181,6 @@ function CampusGreenery({ portals }: { portals: Portal[] }) {
       {[
         [-9, -2, 0],
         [9, -2, 0],
-        [-4, 8, 0],
-        [4, 8, 0],
       ].map(([x, z], i) => (
         <mesh key={i} position={[x ?? 0, 0.16, z ?? 0]} receiveShadow>
           <cylinderGeometry args={[1.05, 1.15, 0.3, 20]} />
@@ -191,9 +210,9 @@ function Tree({ x, z }: { x: number; z: number }) {
   );
 }
 
-function CentralLandmark() {
+function CentralLandmark({ position }: { position: [number, number, number] }) {
   return (
-    <group position={[0, 0, 0]}>
+    <group position={position}>
       <mesh position={[0, 0.07, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[3.15, 40]} />
         <meshStandardMaterial color="#d7b987" roughness={0.95} />
