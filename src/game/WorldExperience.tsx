@@ -52,6 +52,7 @@ export function WorldExperience({ profile }: { profile: Profile }) {
     joystickInput.current = { x: 0, z: 0 };
     touchRef.current = { x: 0, z: 0 };
     setNearbyPlaySpot(null);
+    setNearbyPortal(null);
     setPlayingSpot(spot);
   }, []);
 
