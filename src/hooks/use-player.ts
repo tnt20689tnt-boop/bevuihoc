@@ -9,6 +9,7 @@ export type Profile = {
   display_name: string;
   gender: Gender;
   grade: number;
+  last_grade_promotion: string;
   avatar: Avatar;
 };
 
@@ -37,11 +38,14 @@ export function useMyProfile() {
       if (authError) throw authError;
       if (!authData.user) return null;
 
-      // Load the saved student profile without optional grade-promotion fields or RPCs.
+      // Promote the student's grade once per school year before loading the profile.
+      const { error: promotionError } = await supabase.rpc("promote_my_grade_if_due");
+      if (promotionError) throw promotionError;
+
       const loadProfile = async () => {
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, display_name, gender, grade, avatar")
+          .select("id, display_name, gender, grade, last_grade_promotion, avatar")
           .eq("id", authData.user.id)
           .maybeSingle();
         if (error) throw error;
