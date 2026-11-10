@@ -139,7 +139,7 @@ function CharacterCreator() {
           grade,
           avatar: savedAvatar,
         })
-        .select("id, display_name, gender, grade, avatar")
+        .select("id, display_name, gender, grade, last_grade_promotion, avatar")
         .single();
       if (saveError) throw saveError;
       // Seed the saved profile before navigation so a stale cached null
@@ -149,6 +149,7 @@ function CharacterCreator() {
         display_name: saved.display_name,
         gender: saved.gender as Gender,
         grade: saved.grade,
+        last_grade_promotion: saved.last_grade_promotion,
         avatar: { ...savedAvatar, ...(saved.avatar as Partial<Avatar>), gender },
       });
       void queryClient.invalidateQueries({ queryKey: profileQueryKey });
