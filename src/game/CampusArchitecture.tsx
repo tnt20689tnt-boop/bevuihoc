@@ -5,13 +5,20 @@ import { ROOMS } from "@/game/rooms";
 
 export function CampusArchitecture({ portals }: { portals: Portal[] }) {
   useEffect(() => {
-    const boxes = portals.map((portal) => ({
-      name: ROOMS[portal.to].short,
-      minX: portal.x * 1.28 - 4.1,
-      maxX: portal.x * 1.28 + 4.1,
-      minZ: portal.z * 1.28 - 3.1,
-      maxZ: portal.z * 1.28 + 3.1,
-    }));
+    const boxes = portals.map((portal) => {
+      const cx = portal.x * 1.28;
+      const cz = portal.z * 1.28;
+      const yaw = Math.atan2(-cx, -cz);
+      const halfX = Math.abs(Math.cos(yaw)) * 4.1 + Math.abs(Math.sin(yaw)) * 3.1;
+      const halfZ = Math.abs(Math.sin(yaw)) * 4.1 + Math.abs(Math.cos(yaw)) * 3.1;
+      return {
+        name: ROOMS[portal.to].short,
+        minX: cx - halfX,
+        maxX: cx + halfX,
+        minZ: cz - halfZ,
+        maxZ: cz + halfZ,
+      };
+    });
     boxes.push({ name: "Khu vui chơi", minX: 13, maxX: 39, minZ: 11, maxZ: 37 });
     for (let i = 0; i < boxes.length; i++) {
       for (let j = i + 1; j < boxes.length; j++) {
