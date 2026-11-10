@@ -34,8 +34,7 @@ export type RoomDef = {
   obstacles: { x: number; z: number; r: number }[];
 };
 
-// Replanned campus: three learning buildings at the back and sides,
-// the princess salon on the left, and the playground on the right.
+// Campus layout: learning buildings around an open central courtyard, with a few swings placed separately.
 export const PLAZA_PORTALS: Portal[] = [
   { to: "math", x: -7.731092, z: -2.577031 },
   { to: "vietnamese", x: 7.731092, z: -2.577031 },
