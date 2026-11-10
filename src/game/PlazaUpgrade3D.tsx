@@ -71,15 +71,17 @@ function FountainSpray() {
   }, []);
   useFrame((_, delta) => {
     if (!ref.current) return;
-    const positions = ref.current.geometry.attributes.position.array as Float32Array;
+    const attr = ref.current.geometry.getAttribute("position");
+    if (!attr) return;
+    const positions = attr.array as Float32Array;
     const step = Math.min(delta, 0.04);
     for (let i = 0; i < count; i++) {
       const v = data.velocity[i]!;
-      positions[i * 3] += v.x * step;
-      positions[i * 3 + 1] += v.y * step;
-      positions[i * 3 + 2] += v.z * step;
+      positions[i * 3] = (positions[i * 3] ?? 0) + v.x * step;
+      positions[i * 3 + 1] = (positions[i * 3 + 1] ?? 0) + v.y * step;
+      positions[i * 3 + 2] = (positions[i * 3 + 2] ?? 0) + v.z * step;
       v.y -= 2.8 * step;
-      if (positions[i * 3 + 1] < 0.42) {
+      if ((positions[i * 3 + 1] ?? 0) < 0.42) {
         const angle = Math.atan2(v.z, v.x);
         positions[i * 3] = Math.cos(angle) * 0.25;
         positions[i * 3 + 1] = 1.65;
@@ -87,12 +89,12 @@ function FountainSpray() {
         v.y = 1.2 + (i % 5) * 0.12;
       }
     }
-    ref.current.geometry.attributes.position.needsUpdate = true;
+    attr.needsUpdate = true;
   });
   return (
     <points ref={ref} position={[0, 0.25, 0]}>
       <bufferGeometry>
-        <bufferAttribute attach="attributes-position" count={count} array={data.positions} itemSize={3} />
+        <bufferAttribute attach="attributes-position" args={[data.positions, 3]} />
       </bufferGeometry>
       <pointsMaterial color="#d9f8ff" size={0.075} transparent opacity={0.88} sizeAttenuation />
     </points>

@@ -5,6 +5,7 @@ import * as THREE from "three";
 import { Character3D, makeAnimState, type AnimState } from "@/game/Character3D";
 import { CampusMultiplayer } from "@/game/CampusMultiplayer";
 import { PlazaUpgrade3D } from "@/game/PlazaUpgrade3D";
+import { CampusArchitecture } from "@/game/CampusArchitecture";
 import {
   ROOMS,
   type Activity,
@@ -388,7 +389,7 @@ function RoomDecor({ room }: { room: RoomDef }) {
       {room.id === "english" && <EnglishProps />}
       {room.id === "girls" && <GirlsProps />}
       {room.id === "boys" && <GoalProps />}
-      {room.id !== "arena" && <RoomPlants />}
+      <RoomPlants />
     </group>
   );
 }
@@ -414,8 +415,8 @@ function ArenaRoomDecor() {
       <Html position={[0, 1.35, -7.25]} center distanceFactor={11}><div style={{ color: "#fff8e8", font: "900 15px 'Baloo 2',sans-serif", textShadow: "0 1px 3px #000" }}>MC</div></Html>
       {seatColumns.map((x, col) => [0, 1, 2].map((row) => (
         <group key={String(col) + "-" + String(row)} position={[x, 0, 1.1 + row * 1.75]}>
-          <mesh position={[0, 0.55, 0]} castShadow><boxGeometry args={[1.25, 0.18, 0.85]} /><meshStandardMaterial color={["#4c91c8", "#e2a64b", "#59a77a"][col]} /></mesh>
-          <mesh position={[0, 1.05, -0.34]} castShadow><boxGeometry args={[1.25, 0.9, 0.14]} /><meshStandardMaterial color={["#4c91c8", "#e2a64b", "#59a77a"][col]} /></mesh>
+          <mesh position={[0, 0.55, 0]} castShadow><boxGeometry args={[1.25, 0.18, 0.85]} /><meshStandardMaterial color={["#4c91c8", "#e2a64b", "#59a77a"][col] ?? "#4c91c8"} /></mesh>
+          <mesh position={[0, 1.05, -0.34]} castShadow><boxGeometry args={[1.25, 0.9, 0.14]} /><meshStandardMaterial color={["#4c91c8", "#e2a64b", "#59a77a"][col] ?? "#4c91c8"} /></mesh>
         </group>
       )))}
       {[-4.5, 0, 4.5].map((x) => <group key={x} position={[x, 3.45, 2.4]}><mesh><sphereGeometry args={[0.22, 16, 12]} /><meshStandardMaterial color="#ffe5a0" emissive="#ffbf55" emissiveIntensity={0.8} /></mesh><pointLight position={[0, -0.2, 0]} color="#ffe0a0" intensity={0.55} distance={5} /></group>)}
