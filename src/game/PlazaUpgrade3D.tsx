@@ -92,7 +92,7 @@ function FountainSpray({ position }: { position: [number, number, number] }) {
     attr.needsUpdate = true;
   });
   return (
-    <points ref={ref} position={[0, 0.25, 0]}>
+    <points ref={ref} position={position}>
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[data.positions, 3]} />
       </bufferGeometry>
@@ -101,11 +101,67 @@ function FountainSpray({ position }: { position: [number, number, number] }) {
   );
 }
 
+function FountainStructure() {
+  return (
+    <group>
+      {/* Wide stone basin: make the fountain body clearly visible beneath the water. */}
+      <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
+        <cylinderGeometry args={[2.55, 2.68, 0.4, 48]} />
+        <meshStandardMaterial color="#e7d4b5" roughness={0.72} />
+      </mesh>
+      <mesh position={[0, 0.415, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <circleGeometry args={[2.32, 48]} />
+        <meshStandardMaterial color="#43c6df" metalness={0.18} roughness={0.22} transparent opacity={0.88} />
+      </mesh>
+      <mesh position={[0, 0.43, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[2.28, 2.52, 48]} />
+        <meshStandardMaterial color="#fff0d1" roughness={0.62} />
+      </mesh>
+      <mesh position={[0, 0.52, 0]} castShadow>
+        <cylinderGeometry args={[0.55, 0.72, 0.25, 32]} />
+        <meshStandardMaterial color="#d5b98f" roughness={0.68} />
+      </mesh>
+      {/* Sculpted central column and two tiered bowls. */}
+      <mesh position={[0, 1.03, 0]} castShadow>
+        <cylinderGeometry args={[0.34, 0.48, 0.9, 24]} />
+        <meshStandardMaterial color="#f0dfc2" roughness={0.58} />
+      </mesh>
+      <mesh position={[0, 1.48, 0]} castShadow>
+        <cylinderGeometry args={[0.72, 1.12, 0.24, 32]} />
+        <meshStandardMaterial color="#e8d4b3" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 1.62, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.72, 1.08, 32]} />
+        <meshStandardMaterial color="#b9eaf0" metalness={0.16} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, 1.82, 0]} castShadow>
+        <cylinderGeometry args={[0.22, 0.34, 0.52, 20]} />
+        <meshStandardMaterial color="#f4e5c9" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 2.12, 0]} castShadow>
+        <cylinderGeometry args={[0.38, 0.68, 0.18, 28]} />
+        <meshStandardMaterial color="#e8d4b3" roughness={0.55} />
+      </mesh>
+      <mesh position={[0, 2.23, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[0.38, 0.65, 28]} />
+        <meshStandardMaterial color="#b9eaf0" metalness={0.16} roughness={0.2} />
+      </mesh>
+      <mesh position={[0, 2.28, 0]} castShadow>
+        <sphereGeometry args={[0.2, 18, 14]} />
+        <meshStandardMaterial color="#f6df9c" metalness={0.25} roughness={0.32} />
+      </mesh>
+    </group>
+  );
+}
+
 export function PlazaUpgrade3D() {
   return (
     <group>
       <CampusArchitecture portals={ROOMS.plaza.portals} />
-      <FountainSpray position={[-20, 0.25, -4]} />
+      <group position={[-20, 0, -4]}>
+        <FountainStructure />
+        <FountainSpray position={[0, 0, 0]} />
+      </group>
       <RotatingSeat position={[-19, 0, -9]} speed={0.65} />
       <RotatingSeat position={[19, 0, 0]} speed={0.52} />
       <RotatingSeat position={[-9, 0, -9]} speed={0.72} />
