@@ -192,7 +192,7 @@ function NightCampusLights({ roomId }: { roomId: RoomId }) {
       ))}
       {roomId === "plaza" && [0, 1, 2, 3, 4, 5, 6].map((i) => {
         const angle = (i / 7) * Math.PI * 2;
-        return <pointLight key={i} position={[Math.sin(angle) * 9, 4.2, Math.cos(angle) * 9]} color={colors[i]} intensity={0.85} distance={12} />;
+        return <pointLight key={i} position={[Math.sin(angle) * 9, 4.2, Math.cos(angle) * 9]} color={colors[i]!} intensity={0.85} distance={12} />;
       })}
     </group>
   );
