@@ -15,9 +15,9 @@ export type Database = {
   public: {
     Tables: {
       library_books: {
-        Row: { available_copies: number; color: string; cover_url: string | null; created_at: string; description: string | null; file_url: string | null; grade: number; id: string; is_active: boolean; sort_order: number; subject: string; title: string; total_copies: number }
-        Insert: { available_copies?: number; color?: string; cover_url?: string | null; created_at?: string; description?: string | null; file_url?: string | null; grade: number; id: string; is_active?: boolean; sort_order?: number; subject: string; title: string; total_copies?: number }
-        Update: { available_copies?: number; color?: string; cover_url?: string | null; created_at?: string; description?: string | null; file_url?: string | null; grade?: number; id?: string; is_active?: boolean; sort_order?: number; subject?: string; title?: string; total_copies?: number }
+        Row: { available_copies: number; color: string; content_html: string | null; content_pdf_url: string | null; cover_url: string | null; created_at: string; description: string | null; file_url: string | null; grade: number; id: string; is_active: boolean; sort_order: number; subject: string; title: string; total_copies: number }
+        Insert: { available_copies?: number; color?: string; content_html?: string | null; content_pdf_url?: string | null; cover_url?: string | null; created_at?: string; description?: string | null; file_url?: string | null; grade: number; id: string; is_active?: boolean; sort_order?: number; subject: string; title: string; total_copies?: number }
+        Update: { available_copies?: number; color?: string; content_html?: string | null; content_pdf_url?: string | null; cover_url?: string | null; created_at?: string; description?: string | null; file_url?: string | null; grade?: number; id?: string; is_active?: boolean; sort_order?: number; subject?: string; title?: string; total_copies?: number }
         Relationships: []
       }
       book_loans: {
