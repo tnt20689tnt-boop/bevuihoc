@@ -1,8 +1,30 @@
 import { Html } from "@react-three/drei";
+import { useEffect } from "react";
 import type { Portal } from "@/game/rooms";
 import { ROOMS } from "@/game/rooms";
 
 export function CampusArchitecture({ portals }: { portals: Portal[] }) {
+  useEffect(() => {
+    const boxes = portals.map((portal) => ({
+      name: ROOMS[portal.to].short,
+      minX: portal.x * 1.28 - 4.1,
+      maxX: portal.x * 1.28 + 4.1,
+      minZ: portal.z * 1.28 - 3.1,
+      maxZ: portal.z * 1.28 + 3.1,
+    }));
+    boxes.push({ name: "Khu vui chơi", minX: 13, maxX: 39, minZ: 11, maxZ: 37 });
+    for (let i = 0; i < boxes.length; i++) {
+      for (let j = i + 1; j < boxes.length; j++) {
+        const a = boxes[i];
+        const b = boxes[j];
+        if (a && b && a.minX < b.maxX && a.maxX > b.minX && a.minZ < b.maxZ && a.maxZ > b.minZ) {
+          console.warn(`[Campus AABB] Hai khu vực bị chồng lấn: ${a.name} / ${b.name}`);
+        }
+      }
+    }
+    const entranceCorridor = boxes.filter((box) => box.minX < 6 && box.maxX > -6 && box.maxZ > 0 && box.minZ < 30);
+    if (entranceCorridor.length) console.warn("[Campus AABB] Công trình chắn trục cổng - sân:", entranceCorridor.map((box) => box.name));
+  }, [portals]);
   return (
     <group>
       {/* Sân lát đá ấm và các lối đi tỏa đến từng khu học tập. */}
@@ -31,7 +53,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         );
       })}
       <CampusGreenery portals={portals} />
-      <CentralLandmark />
+      <CentralLandmark position={[-10, 0, 0]} />
       <EntranceGate />
     </group>
   );
@@ -166,9 +188,9 @@ function Tree({ x, z }: { x: number; z: number }) {
   );
 }
 
-function CentralLandmark() {
+function CentralLandmark({ position }: { position: [number, number, number] }) {
   return (
-    <group position={[0, 0, 0]}>
+    <group position={position}>
       <mesh position={[0, 0.07, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[3.15, 40]} />
         <meshStandardMaterial color="#d7b987" roughness={0.95} />
