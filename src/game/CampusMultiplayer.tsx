@@ -14,6 +14,7 @@ type Position = { x: number; z: number; ry: number };
 type CampusPeer = PresenceSyncPlayer & {
   avatar: unknown;
   roomId: RoomId;
+  grade?: number;
 };
 type Props = {
   roomId: RoomId;
@@ -77,6 +78,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }
             updatedAt: Date.now(),
             seq: typeof incoming.seq === "number" && Number.isFinite(incoming.seq) ? incoming.seq : 0,
             roomId,
+            grade: Number.isFinite(incoming.grade) ? Number(incoming.grade) : undefined,
           };
           return [...current.filter((peer) => peer.id !== safe.id), safe];
         });
@@ -88,6 +90,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }
           id,
           name: publicNameRef.current,
           avatar: profile.avatar,
+          grade: profile.grade,
           roomId,
           x: p.x,
           z: p.z,
@@ -124,6 +127,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }
         id: identityRef.current,
         name: publicNameRef.current,
         avatar: profile.avatar,
+        grade: profile.grade,
         roomId,
         x: p.x,
         z: p.z,
@@ -165,7 +169,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }
                 {peers.map((peer) => (
                   <div key={peer.id} className="flex items-center gap-2 rounded-xl p-2 hover:bg-amber-50">
                     <span className="text-xl">🧒</span>
-                    <div className="min-w-0 flex-1"><p className="truncate text-xs font-extrabold">{peer.name || "Bạn học"}</p><p className="text-[10px] text-slate-500">{locateShelf(peer.x, peer.z)}</p></div>
+                    <div className="min-w-0 flex-1"><p className="truncate text-xs font-extrabold">{peer.name || "Bạn học"}</p><p className="text-[10px] text-slate-500">Lớp {peer.grade ?? "—"} · {locateShelf(peer.x, peer.z)}</p></div>
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
                   </div>
                 ))}
