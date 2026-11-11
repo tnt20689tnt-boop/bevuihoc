@@ -3,13 +3,13 @@ import { Classroom } from "@/game/Classroom";
 import { Corridor } from "@/game/Corridor";
 import { useEffect } from "react";
 import type { Portal } from "@/game/rooms";
-import { portalBuildingPosition, ROOMS } from "@/game/rooms";
+import { portalBuildingPosition, portalBuildingRotation, ROOMS } from "@/game/rooms";
 
 export function CampusArchitecture({ portals }: { portals: Portal[] }) {
   useEffect(() => {
     const boxes = portals.map((portal) => {
       const [cx, cz] = portalBuildingPosition(portal);
-      const yaw = Math.atan2(-cx, -cz);
+      const yaw = portalBuildingRotation(portal);
       const halfWidth = ROOMS[portal.to].id === "arena" ? 4.25 : 4.1;
       const halfDepth = ROOMS[portal.to].id === "arena" ? 2.8 : 3.1;
       const halfX = Math.abs(Math.cos(yaw)) * halfWidth + Math.abs(Math.sin(yaw)) * halfDepth;
