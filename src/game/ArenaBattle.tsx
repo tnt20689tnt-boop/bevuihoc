@@ -157,6 +157,13 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         const message = payload as GameMessage;
         if (typeof message.startsAt === "number" && message.question?.question && Array.isArray(message.question.options)) applyGameStart(message);
       })
+      .on("broadcast", { event: "answer-submitted" }, ({ payload }) => {
+        if (!alive || !payload || typeof payload !== "object") return;
+        const message = payload as { questionIndex?: number; advanceAt?: number };
+        if (message.questionIndex === questionIndexRef.current && typeof message.advanceAt === "number") {
+          setAdvanceAt((current) => current === null ? message.advanceAt! : Math.min(current, message.advanceAt!));
+        }
+      })
       .on("broadcast", { event: "next-question" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
         const message = payload as GameMessage;
