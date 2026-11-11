@@ -72,7 +72,7 @@ export function WorldScene(props: WorldSceneProps) {
       style={{ touchAction: "none" }}
     >
       <color attach="background" args={[isNight ? "#101a3b" : room.sky]} />
-      <fog attach="fog" args={[isNight ? "#172044" : room.sky, isNight ? 20 : 28, isNight ? 48 : 62]} />
+      <fog attach="fog" args={[isNight ? "#172044" : room.sky, isNight ? 30 : room.id === "library" ? 48 : 28, isNight ? 72 : room.id === "library" ? 90 : 62]} />
       <ambientLight intensity={isNight ? 0.34 : 1.25} />
       <hemisphereLight args={isNight ? ["#536da8", "#26304a", 0.48] : ["#f8fbff", "#927451", 1.05]} />
       <directionalLight
@@ -788,7 +788,7 @@ function PlayerController({
   const lookTarget = useRef(new THREE.Vector3());
   const cameraYaw = useRef(0);
   const cameraPitch = useRef(0.48);
-  const cameraDistance = useRef(room.id === "library" ? 30 : 12.4);
+  const cameraDistance = useRef(room.id === "library" ? 18 : 12.4);
   const smoothedCamera = useRef(new THREE.Vector3());
   const smoothedTarget = useRef(new THREE.Vector3());
   const cameraInitialized = useRef(false);
@@ -979,7 +979,7 @@ function PlayerController({
         const insideFrontGate = room.id === "plaza" && z > 0 && z < 34.5 && Math.abs(x) < 4.35;
         if (Math.hypot(x, z) > room.radius - 0.8 && !insideFrontGate) return true;
         if (room.id === "library") {
-          if (Math.abs(x) > 38.8 || z < -34.25 || z > 34.5) return true;
+          if (Math.abs(x) > 22.8 || z < -20.5 || z > 20.5) return true;
         }
         if (room.obstacles.some((obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52)) return true;
         if (room.id === "plaza") {
