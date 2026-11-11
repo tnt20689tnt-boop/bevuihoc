@@ -779,8 +779,11 @@ function PlayerController({
   const previousPlayingSpot = useRef<PlaySpot | null>(null);
   const playStartedAt = useRef(0);
   const playingRef = useRef(false);
-  const { camera, gl } = useThree();
+  const { camera, gl, scene } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
+  const cameraRaycaster = useRef(new THREE.Raycaster());
+  const cameraDirection = useRef(new THREE.Vector3());
+  const adjustedCamera = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
   const cameraYaw = useRef(0);
   const cameraPitch = useRef(0.48);
@@ -1061,6 +1064,33 @@ function PlayerController({
       1.6 + Math.sin(cameraPitch.current) * cameraDistance.current,
       position.current.z + Math.cos(cameraYaw.current) * cameraDistance.current * cp,
     );
+
+    // Keep the follow camera on the player side of tagged room walls and roofs.
+    // This prevents architecture from hiding the character when entering a room.
+    const cameraVector = cameraDirection.current.copy(desiredCamera.current).sub(lookTarget.current);
+    const cameraRayLength = cameraVector.length();
+    if (cameraRayLength > 0.001) {
+      cameraVector.normalize();
+      const raycaster = cameraRaycaster.current;
+      raycaster.set(lookTarget.current, cameraVector);
+      raycaster.near = 0.3;
+      raycaster.far = cameraRayLength;
+      const intersections = raycaster.intersectObjects(scene.children, true);
+      const blocker = intersections.find(({ object }) => {
+        let node: THREE.Object3D | null = object;
+        while (node) {
+          if (node.userData.cameraOccluder === true) return true;
+          node = node.parent;
+        }
+        return false;
+      });
+      if (blocker) {
+        const safeDistance = Math.max(2.6, blocker.distance - 0.65);
+        adjustedCamera.current.copy(lookTarget.current).addScaledVector(cameraVector, safeDistance);
+        desiredCamera.current.copy(adjustedCamera.current);
+      }
+    }
+
     const followAlpha = 1 - Math.exp(-10 * dt);
     const lookAlpha = 1 - Math.exp(-14 * dt);
     if (!cameraInitialized.current) {
