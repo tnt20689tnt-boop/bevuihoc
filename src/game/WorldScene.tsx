@@ -439,13 +439,13 @@ function ArenaRoomDecor() {
   const seatColumns = [-3.8, 0, 3.8];
   return (
     <group>
-      <mesh position={[-6.55, 2, -1.5]} castShadow><boxGeometry args={[0.35, 4, 18]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
-      <mesh position={[6.55, 2, -1.5]} castShadow><boxGeometry args={[0.35, 4, 18]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
-      <mesh position={[0, 2, -10.45]} castShadow><boxGeometry args={[13.4, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
-      <mesh position={[-4.1, 2, 7.45]} castShadow><boxGeometry args={[5.2, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
-      <mesh position={[4.1, 2, 7.45]} castShadow><boxGeometry args={[5.2, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
-      <mesh position={[0, 3.82, 7.45]}><boxGeometry args={[3, 0.36, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
-      <mesh position={[0, 4.25, -1.5]} rotation={[0.18, 0, 0]}><boxGeometry args={[13.8, 0.28, 18.8]} /><meshStandardMaterial color="#a94f35" transparent opacity={0.25} depthWrite={false} side={THREE.DoubleSide} /></mesh>
+      <mesh position={[-6.55, 2, -1.5]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[0.35, 4, 18]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[6.55, 2, -1.5]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[0.35, 4, 18]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[0, 2, -10.45]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[13.4, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[-4.1, 2, 7.45]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[5.2, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[4.1, 2, 7.45]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[5.2, 4, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[0, 3.82, 7.45]} userData={{ cameraOccluder: true }}><boxGeometry args={[3, 0.36, 0.35]} /><meshStandardMaterial color="#f2dfbd" /></mesh>
+      <mesh position={[0, 4.25, -1.5]} rotation={[0.18, 0, 0]} userData={{ cameraOccluder: true }}><boxGeometry args={[13.8, 0.28, 18.8]} /><meshStandardMaterial color="#a94f35" transparent opacity={0.25} depthWrite={false} side={THREE.DoubleSide} /></mesh>
       <mesh position={[0, 4.65, -1.5]}><boxGeometry args={[14, 0.22, 0.35]} /><meshStandardMaterial color="#7e3e2b" /></mesh>
       <mesh position={[0, 2.45, -10.12]} castShadow><boxGeometry args={[8.5, 2.5, 0.28]} /><meshStandardMaterial color="#75462e" /></mesh>
       <mesh position={[0, 2.45, -9.94]}><boxGeometry args={[8.05, 2.05, 0.08]} /><meshStandardMaterial color="#173d55" emissive="#0b2638" emissiveIntensity={0.25} /></mesh>
