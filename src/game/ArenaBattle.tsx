@@ -98,8 +98,11 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const [selected, setSelected] = useState<string | null>(null);
   const [score, setScore] = useState(0);
   const [answered, setAnswered] = useState(0);
+  const [advanceAt, setAdvanceAt] = useState<number | null>(null);
+  const [advanceSeconds, setAdvanceSeconds] = useState(0);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const lastQuestionAction = useRef(0);
+  const questionIndexRef = useRef(0);
   const startSentRef = useRef(false);
 
   const self = useMemo<ArenaPlayer>(() => ({
@@ -114,12 +117,15 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const applyGameStart = useCallback((message: GameMessage) => {
     setQuestion(message.question);
     setQuestionIndex(message.questionIndex);
+    questionIndexRef.current = message.questionIndex;
     setSelected(null);
     setStartsAt(message.startsAt);
     setPhase("countdown");
     setCountdown(3);
     setScore(0);
     setAnswered(0);
+    setAdvanceAt(null);
+    setAdvanceSeconds(0);
   }, []);
 
   useEffect(() => {
