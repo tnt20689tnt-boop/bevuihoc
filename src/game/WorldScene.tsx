@@ -795,7 +795,7 @@ function PlayerController({
   useEffect(() => {
     const meshes: THREE.Object3D[] = [];
     scene.traverse((object) => {
-      if (object.userData.cameraOccluder === true) {
+      if (object.userData["cameraOccluder"] === true) {
         object.traverse((child) => {
           if ((child as THREE.Mesh).isMesh) meshes.push(child);
         });
@@ -1094,7 +1094,7 @@ function PlayerController({
       const blocker = intersections.find(({ object }) => {
         let node: THREE.Object3D | null = object;
         while (node) {
-          if (node.userData.cameraOccluder === true) return true;
+          if (node.userData["cameraOccluder"] === true) return true;
           node = node.parent;
         }
         return false;
