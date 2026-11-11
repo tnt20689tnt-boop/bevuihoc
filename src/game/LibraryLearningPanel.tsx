@@ -4,7 +4,7 @@ import { useGeneratedExam, type ExamSubject, type ExamTerm, type GeneratedQuesti
 import type { Grade } from "./types";
 
 type Props = { grade: Grade; shelfRequest?: { subject: ExamSubject; nonce: number } | null };
-type Doc = { title: string; author: string; year: number; pages: number };
+type Doc = { title: string; author: string; year: number; pages?: number };
 type Exam = { title: string; term: ExamTerm; duration: number; questions: number; type: "practice" | "mock" };
 
 const SUBJECTS: { id: ExamSubject; title: string; icon: string; color: string; docs: Record<Grade, Doc[]>; exams: Record<Grade, Exam[]> }[] = [
