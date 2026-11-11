@@ -782,6 +782,7 @@ function PlayerController({
   const { camera, gl, scene } = useThree();
   const desiredCamera = useRef(new THREE.Vector3());
   const cameraRaycaster = useRef(new THREE.Raycaster());
+  const cameraOccluders = useRef<THREE.Object3D[]>([]);
   const cameraDirection = useRef(new THREE.Vector3());
   const adjustedCamera = useRef(new THREE.Vector3());
   const lookTarget = useRef(new THREE.Vector3());
@@ -791,6 +792,19 @@ function PlayerController({
   const smoothedCamera = useRef(new THREE.Vector3());
   const smoothedTarget = useRef(new THREE.Vector3());
   const cameraInitialized = useRef(false);
+  useEffect(() => {
+    const meshes: THREE.Object3D[] = [];
+    scene.traverse((object) => {
+      if (object.userData.cameraOccluder === true) {
+        object.traverse((child) => {
+          if ((child as THREE.Mesh).isMesh) meshes.push(child);
+        });
+      }
+    });
+    cameraOccluders.current = Array.from(new Set(meshes));
+    return () => { cameraOccluders.current = []; };
+  }, [scene]);
+
   const sitting = useRef(false);
   const benchSpots = [
     { x: -8, z: 1, rotation: 0.42 },
@@ -1075,7 +1089,7 @@ function PlayerController({
       raycaster.set(lookTarget.current, cameraVector);
       raycaster.near = 0.3;
       raycaster.far = cameraRayLength;
-      const intersections = raycaster.intersectObjects(scene.children, true);
+      const intersections = raycaster.intersectObjects(cameraOccluders.current, false);
       const blocker = intersections.find(({ object }) => {
         let node: THREE.Object3D | null = object;
         while (node) {
