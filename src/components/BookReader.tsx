@@ -1,6 +1,9 @@
 import {useEffect,useState} from "react";
 import {Html} from "@react-three/drei";
-import {supabase} from "@/integrations/supabase/client";
+import type {SupabaseClient} from "@supabase/supabase-js";
+import {supabase as typedSupabase} from "@/integrations/supabase/client";
+// Library tables are not in the generated types yet; use an untyped client.
+const supabase=typedSupabase as unknown as SupabaseClient;
 type Props={bookId:string;onClose:()=>void};
 type ContentRow={title:string;content_html:string|null;content_pdf_url:string|null};
 function safePdfUrl(value:string|null){if(!value)return null;try{const u=new URL(value);return u.protocol==="https:"?u.toString():null;}catch{return null;}}

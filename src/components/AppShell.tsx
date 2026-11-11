@@ -129,7 +129,8 @@ export function GameShell({
   }, [isLoading, profile, navigate]);
   if (isLoading) return <LoadingScreen />;
   if (isError) {
-    const message = error && typeof error === "object" && "message" in error ? String((error as { message: unknown }).message) : error instanceof Error ? error.message : String(error ?? "Không tải được hồ sơ học sinh.");
+    const errValue: unknown = error;
+    const message = errValue && typeof errValue === "object" && "message" in errValue ? String((errValue as { message: unknown }).message) : String(errValue ?? "Không tải được hồ sơ học sinh.");
     return (
       <div className="grid min-h-screen place-items-center bg-gradient-sky px-4">
         <div className="w-full max-w-md rounded-3xl border-4 border-white bg-card p-6 text-center shadow-xl">

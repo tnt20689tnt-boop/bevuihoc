@@ -3,7 +3,8 @@ import {Text} from "@react-three/drei";
 import {Shelf} from "./Shelf";
 import {ReadingTable} from "./ReadingTable";
 import {useLibrary} from "@/hooks/useLibrary";
-import {BookPopup} from "@/components/BookPopup";\nimport {BookReader} from "@/components/BookReader";
+import {BookPopup} from "@/components/BookPopup";
+import {BookReader} from "@/components/BookReader";
 import type {Book,Grade,Subject} from "./types";
 type Props={currentGrade:Grade};
 export function Library({currentGrade}:Props){

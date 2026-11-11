@@ -12,6 +12,12 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as SachCuaBeRouteImport } from './routes/sach-cua-be'
+import { Route as TaiLieuToanLop3RouteImport } from './routes/tai-lieu-toan-lop-3'
+import { Route as TiengAnhLop1RouteImport } from './routes/tieng-anh-lop-1'
+import { Route as TiengAnhLop2RouteImport } from './routes/tieng-anh-lop-2'
+import { Route as ToanLop1RouteImport } from './routes/toan-lop-1'
+import { Route as ToanLop2RouteImport } from './routes/toan-lop-2'
 import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'
 import { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenticated/bang-xep-hang'
 import { Route as AuthenticatedHoSoRouteImport } from './routes/_authenticated/ho-so'
@@ -20,9 +26,9 @@ import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedSalonRouteImport } from './routes/_authenticated/salon'
 import { Route as AuthenticatedSanBongRouteImport } from './routes/_authenticated/san-bong'
 import { Route as AuthenticatedSanhVinhDanhRouteImport } from './routes/_authenticated/sanh-vinh-danh'
+import { Route as AuthenticatedTaoNguoiMauRouteImport } from './routes/_authenticated/tao-nguoi-mau'
 import { Route as AuthenticatedTheGioiRouteImport } from './routes/_authenticated/the-gioi'
 import { Route as AuthenticatedThiDauRouteImport } from './routes/_authenticated/thi-dau'
-import { Route as AuthenticatedTaoNguoiMauRouteImport } from './routes/_authenticated/tao-nguoi-mau'
 import { Route as AuthenticatedHocSubjectRouteImport } from './routes/_authenticated/hoc.$subject'
 
 const IndexRoute = IndexRouteImport.update({
@@ -37,6 +43,36 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SachCuaBeRoute = SachCuaBeRouteImport.update({
+  id: '/sach-cua-be',
+  path: '/sach-cua-be',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TaiLieuToanLop3Route = TaiLieuToanLop3RouteImport.update({
+  id: '/tai-lieu-toan-lop-3',
+  path: '/tai-lieu-toan-lop-3',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TiengAnhLop1Route = TiengAnhLop1RouteImport.update({
+  id: '/tieng-anh-lop-1',
+  path: '/tieng-anh-lop-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TiengAnhLop2Route = TiengAnhLop2RouteImport.update({
+  id: '/tieng-anh-lop-2',
+  path: '/tieng-anh-lop-2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToanLop1Route = ToanLop1RouteImport.update({
+  id: '/toan-lop-1',
+  path: '/toan-lop-1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToanLop2Route = ToanLop2RouteImport.update({
+  id: '/toan-lop-2',
+  path: '/toan-lop-2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedArenaRoute = AuthenticatedArenaRouteImport.update({
@@ -81,6 +117,12 @@ const AuthenticatedSanhVinhDanhRoute =
     path: '/sanh-vinh-danh',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedTaoNguoiMauRoute =
+  AuthenticatedTaoNguoiMauRouteImport.update({
+    id: '/tao-nguoi-mau',
+    path: '/tao-nguoi-mau',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedTheGioiRoute = AuthenticatedTheGioiRouteImport.update({
   id: '/the-gioi',
   path: '/the-gioi',
@@ -89,11 +131,6 @@ const AuthenticatedTheGioiRoute = AuthenticatedTheGioiRouteImport.update({
 const AuthenticatedThiDauRoute = AuthenticatedThiDauRouteImport.update({
   id: '/thi-dau',
   path: '/thi-dau',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
-const AuthenticatedTaoNguoiMauRoute = AuthenticatedTaoNguoiMauRouteImport.update({
-  id: '/tao-nguoi-mau',
-  path: '/tao-nguoi-mau',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedHocSubjectRoute = AuthenticatedHocSubjectRouteImport.update({
@@ -105,6 +142,12 @@ const AuthenticatedHocSubjectRoute = AuthenticatedHocSubjectRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/sach-cua-be': typeof SachCuaBeRoute
+  '/tai-lieu-toan-lop-3': typeof TaiLieuToanLop3Route
+  '/tieng-anh-lop-1': typeof TiengAnhLop1Route
+  '/tieng-anh-lop-2': typeof TiengAnhLop2Route
+  '/toan-lop-1': typeof ToanLop1Route
+  '/toan-lop-2': typeof ToanLop2Route
   '/arena': typeof AuthenticatedArenaRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
@@ -113,14 +156,20 @@ export interface FileRoutesByFullPath {
   '/salon': typeof AuthenticatedSalonRoute
   '/san-bong': typeof AuthenticatedSanBongRoute
   '/sanh-vinh-danh': typeof AuthenticatedSanhVinhDanhRoute
+  '/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/the-gioi': typeof AuthenticatedTheGioiRoute
   '/thi-dau': typeof AuthenticatedThiDauRoute
-  '/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/sach-cua-be': typeof SachCuaBeRoute
+  '/tai-lieu-toan-lop-3': typeof TaiLieuToanLop3Route
+  '/tieng-anh-lop-1': typeof TiengAnhLop1Route
+  '/tieng-anh-lop-2': typeof TiengAnhLop2Route
+  '/toan-lop-1': typeof ToanLop1Route
+  '/toan-lop-2': typeof ToanLop2Route
   '/arena': typeof AuthenticatedArenaRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
@@ -129,6 +178,7 @@ export interface FileRoutesByTo {
   '/salon': typeof AuthenticatedSalonRoute
   '/san-bong': typeof AuthenticatedSanBongRoute
   '/sanh-vinh-danh': typeof AuthenticatedSanhVinhDanhRoute
+  '/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/the-gioi': typeof AuthenticatedTheGioiRoute
   '/thi-dau': typeof AuthenticatedThiDauRoute
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
@@ -138,6 +188,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/sach-cua-be': typeof SachCuaBeRoute
+  '/tai-lieu-toan-lop-3': typeof TaiLieuToanLop3Route
+  '/tieng-anh-lop-1': typeof TiengAnhLop1Route
+  '/tieng-anh-lop-2': typeof TiengAnhLop2Route
+  '/toan-lop-1': typeof ToanLop1Route
+  '/toan-lop-2': typeof ToanLop2Route
   '/_authenticated/arena': typeof AuthenticatedArenaRoute
   '/_authenticated/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/_authenticated/ho-so': typeof AuthenticatedHoSoRoute
@@ -146,9 +202,9 @@ export interface FileRoutesById {
   '/_authenticated/salon': typeof AuthenticatedSalonRoute
   '/_authenticated/san-bong': typeof AuthenticatedSanBongRoute
   '/_authenticated/sanh-vinh-danh': typeof AuthenticatedSanhVinhDanhRoute
+  '/_authenticated/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/_authenticated/the-gioi': typeof AuthenticatedTheGioiRoute
   '/_authenticated/thi-dau': typeof AuthenticatedThiDauRoute
-  '/_authenticated/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/_authenticated/hoc/$subject': typeof AuthenticatedHocSubjectRoute
 }
 export interface FileRouteTypes {
@@ -156,6 +212,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/sach-cua-be'
+    | '/tai-lieu-toan-lop-3'
+    | '/tieng-anh-lop-1'
+    | '/tieng-anh-lop-2'
+    | '/toan-lop-1'
+    | '/toan-lop-2'
     | '/arena'
     | '/bang-xep-hang'
     | '/ho-so'
@@ -164,14 +226,20 @@ export interface FileRouteTypes {
     | '/salon'
     | '/san-bong'
     | '/sanh-vinh-danh'
+    | '/tao-nguoi-mau'
     | '/the-gioi'
     | '/thi-dau'
-    | '/tao-nguoi-mau'
     | '/hoc/$subject'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/auth'
+    | '/sach-cua-be'
+    | '/tai-lieu-toan-lop-3'
+    | '/tieng-anh-lop-1'
+    | '/tieng-anh-lop-2'
+    | '/toan-lop-1'
+    | '/toan-lop-2'
     | '/arena'
     | '/bang-xep-hang'
     | '/ho-so'
@@ -180,15 +248,21 @@ export interface FileRouteTypes {
     | '/salon'
     | '/san-bong'
     | '/sanh-vinh-danh'
+    | '/tao-nguoi-mau'
     | '/the-gioi'
     | '/thi-dau'
-    | '/tao-nguoi-mau'
     | '/hoc/$subject'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/sach-cua-be'
+    | '/tai-lieu-toan-lop-3'
+    | '/tieng-anh-lop-1'
+    | '/tieng-anh-lop-2'
+    | '/toan-lop-1'
+    | '/toan-lop-2'
     | '/_authenticated/arena'
     | '/_authenticated/bang-xep-hang'
     | '/_authenticated/ho-so'
@@ -197,6 +271,7 @@ export interface FileRouteTypes {
     | '/_authenticated/salon'
     | '/_authenticated/san-bong'
     | '/_authenticated/sanh-vinh-danh'
+    | '/_authenticated/tao-nguoi-mau'
     | '/_authenticated/the-gioi'
     | '/_authenticated/thi-dau'
     | '/_authenticated/hoc/$subject'
@@ -206,6 +281,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  SachCuaBeRoute: typeof SachCuaBeRoute
+  TaiLieuToanLop3Route: typeof TaiLieuToanLop3Route
+  TiengAnhLop1Route: typeof TiengAnhLop1Route
+  TiengAnhLop2Route: typeof TiengAnhLop2Route
+  ToanLop1Route: typeof ToanLop1Route
+  ToanLop2Route: typeof ToanLop2Route
 }
 
 declare module '@tanstack/react-router' {
@@ -229,6 +310,48 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sach-cua-be': {
+      id: '/sach-cua-be'
+      path: '/sach-cua-be'
+      fullPath: '/sach-cua-be'
+      preLoaderRoute: typeof SachCuaBeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tai-lieu-toan-lop-3': {
+      id: '/tai-lieu-toan-lop-3'
+      path: '/tai-lieu-toan-lop-3'
+      fullPath: '/tai-lieu-toan-lop-3'
+      preLoaderRoute: typeof TaiLieuToanLop3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tieng-anh-lop-1': {
+      id: '/tieng-anh-lop-1'
+      path: '/tieng-anh-lop-1'
+      fullPath: '/tieng-anh-lop-1'
+      preLoaderRoute: typeof TiengAnhLop1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tieng-anh-lop-2': {
+      id: '/tieng-anh-lop-2'
+      path: '/tieng-anh-lop-2'
+      fullPath: '/tieng-anh-lop-2'
+      preLoaderRoute: typeof TiengAnhLop2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/toan-lop-1': {
+      id: '/toan-lop-1'
+      path: '/toan-lop-1'
+      fullPath: '/toan-lop-1'
+      preLoaderRoute: typeof ToanLop1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/toan-lop-2': {
+      id: '/toan-lop-2'
+      path: '/toan-lop-2'
+      fullPath: '/toan-lop-2'
+      preLoaderRoute: typeof ToanLop2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/arena': {
@@ -287,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSanhVinhDanhRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/tao-nguoi-mau': {
+      id: '/_authenticated/tao-nguoi-mau'
+      path: '/tao-nguoi-mau'
+      fullPath: '/tao-nguoi-mau'
+      preLoaderRoute: typeof AuthenticatedTaoNguoiMauRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/the-gioi': {
       id: '/_authenticated/the-gioi'
       path: '/the-gioi'
@@ -299,13 +429,6 @@ declare module '@tanstack/react-router' {
       path: '/thi-dau'
       fullPath: '/thi-dau'
       preLoaderRoute: typeof AuthenticatedThiDauRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tao-nguoi-mau': {
-      id: '/_authenticated/tao-nguoi-mau'
-      path: '/tao-nguoi-mau'
-      fullPath: '/tao-nguoi-mau'
-      preLoaderRoute: typeof AuthenticatedTaoNguoiMauRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/hoc/$subject': {
@@ -327,9 +450,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSalonRoute: typeof AuthenticatedSalonRoute
   AuthenticatedSanBongRoute: typeof AuthenticatedSanBongRoute
   AuthenticatedSanhVinhDanhRoute: typeof AuthenticatedSanhVinhDanhRoute
+  AuthenticatedTaoNguoiMauRoute: typeof AuthenticatedTaoNguoiMauRoute
   AuthenticatedTheGioiRoute: typeof AuthenticatedTheGioiRoute
   AuthenticatedThiDauRoute: typeof AuthenticatedThiDauRoute
-  AuthenticatedTaoNguoiMauRoute: typeof AuthenticatedTaoNguoiMauRoute
   AuthenticatedHocSubjectRoute: typeof AuthenticatedHocSubjectRoute
 }
 
@@ -342,9 +465,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSalonRoute: AuthenticatedSalonRoute,
   AuthenticatedSanBongRoute: AuthenticatedSanBongRoute,
   AuthenticatedSanhVinhDanhRoute: AuthenticatedSanhVinhDanhRoute,
+  AuthenticatedTaoNguoiMauRoute: AuthenticatedTaoNguoiMauRoute,
   AuthenticatedTheGioiRoute: AuthenticatedTheGioiRoute,
   AuthenticatedThiDauRoute: AuthenticatedThiDauRoute,
-  AuthenticatedTaoNguoiMauRoute: AuthenticatedTaoNguoiMauRoute,
   AuthenticatedHocSubjectRoute: AuthenticatedHocSubjectRoute,
 }
 
@@ -355,6 +478,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  SachCuaBeRoute: SachCuaBeRoute,
+  TaiLieuToanLop3Route: TaiLieuToanLop3Route,
+  TiengAnhLop1Route: TiengAnhLop1Route,
+  TiengAnhLop2Route: TiengAnhLop2Route,
+  ToanLop1Route: ToanLop1Route,
+  ToanLop2Route: ToanLop2Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

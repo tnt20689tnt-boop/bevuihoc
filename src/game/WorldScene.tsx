@@ -566,7 +566,7 @@ function GirlsProps() {
         <mesh position={[1.1, 1.35, 0.28]} castShadow><cylinderGeometry args={[0.12, 0.12, 1.8, 16]} /><meshStandardMaterial color="#c58aa6" /></mesh>
         {[-0.72, 0, 0.72].map((x, i) => (
           <group key={i} position={[x, 1.3, 0.42]}>
-            <mesh position={[0, 0.1, 0]} castShadow><coneGeometry args={[0.42, 0.85, 4]} /><meshStandardMaterial color={["#f472b6", "#a78bfa", "#60a5fa"][i]} /></mesh>
+            <mesh position={[0, 0.1, 0]} castShadow><coneGeometry args={[0.42, 0.85, 4]} /><meshStandardMaterial color={["#f472b6", "#a78bfa", "#60a5fa"][i] ?? "#f472b6"} /></mesh>
             <mesh position={[0, 0.72, 0]}><sphereGeometry args={[0.19, 16, 12]} /><meshStandardMaterial color="#ffe0c9" /></mesh>
           </group>
         ))}

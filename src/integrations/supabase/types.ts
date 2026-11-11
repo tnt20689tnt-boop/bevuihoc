@@ -14,18 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      library_books: {
-        Row: { available_copies: number; color: string; content_html: string | null; content_pdf_url: string | null; cover_url: string | null; created_at: string; description: string | null; file_url: string | null; grade: number; id: string; is_active: boolean; sort_order: number; subject: string; title: string; total_copies: number }
-        Insert: { available_copies?: number; color?: string; content_html?: string | null; content_pdf_url?: string | null; cover_url?: string | null; created_at?: string; description?: string | null; file_url?: string | null; grade: number; id: string; is_active?: boolean; sort_order?: number; subject: string; title: string; total_copies?: number }
-        Update: { available_copies?: number; color?: string; content_html?: string | null; content_pdf_url?: string | null; cover_url?: string | null; created_at?: string; description?: string | null; file_url?: string | null; grade?: number; id?: string; is_active?: boolean; sort_order?: number; subject?: string; title?: string; total_copies?: number }
-        Relationships: []
-      }
-      book_loans: {
-        Row: { book_id: string; borrowed_at: string; due_at: string; id: string; returned_at: string | null; status: string; user_id: string }
-        Insert: { book_id: string; borrowed_at?: string; due_at?: string; id?: string; returned_at?: string | null; status?: string; user_id: string }
-        Update: { book_id?: string; borrowed_at?: string; due_at?: string; id?: string; returned_at?: string | null; status?: string; user_id?: string }
-        Relationships: []
-      }
       badges: {
         Row: {
           active: boolean
@@ -565,8 +553,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      borrow_library_book: { Args: { p_book_id: string }; Returns: string }
-      return_library_book: { Args: { p_loan_id: string }; Returns: undefined }
       admin_adjust_points: {
         Args: { p_note: string; p_points: number; p_user: string }
         Returns: undefined
@@ -664,10 +650,7 @@ export type Database = {
         Args: { p_period: string; p_ts: string }
         Returns: string
       }
-      promote_my_grade_if_due: {
-        Args: never
-        Returns: number
-      }
+      promote_my_grade_if_due: { Args: never; Returns: number }
       start_contest: { Args: { p_contest: string }; Returns: undefined }
       start_session: {
         Args: {

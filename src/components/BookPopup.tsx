@@ -2,7 +2,7 @@ import {useState} from "react";
 import {Html} from "@react-three/drei";
 import type {Book} from "@/game/types";
 import type {Loan} from "@/hooks/useLibrary";
-type Props={book:Book;loan?:Loan;onClose:()=>void;onBorrow:(id:string)=>Promise<void>;onReturn:(id:string)=>Promise<void>;onRead:(id:string)=>void};
+type Props={book:Book;loan?:Loan|undefined;onClose:()=>void;onBorrow:(id:string)=>Promise<void>;onReturn:(id:string)=>Promise<void>;onRead:(id:string)=>void};
 export function BookPopup({book,loan,onClose,onBorrow,onReturn,onRead}:Props){
  const [busy,setBusy]=useState(false),[error,setError]=useState(""),[message,setMessage]=useState("");
  const run=async(fn:()=>Promise<void>,msg:string)=>{setBusy(true);setError("");setMessage("");try{await fn();setMessage(msg);}catch(e){setError(e instanceof Error?e.message:"Có lỗi, bé thử lại nhé.");}finally{setBusy(false);}};
