@@ -19,7 +19,7 @@ export function Library({currentGrade}:Props){
  <mesh position={[0,.025,0]} rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[48,44]}/><meshStandardMaterial color="#b68b61" roughness={.86}/></mesh>
  <mesh position={[0,2.25,-22]} userData={{ cameraOccluder: true }}><boxGeometry args={[48,4.5,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>
  {[-1,1].map(s=><mesh key={s} position={[s*24,2.25,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[.22,4.5,44]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
- {[-1,1].map(s=><mesh key={s} position={[s*18.5,2.25,21.88]} userData={{ cameraOccluder: true }}><boxGeometry args={[11,.4,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
+ {[-1,1].map(s=><mesh key={s} position={[s*18.5,2.25,21.88]} userData={{ cameraOccluder: true }}><boxGeometry args={[11,4.5,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
  {/* Keep the ceiling open so the wide follow camera can see the player and the full library. */}
  <mesh position={[0,4.05,21.88]}><boxGeometry args={[3.2,.22,.28]}/><meshStandardMaterial color="#8d5d3d"/></mesh>
  <Text position={[0,3.5,21.78]} fontSize={.48} color="#70482d" anchorX="center" anchorY="middle">THƯ VIỆN BÉ VUI HỌC</Text>
