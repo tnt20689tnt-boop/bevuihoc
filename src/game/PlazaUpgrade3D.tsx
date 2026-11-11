@@ -166,13 +166,13 @@ export function PlazaUpgrade3D() {
       </group>
       <FountainRingLights center={[-20, 0.02, -4]} radius={3.35} count={8} />
       <TreeFairyLights center={[-20, 2.8, -12]} radius={1.25} count={20} />
-      <TreeFairyLights center={[20, 2.8, -3]} radius={1.25} count={20} />
+      <TreeFairyLights center={[18, 2.8, -12]} radius={1.25} count={20} />
       <RotatingSeat position={[-19, 0, -9]} speed={0.65} />
-      <RotatingSeat position={[19, 0, 0]} speed={0.52} />
+      <RotatingSeat position={[19, 0, 5]} speed={0.52} />
       <RotatingSeat position={[-9, 0, -9]} speed={0.72} />
       <RotatingSeat position={[9, 0, -9]} speed={0.58} />
       <LayeredTree position={[-20, 0, -12]} scale={0.9} />
-      <LayeredTree position={[20, 0, -3]} scale={0.9} />
+      <LayeredTree position={[18, 0, -12]} scale={0.9} />
       
       
       <Html position={[0, 6.15, 26.95]} center distanceFactor={14}>
