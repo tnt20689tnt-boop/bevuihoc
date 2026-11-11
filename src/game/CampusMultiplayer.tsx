@@ -14,7 +14,7 @@ type Position = { x: number; z: number; ry: number };
 type CampusPeer = PresenceSyncPlayer & {
   avatar: unknown;
   roomId: RoomId;
-  grade?: number;
+  grade?: number | undefined;
 };
 type Props = {
   roomId: RoomId;

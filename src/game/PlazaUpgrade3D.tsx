@@ -168,7 +168,7 @@ export function PlazaUpgrade3D() {
       <TreeFairyLights center={[-20, 2.8, -12]} radius={1.25} count={20} />
       <TreeFairyLights center={[18, 2.8, -12]} radius={1.25} count={20} />
       <RotatingSeat position={[-19, 0, -9]} speed={0.65} />
-      <RotatingSeat position={[19, 0, 5]} speed={0.52} />
+      <RotatingSeat position={[21, 0, 12]} speed={0.52} />
       <RotatingSeat position={[-9, 0, -9]} speed={0.72} />
       <RotatingSeat position={[9, 0, -9]} speed={0.58} />
       <LayeredTree position={[-20, 0, -12]} scale={0.9} />
