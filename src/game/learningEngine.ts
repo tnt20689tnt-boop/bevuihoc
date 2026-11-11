@@ -179,106 +179,137 @@ const generateMath = (grade: number, lv: number) => {
 // PHẦN 2: TIẾNG VIỆT
 // ==========================================
 const generateVietnamese = (grade: number, _lv: number): GeneratedResult => {
-  const chinhTa: Choice[] = [
-    { q: 'Điền từ đúng: "Bầu trời ... xanh"', a: "trong", w: ["chong", "trông", "chong"] },
-    { q: 'Điền từ đúng: "Cánh đồng ... thẳng cánh cò bay"', a: "lúa", w: ["lứa", "lữa", "lưa"] },
-    { q: "Từ nào viết đúng chính tả?", a: "Nghỉ ngơi", w: ["Nghĩ ngơi", "Nghỉ nghơi", "Nghỉ ngơi nhé"] },
-    { q: 'Điền "s" hay "x": "...ung phong"', a: "x", w: ["s", "tr", "ch"] },
-    { q: 'Điền "tr" hay "ch": "...ăm sóc"', a: "ch", w: ["tr", "s", "x"] },
-    { q: 'Điền từ đúng: "Học ... chăm chỉ"', a: "tập", w: ["tạp", "tấp", "tắp"] },
-  ];
-
-  const dongNghia: Choice[] = [
-    { q: 'Từ nào đồng nghĩa với "chăm chỉ"?', a: "Siêng năng", w: ["Lười biếng", "Thông minh", "Xinh đẹp"] },
-    { q: 'Từ nào đồng nghĩa với "to lớn"?', a: "Khổng lồ", w: ["Nhỏ bé", "Tí hon", "Bé nhỏ"] },
-    { q: 'Từ nào trái nghĩa với "vui vẻ"?', a: "Buồn bã", w: ["Hạnh phúc", "Phấn khởi", "Hân hoan"] },
-    { q: 'Từ nào trái nghĩa với "cao"?', a: "Thấp", w: ["Dài", "Rộng", "To"] },
-  ];
-
-  const thanhNgu: Choice[] = [
-    { q: 'Điền vào chỗ trống: "Ăn quả nhớ kẻ ..."', a: "trồng cây", w: ["trồng rừng", "trồng hoa", "trồng lúa"] },
-    { q: 'Điền: "Có công mài sắt, có ngày nên ..."', a: "kim", w: ["vàng", "bạc", "đồng"] },
-    { q: 'Điền: "Uống nước nhớ ..."', a: "nguồn", w: ["sông", "suối", "biển"] },
-    { q: 'Điền: "Lá lành đùm lá ..."', a: "rách", w: ["tốt", "xanh", "vàng"] },
-  ];
-
-  const nguPhap: Choice[] = [
-    { q: 'Từ "chạy" là loại từ gì?', a: "Động từ", w: ["Danh từ", "Tính từ", "Đại từ"] },
-    { q: 'Từ "đẹp" là loại từ gì?', a: "Tính từ", w: ["Danh từ", "Động từ", "Đại từ"] },
-    { q: 'Từ "học sinh" là loại từ gì?', a: "Danh từ", w: ["Động từ", "Tính từ", "Đại từ"] },
-    { q: 'Câu "Bé Lan đang hát" có chủ ngữ là gì?', a: "Bé Lan", w: ["đang hát", "hát", "Bé Lan đang"] },
-  ];
-
-  let bank: Choice[];
-  if (grade <= 1) bank = chinhTa;
-  else if (grade === 2) bank = [...chinhTa, ...dongNghia];
-  else if (grade === 3) bank = [...dongNghia, ...thanhNgu];
-  else if (grade === 4) bank = [...thanhNgu, ...nguPhap];
-  else bank = [...chinhTa, ...dongNghia, ...thanhNgu, ...nguPhap];
-
+  const banks: Record<number, Choice[]> = {
+    1: [
+      { q: "Từ nào viết đúng chính tả?", a: "cái bàn", w: ["kái bàn", "cái pàn", "cái bàng"] },
+      { q: "Từ nào viết đúng chính tả?", a: "quả cam", w: ["quã cam", "qủa cam", "quả camm"] },
+      { q: "Từ nào viết đúng chính tả?", a: "con cá", w: ["con ká", "con cà", "con cả"] },
+      { q: "Từ nào viết đúng chính tả?", a: "hoa hồng", w: ["hoa hòng", "hoa hông", "hoa hồn"] },
+      { q: "Từ nào viết đúng chính tả?", a: "mẹ yêu", w: ["mẹ iêu", "mẹ yều", "mẹ yeu"] },
+      { q: "Từ nào chỉ người?", a: "bà", w: ["cây", "con mèo", "quả"] },
+      { q: "Từ nào chỉ con vật?", a: "con chó", w: ["cái bàn", "bông hoa", "quyển sách"] },
+      { q: "Từ nào chỉ đồ vật?", a: "cái ghế", w: ["ông", "con cá", "hoa"] },
+      { q: "Từ nào chỉ cây cối?", a: "cây tre", w: ["con gà", "cô giáo", "cái áo"] },
+      { q: "Từ nào chỉ hoạt động?", a: "đọc", w: ["bàn", "đẹp", "xanh"] },
+    ],
+    2: [
+      { q: "Từ nào là từ chỉ hoạt động?", a: "chạy", w: ["đẹp", "cao", "xanh"] },
+      { q: "Từ nào là từ chỉ đặc điểm?", a: "đẹp", w: ["chạy", "ăn", "ngủ"] },
+      { q: "Từ nào là từ chỉ sự vật?", a: "bàn", w: ["chạy", "đẹp", "nhanh"] },
+      { q: "Từ nào là từ chỉ hoạt động?", a: "hát", w: ["đỏ", "to", "cao"] },
+      { q: "Từ nào là từ chỉ đặc điểm?", a: "xanh", w: ["đi", "nói", "cười"] },
+      { q: "Cặp từ trái nghĩa là:", a: "cao - thấp", w: ["cao - to", "thấp - bé", "to - lớn"] },
+      { q: "Cặp từ trái nghĩa là:", a: "nóng - lạnh", w: ["nóng - ấm", "lạnh - mát", "ấm - nóng"] },
+      { q: "Cặp từ trái nghĩa là:", a: "đen - trắng", w: ["đen - xám", "trắng - sáng", "xám - đen"] },
+      { q: "Cặp từ trái nghĩa là:", a: "vui - buồn", w: ["vui - hạnh phúc", "buồn - khổ", "vui - cười"] },
+      { q: "Từ nào đồng nghĩa với chăm chỉ?", a: "siêng năng", w: ["lười biếng", "thờ ơ", "chậm chạp"] },
+    ],
+    3: [
+      { q: "Từ nào là danh từ?", a: "học sinh", w: ["chạy", "đẹp", "nhanh"] },
+      { q: "Từ nào là động từ?", a: "viết", w: ["bàn", "đẹp", "cao"] },
+      { q: "Từ nào là tính từ?", a: "thông minh", w: ["chạy", "bàn", "học"] },
+      { q: "Từ nào là danh từ?", a: "quyển sách", w: ["đọc", "hay", "nhanh"] },
+      { q: "Từ nào là động từ?", a: "nhảy", w: ["cao", "đẹp", "bàn"] },
+      { q: 'Thành ngữ "Chậm như ..."', a: "rùa", w: ["thỏ", "ngựa", "mèo"] },
+      { q: 'Thành ngữ "Nhanh như ..."', a: "cắt", w: ["rùa", "ốc", "sên"] },
+      { q: 'Thành ngữ "Khỏe như ..."', a: "voi", w: ["mèo", "kiến", "chim"] },
+      { q: 'Thành ngữ "Đen như ..."', a: "cột nhà cháy", w: ["tuyết", "trứng gà", "bông"] },
+      { q: "Từ nào trái nghĩa với dũng cảm?", a: "nhút nhát", w: ["can đảm", "gan dạ", "mạnh mẽ"] },
+    ],
+    4: [
+      { q: "Câu nào là câu kể?", a: "Em đi học.", w: ["Em có đi học không?", "Ôi, đẹp quá!", "Em đi học nhé!"] },
+      { q: "Câu nào là câu hỏi?", a: "Bạn tên gì?", w: ["Tôi là Nam.", "Đẹp quá!", "Đi thôi!"] },
+      { q: "Câu nào là câu cảm?", a: "Ôi, đẹp quá!", w: ["Tôi đi học.", "Bạn tên gì?", "Đi thôi!"] },
+      { q: "Câu nào là câu khiến?", a: "Đóng cửa lại!", w: ["Trời đẹp.", "Bạn tên gì?", "Ôi, vui quá!"] },
+      { q: "Từ nào là từ láy?", a: "lung linh", w: ["bàn ghế", "học sinh", "xe đạp"] },
+      { q: "Từ nào là từ ghép?", a: "bàn ghế", w: ["lung linh", "xinh xinh", "đẹp đẽ"] },
+      { q: "Từ nào là từ láy?", a: "xinh xắn", w: ["quần áo", "sách vở", "nhà cửa"] },
+      { q: "Từ nào là từ ghép?", a: "quần áo", w: ["lung linh", "rì rào", "lấp lánh"] },
+      { q: "Chủ ngữ trong câu 'Lan đang đọc sách' là?", a: "Lan", w: ["đang đọc", "đọc sách", "sách"] },
+    ],
+    5: [
+      { q: 'Đại từ trong câu "Tôi đi học" là?', a: "Tôi", w: ["đi", "học", "Tôi đi"] },
+      { q: 'Quan hệ từ trong câu "Vì trời mưa nên em nghỉ học" là?', a: "Vì... nên", w: ["trời", "mưa", "em"] },
+      { q: 'Đại từ trong câu "Bạn ấy học giỏi" là?', a: "Bạn ấy", w: ["học", "giỏi", "học giỏi"] },
+      { q: 'Quan hệ từ trong câu "Tuy nhà nghèo nhưng Nam học giỏi" là?', a: "Tuy... nhưng", w: ["nhà", "nghèo", "Nam"] },
+      { q: 'Thành ngữ "Ăn quả nhớ kẻ ..."', a: "trồng cây", w: ["hái quả", "bán quả", "mua quả"] },
+      { q: 'Thành ngữ "Uống nước nhớ ..."', a: "nguồn", w: ["sông", "suối", "biển"] },
+      { q: 'Thành ngữ "Lá lành đùm lá ..."', a: "rách", w: ["xanh", "vàng", "khô"] },
+      { q: 'Thành ngữ "Một nắng hai ..."', a: "sương", w: ["mưa", "gió", "bão"] },
+      { q: "Từ nào đồng nghĩa với hòa bình?", a: "yên bình", w: ["chiến tranh", "xung đột", "ồn ào"] },
+      { q: "Từ nào trái nghĩa với đoàn kết?", a: "chia rẽ", w: ["gắn bó", "đồng lòng", "hợp tác"] },
+    ],
+  };
+  const bank = banks[normalizeGrade(grade)] ?? banks[3]!;
   const item = bank[rand(0, bank.length - 1)]!;
-  const wrongs = [...new Set(item.w)].filter((w) => w !== item.a).slice(0, 3);
-  while (wrongs.length < 3) wrongs.push(`Đáp án khác ${wrongs.length + 1}`);
-
   return {
     questionText: item.q,
     correctVal: item.a,
     explanation: `Đáp án đúng là: ${item.a}.`,
-    wrongs,
+    wrongs: shuffleArray(item.w.filter((value) => value !== item.a)).slice(0, 3),
   };
 };
 
-// ==========================================
-// PHẦN 3: TIẾNG ANH
-// ==========================================
 const generateEnglish = (grade: number, _lv: number): GeneratedResult => {
-  const vocabulary: Choice[] = [
-    { q: "Con mèo trong tiếng Anh là gì?", a: "Cat", w: ["Dog", "Bird", "Fish"] },
-    { q: "Màu đỏ trong tiếng Anh là gì?", a: "Red", w: ["Blue", "Green", "Yellow"] },
-    { q: "Số 5 trong tiếng Anh là gì?", a: "Five", w: ["Four", "Six", "Seven"] },
-    { q: "Mẹ trong tiếng Anh là gì?", a: "Mother", w: ["Father", "Sister", "Brother"] },
-    { q: "Quả táo trong tiếng Anh là gì?", a: "Apple", w: ["Banana", "Orange", "Mango"] },
-    { q: "Trường học trong tiếng Anh là gì?", a: "School", w: ["Hospital", "Market", "Park"] },
-    { q: "Con chó trong tiếng Anh là gì?", a: "Dog", w: ["Cat", "Pig", "Cow"] },
-    { q: "Màu xanh dương là gì?", a: "Blue", w: ["Red", "Green", "Black"] },
-  ];
-
-  const grammar: Choice[] = [
-    { q: 'Điền từ: "I ___ a student."', a: "am", w: ["is", "are", "be"] },
-    { q: 'Điền từ: "She ___ my sister."', a: "is", w: ["am", "are", "be"] },
-    { q: 'Điền từ: "They ___ playing football."', a: "are", w: ["is", "am", "be"] },
-    { q: 'Điền giới từ: "The book is ___ the table."', a: "on", w: ["in", "at", "to"] },
-    { q: 'Điền giới từ: "I go ___ school."', a: "to", w: ["on", "in", "at"] },
-    { q: 'Đại từ nào thay thế cho "Nam"?', a: "He", w: ["She", "It", "They"] },
-    { q: 'Đại từ nào thay thế cho "Lan"?', a: "She", w: ["He", "It", "They"] },
-  ];
-
-  const reading: Choice[] = [
-    { q: 'Đọc: "Tom is a boy. He is 7 years old." - Tom bao nhiêu tuổi?', a: "7", w: ["6", "8", "9"] },
-    { q: 'Đọc: "I have a cat. It is black." - Con mèo màu gì?', a: "Black", w: ["White", "Red", "Blue"] },
-  ];
-
-  const verbs: Choice[] = [
-    { q: 'Chia động từ: "He ___ (go) to school every day."', a: "goes", w: ["go", "going", "went"] },
-    { q: 'Chia động từ: "They ___ (play) games."', a: "play", w: ["plays", "playing", "played"] },
-  ];
-
-  let bank: Choice[];
-  if (grade <= 1) bank = vocabulary;
-  else if (grade === 2) bank = [...vocabulary, ...grammar];
-  else if (grade === 3) bank = [...grammar, ...reading];
-  else if (grade === 4) bank = [...reading, ...verbs, ...grammar];
-  else bank = [...vocabulary, ...grammar, ...reading, ...verbs];
-
+  const banks: Record<number, Choice[]> = {
+    1: [
+      { q: "What color is the sun?", a: "Yellow", w: ["Blue", "Green", "Black"] },
+      { q: "How many fingers are on one hand?", a: "Five", w: ["Three", "Four", "Six"] },
+      { q: 'What is "mèo" in English?', a: "Cat", w: ["Dog", "Bird", "Fish"] },
+      { q: 'What is "chó" in English?', a: "Dog", w: ["Cat", "Cow", "Pig"] },
+      { q: "Which one is a fruit?", a: "Apple", w: ["Car", "Book", "Chair"] },
+      { q: "What color is grass?", a: "Green", w: ["Red", "Blue", "Black"] },
+      { q: 'What is "con cá" in English?', a: "Fish", w: ["Bird", "Dog", "Cat"] },
+      { q: 'What is "quả chuối" in English?', a: "Banana", w: ["Apple", "Orange", "Grape"] },
+    ],
+    2: [
+      { q: 'What is "táo" in English?', a: "Apple", w: ["Orange", "Banana", "Grape"] },
+      { q: 'What is "sách" in English?', a: "Book", w: ["Pen", "Bag", "Desk"] },
+      { q: "Which one is a color?", a: "Red", w: ["Run", "Eat", "Go"] },
+      { q: "How many days are there in a week?", a: "Seven", w: ["Five", "Six", "Eight"] },
+      { q: 'What is "mẹ" in English?', a: "Mother", w: ["Father", "Sister", "Brother"] },
+      { q: 'What is "trường học" in English?', a: "School", w: ["Hospital", "Market", "Park"] },
+      { q: 'What is "con voi" in English?', a: "Elephant", w: ["Tiger", "Rabbit", "Monkey"] },
+      { q: 'What is "màu tím" in English?', a: "Purple", w: ["Yellow", "Brown", "White"] },
+    ],
+    3: [
+      { q: "She ___ a student.", a: "is", w: ["are", "am", "be"] },
+      { q: "They ___ my friends.", a: "are", w: ["is", "am", "be"] },
+      { q: "I ___ nine years old.", a: "am", w: ["is", "are", "be"] },
+      { q: "He ___ a book.", a: "has", w: ["have", "is", "are"] },
+      { q: "We ___ English.", a: "like", w: ["likes", "liking", "liked"] },
+      { q: 'What is "trường học" in English?', a: "School", w: ["Home", "Park", "Shop"] },
+      { q: "There ___ two pens on the desk.", a: "are", w: ["is", "am", "be"] },
+      { q: "What is the plural of 'cat'?", a: "Cats", w: ["Cates", "Cat", "Caties"] },
+    ],
+    4: [
+      { q: "She ___ to school every day.", a: "goes", w: ["go", "going", "went"] },
+      { q: "They ___ football yesterday.", a: "played", w: ["play", "plays", "playing"] },
+      { q: "I ___ a book now.", a: "am reading", w: ["read", "reads", "reading"] },
+      { q: "He ___ his homework last night.", a: "did", w: ["does", "do", "doing"] },
+      { q: "There ___ two cats in the garden.", a: "are", w: ["is", "am", "be"] },
+      { q: "My mother ___ dinner every evening.", a: "cooks", w: ["cook", "cooking", "cooked"] },
+      { q: "We ___ to the zoo last Sunday.", a: "went", w: ["go", "goes", "going"] },
+      { q: "The opposite of 'big' is ___.", a: "small", w: ["long", "tall", "short"] },
+    ],
+    5: [
+      { q: "She ___ here since 2020.", a: "has lived", w: ["lived", "lives", "is living"] },
+      { q: "If it rains, we ___ at home.", a: "will stay", w: ["stay", "stayed", "staying"] },
+      { q: "This book is ___ than that one.", a: "more interesting", w: ["interesting", "most interesting", "interestinger"] },
+      { q: "He is the ___ student in class.", a: "tallest", w: ["taller", "tall", "most tall"] },
+      { q: "I ___ my homework already.", a: "have finished", w: ["finish", "finished", "finishing"] },
+      { q: "She asked me where I ___.", a: "lived", w: ["live", "living", "lives"] },
+      { q: "We have studied English ___ three years.", a: "for", w: ["since", "at", "on"] },
+      { q: "The letter ___ by my teacher yesterday.", a: "was written", w: ["wrote", "is writing", "writes"] },
+    ],
+  };
+  const bank = banks[normalizeGrade(grade)] ?? banks[3]!;
   const item = bank[rand(0, bank.length - 1)]!;
-  const wrongs = item.w.slice(0, 3);
-  while (wrongs.length < 3) wrongs.push(`Other ${wrongs.length + 1}`);
-
   return {
     questionText: item.q,
     correctVal: item.a,
     explanation: `Đáp án đúng là: ${item.a}.`,
-    wrongs,
+    wrongs: shuffleArray(item.w.filter((value) => value !== item.a)).slice(0, 3),
   };
 };
 
