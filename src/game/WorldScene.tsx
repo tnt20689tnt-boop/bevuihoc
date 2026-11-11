@@ -1083,6 +1083,7 @@ function PlayerController({
     // This prevents architecture from hiding the character when entering a room.
     const cameraVector = cameraDirection.current.copy(desiredCamera.current).sub(lookTarget.current);
     const cameraRayLength = cameraVector.length();
+    let cameraObstructed = false;
     if (cameraRayLength > 0.001) {
       cameraVector.normalize();
       const raycaster = cameraRaycaster.current;
@@ -1099,7 +1100,8 @@ function PlayerController({
         return false;
       });
       if (blocker) {
-        const safeDistance = Math.max(2.6, blocker.distance - 0.65);
+        cameraObstructed = true;
+        const safeDistance = Math.max(1.25, blocker.distance - 0.65);
         adjustedCamera.current.copy(lookTarget.current).addScaledVector(cameraVector, safeDistance);
         desiredCamera.current.copy(adjustedCamera.current);
       }
@@ -1112,7 +1114,8 @@ function PlayerController({
       smoothedTarget.current.copy(lookTarget.current);
       cameraInitialized.current = true;
     } else {
-      smoothedCamera.current.lerp(desiredCamera.current, followAlpha);
+      if (cameraObstructed) smoothedCamera.current.copy(desiredCamera.current);
+      else smoothedCamera.current.lerp(desiredCamera.current, followAlpha);
       smoothedTarget.current.lerp(lookTarget.current, lookAlpha);
     }
     camera.position.copy(smoothedCamera.current);
