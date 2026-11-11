@@ -105,7 +105,7 @@ export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }
       if (channelRef.current === channel) channelRef.current = null;
       void supabase.removeChannel(channel);
     };
-  }, [roomId, profile.id, profile.avatar, profile.display_name, positionRef]);
+  }, [roomId, profile.id, profile.avatar, profile.display_name, profile.grade, positionRef]);
 
   useFrame(() => {
     const channel = channelRef.current;
