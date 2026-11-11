@@ -788,7 +788,7 @@ function PlayerController({
   const lookTarget = useRef(new THREE.Vector3());
   const cameraYaw = useRef(0);
   const cameraPitch = useRef(0.48);
-  const cameraDistance = useRef(room.id === "library" ? 19.5 : 12.4);
+  const cameraDistance = useRef(room.id === "library" ? 30 : 12.4);
   const smoothedCamera = useRef(new THREE.Vector3());
   const smoothedTarget = useRef(new THREE.Vector3());
   const cameraInitialized = useRef(false);
@@ -883,7 +883,7 @@ function PlayerController({
     };
     const onPointerUp = () => { drag = null; };
     const onWheel = (event: WheelEvent) => {
-      cameraDistance.current = THREE.MathUtils.clamp(cameraDistance.current + event.deltaY * 0.01, 5, 24);
+      cameraDistance.current = THREE.MathUtils.clamp(cameraDistance.current + event.deltaY * 0.01, 5, 42);
     };
     canvas.addEventListener("pointerdown", onPointerDown);
     canvas.addEventListener("pointermove", onPointerMove);
@@ -979,8 +979,8 @@ function PlayerController({
         const insideFrontGate = room.id === "plaza" && z > 0 && z < 34.5 && Math.abs(x) < 4.35;
         if (Math.hypot(x, z) > room.radius - 0.8 && !insideFrontGate) return true;
         if (room.id === "library") {
-          if (Math.abs(x) > 18.8 || z < -14.25) return true;
-          if (z > 14.5 && Math.abs(x) > 11.5) return true;
+          if (Math.abs(x) > 38.8 || z < -32.25) return true;
+          if (z > 32.5 && Math.abs(x) > 31.5) return true;
         }
         if (room.obstacles.some((obstacle) => Math.hypot(x - obstacle.x, z - obstacle.z) < obstacle.r + 0.52)) return true;
         if (room.id === "plaza") {
