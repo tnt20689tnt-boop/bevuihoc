@@ -42,21 +42,42 @@ export const PLAZA_PORTALS: Portal[] = [
   { to: "girls", x: -8.91727, z: 6.777125 },
   { to: "boys", x: 10.052813, z: -11.599399 },
   { to: "arena", x: -10.052813, z: -11.599399 },
-  { to: "library", x: 18.566549, z: -3.22901 },
+  // Door of the library: in front of its facade, right beside the Vietnamese classroom.
+  { to: "library", x: 10.640253, z: 6.151155 },
 ];
 
-export function portalBuildingPosition(portal: Portal): [number, number] {
+/** Gap between the centres of the Vietnamese classroom and the library (building width 8.2 + walkway). */
+export const LIBRARY_SIDE_OFFSET = 9.2;
+
+function radialBuildingPosition(portal: Portal): [number, number] {
   const length = Math.hypot(portal.x, portal.z) || 1;
   return [portal.x + (portal.x / length) * 4.5, portal.z + (portal.z / length) * 4.5];
 }
 
-export function portalBuildingRotation(portal: Portal): number {
-  // Keep the library facade parallel to the Vietnamese classroom so both
-  // buildings sit on the same visible row instead of the library looking recessed.
+export function portalBuildingPosition(portal: Portal): [number, number] {
+  // The library stands on the same row as the Vietnamese classroom, directly
+  // beside it (towards the front gate) instead of hidden behind it.
   if (portal.to === "library") {
     const vietnamesePortal = PLAZA_PORTALS.find((item) => item.to === "vietnamese");
     if (vietnamesePortal) {
-      const [x, z] = portalBuildingPosition(vietnamesePortal);
+      const [vx, vz] = radialBuildingPosition(vietnamesePortal);
+      const length = Math.hypot(vx, vz) || 1;
+      // Tangent along the classroom facade, pointing towards +z (the gate side).
+      const tx = -vz / length;
+      const tz = vx / length;
+      return [vx + tx * LIBRARY_SIDE_OFFSET, vz + tz * LIBRARY_SIDE_OFFSET];
+    }
+  }
+  return radialBuildingPosition(portal);
+}
+
+export function portalBuildingRotation(portal: Portal): number {
+  // Keep the library facade parallel to the Vietnamese classroom so both
+  // buildings sit side by side on the same visible row.
+  if (portal.to === "library") {
+    const vietnamesePortal = PLAZA_PORTALS.find((item) => item.to === "vietnamese");
+    if (vietnamesePortal) {
+      const [x, z] = radialBuildingPosition(vietnamesePortal);
       return Math.atan2(-x, -z);
     }
   }

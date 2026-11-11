@@ -642,7 +642,7 @@ function PortalGate({
   onEnter: () => void;
 }) {
   const destination = ROOMS[portal.to];
-  const rotation = Math.atan2(-portal.x, -portal.z);
+  const rotation = portalBuildingRotation(portal);
   return (
     <group position={[portal.x, 0, portal.z]} rotation={[0, rotation, 0]}>
       <mesh position={[0, 0.08, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
