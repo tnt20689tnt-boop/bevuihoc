@@ -226,6 +226,7 @@ export function isRoomId(v: unknown): v is RoomId {
 
 /** Where a player appears when entering `to` from `from`. */
 export function spawnPoint(to: RoomId, from: RoomId | null): { x: number; z: number; ry: number } {
+  if (to === "library") return { x: (Math.random() - 0.5) * 1.2, z: 15, ry: Math.PI };
   if (to === "arena") return { x: 0, z: 5, ry: Math.PI };
   if (to === "plaza") {
     const p = PLAZA_PORTALS.find((pp) => pp.to === from);
