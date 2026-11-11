@@ -11,6 +11,7 @@ import { Library } from "@/game/Library";
 import {
   ROOMS,
   portalBuildingPosition,
+  portalBuildingRotation,
   type Activity,
   type Portal,
   type RoomDef,
@@ -985,7 +986,7 @@ function PlayerController({
         if (room.id === "plaza") {
           const buildingHit = room.portals.some((portal) => {
             const [cx, cz] = portalBuildingPosition(portal);
-            const yaw = Math.atan2(-cx, -cz);
+            const yaw = portalBuildingRotation(portal);
             const dx = x - cx;
             const dz = z - cz;
             const localX = dx * Math.cos(yaw) + dz * Math.sin(yaw);
