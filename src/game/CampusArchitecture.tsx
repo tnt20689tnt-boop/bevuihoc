@@ -92,18 +92,18 @@ function SchoolBuilding({
 function ArenaHouse({ position, rotation, room }: { position: [number, number, number]; rotation: number; room: (typeof ROOMS)[keyof typeof ROOMS] }) {
   return (
     <group position={position} rotation={[0, rotation, 0]}>
-      <mesh position={[-3.55, 1.55, 0]} castShadow receiveShadow><boxGeometry args={[0.3, 3.1, 5.2]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
-      <mesh position={[3.55, 1.55, 0]} castShadow receiveShadow><boxGeometry args={[0.3, 3.1, 5.2]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
-      <mesh position={[0, 1.55, -2.48]} castShadow receiveShadow><boxGeometry args={[7.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
-      <mesh position={[-2.5, 1.55, 2.63]} castShadow><boxGeometry args={[2.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
-      <mesh position={[2.5, 1.55, 2.63]} castShadow><boxGeometry args={[2.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
-      <mesh position={[0, 2.95, 2.63]} castShadow><boxGeometry args={[2.6, 0.3, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
+      <mesh position={[-3.55, 1.55, 0]} castShadow receiveShadow userData={{ cameraOccluder: true }}><boxGeometry args={[0.3, 3.1, 5.2]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
+      <mesh position={[3.55, 1.55, 0]} castShadow receiveShadow userData={{ cameraOccluder: true }}><boxGeometry args={[0.3, 3.1, 5.2]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
+      <mesh position={[0, 1.55, -2.48]} castShadow receiveShadow userData={{ cameraOccluder: true }}><boxGeometry args={[7.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" roughness={0.86} /></mesh>
+      <mesh position={[-2.5, 1.55, 2.63]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[2.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
+      <mesh position={[2.5, 1.55, 2.63]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[2.4, 3.1, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
+      <mesh position={[0, 2.95, 2.63]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[2.6, 0.3, 0.25]} /><meshStandardMaterial color="#f6e7cb" /></mesh>
       <mesh position={[0, 0.12, 0]} receiveShadow><boxGeometry args={[7.8, 0.24, 5.6]} /><meshStandardMaterial color="#c28b58" /></mesh>
       {[-1, 1].map((side) => <group key={side} position={[side * 1.18, 0, 2.55]} rotation={[0, side * 0.72, 0]}><mesh position={[-side * 0.53, 1.12, 0]} castShadow><boxGeometry args={[1.06, 2.22, 0.14]} /><meshStandardMaterial color="#805033" /></mesh><mesh position={[-side * 0.53, 1.12, 0.09]}><boxGeometry args={[0.82, 1.95, 0.035]} /><meshStandardMaterial color="#a66b3d" /></mesh></group>)}
       {[-1, 1].map((side) => <mesh key={side} position={[side * 2.75, 1.7, 2.78]}><boxGeometry args={[1.15, 1.2, 0.1]} /><meshStandardMaterial color="#9bd9e7" metalness={0.08} roughness={0.28} /></mesh>)}
-      <mesh position={[0, 3.85, -1.25]} rotation={[0.42, 0, 0]} castShadow><boxGeometry args={[8.3, 0.28, 4.15]} /><meshStandardMaterial color="#a94f35" roughness={0.78} /></mesh>
-      <mesh position={[0, 3.85, 1.25]} rotation={[-0.42, 0, 0]} castShadow><boxGeometry args={[8.3, 0.28, 4.15]} /><meshStandardMaterial color="#b95c3d" roughness={0.78} /></mesh>
-      <mesh position={[0, 4.62, 0]} castShadow><boxGeometry args={[8.5, 0.24, 0.32]} /><meshStandardMaterial color="#713b2c" /></mesh>
+      <mesh position={[0, 3.85, -1.25]} rotation={[0.42, 0, 0]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[8.3, 0.28, 4.15]} /><meshStandardMaterial color="#a94f35" roughness={0.78} /></mesh>
+      <mesh position={[0, 3.85, 1.25]} rotation={[-0.42, 0, 0]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[8.3, 0.28, 4.15]} /><meshStandardMaterial color="#b95c3d" roughness={0.78} /></mesh>
+      <mesh position={[0, 4.62, 0]} castShadow userData={{ cameraOccluder: true }}><boxGeometry args={[8.5, 0.24, 0.32]} /><meshStandardMaterial color="#713b2c" /></mesh>
       <mesh position={[0, 3.02, 0]} castShadow><boxGeometry args={[7.7, 0.24, 5.45]} /><meshStandardMaterial color={room.color} /></mesh>
       <mesh position={[0, 0.2, 3.35]} castShadow><boxGeometry args={[3.8, 0.24, 1.15]} /><meshStandardMaterial color="#d8b58c" /></mesh>
       <Html position={[0, 2.78, 2.98]} center distanceFactor={13}><div style={{ whiteSpace: "nowrap", borderRadius: 10, padding: "5px 14px", color: "#fff8e8", background: "#8e4b32", border: "2px solid #f1d39b", boxShadow: "0 3px 0 #0002", font: "900 17px 'Baloo 2',sans-serif" }}>🏆 NHÀ THI ĐẤU TRI THỨC</div></Html>
