@@ -19,7 +19,7 @@ export function Library({currentGrade}:Props){
  <mesh position={[0,2.25,-36]} userData={{ cameraOccluder: true }}><boxGeometry args={[80,4.5,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>
  {[-1,1].map(s=><mesh key={s} position={[s*40,2.25,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[.22,4.5,72]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
  {[-1,1].map(s=><mesh key={s} position={[s*31.9,2.25,35.88]} userData={{ cameraOccluder: true }}><boxGeometry args={[16.2,4.5,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
- <mesh position={[0,4.62,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[80.5,.3,72.5]}/><meshStandardMaterial color="#6b4932"/></mesh>
+ {/* Keep the ceiling open so the wide follow camera can see the player and the full library. */}
  <mesh position={[0,4.05,35.88]}><boxGeometry args={[3.2,.22,.28]}/><meshStandardMaterial color="#8d5d3d"/></mesh>
  <Text position={[0,3.5,35.78]} fontSize={.48} color="#70482d" anchorX="center" anchorY="middle">THƯ VIỆN BÉ VUI HỌC</Text>
  <Text position={[0,3.08,35.78]} fontSize={.19} color="#8b674b" anchorX="center" anchorY="middle">MỖI CUỐN SÁCH - MỘT HÀNH TRÌNH KHÁM PHÁ</Text>
