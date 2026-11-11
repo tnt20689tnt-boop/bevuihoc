@@ -1,8 +1,7 @@
 -- Seed starter question bank for all 3 subjects and grades 1–5.
 -- Answers remain server-side; this migration is safe to re-run.
-insert into public.question_bank
-(subject, grade, term, topic, question_text, question_type, options, correct_answer, points, difficulty)
-values
+with seed as (
+  values
 ('math',1,'mid1','cộng trong phạm vi 10','2 + 3 = ?','multiple_choice','[{"key":"A","text":"4"},{"key":"B","text":"5"},{"key":"C","text":"6"}]'::jsonb,'B',1,1),
 ('math',1,'mid1','trừ trong phạm vi 10','6 - 2 = ?','multiple_choice','[{"key":"A","text":"3"},{"key":"B","text":"4"},{"key":"C","text":"5"}]'::jsonb,'B',1,1),
 ('math',1,'mid1','số liền sau','Số liền sau của 7 là số nào?','multiple_choice','[{"key":"A","text":"6"},{"key":"B","text":"8"},{"key":"C","text":"9"}]'::jsonb,'B',1,1),
@@ -47,5 +46,10 @@ values
 ('english',4,'mid1','present simple','Choose the correct sentence.','multiple_choice','[{"key":"A","text":"He play football."},{"key":"B","text":"He plays football."},{"key":"C","text":"He playing football."}]'::jsonb,'B',1,1),
 ('english',5,'mid1','grammar','Yesterday, I ___ to school.','multiple_choice','[{"key":"A","text":"go"},{"key":"B","text":"went"},{"key":"C","text":"goes"}]'::jsonb,'B',1,1),
 ('english',5,'mid1','vocabulary','What does ''carefully'' mean?','multiple_choice','[{"key":"A","text":"Một cách cẩn thận"},{"key":"B","text":"Nhanh chóng"},{"key":"C","text":"Ồn ào"}]'::jsonb,'A',1,1),
-('english',5,'mid1','grammar','There ___ two books on the table.','multiple_choice','[{"key":"A","text":"is"},{"key":"B","text":"are"},{"key":"C","text":"am"}]'::jsonb,'B',1,1)
+('english',5,'mid1','grammar','There ___ two books on the table.','multiple_choice','[{"key":"A","text":"is"},{"key":"B","text":"are"},{"key":"C","text":"am"}]'::jsonb,'B',1,1))
+insert into public.question_bank
+(subject, grade, term, topic, question_text, question_type, options, correct_answer, points, difficulty)
+select s.column1, s.column2, terms.term, s.column4, s.column5, s.column6, s.column7, s.column8, s.column9, s.column10
+from seed s
+cross join (values ('mid1'), ('final1'), ('mid2'), ('final2')) as terms(term)
 on conflict (subject, grade, term, question_text) do nothing;
