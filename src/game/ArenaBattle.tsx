@@ -213,23 +213,40 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     void channelRef.current?.send({ type: "broadcast", event: "game-start", payload: message });
   }, [players, phase, profile.id, currentGrade, applyGameStart]);
 
-  const nextQuestion = () => {
+  const nextQuestion = useCallback(() => {
     if (Date.now() - lastQuestionAction.current < 1200) return;
     lastQuestionAction.current = Date.now();
     const message: GameMessage = {
       startsAt: Date.now() + 3000,
       question: randomQuestion(currentGrade),
-      questionIndex: questionIndex + 1,
+      questionIndex: questionIndexRef.current + 1,
     };
     applyGameStart(message);
     void channelRef.current?.send({ type: "broadcast", event: "next-question", payload: message });
-  };
+  }, [currentGrade, applyGameStart]);
+
+  useEffect(() => {
+    if (phase !== "playing" || advanceAt === null) return;
+    const update = () => setAdvanceSeconds(Math.max(0, Math.ceil((advanceAt - Date.now()) / 1000)));
+    update();
+    const interval = window.setInterval(update, 200);
+    let timeout: number | undefined;
+    if (players[0]?.id === profile.id) {
+      timeout = window.setTimeout(() => {
+        if (questionIndexRef.current === questionIndex) nextQuestion();
+      }, Math.max(0, advanceAt - Date.now()));
+    }
+    return () => { window.clearInterval(interval); if (timeout !== undefined) window.clearTimeout(timeout); };
+  }, [phase, advanceAt, players, profile.id, questionIndex, nextQuestion]);
 
   const answer = (value: string) => {
-    if (!question || selected !== null || phase !== "playing") return;
+    if (!question || selected !== null || phase !== "playing" || advanceAt !== null) return;
     setSelected(value);
     setAnswered((n) => n + 1);
     if (value === question.correctAnswer) setScore((n) => n + 1);
+    const deadline = Date.now() + 10000;
+    setAdvanceAt(deadline);
+    void channelRef.current?.send({ type: "broadcast", event: "answer-submitted", payload: { questionIndex, advanceAt: deadline } });
   };
 
   const leaveCompetition = () => {
