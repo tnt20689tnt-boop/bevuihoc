@@ -64,7 +64,14 @@ const EXTRA_EXAMS: Record<ExamSubject, Record<Grade, string[]>> = {
  viet:{1:[],2:["Đề thi học kỳ 2 Tiếng Việt 2"],3:["Đề khảo sát Tiếng Việt 3"],4:["Đề thi học kỳ 2 Tiếng Việt 4"],5:["Đề khảo sát Tiếng Việt 5"]},
  english:{1:["Đề thi học kỳ 2 English 1"],2:["Đề thi học kỳ 2 English 2"],3:["Đề khảo sát English 3"],4:["Đề thi học kỳ 2 English 4"],5:["Đề khảo sát English 5"]}
 };
-// Tài liệu HTML đã có sẵn trong public/files được mở trực tiếp; không giả lập thành sách PDF.\nSUBJECTS.find(s => s.id === "math")!.docs[3].push(\n {title:"Bài tập Toán có lời văn lớp 3",author:"Bé Vui Học",year:2026,fileUrl:"/files/bai-tap-toan-co-loi-van-lop-3.html"},\n {title:"Bảng nhân chia lớp 3",author:"Bé Vui Học",year:2026,fileUrl:"/files/bang-nhan-chia-lop-3.html"},\n {title:"Đề ôn tập Toán lớp 3",author:"Bé Vui Học",year:2026,fileUrl:"/files/de-on-tap-toan-lop-3.html"}\n);\n\nSUBJECTS.forEach(s => {
+// Tài liệu HTML đã có sẵn trong public/files được mở trực tiếp; không giả lập thành sách PDF.
+SUBJECTS.find(s => s.id === "math")!.docs[3].push(
+ {title:"Bài tập Toán có lời văn lớp 3",author:"Bé Vui Học",year:2026,fileUrl:"/files/bai-tap-toan-co-loi-van-lop-3.html"},
+ {title:"Bảng nhân chia lớp 3",author:"Bé Vui Học",year:2026,fileUrl:"/files/bang-nhan-chia-lop-3.html"},
+ {title:"Đề ôn tập Toán lớp 3",author:"Bé Vui Học",year:2026,fileUrl:"/files/de-on-tap-toan-lop-3.html"}
+);
+
+SUBJECTS.forEach(s => {
  ([1,2,3,4,5] as Grade[]).forEach(g => {
   EXTRA_DOCS[s.id][g].forEach((title,i)=>s.docs[g].push({title,author:"Tài liệu tham khảo",year:2023,pages:50+i*10}));
   EXTRA_EXAMS[s.id][g].forEach((title,i)=>s.exams[g].push({title,term:i===0?"final2":"mid2",duration:45,questions:20,type:"mock"}));
