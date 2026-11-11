@@ -10,21 +10,21 @@ import type {Book,Grade,Subject} from "./types";
 type Props={currentGrade:Grade};
 export function Library({currentGrade}:Props){
  const {books,loans,borrowBook,returnBook}=useLibrary(currentGrade);const [selected,setSelected]=useState<Book|null>(null);const [readingBookId,setReadingBookId]=useState<string|null>(null);
- const shelves:{subject:Subject;x:number}[]=[{subject:"math",x:-4.35},{subject:"viet",x:0},{subject:"english",x:4.35}];
+ const shelves:{subject:Subject;x:number}[]=[{subject:"math",x:-5.5},{subject:"viet",x:0},{subject:"english",x:5.5}];
  const visible=useMemo(()=>books.filter(b=>b.grade===currentGrade),[books,currentGrade]);const borrowed=useMemo(()=>new Set(loans.map(l=>l.book_id)),[loans]);
  const loan=selected?loans.find(l=>l.book_id===selected.id):undefined;const active=selected?(books.find(b=>b.id===selected.id)??selected):null;
  return <group>
  <LibraryLearningPanel grade={currentGrade}/>
- <mesh position={[0,.025,0]} rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[14,12]}/><meshStandardMaterial color="#b68b61" roughness={.86}/></mesh>
- <mesh position={[0,2.1,-6]} userData={{ cameraOccluder: true }}><boxGeometry args={[14,4.2,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>
- {[-1,1].map(s=><mesh key={s} position={[s*7,2.1,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[.22,4.2,12]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
- {[-1,1].map(s=><mesh key={s} position={[s*5.05,2.1,6]} userData={{ cameraOccluder: true }}><boxGeometry args={[3.9,4.2,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
- <mesh position={[0,4.28,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[14.5,.28,12.5]}/><meshStandardMaterial color="#6b4932"/></mesh>
- <mesh position={[0,3.82,5.88]}><boxGeometry args={[3.2,.22,.28]}/><meshStandardMaterial color="#8d5d3d"/></mesh>
- <Text position={[0,3.25,5.78]} fontSize={.48} color="#70482d" anchorX="center" anchorY="middle">THƯ VIỆN BÉ VUI HỌC</Text>
- <Text position={[0,2.82,5.78]} fontSize={.19} color="#8b674b" anchorX="center" anchorY="middle">MỖI CUỐN SÁCH - MỘT HÀNH TRÌNH KHÁM PHÁ</Text>
- {shelves.map(s=><Shelf key={s.subject} position={[s.x,0,-4.75]} subject={s.subject} grade={currentGrade} books={visible.filter(b=>b.subject===s.subject)} borrowedIds={borrowed} onSelectBook={setSelected}/>)}
- <ReadingTable position={[0,0,1.15]}/><pointLight position={[0,3.7,0]} intensity={1.8} distance={17} color="#fff0d4"/><pointLight position={[0,2.7,4.6]} intensity={.8} distance={9} color="#ffe2ad"/>
+ <mesh position={[0,.025,0]} rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[20,18]}/><meshStandardMaterial color="#b68b61" roughness={.86}/></mesh>
+ <mesh position={[0,2.25,-9]} userData={{ cameraOccluder: true }}><boxGeometry args={[20,4.5,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>
+ {[-1,1].map(s=><mesh key={s} position={[s*10,2.25,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[.22,4.5,18]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
+ {[-1,1].map(s=><mesh key={s} position={[s*7.9,2.25,9]} userData={{ cameraOccluder: true }}><boxGeometry args={[4.2,4.5,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
+ <mesh position={[0,4.62,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[20.5,.3,18.5]}/><meshStandardMaterial color="#6b4932"/></mesh>
+ <mesh position={[0,4.05,8.88]}><boxGeometry args={[3.2,.22,.28]}/><meshStandardMaterial color="#8d5d3d"/></mesh>
+ <Text position={[0,3.5,8.78]} fontSize={.48} color="#70482d" anchorX="center" anchorY="middle">THƯ VIỆN BÉ VUI HỌC</Text>
+ <Text position={[0,3.08,8.78]} fontSize={.19} color="#8b674b" anchorX="center" anchorY="middle">MỖI CUỐN SÁCH - MỘT HÀNH TRÌNH KHÁM PHÁ</Text>
+ {shelves.map(s=><Shelf key={s.subject} position={[s.x,0,-6.5]} subject={s.subject} grade={currentGrade} books={visible.filter(b=>b.subject===s.subject)} borrowedIds={borrowed} onSelectBook={setSelected}/>)}
+ <ReadingTable position={[0,0,2.15]}/><pointLight position={[0,4,0]} intensity={1.8} distance={23} color="#fff0d4"/><pointLight position={[0,3,7]} intensity={.8} distance={12} color="#ffe2ad"/>
  {active&&<BookPopup book={active} loan={loan} onClose={()=>setSelected(null)} onBorrow={borrowBook} onReturn={returnBook} onRead={id=>{setReadingBookId(id);setSelected(null);}}/>}{readingBookId&&<BookReader bookId={readingBookId} onClose={()=>setReadingBookId(null)}/>}
  </group>;
 }
