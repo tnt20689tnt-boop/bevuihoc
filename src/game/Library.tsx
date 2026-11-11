@@ -14,10 +14,10 @@ export function Library({currentGrade}:Props){
  const loan=selected?loans.find(l=>l.book_id===selected.id):undefined;const active=selected?(books.find(b=>b.id===selected.id)??selected):null;
  return <group>
  <mesh position={[0,.025,0]} rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[14,12]}/><meshStandardMaterial color="#b68b61" roughness={.86}/></mesh>
- <mesh position={[0,2.1,-6]}><boxGeometry args={[14,4.2,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>
- {[-1,1].map(s=><mesh key={s} position={[s*7,2.1,0]}><boxGeometry args={[.22,4.2,12]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
- {[-1,1].map(s=><mesh key={s} position={[s*5.05,2.1,6]}><boxGeometry args={[3.9,4.2,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
- <mesh position={[0,4.28,0]}><boxGeometry args={[14.5,.28,12.5]}/><meshStandardMaterial color="#6b4932"/></mesh>
+ <mesh position={[0,2.1,-6]} userData={{ cameraOccluder: true }}><boxGeometry args={[14,4.2,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>
+ {[-1,1].map(s=><mesh key={s} position={[s*7,2.1,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[.22,4.2,12]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
+ {[-1,1].map(s=><mesh key={s} position={[s*5.05,2.1,6]} userData={{ cameraOccluder: true }}><boxGeometry args={[3.9,4.2,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
+ <mesh position={[0,4.28,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[14.5,.28,12.5]}/><meshStandardMaterial color="#6b4932"/></mesh>
  <mesh position={[0,3.82,5.88]}><boxGeometry args={[3.2,.22,.28]}/><meshStandardMaterial color="#8d5d3d"/></mesh>
  <Text position={[0,3.25,5.78]} fontSize={.48} color="#70482d" anchorX="center" anchorY="middle">THƯ VIỆN BÉ VUI HỌC</Text>
  <Text position={[0,2.82,5.78]} fontSize={.19} color="#8b674b" anchorX="center" anchorY="middle">MỖI CUỐN SÁCH - MỘT HÀNH TRÌNH KHÁM PHÁ</Text>
