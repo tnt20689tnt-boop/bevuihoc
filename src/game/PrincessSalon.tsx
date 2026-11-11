@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Avatar } from "@/lib/avatar";
@@ -45,6 +46,7 @@ function initialLooks(saved: SalonAvatar): Record<string, Makeup> {
 }
 
 export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Profile; initialMode?: "makeup" | "model" }) {
+  const navigate = useNavigate();
   const saved = profile.avatar as SalonAvatar;
   const [activeId, setActiveId] = useState<string>(FIRST_PRINCESS.id);
   const [looks, setLooks] = useState(() => initialLooks(saved));
@@ -111,7 +113,11 @@ export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Pr
 
   return (
     <main className="flex h-[calc(100dvh-4rem)] min-h-0 w-full flex-col items-center overflow-hidden bg-gradient-to-b from-pink-200 via-pink-100 to-purple-200 px-2 py-2 font-sans">
-      <h1 className="mb-2 shrink-0 text-center text-xl font-extrabold text-pink-600 drop-shadow-md sm:text-3xl">{activeMode === "model" ? "👗 XƯỞNG THIẾT KẾ NGƯỜI MẪU 👗" : "👑 TIỆM TRANG ĐIỂM CÔNG CHÚA 👑"}</h1>
+      <div className="mb-2 flex w-full max-w-5xl shrink-0 items-center gap-2">
+        <button type="button" onClick={() => navigate({ to: "/the-gioi" })} className="shrink-0 rounded-xl border-2 border-white bg-white/90 px-3 py-2 text-sm font-extrabold text-pink-700 shadow-md hover:bg-white">← Trở về</button>
+        <h1 className="min-w-0 flex-1 text-center text-lg font-extrabold text-pink-600 drop-shadow-md sm:text-3xl">{activeMode === "model" ? "👗 XƯỞNG THIẾT KẾ NGƯỜI MẪU 👗" : "👑 TIỆM TRANG ĐIỂM CÔNG CHÚA 👑"}</h1>
+        <span className="w-[84px] shrink-0" aria-hidden="true" />
+      </div>
       <div className="mb-2 flex shrink-0 gap-2">
         <button onClick={() => setActiveMode("makeup")} className={`rounded-full px-4 py-2 text-sm font-extrabold shadow ${activeMode === "makeup" ? "bg-pink-600 text-white" : "bg-white/80 text-pink-700"}`}>💄 Trang điểm</button>
         <button onClick={() => setActiveMode("model")} className={`rounded-full px-4 py-2 text-sm font-extrabold shadow ${activeMode === "model" ? "bg-fuchsia-600 text-white" : "bg-white/80 text-pink-700"}`}>👗 Tạo người mẫu</button>
