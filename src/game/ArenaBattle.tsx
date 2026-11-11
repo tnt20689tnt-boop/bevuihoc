@@ -273,12 +273,14 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   }, [phase, advanceAt, players, profile.id, questionIndex, nextQuestion]);
 
   const answer = (value: string) => {
-    if (!question || selected !== null || phase !== "playing" || advanceAt !== null) return;
+    // Mỗi bé được tự trả lời một lần trong khoảng chờ chung 10 giây.
+    // Việc một bé trả lời không khóa đáp án của các bé còn lại.
+    if (!question || selected !== null || phase !== "playing") return;
     setSelected(value);
     setAnswered((n) => n + 1);
     if (value === question.correctAnswer) setScore((n) => n + 1);
     const deadline = Date.now() + 10000;
-    setAdvanceAt(deadline);
+    setAdvanceAt((current) => current === null ? deadline : Math.min(current, deadline));
     void channelRef.current?.send({ type: "broadcast", event: "answer-submitted", payload: { questionIndex, advanceAt: deadline } });
   };
 
