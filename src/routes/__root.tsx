@@ -85,6 +85,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "robots", content: "index, follow" },
       { name: "google-site-verification", content: "4Nw8sSOwIwbfwhg-ozFEKXwAyUBXvFODQpFTBhbc44w" },
+      { name: "msvalidate.01", content: "FD1B83E613D2D338AD3F1AC7D7EBA947" },
       { property: "og:title", content: "Bé Học Vui - Trường Học & Khu Vui Chơi 3D" },
       {
         property: "og:description",
