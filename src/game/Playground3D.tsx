@@ -26,14 +26,11 @@ export const PLAYGROUND_COLLIDERS: PlaygroundCollider[] = [
   { minX: -21.15, maxX: -20.85, minZ: 9.85, maxZ: 10.15 },
   { minX: 20.85, maxX: 21.15, minZ: 9.85, maxZ: 10.15 },
   { minX: 22.85, maxX: 23.15, minZ: 9.85, maxZ: 10.15 },
-  { minX: -1.15, maxX: -0.85, minZ: 19.85, maxZ: 20.15 },
-  { minX: 0.85, maxX: 1.15, minZ: 19.85, maxZ: 20.15 },
 ];
 
 const swingCenters: [number, number, number][] = [
   [-22, 0, 10],
   [22, 0, 10],
-  [0, 0, 20],
 ];
 
 // Two independent seat spots on each wide swing: six children can be seated
