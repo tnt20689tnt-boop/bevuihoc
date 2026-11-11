@@ -154,26 +154,26 @@ export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }
     <group>
       {roomId === "library" && (
         <Html fullscreen zIndexRange={[250, 0]}>
-          <aside className="pointer-events-none fixed left-3 top-24 z-20 w-56 max-w-[48vw] sm:left-5 sm:top-28 sm:w-64">
-            <section className="pointer-events-auto overflow-hidden rounded-2xl border border-white/80 bg-[#fffaf0]/95 text-slate-800 shadow-xl backdrop-blur">
-              <header className="flex items-center justify-between bg-emerald-700 px-3 py-2.5 text-white">
-                <div><p className="text-xs font-black">👥 BÉ ĐANG Ở THƯ VIỆN</p><p className="text-[10px] text-emerald-100">Kết nối trực tiếp</p></div>
-                <span className="rounded-full bg-white/20 px-2 py-1 text-xs font-black">{peers.length + 1}</span>
+          <aside className="pointer-events-none fixed left-3 top-24 z-20 w-44 max-w-[38vw] sm:left-5 sm:top-28 sm:w-48">
+            <section className="pointer-events-auto overflow-hidden rounded-xl border border-white/80 bg-[#fffaf0]/95 text-slate-800 shadow-xl backdrop-blur">
+              <header className="flex items-center justify-between bg-emerald-700 px-2.5 py-1.5 text-white">
+                <div><p className="text-[10px] font-black">👥 BÉ ĐANG Ở THƯ VIỆN</p><p className="text-[9px] text-emerald-100">Kết nối trực tiếp</p></div>
+                <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-black">{peers.length + 1}</span>
               </header>
-              <div className="max-h-56 space-y-1 overflow-y-auto p-2">
-                <div className="flex items-center gap-2 rounded-xl bg-emerald-50 p-2">
-                  <span className="text-xl">🎓</span>
-                  <div className="min-w-0 flex-1"><p className="truncate text-xs font-extrabold">{profile.display_name || "Bạn"} (bạn)</p><p className="text-[10px] text-emerald-700">Lớp {profile.grade} · {locateShelf(positionRef.current.x, positionRef.current.z)}</p></div>
+              <div className="max-h-36 space-y-0.5 overflow-y-auto p-1.5">
+                <div className="flex items-center gap-2 rounded-lg bg-emerald-50 p-1.5">
+                  <span className="text-base">🎓</span>
+                  <div className="min-w-0 flex-1"><p className="truncate text-[10px] font-extrabold">{profile.display_name || "Bạn"} (bạn)</p><p className="text-[9px] text-emerald-700">Lớp {profile.grade} · {locateShelf(positionRef.current.x, positionRef.current.z)}</p></div>
                   <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 </div>
                 {peers.map((peer) => (
-                  <div key={peer.id} className="flex items-center gap-2 rounded-xl p-2 hover:bg-amber-50">
-                    <span className="text-xl">🧒</span>
-                    <div className="min-w-0 flex-1"><p className="truncate text-xs font-extrabold">{peer.name || "Bạn học"}</p><p className="text-[10px] text-slate-500">Lớp {peer.grade ?? "—"} · {locateShelf(peer.x, peer.z)}</p></div>
+                  <div key={peer.id} className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-amber-50">
+                    <span className="text-base">🧒</span>
+                    <div className="min-w-0 flex-1"><p className="truncate text-[10px] font-extrabold">{peer.name || "Bạn học"}</p><p className="text-[9px] text-slate-500">Lớp {peer.grade ?? "—"} · {locateShelf(peer.x, peer.z)}</p></div>
                     <span className="h-2 w-2 rounded-full bg-emerald-500" />
                   </div>
                 ))}
-                {peers.length === 0 && <p className="px-2 py-3 text-center text-[11px] text-slate-500">Chưa có bạn nào khác trong thư viện. Khi bạn bè vào, nhân vật sẽ hiện tại đây và trong không gian 3D.</p>}
+                {peers.length === 0 && <p className="px-1.5 py-2 text-center text-[9px] leading-4 text-slate-500">Chưa có bạn nào khác trong thư viện. Khi bạn bè vào, nhân vật sẽ hiện tại đây và trong không gian 3D.</p>}
               </div>
             </section>
           </aside>
