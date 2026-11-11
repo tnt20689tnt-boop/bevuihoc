@@ -18,7 +18,7 @@ const SUBJECTS: { id: ExamSubject; title: string; icon: string; color: string; d
   2:[{title:"Ôn tập Toán 2 - Cộng trừ trong 100",term:"mid1",duration:35,questions:15,type:"practice"},{title:"Đề thi học kỳ 1 Toán 2",term:"final1",duration:45,questions:20,type:"mock"}],
   3:[{title:"Ôn tập Toán 3 - Bảng nhân chia",term:"mid1",duration:40,questions:20,type:"practice"},{title:"Đề thi học kỳ 1 Toán 3",term:"final1",duration:50,questions:25,type:"mock"},{title:"Đề thi học kỳ 2 Toán 3",term:"final2",duration:50,questions:25,type:"mock"}],
   4:[{title:"Ôn tập Toán 4 - Phân số",term:"mid1",duration:45,questions:25,type:"practice"},{title:"Đề thi học kỳ 1 Toán 4",term:"final1",duration:60,questions:30,type:"mock"}],
-  5:[{title:"Ôn tập Toán 5 - Số thập phân",term:"mid1",duration:45,questions:25,type:"practice"},{title:"Đề thi thử vào lớp 6 - Toán (Đề 1)",term:"final1",duration:60,questions:30,type:"mock"},{title:"Đề thi thử vào lớp 6 - Toán (Đề 2)",term:"final2",duration:60,questions:30,type:"mock"}]}}
+  5:[{title:"Ôn tập Toán 5 - Số thập phân",term:"mid1",duration:45,questions:25,type:"practice"},{title:"Đề thi thử vào lớp 6 - Toán (Đề 1)",term:"final1",duration:60,questions:30,type:"mock"},{title:"Đề thi thử vào lớp 6 - Toán (Đề 2)",term:"final2",duration:60,questions:30,type:"mock"}]}
  },
  { id:"viet", title:"Tiếng Việt", icon:"📖", color:"#D9534F", docs:{
   1:[{title:"SGK Tiếng Việt 1 - Tập 1",author:"NXB Giáo Dục",year:2023},{title:"SGK Tiếng Việt 1 - Tập 2",author:"NXB Giáo Dục",year:2023},{title:"Tập viết chữ đẹp lớp 1",author:"Ngô Thị H",year:2022}],
@@ -30,7 +30,7 @@ const SUBJECTS: { id: ExamSubject; title: string; icon: string; color: string; d
   2:[{title:"Ôn tập Chính tả - Tập làm văn 2",term:"mid1",duration:35,questions:10,type:"practice"},{title:"Đề thi học kỳ 1 Tiếng Việt 2",term:"final1",duration:45,questions:12,type:"mock"}],
   3:[{title:"Ôn tập Luyện từ & câu lớp 3",term:"mid1",duration:40,questions:15,type:"practice"},{title:"Đề thi học kỳ 1 Tiếng Việt 3",term:"final1",duration:50,questions:15,type:"mock"},{title:"Đề thi học kỳ 2 Tiếng Việt 3",term:"final2",duration:50,questions:15,type:"mock"}],
   4:[{title:"Ôn tập Tập làm văn lớp 4",term:"mid1",duration:45,questions:12,type:"practice"},{title:"Đề thi học kỳ 1 Tiếng Việt 4",term:"final1",duration:60,questions:15,type:"mock"}],
-  5:[{title:"Ôn tập Nghị luận & Cảm thụ lớp 5",term:"mid1",duration:50,questions:10,type:"practice"},{title:"Đề thi thử vào lớp 6 - Tiếng Việt (Đề 1)",term:"final1",duration:60,questions:12,type:"mock"},{title:"Đề thi thử vào lớp 6 - Tiếng Việt (Đề 2)",term:"final2",duration:60,questions:12,type:"mock"}]}}
+  5:[{title:"Ôn tập Nghị luận & Cảm thụ lớp 5",term:"mid1",duration:50,questions:10,type:"practice"},{title:"Đề thi thử vào lớp 6 - Tiếng Việt (Đề 1)",term:"final1",duration:60,questions:12,type:"mock"},{title:"Đề thi thử vào lớp 6 - Tiếng Việt (Đề 2)",term:"final2",duration:60,questions:12,type:"mock"}]}
  },
  { id:"english", title:"Tiếng Anh", icon:"🔤", color:"#5CB85C", docs:{
   1:[{title:"English 1 - Student's Book",author:"NXB Giáo Dục",year:2023},{title:"My First Alphabet",author:"Oxford",year:2021},{title:"Bé học từ vựng qua hình",author:"Nguyễn Văn N",year:2022}],
@@ -42,7 +42,7 @@ const SUBJECTS: { id: ExamSubject; title: string; icon: string; color: string; d
   2:[{title:"Ôn tập Colors & Animals",term:"mid1",duration:25,questions:12,type:"practice"},{title:"Đề thi học kỳ 1 English 2",term:"final1",duration:35,questions:15,type:"mock"}],
   3:[{title:"Ôn tập Thì hiện tại đơn",term:"mid1",duration:30,questions:15,type:"practice"},{title:"Đề thi học kỳ 1 English 3",term:"final1",duration:40,questions:20,type:"mock"},{title:"Đề thi học kỳ 2 English 3",term:"final2",duration:40,questions:20,type:"mock"}],
   4:[{title:"Ôn tập Thì quá khứ & Từ vựng",term:"mid1",duration:35,questions:20,type:"practice"},{title:"Đề thi học kỳ 1 English 4",term:"final1",duration:45,questions:25,type:"mock"}],
-  5:[{title:"Ôn tập Ngữ pháp tổng hợp lớp 5",term:"mid1",duration:40,questions:25,type:"practice"},{title:"Đề thi thử vào lớp 6 - English (Đề 1)",term:"final1",duration:50,questions:30,type:"mock"},{title:"Đề thi thử vào lớp 6 - English (Đề 2)",term:"final2",duration:50,questions:30,type:"mock"}]}}
+  5:[{title:"Ôn tập Ngữ pháp tổng hợp lớp 5",term:"mid1",duration:40,questions:25,type:"practice"},{title:"Đề thi thử vào lớp 6 - English (Đề 1)",term:"final1",duration:50,questions:30,type:"mock"},{title:"Đề thi thử vào lớp 6 - English (Đề 2)",term:"final2",duration:50,questions:30,type:"mock"}]}
  }
 ];
 
