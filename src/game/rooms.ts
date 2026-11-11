@@ -50,6 +50,20 @@ export function portalBuildingPosition(portal: Portal): [number, number] {
   return [portal.x + (portal.x / length) * 4.5, portal.z + (portal.z / length) * 4.5];
 }
 
+export function portalBuildingRotation(portal: Portal): number {
+  // Keep the library facade parallel to the Vietnamese classroom so both
+  // buildings sit on the same visible row instead of the library looking recessed.
+  if (portal.to === "library") {
+    const vietnamesePortal = PLAZA_PORTALS.find((item) => item.to === "vietnamese");
+    if (vietnamesePortal) {
+      const [x, z] = portalBuildingPosition(vietnamesePortal);
+      return Math.atan2(-x, -z);
+    }
+  }
+  const [x, z] = portalBuildingPosition(portal);
+  return Math.atan2(-x, -z);
+}
+
 const EXIT: Portal = { to: "plaza", x: 0, z: 11 };
 
 export const ROOMS: Record<RoomId, RoomDef> = {
