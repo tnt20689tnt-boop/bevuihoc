@@ -3,7 +3,7 @@ import { Html } from "@react-three/drei";
 import { useGeneratedExam, type ExamSubject, type ExamTerm, type GeneratedQuestion } from "@/hooks/useGeneratedExam";
 import type { Grade } from "./types";
 
-type Props = { grade: Grade; shelfRequest?: { subject: ExamSubject; nonce: number } | null };
+type Props = { grade: Grade; requestedSubject?: ExamSubject | null; onRequestHandled?: () => void };
 type Doc = { title: string; author: string; year: number; pages?: number };
 type Exam = { title: string; term: ExamTerm; duration: number; questions: number; type: "practice" | "mock" };
 
@@ -71,13 +71,13 @@ SUBJECTS.forEach(s => {
  });
 });
 
-export function LibraryLearningPanel({ grade, shelfRequest }: Props) {
+export function LibraryLearningPanel({ grade, requestedSubject, onRequestHandled }: Props) {
  const [open,setOpen]=useState(false),[subject,setSubject]=useState<ExamSubject>("math"),[tab,setTab]=useState<"docs"|"exams">("docs");
  const [activeDoc,setActiveDoc]=useState<Doc|null>(null);
  const [examId,setExamId]=useState<string|null>(null),[questions,setQuestions]=useState<GeneratedQuestion[]>([]),[answers,setAnswers]=useState<Record<string,string>>({});
  const [result,setResult]=useState<{score:number;total_points:number;percentage:number}|null>(null),[busy,setBusy]=useState(false),[notice,setNotice]=useState("");
  const {createExam,loadQuestions,startAttempt,submitExam,error}=useGeneratedExam();
- useEffect(()=>{if(!shelfRequest)return;setSubject(shelfRequest.subject);setTab("docs");setExamId(null);setQuestions([]);setAnswers({});setResult(null);setNotice("");setActiveDoc(null);setOpen(true);},[shelfRequest?.nonce]);
+ useEffect(()=>{if(!requestedSubject)return;setSubject(requestedSubject);setTab("docs");setExamId(null);setQuestions([]);setAnswers({});setResult(null);setNotice("");setActiveDoc(null);setOpen(true);onRequestHandled?.();},[requestedSubject,onRequestHandled]);
  const selected=SUBJECTS.find(s=>s.id===subject)!;
  const totalDocs=SUBJECTS.reduce((n,s)=>n+s.docs[grade].length,0);
  const totalExams=SUBJECTS.reduce((n,s)=>n+s.exams[grade].length,0);
