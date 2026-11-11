@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Avatar } from "@/lib/avatar";
@@ -46,7 +45,6 @@ function initialLooks(saved: SalonAvatar): Record<string, Makeup> {
 }
 
 export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Profile; initialMode?: "makeup" | "model" }) {
-  const navigate = useNavigate();
   const saved = profile.avatar as SalonAvatar;
   const [activeId, setActiveId] = useState<string>(FIRST_PRINCESS.id);
   const [looks, setLooks] = useState(() => initialLooks(saved));
@@ -114,7 +112,7 @@ export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Pr
   return (
     <main className="flex h-[calc(100dvh-4rem)] min-h-0 w-full flex-col items-center overflow-hidden bg-gradient-to-b from-pink-200 via-pink-100 to-purple-200 px-2 py-2 font-sans">
       <div className="mb-2 flex w-full max-w-5xl shrink-0 items-center gap-2">
-        <button type="button" onClick={() => navigate({ to: "/the-gioi" })} className="shrink-0 rounded-xl border-2 border-white bg-white/90 px-3 py-2 text-sm font-extrabold text-pink-700 shadow-md hover:bg-white">← Trở về</button>
+        <button type="button" onClick={() => { window.location.href = "/the-gioi"; }} className="shrink-0 rounded-xl border-2 border-white bg-white/90 px-3 py-2 text-sm font-extrabold text-pink-700 shadow-md hover:bg-white">← Trở về</button>
         <h1 className="min-w-0 flex-1 text-center text-lg font-extrabold text-pink-600 drop-shadow-md sm:text-3xl">{activeMode === "model" ? "👗 XƯỞNG THIẾT KẾ NGƯỜI MẪU 👗" : "👑 TIỆM TRANG ĐIỂM CÔNG CHÚA 👑"}</h1>
         <span className="w-[84px] shrink-0" aria-hidden="true" />
       </div>
