@@ -259,6 +259,8 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     setSelected(null);
     setScore(0);
     setAnswered(0);
+    setAdvanceAt(null);
+    setAdvanceSeconds(0);
     onExit?.();
   };
 
@@ -323,7 +325,10 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
               <p className="text-lg font-black">{correct ? "🎉 Chính xác! Con giỏi lắm!" : "💪 Cố gắng nhé! Cùng thử câu tiếp theo."}</p>
               <p className="mt-1 text-sm">{question.explanation}</p>
               <p className="mt-2 text-xs">Điểm của con: {score} • Đã trả lời: {answered} câu</p>
-              <button onClick={nextQuestion} className="mt-4 rounded-full bg-amber-300 px-7 py-3 font-black text-slate-950">CÂU TIẾP THEO • CẢ ĐẤU TRƯỜNG →</button>
+              <div className="mt-4 rounded-xl border border-amber-200/30 bg-slate-950/30 px-4 py-3">
+                <p className="text-sm font-black text-amber-200">⏳ Câu tiếp theo tự động sau {advanceSeconds} giây</p>
+                <p className="mt-1 text-xs text-sky-100/80">Không thí sinh nào được tự bấm chuyển câu. Cả đấu trường sẽ cùng sang câu mới.</p>
+              </div>
             </div>
           )}
         </section>
