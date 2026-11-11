@@ -39,7 +39,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
       {portals.map((portal) => {
         const [x, z] = portalBuildingPosition(portal);
         const room = ROOMS[portal.to];
-        const yaw = Math.atan2(-x, -z);
+        const yaw = portalBuildingRotation(portal);
         const length = Math.hypot(x, z);
         return (
           <group key={portal.to}>
