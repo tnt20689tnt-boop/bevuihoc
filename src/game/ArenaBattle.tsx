@@ -256,7 +256,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     const message: GameMessage = { startsAt: Date.now() + 3000, question: next, questionIndex: nextIndex };
     applyGameStart(message);
     void channelRef.current?.send({ type: "broadcast", event: "next-question", payload: message });
-  }, [currentGrade, applyGameStart]);
+  }, [applyGameStart]);
 
   useEffect(() => {
     if (phase !== "playing" || advanceAt === null) return;
