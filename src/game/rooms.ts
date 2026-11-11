@@ -42,7 +42,7 @@ export const PLAZA_PORTALS: Portal[] = [
   { to: "girls", x: -8.91727, z: 6.777125 },
   { to: "boys", x: 10.052813, z: -11.599399 },
   { to: "arena", x: -10.052813, z: -11.599399 },
-  { to: "library", x: 15.5, z: -3.113766 },
+  { to: "library", x: 15.5, z: -2.577031 },
 ];
 
 export function portalBuildingPosition(portal: Portal): [number, number] {
