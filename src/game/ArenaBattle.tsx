@@ -8,7 +8,7 @@ import type { Profile } from "@/hooks/use-player";
 import { toAvatar, type Avatar } from "@/lib/avatar";
 import { generateQuestion, type Question, type Subject } from "./learningEngine";
 
-type Phase = "waiting" | "countdown" | "playing";
+type Phase = "waiting" | "countdown" | "playing" | "finished";
 type ArenaPlayer = {
   id: string;
   name: string;
@@ -17,7 +17,7 @@ type ArenaPlayer = {
   joinedAt: number;
   ready: boolean;
 };
-type GameMessage = { startsAt: number; question: Question; questionIndex: number };
+type GameMessage = { startsAt: number; question: Question; questionIndex: number; questions?: Question[] };
 type Props = { currentGrade: number; profile: Profile; onExit?: () => void };
 
 const SUBJECTS: Subject[] = ["math", "vietnamese", "english"];
@@ -27,9 +27,21 @@ const subjectName: Record<Subject, string> = {
   english: "Tiếng Anh",
 };
 
-function randomQuestion(grade: number): Question {
-  const subject = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)] ?? "math";
-  return generateQuestion(subject, grade, 50);
+const QUESTIONS_PER_MATCH = 10;
+function createMatchQuestions(grade: number): Question[] {
+  const questions: Question[] = [];
+  const seen = new Set<string>();
+  let attempts = 0;
+  while (questions.length < QUESTIONS_PER_MATCH && attempts < 500) {
+    attempts++;
+    const subject = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)] ?? "math";
+    const candidate = generateQuestion(subject, grade, 50);
+    const key = `${candidate.subject}:${candidate.question.trim().toLocaleLowerCase()}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    questions.push(candidate);
+  }
+  return questions;
 }
 
 function PlayerPodium({ player, index }: { player: ArenaPlayer; index: number }) {
@@ -100,6 +112,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const [answered, setAnswered] = useState(0);
   const [advanceAt, setAdvanceAt] = useState<number | null>(null);
   const [advanceSeconds, setAdvanceSeconds] = useState(0);
+  const matchQuestionsRef = useRef<Question[]>([]);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const lastQuestionAction = useRef(0);
   const questionIndexRef = useRef(0);
@@ -126,6 +139,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     setAnswered(0);
     setAdvanceAt(null);
     setAdvanceSeconds(0);
+    if (message.questions?.length) matchQuestionsRef.current = message.questions;
   }, []);
 
   useEffect(() => {
@@ -163,6 +177,12 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         if (message.questionIndex === questionIndexRef.current && typeof message.advanceAt === "number") {
           setAdvanceAt((current) => current === null ? message.advanceAt! : Math.min(current, message.advanceAt!));
         }
+      })
+      .on("broadcast", { event: "match-finished" }, () => {
+        if (!alive) return;
+        setPhase("finished");
+        setAdvanceAt(null);
+        setAdvanceSeconds(0);
       })
       .on("broadcast", { event: "next-question" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
@@ -204,9 +224,12 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     if (phase !== "waiting" || players.length < 2 || !players.every((player) => player.ready)) return;
     if (players[0]?.id !== profile.id || startSentRef.current) return;
     startSentRef.current = true;
+    const questions = createMatchQuestions(currentGrade);
+    matchQuestionsRef.current = questions;
     const message: GameMessage = {
       startsAt: Date.now() + 3000,
-      question: randomQuestion(currentGrade),
+      question: questions[0]!,
+      questions,
       questionIndex: 1,
     };
     applyGameStart(message);
@@ -216,11 +239,21 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const nextQuestion = useCallback(() => {
     if (Date.now() - lastQuestionAction.current < 1200) return;
     lastQuestionAction.current = Date.now();
-    const message: GameMessage = {
-      startsAt: Date.now() + 3000,
-      question: randomQuestion(currentGrade),
-      questionIndex: questionIndexRef.current + 1,
-    };
+    if (questionIndexRef.current >= QUESTIONS_PER_MATCH) {
+      setPhase("finished");
+      setAdvanceAt(null);
+      void channelRef.current?.send({ type: "broadcast", event: "match-finished", payload: { total: QUESTIONS_PER_MATCH } });
+      return;
+    }
+    const nextIndex = questionIndexRef.current + 1;
+    const next = matchQuestionsRef.current[nextIndex - 1];
+    if (!next) {
+      setPhase("finished");
+      setAdvanceAt(null);
+      void channelRef.current?.send({ type: "broadcast", event: "match-finished", payload: { total: questionIndexRef.current } });
+      return;
+    }
+    const message: GameMessage = { startsAt: Date.now() + 3000, question: next, questionIndex: nextIndex };
     applyGameStart(message);
     void channelRef.current?.send({ type: "broadcast", event: "next-question", payload: message });
   }, [currentGrade, applyGameStart]);
@@ -253,6 +286,9 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     const activeChannel = channelRef.current;
     if (activeChannel) void supabase.removeChannel(activeChannel);
     channelRef.current = null;
+    matchQuestionsRef.current = [];
+    questionIndexRef.current = 0;
+    startSentRef.current = false;
     setPhase("waiting");
     setStartsAt(null);
     setQuestion(null);
@@ -304,11 +340,21 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         </section>
       )}
 
+      {phase === "finished" && (
+        <section className="mx-auto mt-5 max-w-2xl rounded-3xl border border-amber-200/40 bg-white/10 p-6 text-center">
+          <div className="text-5xl">🏆</div>
+          <h2 className="mt-3 text-2xl font-black text-amber-200">HOÀN THÀNH 10 CÂU HỎI!</h2>
+          <p className="mt-2 text-sky-100">Con đã trả lời {answered} câu và đạt {score} điểm.</p>
+          <p className="mt-1 text-sm text-sky-100/80">Trận đấu đã kết thúc. Chờ các bé trở về sảnh để bắt đầu lượt mới.</p>
+          <button onClick={leaveCompetition} className="mt-5 rounded-full bg-amber-300 px-7 py-3 font-black text-slate-950">VỀ SẢNH ĐẤU TRƯỜNG</button>
+        </section>
+      )}
+
       {phase === "playing" && question && (
         <section className="mx-auto mt-5 max-w-3xl rounded-3xl border border-sky-200/30 bg-white/10 p-4 sm:p-6">
           <div className="flex flex-wrap items-center justify-between gap-2 text-xs font-black text-amber-200">
             <span>🎲 CÂU HỎI NGẪU NHIÊN • {subject.toUpperCase()}</span>
-            <span>CÂU {questionIndex}</span>
+            <span>CÂU {questionIndex}/{QUESTIONS_PER_MATCH}</span>
           </div>
           <h2 className="mt-4 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
