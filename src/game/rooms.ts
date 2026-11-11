@@ -197,10 +197,10 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     portals: [EXIT],
     activities: [],
     obstacles: [
-      { x: -22, z: -27, r: 2.25 },
-      { x: 0, z: -27, r: 2.25 },
-      { x: 22, z: -27, r: 2.25 },
-      { x: 0, z: 16, r: 1.65 },
+      { x: -12, z: -25, r: 2.25 },
+      { x: 0, z: -25, r: 2.25 },
+      { x: 12, z: -25, r: 2.25 },
+      { x: 0, z: 12, r: 2.55 },
     ],
   },
   boys: {
