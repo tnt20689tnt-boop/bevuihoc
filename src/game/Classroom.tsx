@@ -22,7 +22,7 @@ export function Classroom({
   const darkMetal = "#35434b";
 
   return (
-    <group position={position} rotation={[0, rotationY, 0]}>
+    <group position={position} rotation={[0, rotationY, 0]} userData={{ cameraOccluder: true }}>
       <mesh receiveShadow position={[0, 0.06, depth / 2 + 0.48]}>
         <boxGeometry args={[width + 0.8, 0.12, 1.05]} />
         <meshStandardMaterial color="#d8cbb5" roughness={0.9} />
