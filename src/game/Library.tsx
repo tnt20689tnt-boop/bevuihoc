@@ -5,6 +5,7 @@ import {ReadingTable} from "./ReadingTable";
 import {useLibrary} from "@/hooks/useLibrary";
 import {BookPopup} from "@/components/BookPopup";
 import {BookReader} from "@/components/BookReader";
+import {LibraryLearningPanel} from "@/game/LibraryLearningPanel";
 import type {Book,Grade,Subject} from "./types";
 type Props={currentGrade:Grade};
 export function Library({currentGrade}:Props){
@@ -13,6 +14,7 @@ export function Library({currentGrade}:Props){
  const visible=useMemo(()=>books.filter(b=>b.grade===currentGrade),[books,currentGrade]);const borrowed=useMemo(()=>new Set(loans.map(l=>l.book_id)),[loans]);
  const loan=selected?loans.find(l=>l.book_id===selected.id):undefined;const active=selected?(books.find(b=>b.id===selected.id)??selected):null;
  return <group>
+ <LibraryLearningPanel grade={currentGrade}/>
  <mesh position={[0,.025,0]} rotation={[-Math.PI/2,0,0]} receiveShadow><planeGeometry args={[14,12]}/><meshStandardMaterial color="#b68b61" roughness={.86}/></mesh>
  <mesh position={[0,2.1,-6]} userData={{ cameraOccluder: true }}><boxGeometry args={[14,4.2,.22]}/><meshStandardMaterial color="#eee6d8"/></mesh>
  {[-1,1].map(s=><mesh key={s} position={[s*7,2.1,0]} userData={{ cameraOccluder: true }}><boxGeometry args={[.22,4.2,12]}/><meshStandardMaterial color="#eee6d8"/></mesh>)}
