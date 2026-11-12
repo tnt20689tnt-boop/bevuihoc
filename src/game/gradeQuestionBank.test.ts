@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { generateGradeQuestions, type PracticeSubject } from "./gradeQuestionBank";
+import { generateGradeQuestions, getPracticeDifficultyBand, type PracticeSubject } from "./gradeQuestionBank";
 
 describe("grade and 100-level practice question bank", () => {
+  it("raises the language-skill band every 20 Levels", () => {
+    expect([1, 20, 21, 40, 41, 60, 61, 80, 81, 100].map(getPracticeDifficultyBand))
+      .toEqual([1, 1, 2, 2, 3, 3, 4, 4, 5, 5]);
+  });
+
   it("creates five distinct, valid questions for every subject, grade, and level without repeating prompts", () => {
     const subjects: PracticeSubject[] = ["math", "vietnamese", "english"];
     for (const subject of subjects) {
