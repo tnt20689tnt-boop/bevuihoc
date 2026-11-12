@@ -156,27 +156,56 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`Tiếng nào có âm đầu “${onset}”?`, answer, ["bàn", "mèo", "cô", "gỗ", "hoa"].filter(x => x !== answer), "Nghe âm đầu tiên khi đọc tiếng.");
     }
     if (stageKind === 2) return make(`Từ nào có vần “${word.slice(-2)}”?`, word, ["bàn", "mẹ", "cá", "bé"].filter(x => x !== word).concat(["nhà"]), "Đọc phần vần ở cuối tiếng.");
-    if (stageKind === 3) return make("Câu nào được viết đúng đầu câu và dấu kết thúc?", "Bé đi học.", ["bé đi học.", "Bé đi học", "bé đi học"], "Đầu câu viết hoa và cuối câu có dấu câu.");
-    return make("Từ nào chỉ hoạt động?", pick(["chạy", "đọc", "hát", "viết"]), ["cái bàn", "bông hoa", "màu đỏ"], "Từ chỉ hoạt động cho biết người hoặc vật làm gì.");
+    if (stageKind === 3) {
+      const action = pick(["đi học", "đọc sách", "vẽ tranh", "đá bóng", "hát múa"]);
+      const correct = `${name} ${action}.`;
+      return make(`Chọn cách viết đúng câu: “${name} ${action}”.`, correct, [`${name.toLowerCase()} ${action}.`, `${correct.slice(0, -1)}`, `${name.toUpperCase()} ${action}.`], "Đầu câu viết hoa và cuối câu có dấu chấm.");
+    }
+    const action = pick(["chạy", "đọc", "hát", "viết", "vẽ", "nhảy", "bơi", "cười"]);
+    return make(`Trong câu “${name} đang ${action}”, từ nào chỉ hoạt động?`, action, [name, "đang", "bạn"], "Từ chỉ hoạt động cho biết người hoặc vật làm gì.");
   }
   if (grade === 2) {
-    if (stageKind === 0) return make("Từ nào chỉ sự vật?", pick(["quyển vở", "cây bàng", "con mèo", "cô giáo"]), ["chạy", "xinh đẹp", "nhanh chóng"], "Từ chỉ sự vật gọi tên người, vật, cây cối.");
-    if (stageKind === 1) return make("Từ nào chỉ đặc điểm?", pick(["hiền lành", "xanh biếc", "cao lớn", "chăm ngoan"]), ["đọc sách", "cái bàn", "học sinh"], "Từ chỉ đặc điểm nêu tính chất hoặc màu sắc.");
-    if (stageKind === 2) return make("Từ nào chỉ hoạt động?", pick(["đang viết", "nhảy dây", "đọc sách", "quét nhà"]), ["màu đỏ", "hiền hậu", "quyển truyện"], "Từ chỉ hoạt động trả lời câu hỏi làm gì.");
+    if (stageKind === 0) {
+      const noun = pick(["quyển vở", "cây bàng", "con mèo", "cô giáo", "chiếc xe", "bông hoa", "dòng sông", "ngôi trường"]);
+      return make(`Trong câu “${name} nhìn thấy ${noun}”, từ nào chỉ sự vật?`, noun, ["chạy", "xinh đẹp", "nhanh chóng"], "Từ chỉ sự vật gọi tên người, vật, cây cối.");
+    }
+    if (stageKind === 1) {
+      const adjective = pick(["hiền lành", "xanh biếc", "cao lớn", "chăm ngoan", "dịu dàng", "rực rỡ", "sạch sẽ", "vui vẻ"]);
+      return make(`Bạn ${name} được khen là “${adjective}”. Từ nào chỉ đặc điểm?`, adjective, ["đọc sách", "cái bàn", "học sinh"], "Từ chỉ đặc điểm nêu tính chất hoặc màu sắc.");
+    }
+    if (stageKind === 2) {
+      const action = pick(["đang viết", "nhảy dây", "đọc sách", "quét nhà", "tưới cây", "xếp hàng", "đàn hát", "tập thể dục"]);
+      return make(`Mỗi sáng, ${name} thường ${action}. Cụm từ nào chỉ hoạt động?`, action, ["màu đỏ", "hiền hậu", "quyển truyện"], "Từ chỉ hoạt động trả lời câu hỏi làm gì.");
+    }
     if (stageKind === 3) return make(`Từ trái nghĩa với “${pair[0]}” là gì?`, pair[2], [pair[1], pair[3], "vui vẻ"], "Tìm từ có nghĩa trái ngược.");
     return make("Câu nào là câu hỏi?", `Bạn ${name} học lớp mấy?`, [`Bạn ${name} học lớp hai.`, `Ôi, quyển sách đẹp quá!`, `Hãy mở sách ra.`], "Câu hỏi dùng để hỏi và thường kết thúc bằng dấu hỏi.");
   }
   if (grade === 3) {
-    if (stageKind === 0) return make("Từ nào là danh từ?", pick(["học sinh", "dòng sông", "ước mơ", "cánh đồng"]), ["chạy", "xanh", "nhanh nhẹn"], "Danh từ gọi tên người, vật, hiện tượng, khái niệm.");
-    if (stageKind === 1) return make("Từ nào là động từ?", pick(["suy nghĩ", "bảo vệ", "xây dựng", "lắng nghe"]), ["bầu trời", "xinh đẹp", "thông minh"], "Động từ chỉ hoạt động hoặc trạng thái.");
-    if (stageKind === 2) return make("Từ nào là tính từ?", pick(["trong trẻo", "rộng lớn", "dũng cảm", "dịu dàng"]), ["học tập", "bàn ghế", "cây cối"], "Tính từ chỉ đặc điểm, tính chất.");
+    if (stageKind === 0) {
+      const noun = pick(["học sinh", "dòng sông", "ước mơ", "cánh đồng", "bầu trời", "bác sĩ", "tiếng chim", "tình bạn"]);
+      return make(`Trong câu “${name} ngắm ${noun}”, từ nào là danh từ?`, noun, ["chạy", "xanh", "nhanh nhẹn"], "Danh từ gọi tên người, vật, hiện tượng, khái niệm.");
+    }
+    if (stageKind === 1) {
+      const verb = pick(["suy nghĩ", "bảo vệ", "xây dựng", "lắng nghe", "tìm hiểu", "chia sẻ", "khám phá", "giúp đỡ"]);
+      return make(`Trong câu “${name} ${verb} thiên nhiên”, từ nào là động từ?`, verb, ["bầu trời", "xinh đẹp", "thông minh"], "Động từ chỉ hoạt động hoặc trạng thái.");
+    }
+    if (stageKind === 2) {
+      const adjective = pick(["trong trẻo", "rộng lớn", "dũng cảm", "dịu dàng", "kiên trì", "mênh mông", "thân thiện", "sáng suốt"]);
+      return make(`Từ nào miêu tả đặc điểm của ${name} trong cụm “${name} rất ${adjective}”?`, adjective, ["học tập", "bàn ghế", "cây cối"], "Tính từ chỉ đặc điểm, tính chất.");
+    }
     if (stageKind === 3) return make(`Trong câu “${name} chăm chỉ đọc sách”, từ nào chỉ hoạt động?`, "đọc", ["chăm chỉ", name, "sách"], "Động từ nêu hoạt động của chủ thể.");
-    return make("Thành ngữ nào khuyên con người biết yêu thương nhau?", "Thương người như thể thương thân", ["Có công mài sắt có ngày nên kim", "Đi một ngày đàng học một sàng khôn", "Ăn quả nhớ kẻ trồng cây"], "Chọn câu nói trực tiếp về lòng nhân ái.");
+    return make("Tục ngữ nào khuyên con người biết yêu thương nhau?", "Thương người như thể thương thân", ["Có công mài sắt có ngày nên kim", "Đi một ngày đàng học một sàng khôn", "Ăn quả nhớ kẻ trồng cây"], "Chọn câu nói trực tiếp về lòng nhân ái.");
   }
   if (grade === 4) {
     if (stageKind === 0) return make("Câu nào thuộc kiểu câu kể Ai làm gì?", `${name} đang chăm sóc vườn rau.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, vườn rau đẹp quá!`], "Kiểu câu này nêu chủ thể và hoạt động.");
-    if (stageKind === 1) return make("Từ nào là từ láy?", pick(["lung linh", "rì rào", "lấp lánh", "xanh xao"]), ["bàn ghế", "sách vở", "học sinh"], "Từ láy có sự lặp lại âm hoặc vần.");
-    if (stageKind === 2) return make("Từ nào là từ ghép?", pick(["bảo vệ", "học sinh", "quê hương", "chăm học"]), ["long lanh", "lấp lánh", "rì rào"], "Từ ghép gồm các tiếng có quan hệ về nghĩa.");
+    if (stageKind === 1) {
+      const reduplicative = pick(["lung linh", "rì rào", "lấp lánh", "xanh xao", "long lanh", "ào ào", "thăm thẳm", "lập lòe"]);
+      return make(`Từ nào là từ láy trong nhóm: ${reduplicative}, bàn ghế, sách vở, học sinh?`, reduplicative, ["bàn ghế", "sách vở", "học sinh"], "Từ láy có sự lặp lại âm hoặc vần.");
+    }
+    if (stageKind === 2) {
+      const compound = pick(["bảo vệ", "học sinh", "quê hương", "bàn ghế", "sách vở", "hoa quả", "nhà cửa", "thầy cô"]);
+      return make(`Từ nào là từ ghép trong nhóm: ${compound}, long lanh, lấp lánh, rì rào?`, compound, ["long lanh", "lấp lánh", "rì rào"], "Từ ghép gồm các tiếng có quan hệ về nghĩa.");
+    }
     if (stageKind === 3) return make(`Trong câu “${name} đang đọc truyện”, chủ ngữ là gì?`, name, ["đang đọc", "đọc truyện", "truyện"], "Chủ ngữ thường trả lời câu hỏi Ai hoặc Cái gì.");
     return make("Câu nào là câu khiến?", "Em hãy giữ gìn sách vở nhé!", ["Sách vở rất đẹp.", "Ai đang giữ sách?", "Ôi, sách mới đẹp quá!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
   }
