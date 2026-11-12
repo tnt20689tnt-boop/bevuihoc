@@ -70,29 +70,21 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`${a} - ${b} = ?`, String(answer), [String(answer + 1), String(Math.max(0, answer - 1)), String(a + b)], "Trừ theo từng hàng, chú ý mượn nếu cần.");
     }
     if (kind === 3) {
-      const a = int(2, 5), b = int(2, 9), answer = a * b;
+      const a = int(2, Math.min(10, 2 + Math.floor(scale / 15))), b = int(2, 9), answer = a * b;
       return make(`${a} × ${b} = ?`, String(answer), [String(answer + a), String(answer - b), String(answer + 2)], "Dùng phép cộng lặp hoặc bảng nhân.");
     }
     const a = int(2, 5), answer = int(2, 9), total = a * answer;
-    return make(`${total} : ${a} = ?`, String(answer), [String(answer + 1), String(Math.max(1, answer - 1)), String(total + a)], "Tìm số mà nhân với ${a} được ${total}.");
+    return make(`${total} : ${a} = ?`, String(answer), [String(answer + 1), String(Math.max(1, answer - 1)), String(total + a)], `Tìm số mà nhân với ${a} được ${total}.`);
   }
   if (grade === 3) {
     const kind = int(0, 4), max = Math.min(10000, 100 + scale * 100);
     if (kind === 0) {
-    const precision = scale <= 20 ? 1 : scale <= 60 ? 2 : 3;
-    const factor = 10 ** precision;
-    const maxValue = Math.min(110, 10 + scale);
-    const a = int(factor, Math.round(maxValue * factor)) / factor;
-    const b = int(factor, Math.round(maxValue * factor)) / factor;
-    const answer = Math.round((a + b) * factor) / factor;
-    return make(`${a.toFixed(precision)} + ${b.toFixed(precision)} = ?`, answer.toFixed(precision), [(answer + 1 / factor).toFixed(precision), (answer - 1 / factor).toFixed(precision), (answer + 1).toFixed(precision)], "Đặt thẳng hàng các chữ số cùng hàng thập phân.");
-  }
-  if (kind === 1) {
-      const subject = pick(["They", "We", "I", "My friends", "The children", "He", "She", "My brother", "My sister"]);
-      const answer = ["He", "She", "My brother", "My sister"].includes(subject) ? "has" : "have";
-      const object = pick(["two storybooks", "a new school bag", "three pencils", "a red bicycle"]);
-      const context = pick(["at home", "before school", "in the classroom", "during the English lesson"]);
-      return make(`${subject} ___ ${object} ${context}.`, answer, ["has", "have", "having"].filter(x => x !== answer).concat(["is"]), "Dùng have với I, you, we, they và has với he, she, it.");
+      const a = int(2, Math.min(999, 2 + scale * 10)), b = int(2, 9), answer = a * b;
+      return make(`${a} × ${b} = ?`, String(answer), [String(answer + a), String(Math.max(0, answer - b)), String(a + b)], "Nhân số có nhiều chữ số với số có một chữ số.");
+    }
+    if (kind === 1) {
+      const divisor = int(2, 9), answer = int(2, 10 + scale * 2), total = divisor * answer;
+      return make(`${total} : ${divisor} = ?`, String(answer), [String(answer + 1), String(Math.max(1, answer - 1)), String(total - divisor)], "Dùng phép nhân để kiểm tra kết quả phép chia.");
     }
     if (kind === 2) {
       const a = int(100, max), b = int(100, max), answer = a + b;
@@ -102,8 +94,8 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
       const a = int(10, 30 + scale * 10), b = int(5, 20 + scale * 5), answer = 2 * (a + b);
       return make(`Hình chữ nhật dài ${a} cm, rộng ${b} cm. Chu vi là bao nhiêu?`, `${answer} cm`, [`${a + b} cm`, `${a * b} cm`, `${answer + 2} cm`], "Chu vi = (chiều dài + chiều rộng) × 2.");
     }
-    const a = int(2, 9), b = int(2, 9), answer = a * b;
-    return make(`Có ${a} hộp, mỗi hộp ${b} chiếc bút. Có tất cả bao nhiêu chiếc bút?`, String(answer), [String(answer + a), String(answer - b), String(a + b)], "Số đồ vật bằng số hộp nhân số đồ vật mỗi hộp.");
+    const boxes = int(2, Math.min(20, 2 + Math.floor(scale / 5))), pencils = int(2, 9), answer = boxes * pencils;
+    return make(`Có ${boxes} hộp, mỗi hộp ${pencils} chiếc bút. Có tất cả bao nhiêu chiếc bút?`, String(answer), [String(answer + boxes), String(Math.max(0, answer - pencils)), String(boxes + pencils)], "Số đồ vật bằng số hộp nhân số đồ vật mỗi hộp.");
   }
   if (grade === 4) {
     const kind = int(0, 4), max = 1000 + scale * 9000;
