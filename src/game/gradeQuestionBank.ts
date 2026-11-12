@@ -206,11 +206,13 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   if (grade === 3) {
     if (stageKind === 0) {
       const noun = pick(["học sinh", "dòng sông", "ước mơ", "cánh đồng", "bầu trời", "bác sĩ", "tiếng chim", "tình bạn"]);
-      const scene = pick(["trên đường đến trường", "trong buổi tham quan", "ở công viên", "trong bài văn"]);\n      return make(`Trong câu “${name} ngắm ${noun} ${scene}”, từ nào là danh từ?`, noun, ["chạy", "xanh", "nhanh nhẹn"], "Danh từ gọi tên người, vật, hiện tượng, khái niệm.");
+      const scene = pick(["trên đường đến trường", "trong buổi tham quan", "ở công viên", "trong bài văn"]);
+      return make(`Trong câu “${name} ngắm ${noun} ${scene}”, từ nào là danh từ?`, noun, ["chạy", "xanh", "nhanh nhẹn"], "Danh từ gọi tên người, vật, hiện tượng, khái niệm.");
     }
     if (stageKind === 1) {
       const verb = pick(["suy nghĩ", "bảo vệ", "xây dựng", "lắng nghe", "tìm hiểu", "chia sẻ", "khám phá", "giúp đỡ"]);
-      const object = pick(["thiên nhiên", "bạn bè", "quê hương", "môi trường"]);\n      return make(`Trong câu “${name} ${verb} ${object} mỗi ngày”, từ nào là động từ?`, verb, ["bầu trời", "xinh đẹp", "thông minh"], "Động từ chỉ hoạt động hoặc trạng thái.");
+      const object = pick(["thiên nhiên", "bạn bè", "quê hương", "môi trường"]);
+      return make(`Trong câu “${name} ${verb} ${object} mỗi ngày”, từ nào là động từ?`, verb, ["bầu trời", "xinh đẹp", "thông minh"], "Động từ chỉ hoạt động hoặc trạng thái.");
     }
     if (stageKind === 2) {
       const adjective = pick(["trong trẻo", "rộng lớn", "dũng cảm", "dịu dàng", "kiên trì", "mênh mông", "thân thiện", "sáng suốt"]);
@@ -238,7 +240,8 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     }
     if (stageKind === 3) { const activity = pick(["đang đọc truyện", "đang tưới cây", "đang viết bài", "đang chăm sóc hoa"]); const object = pick(["trong vườn", "ở lớp", "sau giờ học"]); const context = pick(["trong giờ luyện ngữ pháp", "khi phân tích câu", "ở bài tập đọc hiểu", "trong vở bài tập"]); return make(`${context}: trong câu “${name} ${activity} ${object}”, chủ ngữ là gì?`, name, [activity, object, "truyện"], "Chủ ngữ thường trả lời câu hỏi Ai hoặc Cái gì."); }
     const request = pick(["hãy giữ gìn sách vở", "giúp cô xếp bàn ghế", "đọc bài thật kỹ", "chăm sóc cây xanh"]);
-    const context = pick(["trong giờ học", "khi làm việc nhóm", "ở thư viện", "trong buổi lao động"]);\n    return make(`Bạn ${name} muốn nhờ các bạn ${request} ${context}. Câu nào là câu khiến?`, `Các bạn hãy ${request} nhé!`, [`Các bạn đang ${request}.`, `Ai đã ${request}?`, "Ôi, việc đó thật vui!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
+    const context = pick(["trong giờ học", "khi làm việc nhóm", "ở thư viện", "trong buổi lao động"]);
+    return make(`Bạn ${name} muốn nhờ các bạn ${request} ${context}. Câu nào là câu khiến?`, `Các bạn hãy ${request} nhé!`, [`Các bạn đang ${request}.`, `Ai đã ${request}?`, "Ôi, việc đó thật vui!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
   }
   if (stageKind === 0) {
     const pronoun = pick(["Chúng em", "Chúng tôi", "Mình", "Tôi", "Các bạn"]);
