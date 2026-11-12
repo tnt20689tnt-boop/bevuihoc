@@ -243,7 +243,8 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   if (stageKind === 0) {
     const pronoun = pick(["Chúng em", "Chúng tôi", "Mình", "Tôi", "Các bạn"]);
     const action = pick(["bảo vệ môi trường", "đọc sách mỗi ngày", "giúp đỡ bạn bè", "chăm sóc vườn trường"]);
-    const context = pick(["trong giờ sinh hoạt", "ở câu lạc bộ", "trong buổi lao động", "sau giờ học"]);\n    return make(`Bạn ${name} viết câu ${context}: “${pronoun} cùng nhau ${action}”. Đại từ xưng hô là từ nào?`, pronoun, ["cùng nhau", action, "mỗi ngày"], "Đại từ xưng hô dùng để chỉ người đang nói, nghe hoặc được nhắc đến.");
+    const context = pick(["trong giờ sinh hoạt", "ở câu lạc bộ", "trong buổi lao động", "sau giờ học"]);
+    return make(`Bạn ${name} viết câu ${context}: “${pronoun} cùng nhau ${action}”. Đại từ xưng hô là từ nào?`, pronoun, ["cùng nhau", action, "mỗi ngày"], "Đại từ xưng hô dùng để chỉ người đang nói, nghe hoặc được nhắc đến.");
   }
   if (stageKind === 1) {
     const relations = [
