@@ -325,7 +325,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
     if (kind === 0) {
       const subject = pick(["Mai", "Nam", "Linh", "My brother", "My sister", "Tom"]);
       const verb = pick(["go", "walk", "cycle", "travel"]);
-      return make(`Complete: ${subject} ___ to school every day.`, `${verb}s`, [verb, `${verb}ing`, `${verb}ed`], "Với chủ ngữ số ít ở hiện tại đơn, động từ thường thêm -s.");
+      const context = pick(["on weekdays", "before 7 a.m.", "with a friend", "by bus", "after breakfast"]);\n      return make(`Complete: ${subject} ___ to school ${context}.`, `${verb}s`, [verb, `${verb}ing`, `${verb}ed`], "Với chủ ngữ số ít ở hiện tại đơn, động từ thường thêm -s.");
     }
     if (kind === 1) {
       const subject = pick(["They", "We", "I", "My friends", "The children"]);
@@ -349,17 +349,62 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`${name} needs the opposite of “${item[0]}” ${context}. Which word is correct?`, item[1], opposites.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ có nghĩa trái ngược.");
   }
   if (grade === 4) {
-    if (kind === 0) return make("Complete: We ___ football yesterday.", "played", ["play", "plays", "playing"], "Yesterday thường đi với thì quá khứ đơn.");
-    if (kind === 1) return make("Look! The children ___ in the park.", "are playing", ["play", "plays", "played"], "Look! diễn tả hành động đang xảy ra.");
-    if (kind === 2) return make("A giraffe is ___ than a goat.", "taller", ["tall", "tallest", "more tall"], "So sánh hơn với tính từ ngắn: thêm -er.");
-    if (kind === 3) return make("Choose the correct adverb of frequency: I ___ brush my teeth twice a day.", "always", ["yesterday", "tomorrow", "last"], "Always diễn tả tần suất.");
-    return make("Choose the correct question: ___ did you go yesterday?", "Where", ["Who", "How much", "What color"], "Where hỏi địa điểm.");
+    if (kind === 0) {
+      const subject = pick(["We", "Mai", "Nam", "My friends", "The children"]);
+      const activity = pick(["football", "badminton", "chess", "volleyball"]);
+      const context = pick(["after school", "at the sports center", "last weekend", "in the playground", "with our classmates"]);
+      return make(`${subject} ___ ${activity} ${context}.`, "played", ["play", "plays", "playing"], "Yesterday hoặc mốc thời gian quá khứ đi với thì quá khứ đơn.");
+    }
+    if (kind === 1) {
+      const subject = pick(["The children", "Mai and Nam", "My friends", "The boys"]);
+      const activity = pick(["running", "dancing", "singing", "playing"]);
+      const context = pick(["in the school yard", "at the park", "near the playground", "after class", "during break time"]);
+      return make(`Look! ${subject} ___ ${context}.`, `are ${activity}`, ["play", "plays", "played"], "Look! diễn tả hành động đang xảy ra; dùng am/is/are + V-ing.");
+    }
+    if (kind === 2) {
+      const pairs = [["A giraffe", "a goat", "tall", "taller"], ["An elephant", "a dog", "big", "bigger"], ["A train", "a bicycle", "fast", "faster"], ["A whale", "a fish", "large", "larger"]];
+      const item = pick(pairs);
+      const context = pick(["in the animal world", "on a race track", "in a size comparison", "in a science lesson", "in the story"]);
+      return make(`${item[0]} is ___ than ${item[1]} ${context}.`, item[3], [item[2], `${item[2]}est`, `more ${item[2]}`], "Dùng dạng so sánh hơn để so sánh hai sự vật.");
+    }
+    if (kind === 3) {
+      const subject = pick(["I", "We", "Mai", "Nam", "My sister"]);
+      const action = pick(["brush my teeth", "do homework", "read books", "help my parents"]);
+      const context = pick(["before bedtime", "after school", "every morning", "on weekdays", "at home"]);
+      return make(`${subject} ___ ${action} ${context}.`, "always", ["yesterday", "tomorrow", "last"], "Always diễn tả tần suất.");
+    }
+    const prompts = [["ask about a place", "Where"], ["ask about a person", "Who"], ["ask about a time", "When"], ["ask about a reason", "Why"]];
+    const item = pick(prompts);
+    const context = pick(["in an interview", "during a conversation", "at school", "when planning a trip", "in a story"]);
+    return make(`${name} wants to ${item[0]} ${context}. Which question word should be used?`, item[1], prompts.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ để hỏi phù hợp với thông tin cần biết.");
   }
-  if (kind === 0) return make("Complete: We ___ visit our grandparents tomorrow.", "will", ["did", "are", "was"], "Will dùng để nói về tương lai.");
-  if (kind === 1) return make("Choose the superlative form of “small”.", "smallest", ["smaller", "more small", "most small"], "Tính từ ngắn thường thêm -est ở so sánh nhất.");
-  if (kind === 2) return make("Choose the correct advice: You ___ wear a helmet when riding a bike.", "should", ["shouldn't to", "are", "did"], "Should dùng để đưa ra lời khuyên.");
-  if (kind === 3) return make("Choose the correct conjunction: I stayed home ___ I was ill.", "because", ["but", "or", "although of"], "Because nêu lý do.");
-  return make("Complete: She ___ to the museum last Sunday.", "went", ["go", "goes", "going"], "Go có dạng quá khứ là went.");
+  if (kind === 0) {
+    const subject = pick(["We", "I", "Mai", "Nam", "My family"]);
+    const activity = pick(["visit our grandparents", "go to the museum", "have a picnic", "travel to Da Nang"]);
+    const context = pick(["next Sunday", "during the summer holiday", "after the exam", "next weekend", "in December"]);
+    return make(`${subject} ___ ${activity} ${context}.`, "will", ["did", "are", "was"], "Will dùng để nói về tương lai.");
+  }
+  if (kind === 1) {
+    const adjectives = [["small", "smallest"], ["tall", "tallest"], ["fast", "fastest"], ["young", "youngest"]];
+    const item = pick(adjectives);
+    const context = pick(["in the group", "of all the animals", "in the class", "on the team", "in the family"]);
+    return make(`Choose the superlative form of “${item[0]}” for ${name} ${context}.`, item[1], [`${item[0]}er`, `more ${item[0]}`, `most ${item[0]}`], "Tính từ ngắn thường thêm -est ở so sánh nhất.");
+  }
+  if (kind === 2) {
+    const advice = pick(["wear a helmet when riding a bike", "wash your hands before eating", "drink enough water", "do your homework"]);
+    const context = pick(["to stay safe", "to stay healthy", "before school", "every day", "at home"]);
+    return make(`${name}, you ___ ${advice} ${context}.`, "should", ["shouldn't to", "are", "did"], "Should dùng để đưa ra lời khuyên.");
+  }
+  if (kind === 3) {
+    const clauses = [["I stayed home", "I was ill"], ["She wore a coat", "it was cold"], ["We were happy", "we won the game"], ["He took an umbrella", "it was raining"]];
+    const item = pick(clauses);
+    const context = pick(["yesterday", "in the afternoon", "on the way to school", "during the holiday", "last night"]);
+    return make(`${name} says: ${item[0]} ___ ${item[1]} ${context}.`, "because", ["but", "or", "although of"], "Because dùng để nối nguyên nhân với kết quả.");
+  }
+  const subject = pick(["She", "He", "They", "My parents", "Mai"]);
+  const place = pick(["the museum", "the zoo", "the library", "the park"]);
+  const context = pick(["with her family", "after lunch", "during the holiday", "with their classmates", "in the morning"]);
+  return make(`${subject} ___ to ${place} last Sunday ${context}.`, "went", ["go", "goes", "going"], "Go có dạng quá khứ là went.");
 };
 
 export const generateGradeQuestions = (
