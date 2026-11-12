@@ -115,6 +115,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const playerScoresRef = useRef<Record<string, MatchScore>>({});
   const answeredPlayerIdsRef = useRef<string[]>([]);
   const savedMatchRef = useRef<string | null>(null);
+  const finishMatchRef = useRef<((message?: MatchFinishedMessage) => void) | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const lastQuestionAction = useRef(0);
   const questionIndexRef = useRef(0);
@@ -201,6 +202,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       });
     }
   }, [profile.id, self.name, players, currentGrade]);
+  finishMatchRef.current = finishMatch;
 
   useEffect(() => {
     let alive = true;
@@ -258,7 +260,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       })
       .on("broadcast", { event: "match-finished" }, ({ payload }) => {
         if (!alive) return;
-        finishMatch(payload && typeof payload === "object" ? payload as MatchFinishedMessage : undefined);
+        finishMatchRef.current?.(payload && typeof payload === "object" ? payload as MatchFinishedMessage : undefined);
       })
       .on("broadcast", { event: "next-question" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
@@ -276,7 +278,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       if (channelRef.current === channel) channelRef.current = null;
       void supabase.removeChannel(channel);
     };
-  }, [profile.id, self, applyGameStart, finishMatch]);
+  }, [profile.id, self, applyGameStart]);
 
   useEffect(() => {
     if (phase !== "countdown" || startsAt === null) return;
