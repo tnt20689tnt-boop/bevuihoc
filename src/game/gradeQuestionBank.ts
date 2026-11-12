@@ -191,10 +191,17 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`Mỗi sáng, ${name} thường ${action}. Cụm từ nào chỉ hoạt động?`, action, ["màu đỏ", "hiền hậu", "quyển truyện"], "Từ chỉ hoạt động trả lời câu hỏi làm gì.");
     }
     if (stageKind === 3) { const context = pick(["trong bài đọc", "ở lớp học", "trong câu chuyện", "khi miêu tả bạn bè"]); return make(`Bạn ${name} tìm từ trái nghĩa với “${pair[0]}” ${context}. Từ cần tìm là gì?`, pair[2], [pair[1], pair[3], "vui vẻ"], "Tìm từ có nghĩa trái ngược."); }
-    const questions = [`Bạn ${name} học lớp mấy?`, `Hôm nay ${name} trực nhật phải không?`, `${name} đang đọc quyển sách nào?`, `Ai cùng ${name} đến thư viện?`];
-    const question = pick(questions);
+    const topics = [
+      ["hỏi về lớp học", `Bạn ${name} học lớp mấy?`],
+      ["hỏi về việc trực nhật", `Hôm nay ${name} trực nhật phải không?`],
+      ["hỏi về quyển sách", `${name} đang đọc quyển sách nào?`],
+      ["hỏi về người đi cùng", `Ai cùng ${name} đến thư viện?`],
+      ["hỏi về thời gian", `Khi nào ${name} đến trường?`],
+      ["hỏi về địa điểm", `${name} đang học ở đâu?`],
+    ];
+    const topic = pick(topics);
     const context = pick(["trong giờ học", "khi trò chuyện", "trong bài tập đọc"]);
-    return make(`Câu nào là câu hỏi ${context}?`, question, [`Bạn ${name} học lớp hai.`, `Ôi, quyển sách đẹp quá!`, `Hãy mở sách ra.`], "Câu hỏi dùng để hỏi và thường kết thúc bằng dấu hỏi.");
+    return make(`Trong tình huống ${context}, câu nào dùng để ${topic[0]}?`, topic[1], [`Bạn ${name} học lớp hai.`, `Ôi, quyển sách đẹp quá!`, `Hãy mở sách ra.`], "Câu hỏi dùng để hỏi và thường kết thúc bằng dấu hỏi.");
   }
   if (grade === 3) {
     if (stageKind === 0) {
