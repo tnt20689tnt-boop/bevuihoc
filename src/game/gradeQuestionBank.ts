@@ -169,11 +169,13 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     }
     if (stageKind === 3) {
       const action = pick(["đi học", "đọc sách", "vẽ tranh", "đá bóng", "hát múa"]);
-      const correct = `${name} ${action}.`;
-      return make(`Chọn cách viết đúng câu: “${name} ${action}”.`, correct, [`${name.toLowerCase()} ${action}.`, `${correct.slice(0, -1)}`, `${name.toUpperCase()} ${action}.`], "Đầu câu viết hoa và cuối câu có dấu chấm.");
+      const time = pick(["Mỗi buổi sáng", "Sau giờ học", "Vào ngày chủ nhật", "Hôm nay"]);
+      const correct = `${time}, ${name} ${action}.`;
+      return make(`Chọn cách viết đúng câu: “${correct}”`, correct, [`${time.toLowerCase()}, ${name.toLowerCase()} ${action}.`, `${correct.slice(0, -1)}`, `${time}, ${name.toUpperCase()} ${action}.`], "Đầu câu viết hoa và cuối câu có dấu chấm.");
     }
     const action = pick(["chạy", "đọc", "hát", "viết", "vẽ", "nhảy", "bơi", "cười"]);
-    return make(`Trong câu “${name} đang ${action}”, từ nào chỉ hoạt động?`, action, [name, "đang", "bạn"], "Từ chỉ hoạt động cho biết người hoặc vật làm gì.");
+    const place = pick(["ở sân trường", "trong lớp", "ở công viên", "tại nhà"]);
+    return make(`Trong câu “${name} đang ${action} ${place}”, từ nào chỉ hoạt động?`, action, [name, "đang", place], "Từ chỉ hoạt động cho biết người hoặc vật làm gì.");
   }
   if (grade === 2) {
     if (stageKind === 0) {
