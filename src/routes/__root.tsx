@@ -142,11 +142,13 @@ function RootComponent() {
     void useSettings.persist.rehydrate();
 
     if ("serviceWorker" in navigator) {
-      window.addEventListener("load", () => {
+      const registerServiceWorker = () => {
         void navigator.serviceWorker.register("/sw.js").catch((error) => {
           console.warn("Bé Vui Học: không thể đăng ký chế độ cài đặt PWA.", error);
         });
-      });
+      };
+      if (document.readyState === "complete") registerServiceWorker();
+      else window.addEventListener("load", registerServiceWorker, { once: true });
     }
 
     const { data } = supabase.auth.onAuthStateChange((event) => {
