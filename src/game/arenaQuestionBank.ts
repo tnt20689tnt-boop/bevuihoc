@@ -162,12 +162,11 @@ const englishDrafts = (grade: number): Draft[] => {
     5: [["thành tựu", "achievement"], ["truyền thống", "tradition"], ["phát minh", "invention"], ["năng lượng", "energy"], ["tình nguyện", "volunteer"], ["bền vững", "sustainable"], ["sự lựa chọn", "choice"], ["thử thách", "challenge"], ["cải thiện", "improve"], ["bảo vệ", "protect"], ["tự tin", "confident"], ["kiên nhẫn", "patient"]],
   };
   const pairs = vocab[grade]!;
-  pairs.forEach(([vi, en], index) => {
+  pairs.forEach(([vi, en]) => {
     const wrong = shuffle(pairs.filter((pair) => pair[1] !== en).map((pair) => pair[1])).slice(0, 3);
-    const mode = index % 3;
-    if (mode === 0) add("english", grade, `Choose the English word for “${vi}”.`, en, wrong, `“${vi}” means “${en}”.`, "tu-vung-dich");
-    else if (mode === 1) add("english", grade, `Which word means “${vi}”?`, en, wrong, `The correct translation is “${en}”.`, "tu-vung-nhan-dien");
-    else add("english", grade, `Complete the vocabulary pair: ${vi} = ____.`, en, wrong, `The English word is “${en}”.`, "tu-vung-dien-tu");
+    add("english", grade, `Choose the English word for “${vi}”.`, en, wrong, `“${vi}” means “${en}”.`, "tu-vung-dich");
+    add("english", grade, `Which word means “${vi}”?`, en, wrong, `The correct translation is “${en}”.`, "tu-vung-nhan-dien");
+    add("english", grade, `Complete the vocabulary pair: ${vi} = ____.`, en, wrong, `The English word is “${en}”.`, "tu-vung-dien-tu");
   });
 
   const grammar: Record<number, Array<[string, string, string[], string, string]>> = {
