@@ -343,7 +343,10 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       const context = pick(["in the wild", "on a farm", "at the zoo", "in a nature book", "during a science lesson"]);
       return make(`${name} learns that ${animal.toLowerCase()} ___ ${ability} ${context}.`, "can", ["cans", "is", "does"], "Sau can dùng động từ nguyên mẫu.");
     }
-    const opposites = [["early", "late"], ["strong", "weak"], ["noisy", "quiet"], ["expensive", "cheap"], ["clean", "dirty"]];\n    const item = pick(opposites);\n    const context = pick(["in the story", "in the classroom", "in a vocabulary game", "while describing a person", "during an English lesson"]);\n    return make(`${name} needs the opposite of “${item[0]}” ${context}. Which word is correct?`, item[1], opposites.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ có nghĩa trái ngược.");
+    const opposites = [["early", "late"], ["strong", "weak"], ["noisy", "quiet"], ["expensive", "cheap"], ["clean", "dirty"]];
+    const item = pick(opposites);
+    const context = pick(["in the story", "in the classroom", "in a vocabulary game", "while describing a person", "during an English lesson"]);
+    return make(`${name} needs the opposite of “${item[0]}” ${context}. Which word is correct?`, item[1], opposites.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ có nghĩa trái ngược.");
   }
   if (grade === 4) {
     if (kind === 0) return make("Complete: We ___ football yesterday.", "played", ["play", "plays", "playing"], "Yesterday thường đi với thì quá khứ đơn.");
