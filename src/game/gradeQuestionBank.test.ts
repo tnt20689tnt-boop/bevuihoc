@@ -8,6 +8,7 @@ describe("grade and 100-level practice question bank", () => {
       const seen = new Set<string>();
       for (let grade = 1; grade <= 5; grade++) {
         for (let level = 1; level <= 100; level++) {
+          const previouslySeen = new Set(seen);
           const questions = generateGradeQuestions(subject, grade, level, 5, seen);
           expect(questions, `${subject}, grade ${grade}, level ${level}`).toHaveLength(5);
           for (const question of questions) {
