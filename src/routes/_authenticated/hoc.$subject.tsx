@@ -76,17 +76,17 @@ function LessonRoom({ profile }: { profile: Profile }) {
         topic: string | null;
       }>;
       const usedThisSet = new Set<string>();
-      onlineQuestions = onlineRows.flatMap(row => {
+      onlineQuestions = onlineRows.flatMap((row) => {
         const promptKey = normalizeQuestion(row.question_text);
         const sourceOptions = Array.isArray(row.options) ? row.options : [];
-        const correctText = sourceOptions.find(option => option.key === row.correct_answer)?.text;
+        const correctText = sourceOptions.find((option) => option.key === row.correct_answer)?.text;
         if (
           !row.question_text ||
           seen.has(promptKey) ||
           usedThisSet.has(promptKey) ||
           sourceOptions.length !== 4 ||
           !correctText ||
-          new Set(sourceOptions.map(option => option.text)).size !== 4
+          new Set(sourceOptions.map((option) => option.text)).size !== 4
         ) return [];
         usedThisSet.add(promptKey);
         const choices = shuffle(sourceOptions.map(option => option.text));
@@ -97,7 +97,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
           hint: row.topic ? `Chủ đề: ${row.topic}. Hãy đọc kỹ câu hỏi và suy nghĩ từng đáp án.` : "Bé hãy đọc kỹ câu hỏi và thử lại nhé.",
         }];
       });
-      onlineQuestions.forEach(question => seen.add(normalizeQuestion(question.prompt)));
+      onlineQuestions.forEach((question) => seen.add(normalizeQuestion(question.prompt)));
     } catch (error) {
       console.error("Không tải được ngân hàng câu hỏi online:", error);
       toast.error("Chưa tải được ngân hàng online. Hệ thống sẽ dùng bộ câu hỏi theo lớp và Level.");
