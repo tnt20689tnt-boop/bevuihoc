@@ -18,6 +18,7 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
   const page = config[mode];
   const { data, isLoading, error } = useQuery({
     queryKey: ["school-rankings", profile?.id],
+    enabled: mode !== "arena" && !!profile?.id,
     queryFn: async (): Promise<PlayerRow[]> => {
       const [{ data: profiles, error: profileError }, { data: events, error: eventError }] = await Promise.all([
         supabase.from("profiles").select("id, display_name, grade").limit(1000),
