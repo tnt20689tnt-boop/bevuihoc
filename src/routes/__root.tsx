@@ -9,6 +9,9 @@ import {
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
+import { Capacitor } from "@capacitor/core";
+import { Haptics, ImpactStyle } from "@capacitor/haptics";
+import { StatusBar, Style } from "@capacitor/status-bar";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -131,6 +134,29 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
+
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) return;
+
+    document.documentElement.classList.add("capacitor-native");
+    if (Capacitor.getPlatform() === "ios") {
+      void StatusBar.setStyle({ style: Style.Dark }).catch(() => undefined);
+      void StatusBar.setOverlaysWebView({ overlay: false }).catch(() => undefined);
+    }
+
+    const handleNativeTap = (event: MouseEvent) => {
+      if (!(event.target instanceof Element)) return;
+      if (event.target.closest("button, [role=button], a, [data-haptic]")) {
+        void Haptics.impact({ style: ImpactStyle.Light }).catch(() => undefined);
+      }
+    };
+
+    document.addEventListener("click", handleNativeTap, true);
+    return () => {
+      document.removeEventListener("click", handleNativeTap, true);
+      document.documentElement.classList.remove("capacitor-native");
+    };
+  }, []);
 
   useEffect(() => {
     void useSettings.persist.rehydrate();

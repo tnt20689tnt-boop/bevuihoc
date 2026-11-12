@@ -1,0 +1,41 @@
+name: iOS shell validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "capacitor.config.ts"
+      - "ios-web/**"
+      - "src/**"
+      - "package.json"
+      - "bun.lock"
+      - ".github/workflows/ios-shell.yml"
+  workflow_dispatch:
+
+jobs:
+  ios-simulator:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies and refresh Bun lockfile
+        run: bun install
+      - name: Build existing web application
+        run: bun run build
+      - name: Generate native iOS project
+        run: bun run ios:add
+      - name: Sync Capacitor plugins and web shell
+        run: bun run ios:sync
+      - name: Compile iOS Simulator target
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -derivedDataPath "$RUNNER_TEMP/DerivedData" \
+            CODE_SIGNING_ALLOWED=NO \
+            build
