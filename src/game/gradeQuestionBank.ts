@@ -146,7 +146,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   const syllables = ["trăng", "sáng", "sách", "trường", "chim", "phượng", "biển", "rừng", "thầy", "cô", "bạn", "ước mơ"];
   const names = ["Lan", "Minh", "Hoa", "Nam", "Mai", "An", "Bình", "Hà"];
   const name = pick(names), pair = pick(words);
-  const stageKind = (stage - 1) % 5;
+  const stageKind = Math.min(4, Math.floor((stage - 1) / 20));
   if (grade === 1) {
     if (stageKind === 0) {
       const letter = pick(["a", "ă", "â", "b", "c", "d", "đ", "e", "ê", "g", "h", "i", "k", "l", "m", "n", "o", "ô", "ơ", "p", "q", "r", "s", "t", "u", "ư", "v", "x", "y"]);
@@ -288,7 +288,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   const colors = ["red", "blue", "green", "yellow", "purple", "orange", "black", "white"];
   const nouns = ["book", "pencil", "school", "teacher", "friend", "garden", "library", "family"];
   const name = pick(["Mai", "Nam", "Linh", "Tom", "Anna", "Ben"]);
-  const kind = (stage - 1) % 5;
+  const kind = Math.min(4, Math.floor((stage - 1) / 20));
   if (grade === 1) {
     if (kind === 0) { const word = pick(animals); const context = pick(["at the zoo", "in a picture book", "on a flashcard"]); return make(`What does ${name} call this animal ${context}: “${word}”?`, ({cat:"con mèo",dog:"con chó",bird:"con chim",fish:"con cá",rabbit:"con thỏ",tiger:"con hổ",elephant:"con voi",monkey:"con khỉ"} as Record<string,string>)[word]!, ["quả táo","quyển sách","bông hoa"], "Nhớ nghĩa của từ chỉ con vật."); }
     if (kind === 1) { const object = pick(["the sky", "a banana", "grass", "a tomato", "an orange", "the sea"]); const context = pick(["in the garden", "at the beach", "in the fruit basket", "on a sunny day"]); return make(`${name} is looking ${context}. Which color is usually associated with ${object}?`, ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!, colors.filter(x => x !== ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!), "Nhớ từ vựng chỉ màu sắc."); }
@@ -426,7 +426,7 @@ export const generateGradeQuestions = (
   const output: PracticeQuestion[] = [];
   const local = new Set<string>();
   let attempts = 0;
-  while (output.length < safeCount && attempts < safeCount * 100) {
+  while (output.length < safeCount && attempts < safeCount * 1000) {
     attempts++;
     const q = subject === "math"
       ? mathQuestion(safeGrade, stage)
