@@ -153,13 +153,18 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       const onset = pick(["b", "m", "c", "g", "h", "t"]);
       const examples: Record<string, string[]> = { b: ["ba", "bé", "bà"], m: ["mẹ", "mèo", "mũ"], c: ["cá", "cô", "cờ"], g: ["gà", "gỗ", "gấu"], h: ["hoa", "hồ", "hè"], t: ["táo", "tay", "tủ"] };
       const answer = pick(examples[onset]!);
-      return make(`Tiếng nào có âm đầu “${onset}”?`, answer, ["bàn", "mèo", "cô", "gỗ", "hoa"].filter(x => x !== answer), "Nghe âm đầu tiên khi đọc tiếng.");
+      const allWords = Object.values(examples).flat();
+      const distractors = shuffle(allWords.filter(value => !examples[onset]!.includes(value))).slice(0, 3);
+      const displayed = shuffle([answer, ...distractors]);
+      return make(`${name} đọc các tiếng: ${displayed.join(", ")}. Tiếng nào bắt đầu bằng âm “${onset}”?`, answer, distractors, "Nghe âm đầu tiên khi đọc tiếng.");
     }
     if (stageKind === 2) {
       const rhymeGroups = [["an", "bàn", "lan", "can", "tan"], ["ong", "bóng", "sông", "cong", "mong"], ["at", "cát", "mát", "hát", "bát"], ["ang", "bàng", "sáng", "nàng", "mang"], ["ơi", "chơi", "bơi", "lời", "mời"]];
       const group = pick(rhymeGroups);
       const answer = group[int(1, 4)]!;
-      return make(`Tiếng nào có vần “${group[0]}”?`, answer, group.slice(1).filter(x => x !== answer).concat(["mẹ", "cá"]), "Đọc phần vần ở cuối tiếng.");
+      const distractors = shuffle(rhymeGroups.filter(item => item[0] !== group[0]).map(item => item[int(1, 4)]!)).slice(0, 3);
+      const displayed = shuffle([answer, ...distractors]);
+      return make(`${name} nhìn các thẻ tiếng: ${displayed.join(", ")}. Tiếng nào có vần “${group[0]}”?`, answer, distractors, "Đọc phần vần ở cuối tiếng.");
     }
     if (stageKind === 3) {
       const action = pick(["đi học", "đọc sách", "vẽ tranh", "đá bóng", "hát múa"]);
