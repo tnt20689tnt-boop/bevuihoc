@@ -219,7 +219,9 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     if (stageKind === 3) { const action = pick(["đọc", "viết", "trồng", "chăm sóc", "bảo vệ"]); const object = pick(["sách", "cây xanh", "môi trường", "bài tập"]); return make(`Trong câu “${name} đang ${action} ${object}”, từ nào là động từ?`, action, ["chăm chỉ", name, object], "Động từ nêu hoạt động của chủ thể."); }
     const proverbs = ["Thương người như thể thương thân", "Lá lành đùm lá rách", "Một con ngựa đau cả tàu bỏ cỏ", "Chị ngã em nâng"];
     const proverb = pick(proverbs);
-    return make(`Câu tục ngữ nào nhắc nhở chúng ta biết yêu thương, giúp đỡ nhau?`, proverb, proverbs.filter(x => x !== proverb).slice(0, 3), "Chọn câu nói về lòng nhân ái và sự sẻ chia.");
+    const theme = pick(["lòng nhân ái", "tinh thần đoàn kết", "sự sẻ chia", "giúp đỡ người gặp khó khăn"]);
+    const context = pick(["trong giờ sinh hoạt lớp", "ở tiết học đạo đức", "khi viết đoạn văn", "trong câu chuyện về tình bạn"]);
+    return make(`Bạn ${name} chọn tục ngữ cho chủ đề ${theme} ${context}. Câu nào phù hợp?`, proverb, proverbs.filter(x => x !== proverb).slice(0, 3), "Chọn câu nói về lòng nhân ái và sự sẻ chia.");
   }
   if (grade === 4) {
     if (stageKind === 0) return make("Câu nào thuộc kiểu câu kể Ai làm gì?", `${name} đang chăm sóc vườn rau.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, vườn rau đẹp quá!`], "Kiểu câu này nêu chủ thể và hoạt động.");
