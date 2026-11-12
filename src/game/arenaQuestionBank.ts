@@ -22,7 +22,7 @@ function draft(
   explanation: string,
   family: string,
 ): Draft {
-  const wrong = shuffle(unique(distractors.filter((item) => item !== correctAnswer)));
+  const wrong = shuffle(unique(distractors.filter((item) => item !== correctAnswer))).slice(0, 3);
   while (wrong.length < 3) {
     const fallback = ["Không có đáp án nào đúng", "Cả hai đáp án đều đúng", "Không xác định"];
     const candidate = fallback.find((item) => item !== correctAnswer && !wrong.includes(item));
