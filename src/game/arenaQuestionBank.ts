@@ -1,20 +1,6 @@
 import { generateQuestion, type Question, type Subject } from "./learningEngine";
 
-const viWords: Record<number, { person: string[]; animal: string[]; object: string[]; action: string[]; trait: string[] }> = {
-  1: { person: ["bố", "mẹ", "bà", "ông", "cô giáo", "bạn nhỏ"], animal: ["con mèo", "con chó", "con gà", "con vịt", "con cá", "con thỏ"], object: ["cái bàn", "cái ghế", "quyển vở", "cặp sách", "bút chì", "thước kẻ"], action: ["đọc", "viết", "chạy", "nhảy", "hát", "vẽ"], trait: ["xanh", "đỏ", "đẹp", "ngoan", "cao", "nhỏ"] },
-  2: { person: ["bác sĩ", "học sinh", "nông dân", "thầy giáo", "công nhân", "bố"], animal: ["voi", "hổ", "sư tử", "chim én", "cá heo", "con sóc"], object: ["thư viện", "bút mực", "bảng lớp", "đồng hồ", "xe đạp", "cánh diều"], action: ["tưới cây", "quét nhà", "đọc sách", "tập thể dục", "chăm sóc", "gieo hạt"], trait: ["chăm chỉ", "dũng cảm", "hiền lành", "nhanh nhẹn", "thật thà", "vui vẻ"] },
-  3: { person: ["bác nông dân", "người thợ", "bạn học", "nhạc sĩ", "họa sĩ", "chiến sĩ"], animal: ["đại bàng", "hươu cao cổ", "cá voi", "chim công", "rùa biển", "khỉ"], object: ["kính hiển vi", "bản đồ", "la bàn", "máy tính", "chiếc trống", "quả địa cầu"], action: ["khám phá", "bảo vệ", "sáng tạo", "quan sát", "thảo luận", "thu hoạch"], trait: ["kiên trì", "thân thiện", "sáng suốt", "khiêm tốn", "cần cù", "linh hoạt"] },
-  4: { person: ["nhà khoa học", "kiến trúc sư", "nhà văn", "phi công", "thủ thư", "hướng dẫn viên"], animal: ["gấu trúc", "tê giác", "chim hải âu", "rái cá", "linh dương", "cá mập"], object: ["ống nhòm", "từ điển", "thiết bị", "tư liệu", "di tích", "hành trang"], action: ["nghiên cứu", "phát minh", "bảo tồn", "thuyết trình", "tổ chức", "đánh giá"], trait: ["trung thực", "sáng tạo", "nhân hậu", "độc lập", "cẩn thận", "trách nhiệm"] },
-  5: { person: ["nhà khảo cổ", "nhà môi trường", "nhà ngoại giao", "nhà thiết kế", "nhà nghiên cứu", "tình nguyện viên"], animal: ["voi châu Á", "gấu Bắc Cực", "đười ươi", "rùa xanh", "báo đốm", "cá voi xanh"], object: ["hệ sinh thái", "di sản", "năng lượng", "tài nguyên", "thí nghiệm", "công trình"], action: ["phân tích", "bảo tồn", "đề xuất", "thuyết phục", "hợp tác", "đóng góp"], trait: ["bao dung", "bền bỉ", "khách quan", "sâu sắc", "linh hoạt", "sáng suốt"] },
-};
-
-const enPairs: Record<number, Array<[string, string]>> = {
-  1: [["con chim", "Bird"], ["con bò", "Cow"], ["con vịt", "Duck"], ["con thỏ", "Rabbit"], ["quả cam", "Orange"], ["quả nho", "Grape"], ["màu đỏ", "Red"], ["màu xanh", "Green"], ["mẹ", "Mother"], ["anh trai", "Brother"], ["quyển sách", "Book"], ["cái cặp", "Bag"]],
-  2: [["bữa sáng", "Breakfast"], ["phòng ngủ", "Bedroom"], ["bệnh viện", "Hospital"], ["siêu thị", "Supermarket"], ["con voi", "Elephant"], ["con hổ", "Tiger"], ["thứ hai", "Monday"], ["Chủ nhật", "Sunday"], ["mưa", "Rain"], ["nắng", "Sunshine"], ["đọc", "Read"], ["viết", "Write"]],
-  3: [["bơi", "Swim"], ["nhảy", "Jump"], ["thư viện", "Library"], ["sân chơi", "Playground"], ["bữa trưa", "Lunch"], ["bữa tối", "Dinner"], ["mùa xuân", "Spring"], ["mùa đông", "Winter"], ["cao", "Tall"], ["thấp", "Short"], ["khát nước", "Thirsty"], ["đói bụng", "Hungry"]],
-  4: [["thời tiết", "Weather"], ["địa chỉ", "Address"], ["kỳ nghỉ", "Holiday"], ["bảo tàng", "Museum"], ["bưu điện", "Post office"], ["ồn ào", "Noisy"], ["yên tĩnh", "Quiet"], ["nguy hiểm", "Dangerous"], ["môi trường", "Environment"], ["ô nhiễm", "Pollution"], ["tiết kiệm", "Save"], ["lời khuyên", "Advice"]],
-  5: [["thành tựu", "Achievement"], ["truyền thống", "Tradition"], ["phát minh", "Invention"], ["năng lượng", "Energy"], ["tình nguyện", "Volunteer"], ["bền vững", "Sustainable"], ["sự lựa chọn", "Choice"], ["thử thách", "Challenge"], ["cải thiện", "Improve"], ["bảo vệ", "Protect"], ["tự tin", "Confident"], ["kiên nhẫn", "Patient"]],
-};
+type Draft = Omit<Question, "id" | "level"> & { family: string };
 
 const shuffle = <T,>(items: T[]): T[] => {
   const copy = [...items];
@@ -25,63 +11,274 @@ const shuffle = <T,>(items: T[]): T[] => {
   return copy;
 };
 
-function languageQuestions(grade: number, subject: "vietnamese" | "english"): Question[] {
-  const g = Math.max(1, Math.min(5, Math.floor(grade) || 1));
-  const result: Question[] = [];
-  if (subject === "english") {
-    const pairs = enPairs[g] ?? enPairs[3]!;
-    pairs.forEach(([vi, en], index) => {
-      const distractors = shuffle(pairs.filter((pair) => pair[1] !== en).map((pair) => pair[1])).slice(0, 3);
-      result.push({ id: `arena-en-g${g}-${index}`, subject, grade: g, level: 50, question: `What is "${vi}" in English?`, options: shuffle([en, ...distractors]), correctAnswer: en, explanation: `"${vi}" means "${en}" in English.` });
+const pick = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)]!;
+const unique = (items: string[]) => [...new Set(items)];
+
+function draft(
+  subject: Subject,
+  grade: number,
+  question: string,
+  correctAnswer: string,
+  distractors: string[],
+  explanation: string,
+  family: string,
+): Draft {
+  const wrong = shuffle(unique(distractors.filter((item) => item !== correctAnswer))).slice(0, 3);
+  return {
+    subject, grade, question, correctAnswer,
+    options: shuffle([correctAnswer, ...wrong]),
+    explanation, family,
+  };
+}
+
+const vietnameseDrafts = (grade: number): Draft[] => {
+  const result: Draft[] = [];
+  const add = (...args: Parameters<typeof draft>) => result.push(draft(...args));
+
+  if (grade === 1) {
+    const sets = [
+      { name: "người", words: ["bác sĩ", "cô giáo", "bố", "bạn nhỏ", "bà", "chú công an"] },
+      { name: "con vật", words: ["con thỏ", "con voi", "con gà", "con cá", "con mèo", "con chim"] },
+      { name: "đồ vật", words: ["cặp sách", "bút chì", "quyển vở", "cái bàn", "thước kẻ", "cái trống"] },
+      { name: "hoạt động", words: ["đọc sách", "chạy", "vẽ tranh", "quét nhà", "hát", "nhảy dây"] },
+      { name: "đặc điểm", words: ["hiền lành", "cao", "xanh", "chăm chỉ", "nhỏ", "xinh đẹp"] },
+    ];
+    sets.forEach((set) => set.words.forEach((word) => {
+      const others = sets.filter((item) => item.name !== set.name).map((item) => item.name);
+      const mode = result.length % 3;
+      if (mode === 0) {
+        add("vietnamese", grade, `Từ “${word}” dùng để chỉ điều gì?`, set.name, others, `“${word}” thuộc nhóm từ chỉ ${set.name}.`, `nhom-tu-${set.name}`);
+      } else if (mode === 1) {
+        add("vietnamese", grade, `Trong các từ sau, từ nào chỉ ${set.name}?`, word, shuffle(set.words.filter((w) => w !== word)).slice(0, 3), `“${word}” là từ chỉ ${set.name}.`, `nhan-dien-${set.name}`);
+      } else {
+        const sentence = set.name === "hoạt động" ? `Bé đang ${word}.` : set.name === "đặc điểm" ? `Bông hoa thật ${word}.` : set.name === "người" ? `${word.charAt(0).toUpperCase() + word.slice(1)} đang giúp mọi người.` : set.name === "con vật" ? `${word.charAt(0).toUpperCase() + word.slice(1)} đang ở trong vườn.` : `Đây là ${word} của em.`;
+        add("vietnamese", grade, `Chọn từ thích hợp để hoàn thành câu: “${sentence}” Từ được nhắc đến thuộc nhóm nào?`, set.name, others, `Từ “${word}” thuộc nhóm ${set.name}.`, `van-dung-${set.name}`);
+      }
+    }));
+  } else if (grade === 2) {
+    const pairs = [
+      ["chăm chỉ", "siêng năng"], ["dũng cảm", "gan dạ"], ["yên tĩnh", "im lặng"],
+      ["nhanh nhẹn", "lanh lợi"], ["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"],
+      ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"],
+    ];
+    pairs.forEach(([a, b], i) => {
+      const isSynonym = i < 6;
+      const answer = isSynonym ? b : b;
+      const wrong = isSynonym ? ["lười biếng", "ồn ào", "yếu đuối"] : ["rộng", "dài", "nhanh"];
+      add("vietnamese", grade, isSynonym ? `Từ nào gần nghĩa với “${a}”?` : `Từ nào trái nghĩa với “${a}”?`, answer, wrong, `“${a}” và “${b}” ${isSynonym ? "gần nghĩa" : "trái nghĩa"} với nhau.`, isSynonym ? "tu-dong-nghia" : "tu-trai-nghia");
     });
+    const tasks = [
+      ["Bạn Lan đang tưới cây.", "Ai đang tưới cây?", "Bạn Lan", ["đang tưới", "cây", "tưới cây"], "Bạn Lan là người thực hiện hoạt động."],
+      ["Đàn chim hót líu lo.", "Con gì hót líu lo?", "Đàn chim", ["líu lo", "hót", "đàn"], "Đàn chim là sự vật được nói đến."],
+      ["Bầu trời hôm nay rất trong xanh.", "Bầu trời hôm nay có đặc điểm gì?", "Trong xanh", ["hôm nay", "bầu trời", "rất"], "Trong xanh nêu đặc điểm của bầu trời."],
+      ["Minh đọc sách ở thư viện.", "Minh làm gì ở thư viện?", "Đọc sách", ["Minh", "thư viện", "sách"], "Đọc sách là hoạt động của Minh."],
+      ["Mẹ em nấu bữa tối.", "Ai nấu bữa tối?", "Mẹ em", ["bữa tối", "nấu", "tối"], "Mẹ em là người nấu bữa tối."],
+    ];
+    tasks.forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” rồi trả lời: ${q}`, a, wrong, exp, "doc-hieu-cau"));
+    [
+      ["sạch sẽ", "sạch sẻ", "sạch xẽ", "sạch sẹ"],
+      ["xinh xắn", "sinh xắn", "xinh sắn", "sinh sắn"],
+      ["nghỉ ngơi", "ngỉ ngơi", "nghĩ ngơi", "nghỉ ngi"],
+      ["trường học", "chường học", "trường hộc", "chường hộc"],
+    ].forEach(([correct, ...wrong]) => add("vietnamese", grade, "Chọn cách viết đúng chính tả.", correct, wrong, `Cách viết đúng là “${correct}”.`, "chinh-ta"));
+  } else if (grade === 3) {
+    const categories = [
+      { name: "danh từ", words: ["dòng sông", "học sinh", "cánh đồng", "bác thợ mộc", "tiếng trống"] },
+      { name: "động từ", words: ["suy nghĩ", "xây dựng", "quan sát", "thu hoạch", "bảo vệ"] },
+      { name: "tính từ", words: ["rộng lớn", "dịu dàng", "chăm chỉ", "rực rỡ", "mạnh mẽ"] },
+    ];
+    categories.forEach((set) => set.words.forEach((word) => {
+      const wrong = categories.filter((x) => x.name !== set.name).map((x) => x.name);
+      add("vietnamese", grade, `Từ “${word}” thuộc từ loại nào?`, set.name, wrong, `“${word}” là ${set.name}.`, `tu-loai-${set.name}`);
+    }));
+    [
+      ["Chậm như", "rùa", ["thỏ", "ngựa", "chim"], "Thành ngữ so sánh “Chậm như rùa”."],
+      ["Nhanh như", "cắt", ["ốc", "sên", "rùa"], "Thành ngữ quen thuộc là “Nhanh như cắt”."],
+      ["Khỏe như", "voi", ["mèo", "kiến", "bướm"], "“Khỏe như voi” chỉ sức khỏe tốt."],
+      ["Hiền như", "bụt", ["hổ", "sói", "cáo"], "“Hiền như bụt” chỉ người rất hiền."],
+    ].forEach(([start, answer, wrong, exp]) => add("vietnamese", grade, `${start} …` , answer, wrong, exp, "thanh-ngu"));
+    [
+      ["Mặt trời thức dậy sau rặng núi.", "Ai được nhân hóa?", "Mặt trời", ["rặng núi", "thức dậy", "sau"], "Mặt trời được miêu tả như con người thức dậy."],
+      ["Những bông hoa mỉm cười trong nắng.", "Sự vật nào được nhân hóa?", "Những bông hoa", ["trong nắng", "mỉm cười", "nắng"], "Bông hoa được gán hành động mỉm cười."],
+      ["Lan chăm sóc vườn rau mỗi chiều.", "Bộ phận trả lời câu hỏi “Ai?” là gì?", "Lan", ["chăm sóc", "vườn rau", "mỗi chiều"], "Lan là chủ thể thực hiện hoạt động."],
+    ].forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc “${sentence}” và xác định: ${q}`, a, wrong, exp, "doc-hieu-ngu-phap"));
+  } else if (grade === 4) {
+    const sentenceTypes = [
+      ["Sáng nay, em đến trường rất sớm.", "câu kể", ["câu hỏi", "câu cảm", "câu khiến"]],
+      ["Bạn đã làm xong bài tập chưa?", "câu hỏi", ["câu kể", "câu cảm", "câu khiến"]],
+      ["Ôi, bông hoa đẹp quá!", "câu cảm", ["câu kể", "câu hỏi", "câu khiến"]],
+      ["Hãy giữ gìn lớp học sạch đẹp!", "câu khiến", ["câu kể", "câu hỏi", "câu cảm"]],
+    ];
+    sentenceTypes.forEach(([sentence, answer, wrong]) => add("vietnamese", grade, `Câu “${sentence}” thuộc kiểu câu nào?`, answer, wrong, `Đây là ${answer}.`, "kieu-cau"));
+    [
+      ["lung linh", "từ láy", ["bàn ghế", "xe đạp", "học sinh"]],
+      ["nhà cửa", "từ ghép", ["long lanh", "xanh xanh", "rì rào"]],
+      ["lấp lánh", "từ láy", ["quần áo", "sách vở", "bàn học"]],
+      ["bạn bè", "từ ghép", ["mênh mông", "thoang thoảng", "xinh xắn"]],
+      ["rì rào", "từ láy", ["nhà cửa", "cây cối", "quần áo"]],
+    ].forEach(([word, answer, wrong]) => add("vietnamese", grade, `“${word}” là từ ghép hay từ láy?`, answer, wrong, `“${word}” là ${answer}.`, "cau-tao-tu"));
+    [
+      ["Nhờ chăm chỉ luyện tập, Nam tiến bộ rõ rệt.", "Vì sao Nam tiến bộ?", "Vì chăm chỉ luyện tập", ["Vì Nam nghỉ học", "Vì bài tập dễ", "Vì được nghỉ ngơi"], "Nam tiến bộ nhờ chăm chỉ luyện tập."],
+      ["Dù trời mưa, các bạn vẫn đến lớp đúng giờ.", "Các bạn đến lớp trong hoàn cảnh nào?", "Trời mưa", ["Trời nắng", "Trời rét", "Trời quang"], "Câu cho biết trời mưa nhưng các bạn vẫn đến lớp."],
+      ["Cây phượng nở hoa đỏ rực vào mùa hè.", "Hoa phượng có màu gì?", "Đỏ rực", ["Vàng nhạt", "Trắng muốt", "Tím biếc"], "Thông tin được nêu trực tiếp trong câu."],
+    ].forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc đoạn thông tin: “${sentence}” ${q}`, a, wrong, exp, "doc-hieu"));
   } else {
-    const words = viWords[g] ?? viWords[3]!;
-    const groups = [{ label: "người", values: words.person }, { label: "con vật", values: words.animal }, { label: "đồ vật hoặc sự vật", values: words.object }, { label: "hoạt động", values: words.action }, { label: "đặc điểm", values: words.trait }];
-    groups.forEach((group, index) => {
-      group.values.forEach((word, wordIndex) => {
-        const otherWords = shuffle(groups.filter((item) => item.label !== group.label).map((item) => item.values[(wordIndex + index) % item.values.length]!)).slice(0, 3);
-        result.push({ id: `arena-vi-g${g}-${index}-${wordIndex}`, subject, grade: g, level: 50, question: `Từ "${word}" thuộc nhóm từ nào?`, options: shuffle([group.label, ...otherWords.map((_, i) => groups.filter((item) => item.label !== group.label)[i]!.label)]), correctAnswer: group.label, explanation: `"${word}" là từ chỉ ${group.label}.` });
-      });
-    });
+    [
+      ["Tôi rất yêu quê hương mình.", "Đại từ xưng hô là từ nào?", "Tôi", ["rất", "yêu", "quê hương"], "“Tôi” là đại từ xưng hô."],
+      ["Chúng em cùng nhau trồng cây.", "Đại từ chỉ người là từ nào?", "Chúng em", ["cùng nhau", "trồng", "cây"], "“Chúng em” dùng để xưng gọi một nhóm người."],
+      ["Vì trời mưa nên trận đấu bị hoãn.", "Cặp quan hệ từ biểu thị nguyên nhân – kết quả là gì?", "Vì… nên", ["Tuy… nhưng", "Nếu… thì", "Không những… mà còn"], "“Vì… nên” biểu thị quan hệ nguyên nhân – kết quả."],
+      ["Tuy đường xa nhưng Hoa vẫn đi học đúng giờ.", "Cặp quan hệ từ biểu thị tương phản là gì?", "Tuy… nhưng", ["Vì… nên", "Nếu… thì", "Do… nên"], "“Tuy… nhưng” biểu thị sự tương phản."],
+      ["Nếu em chăm đọc sách thì vốn từ sẽ phong phú hơn.", "Cặp quan hệ từ biểu thị điều kiện – kết quả là gì?", "Nếu… thì", ["Vì… nên", "Tuy… nhưng", "Mặc dù… nhưng"], "“Nếu… thì” biểu thị điều kiện – kết quả."],
+    ].forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” rồi xác định: ${q}`, a, wrong, exp, "dai-tu-quan-he-tu"));
+    [
+      ["Ăn quả nhớ kẻ trồng cây", "Biết ơn người tạo ra thành quả", ["Chỉ thích ăn trái cây", "Phải trồng cây mỗi ngày", "Không nên hái quả"], "Câu tục ngữ nhắc nhở lòng biết ơn."],
+      ["Có công mài sắt, có ngày nên kim", "Kiên trì sẽ đạt được thành công", ["Làm việc thật nhanh", "Chỉ cần may mắn", "Không cần cố gắng"], "Tục ngữ đề cao sự kiên trì."],
+      ["Lá lành đùm lá rách", "Giúp đỡ người gặp khó khăn", ["Che lá khỏi mưa", "Trồng nhiều cây xanh", "Giữ đồ vật sạch sẽ"], "Câu tục ngữ khuyên con người tương thân tương ái."],
+      ["Uống nước nhớ nguồn", "Nhớ ơn những người đi trước", ["Tiết kiệm nước uống", "Bảo vệ nguồn nước", "Tìm nơi có nước"], "Câu tục ngữ nhắc nhớ cội nguồn và lòng biết ơn."],
+    ].forEach(([proverb, q, wrong, exp]) => add("vietnamese", grade, `Ý nghĩa của câu tục ngữ “${proverb}” là gì?`, q, wrong, exp, "giai-nghia-tuc-ngu"));
   }
   return result;
-}
+};
+
+const englishDrafts = (grade: number): Draft[] => {
+  const result: Draft[] = [];
+  const add = (...args: Parameters<typeof draft>) => result.push(draft(...args));
+  const vocab: Record<number, Array<[string, string]>> = {
+    1: [["con chim", "bird"], ["con bò", "cow"], ["con vịt", "duck"], ["con thỏ", "rabbit"], ["quả cam", "orange"], ["quả nho", "grape"], ["màu đỏ", "red"], ["màu xanh", "green"], ["mẹ", "mother"], ["anh trai", "brother"], ["quyển sách", "book"], ["cái cặp", "schoolbag"]],
+    2: [["bữa sáng", "breakfast"], ["phòng ngủ", "bedroom"], ["bệnh viện", "hospital"], ["siêu thị", "supermarket"], ["con voi", "elephant"], ["con hổ", "tiger"], ["thứ hai", "Monday"], ["Chủ nhật", "Sunday"], ["mưa", "rain"], ["nắng", "sunny"], ["đọc", "read"], ["viết", "write"]],
+    3: [["bơi", "swim"], ["nhảy", "jump"], ["thư viện", "library"], ["sân chơi", "playground"], ["bữa trưa", "lunch"], ["bữa tối", "dinner"], ["mùa xuân", "spring"], ["mùa đông", "winter"], ["cao", "tall"], ["thấp", "short"], ["khát nước", "thirsty"], ["đói bụng", "hungry"]],
+    4: [["thời tiết", "weather"], ["địa chỉ", "address"], ["kỳ nghỉ", "holiday"], ["bảo tàng", "museum"], ["bưu điện", "post office"], ["ồn ào", "noisy"], ["yên tĩnh", "quiet"], ["nguy hiểm", "dangerous"], ["môi trường", "environment"], ["ô nhiễm", "pollution"], ["tiết kiệm", "save"], ["lời khuyên", "advice"]],
+    5: [["thành tựu", "achievement"], ["truyền thống", "tradition"], ["phát minh", "invention"], ["năng lượng", "energy"], ["tình nguyện", "volunteer"], ["bền vững", "sustainable"], ["sự lựa chọn", "choice"], ["thử thách", "challenge"], ["cải thiện", "improve"], ["bảo vệ", "protect"], ["tự tin", "confident"], ["kiên nhẫn", "patient"]],
+  };
+  const pairs = vocab[grade]!;
+  pairs.forEach(([vi, en], index) => {
+    const wrong = shuffle(pairs.filter((pair) => pair[1] !== en).map((pair) => pair[1])).slice(0, 3);
+    const mode = index % 3;
+    if (mode === 0) add("english", grade, `Choose the English word for “${vi}”.`, en, wrong, `“${vi}” means “${en}”.`, "tu-vung-dich");
+    else if (mode === 1) add("english", grade, `Which word means “${vi}”?`, en, wrong, `The correct translation is “${en}”.`, "tu-vung-nhan-dien");
+    else add("english", grade, `Complete the vocabulary pair: ${vi} = ____.`, en, wrong, `The English word is “${en}”.`, "tu-vung-dien-tu");
+  });
+
+  const grammar: Record<number, Array<[string, string, string[], string, string]>> = {
+    1: [
+      ["What color is a banana?", "Yellow", ["Blue", "Black", "Purple"], "A ripe banana is usually yellow.", "mau-sac"],
+      ["How many legs does a dog have?", "Four", ["Two", "Six", "Eight"], "A dog has four legs.", "so-dem"],
+      ["Choose the correct greeting in the morning.", "Good morning", ["Good night", "Good evening", "Goodbye"], "We say “Good morning” in the morning.", "giao-tiep"],
+      ["Which one is an animal?", "Rabbit", ["Pencil", "Table", "Window"], "A rabbit is an animal.", "nhan-biet"],
+      ["Complete: This is ____ apple.", "an", ["a", "am", "are"], "We use “an” before a vowel sound.", "mao-tu"],
+    ],
+    2: [
+      ["There ____ five books on the desk.", "are", ["is", "am", "be"], "Use “are” with plural nouns.", "there-are"],
+      ["My sister ____ eight years old.", "is", ["am", "are", "be"], "Use “is” with “my sister”.", "dong-tu-to-be"],
+      ["What day comes after Friday?", "Saturday", ["Thursday", "Monday", "Sunday"], "Saturday comes after Friday.", "ngay-trong-tuan"],
+      ["Choose the opposite of “hot”.", "cold", ["warm", "big", "fast"], "“Cold” is the opposite of “hot”.", "tu-trai-nghia"],
+      ["I have two ____.", "pencils", ["pencil", "penciles", "penciling"], "Use the plural form “pencils” after “two”.", "so-nhieu"],
+    ],
+    3: [
+      ["She ____ a student.", "is", ["are", "am", "be"], "Use “is” with “she”.", "to-be"],
+      ["They ____ football after school.", "play", ["plays", "playing", "played"], "Use the base verb with “they” in the present simple.", "hien-tai-don"],
+      ["There ____ a ruler in my bag.", "is", ["are", "am", "be"], "Use “is” with the singular noun “a ruler”.", "there-is"],
+      ["What is the plural of “child”?", "children", ["childs", "childes", "childrens"], "“Child” has the irregular plural “children”.", "so-nhieu-bat-quy-tac"],
+      ["Choose the correct question.", "Where do you live?", ["Where you live?", "Where does you live?", "Where are you live?"], "Use “do” with “you” in this present simple question.", "dat-cau-hoi"],
+    ],
+    4: [
+      ["She ____ to school every day.", "goes", ["go", "going", "went"], "Use “goes” with “she” in the present simple.", "hien-tai-don"],
+      ["We ____ to the zoo last Sunday.", "went", ["go", "goes", "going"], "“Last Sunday” signals the past simple.", "qua-khu-don"],
+      ["Look! The children ____ in the garden.", "are playing", ["play", "plays", "played"], "Use the present continuous for an action happening now.", "hien-tai-tiep-dien"],
+      ["The opposite of “careful” is ____.", "careless", ["helpful", "useful", "beautiful"], "“Careless” means not careful.", "tu-trai-nghia"],
+      ["The book is ____ the table.", "on", ["between", "understand", "behind of"], "“On” means the book is on the surface of the table.", "gioi-tu"],
+    ],
+    5: [
+      ["She ____ here since 2020.", "has lived", ["lived", "lives", "is living"], "Use the present perfect with “since” for a continuing situation.", "hien-tai-hoan-thanh"],
+      ["If it rains tomorrow, we ____ at home.", "will stay", ["stayed", "staying", "stay yesterday"], "Use “will” in the result clause of this first conditional.", "cau-dieu-kien"],
+      ["This puzzle is ____ than the last one.", "more difficult", ["most difficult", "difficulter", "difficult"], "Use “more difficult” for this comparison.", "so-sanh-hon"],
+      ["The classroom ____ every afternoon.", "is cleaned", ["cleans", "cleaned", "is cleaning"], "The passive form is “is cleaned”.", "bi-dong"],
+      ["We have studied English ____ three years.", "for", ["since", "at", "on"], "Use “for” with a period of time.", "gioi-tu-thoi-gian"],
+      ["He asked me where I ____.", "lived", ["live", "living", "lives"], "Reported questions use statement word order and backshift here.", "cau-tuong-thuat"],
+    ],
+  };
+  grammar[grade]!.forEach(([q, a, wrong, explanation, family]) => add("english", grade, q, a, wrong, explanation, family));
+  return result;
+};
+
+const normalizeQuestion = (question: string) =>
+  question.normalize("NFC").toLocaleLowerCase("vi")
+    .replace(/[“”"'.,!?;:]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
 
 export function createArenaQuestionSet(grade: number, count = 10): Question[] {
   const g = Math.max(1, Math.min(5, Math.floor(grade) || 1));
-  const storageKey = `be-vui-hoc:arena-seen:v2:grade-${g}`;
+  const storageKey = `be-vui-hoc:arena-seen:v3:grade-${g}`;
   let seen: string[] = [];
-  try { seen = JSON.parse(localStorage.getItem(storageKey) || "[]") as string[]; } catch { seen = []; }
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(storageKey) || "[]");
+    if (Array.isArray(parsed)) seen = parsed.filter((value): value is string => typeof value === "string");
+  } catch { seen = []; }
   const seenSet = new Set(seen);
-  const pool = [
-    ...languageQuestions(g, "vietnamese"),
-    ...languageQuestions(g, "english"),
+
+  const languagePool = [
+    ...vietnameseDrafts(g),
+    ...englishDrafts(g),
   ];
-  const mathCandidates: Question[] = [];
-  for (let i = 0; i < 180; i++) mathCandidates.push(generateQuestion("math", g, 50));
-  pool.push(...mathCandidates);
-  const fresh = shuffle(pool.filter((q) => !seenSet.has(`${q.subject}:${q.question.toLocaleLowerCase()}`)));
+  const mathPool: Question[] = [];
+  for (let i = 0; i < 500; i++) {
+    const level = 1 + (i % 100);
+    const q = generateQuestion("math", g, level);
+    mathPool.push(q);
+  }
+
+  const freshLanguage = languagePool.filter((q) => !seenSet.has(`${q.subject}:${normalizeQuestion(q.question)}`));
+  const freshMath = mathPool.filter((q) => !seenSet.has(`math:${normalizeQuestion(q.question)}`));
   const selected: Question[] = [];
   const used = new Set<string>();
-  for (const q of fresh) {
-    const key = `${q.subject}:${q.question.toLocaleLowerCase()}`;
-    if (used.has(key)) continue;
-    used.add(key);
-    selected.push(q);
-    if (selected.length >= count) break;
-  }
-  if (selected.length < count) {
+  const usedFamilies = new Set<string>();
+
+  const addFrom = (pool: Question[], target: number) => {
+    let added = 0;
     for (const q of shuffle(pool)) {
-      const key = `${q.subject}:${q.question.toLocaleLowerCase()}`;
+      const key = `${q.subject}:${normalizeQuestion(q.question)}`;
+      if (used.has(key)) continue;
+      const family = (q as Question & { family?: string }).family;
+      if (family && usedFamilies.has(`${q.subject}:${family}`) && added < target - 1) continue;
+      used.add(key);
+      if (family) usedFamilies.add(`${q.subject}:${family}`);
+      selected.push(q);
+      added++;
+      if (added >= target) break;
+    }
+  };
+
+  const safeCount = Math.max(1, Math.min(30, Math.floor(count) || 10));
+  // Keep all three subjects represented in every normal 10-question match.
+  const mathTarget = Math.ceil(safeCount * 0.4);
+  const viTarget = Math.floor(safeCount * 0.3);
+  const enTarget = safeCount - mathTarget - viTarget;
+  addFrom(freshMath, mathTarget);
+  addFrom(freshLanguage.filter((q) => q.subject === "vietnamese"), viTarget);
+  addFrom(freshLanguage.filter((q) => q.subject === "english"), enTarget);
+
+  if (selected.length < safeCount) {
+    const remaining = shuffle([...freshMath, ...freshLanguage]);
+    for (const q of remaining) {
+      const key = `${q.subject}:${normalizeQuestion(q.question)}`;
       if (used.has(key)) continue;
       used.add(key);
       selected.push(q);
-      if (selected.length >= count) break;
+      if (selected.length >= safeCount) break;
     }
   }
+
+  const finalQuestions = shuffle(selected).slice(0, safeCount).map((q, index) => ({
+    ...q,
+    id: `arena-g${g}-${Date.now()}-${index}-${Math.floor(Math.random() * 100000)}`,
+    level: q.subject === "math" ? q.level : g * 10 + index,
+  }));
+
   try {
-    const nextSeen = [...seen, ...selected.map((q) => `${q.subject}:${q.question.toLocaleLowerCase()}`)].slice(-1500);
+    const nextSeen = [...seen, ...finalQuestions.map((q) => `${q.subject}:${normalizeQuestion(q.question)}`)].slice(-3000);
     localStorage.setItem(storageKey, JSON.stringify(nextSeen));
-  } catch { /* Storage can be unavailable in private browsing; matches still work. */ }
-  return shuffle(selected).slice(0, count);
+  } catch { /* Storage can be unavailable; the in-match de-duplication still applies. */ }
+
+  return finalQuestions;
 }
