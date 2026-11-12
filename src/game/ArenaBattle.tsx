@@ -140,6 +140,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     if (isNewMatch) {
       scoreRef.current = 0;
       answeredRef.current = 0;
+      lastQuestionAction.current = 0;
       playerScoresRef.current = {};
       savedMatchRef.current = null;
       setScore(0);
@@ -312,8 +313,8 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   }, [players, phase, profile.id, currentGrade, applyGameStart]);
 
   const nextQuestion = useCallback(() => {
-    if (Date.now() - lastQuestionAction.current < 1200) return;
-    lastQuestionAction.current = Date.now();
+    if (lastQuestionAction.current === questionIndexRef.current) return;
+    lastQuestionAction.current = questionIndexRef.current;
     if (questionIndexRef.current >= QUESTIONS_PER_MATCH || !matchQuestionsRef.current[questionIndexRef.current]) {
       const scores = players.map((player) => {
         const current = playerScoresRef.current[player.id];
