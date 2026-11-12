@@ -95,7 +95,7 @@ const generateMath = (grade: number, lv: number) => {
         const a = rand(1, Math.max(1, maxNum - 2));
         const b = a + 2;
         correctVal = a + 1;
-        questionText = `Điền số thích hợp vào ô trống: ${a} < □ < ${b}`;
+        questionText = `Số nào nằm giữa ${a} và ${b}?`;
         explanation = `Số nằm giữa ${a} và ${b} là ${correctVal}.`;
       } else {
         let a = rand(1, maxNum);
