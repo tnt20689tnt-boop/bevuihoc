@@ -421,6 +421,12 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
 
   const correct = !!question && selected === question.correctAnswer;
   const subject = question ? subjectName[question.subject] : "";
+  const orderedScores = [...matchScores].sort((a, b) => b.score - a.score);
+  const matchIsDraw = orderedScores.length >= 2 && orderedScores[0]!.score === orderedScores[1]!.score;
+  const winner = orderedScores[0];
+  const scoreLine = orderedScores.length >= 2
+    ? `${orderedScores[0]!.name} ${orderedScores[0]!.score} – ${orderedScores[1]!.score} ${orderedScores[1]!.name}`
+    : `${score}/${QUESTIONS_PER_MATCH}`;
 
   return (
     <main className="relative min-h-[calc(100dvh-5rem)] overflow-hidden rounded-3xl bg-gradient-to-b from-indigo-950 via-slate-900 to-sky-950 p-3 text-white sm:p-6">
@@ -462,9 +468,27 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       {phase === "finished" && (
         <section className="mx-auto mt-5 max-w-2xl rounded-3xl border border-amber-200/40 bg-white/10 p-6 text-center">
           <div className="text-5xl">🏆</div>
-          <h2 className="mt-3 text-2xl font-black text-amber-200">HOÀN THÀNH 10 CÂU HỎI!</h2>
-          <p className="mt-2 text-sky-100">Con đã trả lời {answered} câu và đạt {score} điểm.</p>
-          <p className="mt-1 text-sm text-sky-100/80">Trận đấu đã kết thúc. Chờ các bé trở về sảnh để bắt đầu lượt mới.</p>
+          <h2 className="mt-3 text-2xl font-black text-amber-200">KẾT QUẢ ĐẤU TRƯỜNG</h2>
+          <p className="mt-3 text-2xl font-black text-white">{scoreLine}</p>
+          <p className="mt-2 text-xl font-black text-amber-200">
+            {matchIsDraw ? "🤝 Hai thí sinh hòa nhau!" : winner ? `🏆 ${winner.name} chiến thắng!` : "Đã hoàn thành trận đấu"}
+          </p>
+          <div className="mx-auto mt-4 max-w-md space-y-2 rounded-2xl border border-white/15 bg-slate-950/35 p-4 text-left">
+            {matchScores.map((item) => (
+              <div key={item.playerId} className="flex items-center justify-between gap-3 text-sm">
+                <span className="font-bold">{item.name}{item.playerId === profile.id ? " (Bạn)" : ""}</span>
+                <span className="font-black tabular-nums text-amber-200">{item.score}/{QUESTIONS_PER_MATCH} điểm</span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-sm text-sky-100">Con đã trả lời {answered} câu. Mã trận: {matchId?.slice(0, 8) || "—"}</p>
+          {saveError ? (
+            <p className="mt-2 text-sm font-bold text-rose-300">Chưa lưu được kết quả: {saveError}</p>
+          ) : (
+            <p className="mt-2 text-sm text-emerald-200">✓ Kết quả trận đấu đã được gửi lưu vào mục Thi đấu.</p>
+          )
+          }
+          <p className="mt-1 text-xs text-sky-100/70">Trận đấu đã kết thúc. Chờ các bé trở về sảnh để bắt đầu lượt mới.</p>
           <button onClick={leaveCompetition} className="mt-5 rounded-full bg-amber-300 px-7 py-3 font-black text-slate-950">VỀ SẢNH ĐẤU TRƯỜNG</button>
         </section>
       )}
