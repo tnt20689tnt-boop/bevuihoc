@@ -147,7 +147,8 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   if (grade === 1) {
     if (stageKind === 0) {
       const letter = pick(["a", "ă", "â", "b", "c", "d", "đ", "e", "ê", "g", "h", "i", "k", "l", "m", "n", "o", "ô", "ơ", "p", "q", "r", "s", "t", "u", "ư", "v", "x", "y"]);
-      return make(`Chữ nào giống chữ “${letter}”?`, letter, ["b", "d", "m"].filter(x => x !== letter).concat(["a", "e", "o"].filter(x => x !== letter)), "Quan sát nét chữ và dấu của chữ cái.");
+      const place = pick(["trên bảng lớp", "trong quyển vở", "trên thẻ chữ", "ở góc thư viện"]);
+      return make(`Bạn ${name} nhìn ${place}. Chữ nào giống chữ “${letter}”?`, letter, ["b", "d", "m"].filter(x => x !== letter).concat(["a", "e", "o"].filter(x => x !== letter)), "Quan sát nét chữ và dấu của chữ cái.");
     }
     if (stageKind === 1) {
       const onset = pick(["b", "m", "c", "g", "h", "t"]);
