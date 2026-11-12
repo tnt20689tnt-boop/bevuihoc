@@ -299,21 +299,21 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`Complete the sentence ${context}: This is ___ ${object}.`, article, [article === "a" ? "an" : "a", "are", "am"], "Chọn mạo từ a hoặc an theo âm đầu của danh từ.");
   }
   if (grade === 2) {
-    if (kind === 0) { const noun = pick(nouns); return make(`What is “${noun}” in Vietnamese?`, ({book:"quyển sách",pencil:"bút chì",school:"trường học",teacher:"giáo viên",friend:"bạn bè",garden:"khu vườn",library:"thư viện",family:"gia đình"} as Record<string,string>)[noun]!, ["con mèo","quả cam","màu xanh"], "Ôn từ vựng quen thuộc."); }
+    if (kind === 0) { const noun = pick(nouns); const context = pick(["in a school story", "on a vocabulary card", "during an English lesson"]); return make(`${name} sees the word “${noun}” ${context}. What does it mean in Vietnamese?`, ({book:"quyển sách",pencil:"bút chì",school:"trường học",teacher:"giáo viên",friend:"bạn bè",garden:"khu vườn",library:"thư viện",family:"gia đình"} as Record<string,string>)[noun]!, ["con mèo","quả cam","màu xanh"], "Ôn từ vựng quen thuộc."); }
     if (kind === 1) {
       const singular = pick(["box", "bus", "class", "dish", "watch", "baby"]);
       const plural = singular === "baby" ? "babies" : `${singular}es`;
-      return make(`Choose the plural form of “${singular}”.`, plural, [`${singular}s`, `${singular}ies`, singular], "Chú ý quy tắc thêm -es hoặc đổi y thành -ies.");
+      const context = pick(["in the classroom", "in a reading exercise", "on a vocabulary worksheet"]);\n      return make(`${name} is doing an English exercise ${context}. Choose the plural form of “${singular}”.`, plural, [`${singular}s`, `${singular}ies`, singular], "Chú ý quy tắc thêm -es hoặc đổi y thành -ies.");
     }
-    if (kind === 2) return make(`Complete: ${name} ___ my friend.`, "is", ["am", "are", "be"], "Dùng is với chủ ngữ số ít.");
+    if (kind === 2) { const object = pick(["classmate", "neighbor", "teacher", "cousin", "new friend"]); const context = pick(["at school", "in the playground", "in the classroom", "at the library"]); return make(`Complete the sentence ${context}: ${name} ___ my ${object}.`, "is", ["am", "are", "be"], "Dùng is với chủ ngữ số ít."); }
     if (kind === 3) {
       const prompts = [["asking a name", "What"], ["asking a place", "Where"], ["asking a time", "When"], ["asking a reason", "Why"]];
       const item = pick(prompts);
-      return make(`Which question word is used for ${item[0]}?`, item[1], prompts.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ để hỏi phù hợp với thông tin cần biết.");
+      const context = pick(["in a conversation", "during an interview", "in a classroom dialogue", "when asking a new friend"]);\n      return make(`${name} needs to ${item[0]} ${context}. Which question word should be used?`, item[1], prompts.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ để hỏi phù hợp với thông tin cần biết.");
     }
     const place = pick(["the table", "the school bag", "the chair", "the desk"]);
     const relation = pick(["on", "under", "in"]);
-    return make(`The pencil is ${relation === "on" ? "___" : "___"} ${place}. Choose the correct preposition.`, relation, ["on", "under", "in"].filter(x => x !== relation).concat(["between"]), "On là ở trên, under là ở dưới, in là ở trong.");
+    const context = pick(["in the classroom", "at the library", "on the study desk", "in the bedroom"]);\n    return make(`${name} is describing a pencil ${context}: The pencil is ___ ${place}. Choose the correct preposition.`, relation, ["on", "under", "in"].filter(x => x !== relation).concat(["between"]), "On là ở trên, under là ở dưới, in là ở trong.");
   }
   if (grade === 3) {
     if (kind === 0) {
