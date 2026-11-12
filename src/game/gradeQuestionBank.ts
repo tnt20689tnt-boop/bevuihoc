@@ -188,7 +188,10 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`Mỗi sáng, ${name} thường ${action}. Cụm từ nào chỉ hoạt động?`, action, ["màu đỏ", "hiền hậu", "quyển truyện"], "Từ chỉ hoạt động trả lời câu hỏi làm gì.");
     }
     if (stageKind === 3) { const context = pick(["trong bài đọc", "ở lớp học", "trong câu chuyện", "khi miêu tả bạn bè"]); return make(`Bạn ${name} tìm từ trái nghĩa với “${pair[0]}” ${context}. Từ cần tìm là gì?`, pair[2], [pair[1], pair[3], "vui vẻ"], "Tìm từ có nghĩa trái ngược."); }
-    const questions = [`Bạn ${name} học lớp mấy?`, `Hôm nay ${name} trực nhật phải không?`, `${name} đang đọc quyển sách nào?`, `Ai cùng ${name} đến thư viện?`];\n    const question = pick(questions);\n    const context = pick(["trong giờ học", "khi trò chuyện", "trong bài tập đọc"]);\n    return make(`Câu nào là câu hỏi ${context}?`, question, [`Bạn ${name} học lớp hai.`, `Ôi, quyển sách đẹp quá!`, `Hãy mở sách ra.`], "Câu hỏi dùng để hỏi và thường kết thúc bằng dấu hỏi.");
+    const questions = [`Bạn ${name} học lớp mấy?`, `Hôm nay ${name} trực nhật phải không?`, `${name} đang đọc quyển sách nào?`, `Ai cùng ${name} đến thư viện?`];
+    const question = pick(questions);
+    const context = pick(["trong giờ học", "khi trò chuyện", "trong bài tập đọc"]);
+    return make(`Câu nào là câu hỏi ${context}?`, question, [`Bạn ${name} học lớp hai.`, `Ôi, quyển sách đẹp quá!`, `Hãy mở sách ra.`], "Câu hỏi dùng để hỏi và thường kết thúc bằng dấu hỏi.");
   }
   if (grade === 3) {
     if (stageKind === 0) {
@@ -204,7 +207,9 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`Từ nào miêu tả đặc điểm của ${name} trong cụm “${name} rất ${adjective}”?`, adjective, ["học tập", "bàn ghế", "cây cối"], "Tính từ chỉ đặc điểm, tính chất.");
     }
     if (stageKind === 3) { const action = pick(["đọc", "viết", "trồng", "chăm sóc", "bảo vệ"]); const object = pick(["sách", "cây xanh", "môi trường", "bài tập"]); return make(`Trong câu “${name} đang ${action} ${object}”, từ nào là động từ?`, action, ["chăm chỉ", name, object], "Động từ nêu hoạt động của chủ thể."); }
-    const proverbs = ["Thương người như thể thương thân", "Lá lành đùm lá rách", "Một con ngựa đau cả tàu bỏ cỏ", "Chị ngã em nâng"];\n    const proverb = pick(proverbs);\n    return make(`Câu tục ngữ nào nhắc nhở chúng ta biết yêu thương, giúp đỡ nhau?`, proverb, proverbs.filter(x => x !== proverb).slice(0, 3), "Chọn câu nói về lòng nhân ái và sự sẻ chia.");
+    const proverbs = ["Thương người như thể thương thân", "Lá lành đùm lá rách", "Một con ngựa đau cả tàu bỏ cỏ", "Chị ngã em nâng"];
+    const proverb = pick(proverbs);
+    return make(`Câu tục ngữ nào nhắc nhở chúng ta biết yêu thương, giúp đỡ nhau?`, proverb, proverbs.filter(x => x !== proverb).slice(0, 3), "Chọn câu nói về lòng nhân ái và sự sẻ chia.");
   }
   if (grade === 4) {
     if (stageKind === 0) return make("Câu nào thuộc kiểu câu kể Ai làm gì?", `${name} đang chăm sóc vườn rau.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, vườn rau đẹp quá!`], "Kiểu câu này nêu chủ thể và hoạt động.");
