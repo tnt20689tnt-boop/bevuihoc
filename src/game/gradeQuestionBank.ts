@@ -300,7 +300,18 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       const context = pick(["at school", "in the calendar", "during the weekend", "in the morning"]);
       return make(`${name} checks the calendar ${context}. Which day comes after ${item[0]}?`, item[1]!, ["Monday", "Friday", "Sunday"].filter(x => x !== item[1]), "Học thứ tự các ngày trong tuần.");
     }
-    if (kind === 3) { const time = pick([["8 a.m.", "Good morning"], ["2 p.m.", "Good afternoon"], ["6 p.m.", "Good evening"], ["before going to bed", "Good night"]]); const context = pick(["at the school gate", "when meeting a friend", "at home", "on the way to class", "during a family visit", "before the English lesson"]); return make(`What should you say to ${name} ${context} at ${time[0]}?`, time[1]!, ["Good morning", "Goodbye", "Good evening"].filter(x => x !== time[1]), "Chọn lời chào phù hợp với thời điểm."); }
+    if (kind === 3) {
+      const greetings = [
+        ["meet a friend at 8 a.m.", "Good morning"],
+        ["meet a friend at 2 p.m.", "Good afternoon"],
+        ["meet a friend at 6 p.m.", "Good evening"],
+        ["say goodbye before bedtime", "Good night"],
+      ];
+      const greeting = pick(greetings);
+      const context = pick(["at the school gate", "at home", "during a family visit", "before class", "after an afternoon activity", "when leaving a friend's house"]);
+      const wrong = shuffle(["Good morning", "Good afternoon", "Good evening", "Good night", "Goodbye", "Hello"].filter((value) => value !== greeting[1])).slice(0, 3);
+      return make(`What should ${name} say when they ${greeting[0]} ${context}?`, greeting[1]!, wrong, "Chọn lời chào hoặc lời tạm biệt phù hợp với thời điểm.");
+    }
     const object = pick(["book", "pencil", "ruler", "bag", "desk", "chair", "apple", "orange"]);
     const article = /^[aeiou]/i.test(object) ? "an" : "a";
     const context = pick([`in ${name}’s school bag`, `on ${name}’s desk`, `in ${name}’s classroom`, `at ${name}’s library`]);
@@ -321,11 +332,11 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       const context = pick(["in a conversation", "during an interview", "in a classroom dialogue", "when asking a new friend", "while visiting a new place"]);
       return make(`${name} needs to ${item[0]} ${context}. Which question word should be used?`, item[1], prompts.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ để hỏi phù hợp với thông tin cần biết.");
     }
-    const place = pick(["the table", "the school bag", "the chair", "the desk"]);
+    const locations = [["on", "the table"], ["in", "the school bag"], ["under", "the chair"], ["on", "the desk"], ["in", "the drawer"], ["under", "the desk"]];
+    const location = pick(locations);
     const object = pick(["pencil", "book", "ruler", "eraser"]);
-    const relation = pick(["on", "under", "in"]);
     const context = pick(["in the classroom", "at the library", "on the study desk", "in the bedroom", "during an English lesson"]);
-    return make(`${name} is describing a ${object} ${context}: The ${object} is ___ ${place}. Choose the correct preposition.`, relation, ["on", "under", "in"].filter(x => x !== relation).concat(["between"]), "On là ở trên, under là ở dưới, in là ở trong.");
+    return make(`${name} describes a ${object} ${context}: The ${object} is ___ ${location[1]}.`, location[0], ["on", "under", "in"].filter((value) => value !== location[0]).concat(["between"]), "On là ở trên, under là ở dưới, in là ở trong.");
   }
   if (grade === 3) {
     if (kind === 0) {
