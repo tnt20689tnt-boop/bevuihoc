@@ -191,10 +191,10 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       .on("broadcast", { event: "answer-submitted" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
         const message = payload as {
-          questionIndex?: number; advanceAt?: number; playerId?: string;
+          matchId?: string; questionIndex?: number; advanceAt?: number; playerId?: string;
           playerName?: string; scoreAfter?: number; answeredAfter?: number;
         };
-        if (message.questionIndex !== questionIndexRef.current) return;
+        if (message.matchId !== matchIdRef.current || message.questionIndex !== questionIndexRef.current) return;
         if (typeof message.advanceAt === "number") {
           setAdvanceAt((current) => current === null ? message.advanceAt! : Math.min(current, message.advanceAt!));
         }
@@ -220,7 +220,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       .on("broadcast", { event: "next-question" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
         const message = payload as GameMessage;
-        if (typeof message.startsAt === "number" && message.question?.question && Array.isArray(message.question.options)) applyGameStart(message);
+        if (message.matchId === matchIdRef.current && typeof message.startsAt === "number" && message.question?.question && Array.isArray(message.question.options)) applyGameStart(message);
       })
       .subscribe(async (status) => {
         if (!alive || status !== "SUBSCRIBED") return;
@@ -248,6 +248,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   }, [phase, startsAt]);
 
   const finishMatch = useCallback((message?: MatchFinishedMessage) => {
+    if (message?.matchId && matchIdRef.current && message.matchId !== matchIdRef.current) return;
     const id = message?.matchId || matchIdRef.current;
     const scoreMap = { ...playerScoresRef.current };
     if (message?.scores) {
@@ -383,6 +384,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       type: "broadcast",
       event: "answer-submitted",
       payload: {
+        matchId: matchIdRef.current,
         questionIndex,
         advanceAt: deadline,
         playerId: profile.id,
@@ -505,7 +507,10 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
           ) : saveStatus === "saved" ? (
             <p className="mt-2 text-sm text-emerald-200">✓ Đã lưu kết quả vào mục Thi đấu.</p>
           ) : saveStatus === "error" ? (
-            <p className="mt-2 text-sm font-bold text-rose-300">Chưa lưu được kết quả: {saveError}</p>
+            <div className="mt-2 flex flex-col items-center gap-2">
+              <p className="text-sm font-bold text-rose-300">Chưa lưu được kết quả: {saveError}</p>
+              <button onClick={() => finishMatch()} className="rounded-full border border-rose-200/40 px-4 py-2 text-xs font-bold text-rose-100">Thử lưu lại</button>
+            </div>
           ) : (
             <p className="mt-2 text-sm text-sky-100/80">Đang hoàn tất lưu kết quả…</p>
           )}
