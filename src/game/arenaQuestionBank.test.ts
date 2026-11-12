@@ -29,7 +29,7 @@ describe("Arena question bank", () => {
       const questions = createArenaQuestionSet(grade, 10);
       const normalized = questions.map((question) =>
         question.question.normalize("NFC").toLocaleLowerCase("vi")
-          .replace(/[“”"'.,!?;:]/g, "").replace(/\\s+/g, " ").trim(),
+          .replace(/[“”"'.,!?;:]/g, "").replace(/\s+/g, " ").trim(),
       );
       expect(new Set(normalized).size).toBe(questions.length);
     }
@@ -40,11 +40,11 @@ describe("Arena question bank", () => {
     const second = createArenaQuestionSet(3, 10);
     const firstKeys = new Set(first.map((question) =>
       question.subject + ":" + question.question.normalize("NFC").toLocaleLowerCase("vi")
-        .replace(/[“”"'.,!?;:]/g, "").replace(/\\s+/g, " ").trim(),
+        .replace(/[“”"'.,!?;:]/g, "").replace(/\s+/g, " ").trim(),
     ));
     const secondKeys = second.map((question) =>
       question.subject + ":" + question.question.normalize("NFC").toLocaleLowerCase("vi")
-        .replace(/[“”"'.,!?;:]/g, "").replace(/\\s+/g, " ").trim(),
+        .replace(/[“”"'.,!?;:]/g, "").replace(/\s+/g, " ").trim(),
     );
     expect(secondKeys.some((key) => firstKeys.has(key))).toBe(false);
   });
