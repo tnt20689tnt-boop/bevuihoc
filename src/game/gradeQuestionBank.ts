@@ -57,7 +57,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`Dãy số ${a}, ${a + 1}, __, ${a + 3}. Số còn thiếu là?`, String(answer), [String(answer - 1), String(answer + 1), String(answer + 2)], "Mỗi lần dãy tăng thêm 1.");
   }
   if (grade === 2) {
-    const max = 20 + scale * 98;
+    const max = Math.min(999, 20 + Math.round(scale * 9.8));
     const kind = int(0, 4);
     if (kind <= 1) {
       const a = int(10, max - 1), b = int(1, Math.max(1, max - a));
@@ -77,7 +77,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`${total} : ${a} = ?`, String(answer), [String(answer + 1), String(Math.max(1, answer - 1)), String(total + a)], "Tìm số mà nhân với ${a} được ${total}.");
   }
   if (grade === 3) {
-    const kind = int(0, 4), max = 100 + scale * 180;
+    const kind = int(0, 4), max = Math.min(10000, 100 + scale * 100);
     if (kind === 0) {
       const a = int(2, 9), b = int(2, 9), answer = a * b;
       return make(`${a} × ${b} = ?`, String(answer), [String(answer + a), String(answer - b), String(a + b)], "Vận dụng bảng nhân.");
@@ -115,7 +115,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`Phân số nào bằng ${numerator}/${denominator} khi nhân cả tử và mẫu với 2?`, `${numerator * 2}/${denominator * 2}`, [`${numerator + 1}/${denominator * 2}`, `${numerator * 2}/${denominator}`, `${numerator}/${denominator * 2}`], "Nhân cả tử số và mẫu số với cùng một số khác 0.");
     }
     if (kind === 3) {
-      const a = int(10, 100 + scale * 10), b = int(10, 80 + scale * 8), answer = a * b;
+      const a = int(10, 100 + scale * 2), b = int(10, 80 + scale * 2), answer = a * b;
       return make(`Hình chữ nhật dài ${a} m, rộng ${b} m. Diện tích là?`, `${answer} m²`, [`${2 * (a + b)} m²`, `${a + b} m²`, `${answer + a} m²`], "Diện tích hình chữ nhật = dài × rộng.");
     }
     const a = int(1000, max), b = int(1000, max), answer = a + b;
@@ -127,7 +127,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`${a.toFixed(1)} + ${b.toFixed(1)} = ?`, answer.toFixed(2), [(answer + 0.1).toFixed(2), (answer - 0.1).toFixed(2), (answer + 1).toFixed(2)], "Đặt thẳng hàng các chữ số cùng hàng thập phân.");
   }
   if (kind === 1) {
-    const denominator = int(3, 12), a = int(1, denominator - 1), b = int(1, denominator - a);
+    const denominator = int(3, Math.min(20, 3 + Math.floor(scale / 6))), a = int(1, denominator - 1), b = int(1, denominator - a);
     return make(`${a}/${denominator} + ${b}/${denominator} = ?`, `${a + b}/${denominator}`, [`${a + b + 1}/${denominator}`, `${a + b}/${denominator + 1}`, `${Math.max(0, a - b)}/${denominator}`], "Giữ nguyên mẫu số và cộng các tử số.");
   }
   if (kind === 2) {
@@ -135,7 +135,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`${percent}% của ${total} là bao nhiêu?`, String(answer), [String(answer + total / 10), String(answer - total / 10), String(answer + percent)], "Lấy số đó nhân với phần trăm rồi chia 100.");
   }
   if (kind === 3) {
-    const a = int(2, 20 + scale * 5), b = int(2, 15 + scale * 3), h = int(2, 10 + scale * 2), answer = a * b * h;
+    const a = int(2, Math.min(100, 20 + scale)), b = int(2, Math.min(80, 15 + Math.floor(scale * 0.6))), h = int(2, Math.min(50, 10 + Math.floor(scale * 0.4))), answer = a * b * h;
     return make(`Hộp chữ nhật dài ${a} cm, rộng ${b} cm, cao ${h} cm. Thể tích là?`, `${answer} cm³`, [`${a * b} cm³`, `${2 * (a + b + h)} cm³`, `${answer + a} cm³`], "Thể tích = dài × rộng × cao.");
   }
   const speed = int(20, Math.min(150, 60 + scale)), hours = int(2, 8), answer = speed * hours;
