@@ -11,7 +11,6 @@ const shuffle = <T,>(items: T[]): T[] => {
   return copy;
 };
 
-const pick = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)]!;
 const unique = (items: string[]) => [...new Set(items)];
 
 function draft(
@@ -129,12 +128,12 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["Tuy đường xa nhưng Hoa vẫn đi học đúng giờ.", "Cặp quan hệ từ biểu thị tương phản là gì?", "Tuy… nhưng", ["Vì… nên", "Nếu… thì", "Do… nên"], "“Tuy… nhưng” biểu thị sự tương phản."],
       ["Nếu em chăm đọc sách thì vốn từ sẽ phong phú hơn.", "Cặp quan hệ từ biểu thị điều kiện – kết quả là gì?", "Nếu… thì", ["Vì… nên", "Tuy… nhưng", "Mặc dù… nhưng"], "“Nếu… thì” biểu thị điều kiện – kết quả."],
     ] as Array<[string, string, string, string[], string]>).forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” rồi xác định: ${q}`, a, wrong, exp, "dai-tu-quan-he-tu"));
-    [
+    ([
       ["Ăn quả nhớ kẻ trồng cây", "Biết ơn người tạo ra thành quả", ["Chỉ thích ăn trái cây", "Phải trồng cây mỗi ngày", "Không nên hái quả"], "Câu tục ngữ nhắc nhở lòng biết ơn."],
       ["Có công mài sắt, có ngày nên kim", "Kiên trì sẽ đạt được thành công", ["Làm việc thật nhanh", "Chỉ cần may mắn", "Không cần cố gắng"], "Tục ngữ đề cao sự kiên trì."],
       ["Lá lành đùm lá rách", "Giúp đỡ người gặp khó khăn", ["Che lá khỏi mưa", "Trồng nhiều cây xanh", "Giữ đồ vật sạch sẽ"], "Câu tục ngữ khuyên con người tương thân tương ái."],
       ["Uống nước nhớ nguồn", "Nhớ ơn những người đi trước", ["Tiết kiệm nước uống", "Bảo vệ nguồn nước", "Tìm nơi có nước"], "Câu tục ngữ nhắc nhớ cội nguồn và lòng biết ơn."],
-    ].forEach(([proverb, q, wrong, exp]) => add("vietnamese", grade, `Ý nghĩa của câu tục ngữ “${proverb}” là gì?`, q, wrong, exp, "giai-nghia-tuc-ngu"));
+    ] as Array<[string, string, string[], string]>).forEach(([proverb, q, wrong, exp]) => add("vietnamese", grade, `Ý nghĩa của câu tục ngữ “${proverb}” là gì?`, q, wrong, exp, "giai-nghia-tuc-ngu"));
   }
   return result;
 };
