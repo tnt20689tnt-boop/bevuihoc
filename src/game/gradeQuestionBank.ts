@@ -284,17 +284,17 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   const name = pick(["Mai", "Nam", "Linh", "Tom", "Anna", "Ben"]);
   const kind = (stage - 1) % 5;
   if (grade === 1) {
-    if (kind === 0) { const word = pick(animals); return make(`What is “${word}” in Vietnamese?`, ({cat:"con mèo",dog:"con chó",bird:"con chim",fish:"con cá",rabbit:"con thỏ",tiger:"con hổ",elephant:"con voi",monkey:"con khỉ"} as Record<string,string>)[word]!, ["quả táo","quyển sách","bông hoa"], "Nhớ nghĩa của từ chỉ con vật."); }
-    if (kind === 1) { const object = pick(["the sky", "a banana", "grass", "a tomato", "an orange", "the sea"]); return make(`Which color is usually associated with ${object}?`, ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!, colors.filter(x => x !== ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!), "Nhớ từ vựng chỉ màu sắc."); }
+    if (kind === 0) { const word = pick(animals); const context = pick(["at the zoo", "in a picture book", "on a flashcard"]); return make(`What does ${name} call this animal ${context}: “${word}”?`, ({cat:"con mèo",dog:"con chó",bird:"con chim",fish:"con cá",rabbit:"con thỏ",tiger:"con hổ",elephant:"con voi",monkey:"con khỉ"} as Record<string,string>)[word]!, ["quả táo","quyển sách","bông hoa"], "Nhớ nghĩa của từ chỉ con vật."); }
+    if (kind === 1) { const object = pick(["the sky", "a banana", "grass", "a tomato", "an orange", "the sea"]); const context = pick(["in the garden", "at the beach", "in the fruit basket", "on a sunny day"]); return make(`${name} is looking ${context}. Which color is usually associated with ${object}?`, ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!, colors.filter(x => x !== ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!), "Nhớ từ vựng chỉ màu sắc."); }
     if (kind === 2) {
       const days = [["Monday", "Tuesday"], ["Tuesday", "Wednesday"], ["Wednesday", "Thursday"], ["Thursday", "Friday"], ["Friday", "Saturday"], ["Saturday", "Sunday"]];
       const item = pick(days);
-      return make(`Which day comes after ${item[0]}?`, item[1]!, ["Monday", "Friday", "Sunday"].filter(x => x !== item[1]), "Học thứ tự các ngày trong tuần.");
+      const context = pick(["at school", "in the calendar", "during the weekend", "in the morning"]);\n      return make(`${name} checks the calendar ${context}. Which day comes after ${item[0]}?`, item[1]!, ["Monday", "Friday", "Sunday"].filter(x => x !== item[1]), "Học thứ tự các ngày trong tuần.");
     }
-    if (kind === 3) return make(`What should you say to ${name} when you meet at 8 a.m.?`, "Good morning", ["Good night", "Goodbye", "Good evening"], "Dùng Good morning vào buổi sáng.");
+    if (kind === 3) { const time = pick([["8 a.m.", "Good morning"], ["2 p.m.", "Good afternoon"], ["6 p.m.", "Good evening"], ["before going to bed", "Good night"]]); const context = pick(["at the school gate", "when meeting a friend", "at home", "on the way to class"]); return make(`What should you say to ${name} ${context} at ${time[0]}?`, time[1]!, ["Good morning", "Goodbye", "Good evening"].filter(x => x !== time[1]), "Chọn lời chào phù hợp với thời điểm."); }
     const object = pick(["book", "pencil", "ruler", "bag", "desk", "chair", "apple", "orange"]);
     const article = /^[aeiou]/i.test(object) ? "an" : "a";
-    return make(`Complete: This is ___ ${object}.`, article, [article === "a" ? "an" : "a", "are", "am"], "Chọn mạo từ a hoặc an theo âm đầu của danh từ.");
+    const context = pick(["in ${name}’s school bag", "on the teacher’s desk", "in the classroom", "at the library"]);\n    return make(`Complete the sentence ${context}: This is ___ ${object}.`, article, [article === "a" ? "an" : "a", "are", "am"], "Chọn mạo từ a hoặc an theo âm đầu của danh từ.");
   }
   if (grade === 2) {
     if (kind === 0) { const noun = pick(nouns); return make(`What is “${noun}” in Vietnamese?`, ({book:"quyển sách",pencil:"bút chì",school:"trường học",teacher:"giáo viên",friend:"bạn bè",garden:"khu vườn",library:"thư viện",family:"gia đình"} as Record<string,string>)[noun]!, ["con mèo","quả cam","màu xanh"], "Ôn từ vựng quen thuộc."); }
