@@ -55,7 +55,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
     const max = 20 + scale * 98;
     const kind = int(0, 4);
     if (kind <= 1) {
-      const a = int(10, max - 1), b = int(1, 999 - a);
+      const a = int(10, max - 1), b = int(1, Math.max(1, max - a));
       const answer = a + b;
       return make(`${a} + ${b} = ?`, String(answer), [String(answer + 1), String(answer - 1), String(answer + 10)], "Cộng lần lượt hàng đơn vị và hàng chục.");
     }
@@ -130,7 +130,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
     const a = int(2, 20 + scale * 5), b = int(2, 15 + scale * 3), h = int(2, 10 + scale * 2), answer = a * b * h;
     return make(`Hộp chữ nhật dài ${a} cm, rộng ${b} cm, cao ${h} cm. Thể tích là?`, `${answer} cm³`, [`${a * b} cm³`, `${2 * (a + b + h)} cm³`, `${answer + a} cm³`], "Thể tích = dài × rộng × cao.");
   }
-  const speed = int(20, 60 + scale * 10), hours = int(2, 8), answer = speed * hours;
+  const speed = int(20, Math.min(150, 60 + scale)), hours = int(2, 8), answer = speed * hours;
   return make(`Một xe đi với vận tốc ${speed} km/giờ trong ${hours} giờ. Quãng đường là?`, `${answer} km`, [`${speed + hours} km`, `${answer - speed} km`, `${answer + hours} km`], "Quãng đường = vận tốc × thời gian.");
 };
 
@@ -245,7 +245,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   const kind = (stage - 1) % 5;
   if (grade === 1) {
     if (kind === 0) { const word = pick(animals); return make(`What is “${word}” in Vietnamese?`, ({cat:"con mèo",dog:"con chó",bird:"con chim",fish:"con cá",rabbit:"con thỏ",tiger:"con hổ",elephant:"con voi",monkey:"con khỉ"} as Record<string,string>)[word]!, ["quả táo","quyển sách","bông hoa"], "Nhớ nghĩa của từ chỉ con vật."); }
-    if (kind === 1) { const color = pick(colors); const object = pick(["the sky", "a banana", "grass", "a tomato", "an orange", "the sea"]); return make(`Which color is usually associated with ${object}?`, ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!, colors.filter(x => x !== ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!), "Nhớ từ vựng chỉ màu sắc."); }
+    if (kind === 1) { const object = pick(["the sky", "a banana", "grass", "a tomato", "an orange", "the sea"]); return make(`Which color is usually associated with ${object}?`, ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!, colors.filter(x => x !== ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!), "Nhớ từ vựng chỉ màu sắc."); }
     if (kind === 2) {
       const days = [["Monday", "Tuesday"], ["Tuesday", "Wednesday"], ["Wednesday", "Thursday"], ["Thursday", "Friday"], ["Friday", "Saturday"], ["Saturday", "Sunday"]];
       const item = pick(days);
