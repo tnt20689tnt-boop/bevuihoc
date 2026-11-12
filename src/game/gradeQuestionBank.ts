@@ -214,7 +214,8 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     }
     if (stageKind === 2) {
       const adjective = pick(["trong trẻo", "rộng lớn", "dũng cảm", "dịu dàng", "kiên trì", "mênh mông", "thân thiện", "sáng suốt"]);
-      const scene = pick(["khi tham gia hoạt động nhóm", "trong buổi dã ngoại", "lúc giúp đỡ bạn", "trong giờ học"]);\n      return make(`Từ nào miêu tả đặc điểm của ${name} ${scene} trong cụm “${name} rất ${adjective}”?`, adjective, ["học tập", "bàn ghế", "cây cối"], "Tính từ chỉ đặc điểm, tính chất.");
+      const scene = pick(["khi tham gia hoạt động nhóm", "trong buổi dã ngoại", "lúc giúp đỡ bạn", "trong giờ học"]);
+      return make(`Từ nào miêu tả đặc điểm của ${name} ${scene} trong cụm “${name} rất ${adjective}”?`, adjective, ["học tập", "bàn ghế", "cây cối"], "Tính từ chỉ đặc điểm, tính chất.");
     }
     if (stageKind === 3) { const action = pick(["đọc", "viết", "trồng", "chăm sóc", "bảo vệ"]); const object = pick(["sách", "cây xanh", "môi trường", "bài tập"]); return make(`Trong câu “${name} đang ${action} ${object}”, từ nào là động từ?`, action, ["chăm chỉ", name, object], "Động từ nêu hoạt động của chủ thể."); }
     const proverbs = ["Thương người như thể thương thân", "Lá lành đùm lá rách", "Một con ngựa đau cả tàu bỏ cỏ", "Chị ngã em nâng"];
@@ -227,18 +228,22 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     if (stageKind === 0) { const action = pick(["chăm sóc vườn rau", "đọc sách trong thư viện", "tưới cây ngoài sân", "giúp mẹ nấu cơm"]); const context = pick(["trong bài kể chuyện", "khi tả hoạt động hằng ngày", "ở giờ luyện câu", "trong đoạn văn"]); return make(`Trong ${context}, câu nào thuộc kiểu Ai làm gì về hoạt động của ${name}?`, `${name} đang ${action}.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, ${action} thật vui!`], "Kiểu câu này nêu chủ thể và hoạt động."); }
     if (stageKind === 1) {
       const reduplicative = pick(["lung linh", "rì rào", "lấp lánh", "xanh xao", "long lanh", "ào ào", "thăm thẳm", "lập lòe"]);
-      const context = pick(["trong bài văn tả cảnh", "khi miêu tả âm thanh", "ở bài tập từ láy", "trong đoạn văn của bạn"]);\n      return make(`Bạn ${name} tìm từ láy ${context}. Từ nào trong nhóm sau là từ láy: ${reduplicative}, bàn ghế, sách vở, học sinh?`, reduplicative, ["bàn ghế", "sách vở", "học sinh"], "Từ láy có sự lặp lại âm hoặc vần.");
+      const context = pick(["trong bài văn tả cảnh", "khi miêu tả âm thanh", "ở bài tập từ láy", "trong đoạn văn của bạn"]);
+      return make(`Bạn ${name} tìm từ láy ${context}. Từ nào trong nhóm sau là từ láy: ${reduplicative}, bàn ghế, sách vở, học sinh?`, reduplicative, ["bàn ghế", "sách vở", "học sinh"], "Từ láy có sự lặp lại âm hoặc vần.");
     }
     if (stageKind === 2) {
       const compound = pick(["bảo vệ", "học sinh", "quê hương", "bàn ghế", "sách vở", "hoa quả", "nhà cửa", "thầy cô"]);
-      const context = pick(["trong bài tập phân loại từ", "khi viết đoạn văn", "ở tiết Tiếng Việt", "trong trò chơi ghép từ"]);\n      return make(`Trong ${context}, bạn ${name} cần tìm từ ghép. Từ nào trong nhóm sau là từ ghép: ${compound}, long lanh, lấp lánh, rì rào?`, compound, ["long lanh", "lấp lánh", "rì rào"], "Từ ghép gồm các tiếng có quan hệ về nghĩa.");
+      const context = pick(["trong bài tập phân loại từ", "khi viết đoạn văn", "ở tiết Tiếng Việt", "trong trò chơi ghép từ"]);
+      return make(`Trong ${context}, bạn ${name} cần tìm từ ghép. Từ nào trong nhóm sau là từ ghép: ${compound}, long lanh, lấp lánh, rì rào?`, compound, ["long lanh", "lấp lánh", "rì rào"], "Từ ghép gồm các tiếng có quan hệ về nghĩa.");
     }
     if (stageKind === 3) { const activity = pick(["đang đọc truyện", "đang tưới cây", "đang viết bài", "đang chăm sóc hoa"]); const object = pick(["trong vườn", "ở lớp", "sau giờ học"]); const context = pick(["trong giờ luyện ngữ pháp", "khi phân tích câu", "ở bài tập đọc hiểu", "trong vở bài tập"]); return make(`${context}: trong câu “${name} ${activity} ${object}”, chủ ngữ là gì?`, name, [activity, object, "truyện"], "Chủ ngữ thường trả lời câu hỏi Ai hoặc Cái gì."); }
-    const request = pick(["hãy giữ gìn sách vở", "giúp cô xếp bàn ghế", "đọc bài thật kỹ", "chăm sóc cây xanh"]);\n    return make(`Bạn ${name} muốn nhờ các bạn ${request}. Câu nào là câu khiến?`, `Các bạn hãy ${request} nhé!`, ["Các bạn đang ${request}.", "Ai đã ${request}?", "Ôi, việc đó thật vui!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
+    const request = pick(["hãy giữ gìn sách vở", "giúp cô xếp bàn ghế", "đọc bài thật kỹ", "chăm sóc cây xanh"]);
+    return make(`Bạn ${name} muốn nhờ các bạn ${request}. Câu nào là câu khiến?`, `Các bạn hãy ${request} nhé!`, ["Các bạn đang ${request}.", "Ai đã ${request}?", "Ôi, việc đó thật vui!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
   }
   if (stageKind === 0) {
     const pronoun = pick(["Chúng em", "Chúng tôi", "Mình", "Tôi", "Các bạn"]);
-    const action = pick(["bảo vệ môi trường", "đọc sách mỗi ngày", "giúp đỡ bạn bè", "chăm sóc vườn trường"]);\n    return make(`Trong câu “${pronoun} cùng nhau ${action}”, đại từ xưng hô là từ nào?`, pronoun, ["cùng nhau", action, "mỗi ngày"], "Đại từ xưng hô dùng để chỉ người đang nói, nghe hoặc được nhắc đến.");
+    const action = pick(["bảo vệ môi trường", "đọc sách mỗi ngày", "giúp đỡ bạn bè", "chăm sóc vườn trường"]);
+    return make(`Trong câu “${pronoun} cùng nhau ${action}”, đại từ xưng hô là từ nào?`, pronoun, ["cùng nhau", action, "mỗi ngày"], "Đại từ xưng hô dùng để chỉ người đang nói, nghe hoặc được nhắc đến.");
   }
   if (stageKind === 1) {
     const relations = [
@@ -248,7 +253,8 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       ["tăng tiến", "Không những… mà còn…", ["Vì… nên…", "Nếu… thì…", "Tuy… nhưng…"]],
     ] as const;
     const relation = pick(relations);
-    const context = pick(["trong bài đọc hiểu", "khi nối hai vế câu", "ở bài tập ngữ pháp", "trong đoạn văn của bạn"]);\n    return make(`Bạn ${name} đang làm bài ${context}. Cặp quan hệ từ nào biểu thị quan hệ ${relation[0]}?`, relation[1], [...relation[2]], "Xác định ý nghĩa quan hệ giữa hai vế câu.");
+    const context = pick(["trong bài đọc hiểu", "khi nối hai vế câu", "ở bài tập ngữ pháp", "trong đoạn văn của bạn"]);
+    return make(`Bạn ${name} đang làm bài ${context}. Cặp quan hệ từ nào biểu thị quan hệ ${relation[0]}?`, relation[1], [...relation[2]], "Xác định ý nghĩa quan hệ giữa hai vế câu.");
   }
   if (stageKind === 2) {
     const secondName = pick(names);
@@ -259,9 +265,12 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   if (stageKind === 3) {
     const synonyms = [["nhân hậu", "nhân ái"], ["siêng năng", "chăm chỉ"], ["dũng cảm", "can đảm"], ["bao la", "mênh mông"], ["hạnh phúc", "sung sướng"], ["trung thực", "thật thà"]];
     const item = pick(synonyms);
-    const context = pick(["trong bài văn", "khi miêu tả một người", "trong câu chuyện", "ở bài tập từ đồng nghĩa"]);\n    return make(`Bạn ${name} cần tìm từ gần nghĩa với “${item[0]}” ${context}. Từ nào phù hợp?`, item[1], ["độc ác", "ích kỷ", "thô lỗ"], "Tìm từ có nghĩa gần giống.");
+    const context = pick(["trong bài văn", "khi miêu tả một người", "trong câu chuyện", "ở bài tập từ đồng nghĩa"]);
+    return make(`Bạn ${name} cần tìm từ gần nghĩa với “${item[0]}” ${context}. Từ nào phù hợp?`, item[1], ["độc ác", "ích kỷ", "thô lỗ"], "Tìm từ có nghĩa gần giống.");
   }
-  const image = pick(["Mặt trời như quả cầu lửa", "Tiếng suối trong như tiếng hát", "Bạn Nam nhanh như sóc", "Mái tóc bà trắng như mây"]);\n  const context = pick(["trong bài văn miêu tả", "ở giờ đọc hiểu", "trong câu chuyện của bạn", "khi phân tích hình ảnh"]);\n  return make(`Biện pháp tu từ trong câu “${image}” là gì ${context}?`, "So sánh", ["Nhân hóa", "Điệp từ", "Ẩn dụ"], "Từ ngữ so sánh hoặc hình ảnh tương đồng giúp nhận ra phép so sánh.");
+  const image = pick(["Mặt trời như quả cầu lửa", "Tiếng suối trong như tiếng hát", "Bạn Nam nhanh như sóc", "Mái tóc bà trắng như mây"]);
+  const context = pick(["trong bài văn miêu tả", "ở giờ đọc hiểu", "trong câu chuyện của bạn", "khi phân tích hình ảnh"]);
+  return make(`Biện pháp tu từ trong câu “${image}” là gì ${context}?`, "So sánh", ["Nhân hóa", "Điệp từ", "Ẩn dụ"], "Từ ngữ so sánh hoặc hình ảnh tương đồng giúp nhận ra phép so sánh.");
 };
 
 const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
