@@ -289,12 +289,14 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
     if (kind === 2) {
       const days = [["Monday", "Tuesday"], ["Tuesday", "Wednesday"], ["Wednesday", "Thursday"], ["Thursday", "Friday"], ["Friday", "Saturday"], ["Saturday", "Sunday"]];
       const item = pick(days);
-      const context = pick(["at school", "in the calendar", "during the weekend", "in the morning"]);\n      return make(`${name} checks the calendar ${context}. Which day comes after ${item[0]}?`, item[1]!, ["Monday", "Friday", "Sunday"].filter(x => x !== item[1]), "Học thứ tự các ngày trong tuần.");
+      const context = pick(["at school", "in the calendar", "during the weekend", "in the morning"]);
+      return make(`${name} checks the calendar ${context}. Which day comes after ${item[0]}?`, item[1]!, ["Monday", "Friday", "Sunday"].filter(x => x !== item[1]), "Học thứ tự các ngày trong tuần.");
     }
     if (kind === 3) { const time = pick([["8 a.m.", "Good morning"], ["2 p.m.", "Good afternoon"], ["6 p.m.", "Good evening"], ["before going to bed", "Good night"]]); const context = pick(["at the school gate", "when meeting a friend", "at home", "on the way to class"]); return make(`What should you say to ${name} ${context} at ${time[0]}?`, time[1]!, ["Good morning", "Goodbye", "Good evening"].filter(x => x !== time[1]), "Chọn lời chào phù hợp với thời điểm."); }
     const object = pick(["book", "pencil", "ruler", "bag", "desk", "chair", "apple", "orange"]);
     const article = /^[aeiou]/i.test(object) ? "an" : "a";
-    const context = pick(["in ${name}’s school bag", "on the teacher’s desk", "in the classroom", "at the library"]);\n    return make(`Complete the sentence ${context}: This is ___ ${object}.`, article, [article === "a" ? "an" : "a", "are", "am"], "Chọn mạo từ a hoặc an theo âm đầu của danh từ.");
+    const context = pick(["in ${name}’s school bag", "on the teacher’s desk", "in the classroom", "at the library"]);
+    return make(`Complete the sentence ${context}: This is ___ ${object}.`, article, [article === "a" ? "an" : "a", "are", "am"], "Chọn mạo từ a hoặc an theo âm đầu của danh từ.");
   }
   if (grade === 2) {
     if (kind === 0) { const noun = pick(nouns); return make(`What is “${noun}” in Vietnamese?`, ({book:"quyển sách",pencil:"bút chì",school:"trường học",teacher:"giáo viên",friend:"bạn bè",garden:"khu vườn",library:"thư viện",family:"gia đình"} as Record<string,string>)[noun]!, ["con mèo","quả cam","màu xanh"], "Ôn từ vựng quen thuộc."); }
