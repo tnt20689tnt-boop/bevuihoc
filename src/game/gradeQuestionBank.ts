@@ -73,7 +73,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
       const a = int(2, Math.min(10, 2 + Math.floor(scale / 15))), b = int(2, 9), answer = a * b;
       return make(`${a} × ${b} = ?`, String(answer), [String(answer + a), String(answer - b), String(answer + 2)], "Dùng phép cộng lặp hoặc bảng nhân.");
     }
-    const a = int(2, 5), answer = int(2, 9), total = a * answer;
+    const a = int(2, Math.min(10, 2 + Math.floor(scale / 12))), answer = int(2, Math.min(20, 2 + Math.floor(scale / 10))), total = a * answer;
     return make(`${total} : ${a} = ?`, String(answer), [String(answer + 1), String(Math.max(1, answer - 1)), String(total + a)], `Tìm số mà nhân với ${a} được ${total}.`);
   }
   if (grade === 3) {
@@ -108,7 +108,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`${total} : ${divisor} = ?`, String(answer), [String(answer + 10), String(answer - 10), String(total - divisor)], "Thực hiện phép chia theo thứ tự từ trái sang phải.");
     }
     if (kind === 2) {
-      const denominator = int(3, 12), numerator = int(1, denominator - 1);
+      const denominator = int(3, Math.min(20, 3 + Math.floor(scale / 6))), numerator = int(1, denominator - 1);
       return make(`Phân số nào bằng ${numerator}/${denominator} khi nhân cả tử và mẫu với 2?`, `${numerator * 2}/${denominator * 2}`, [`${numerator + 1}/${denominator * 2}`, `${numerator * 2}/${denominator}`, `${numerator}/${denominator * 2}`], "Nhân cả tử số và mẫu số với cùng một số khác 0.");
     }
     if (kind === 3) {
