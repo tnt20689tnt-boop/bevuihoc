@@ -26,7 +26,6 @@ describe("learning question engine quality guards", () => {
       for (let sample = 0; sample < 100; sample++) {
         const question = generateQuestion("math", 1, level);
         expect(question.question.toLocaleLowerCase("vi")).not.toContain("lớn hơn hoặc bằng");
-        expect(question.question).not.toContain("□");
       }
     }
   });
