@@ -23,7 +23,13 @@ function draft(
   explanation: string,
   family: string,
 ): Draft {
-  const wrong = shuffle(unique(distractors.filter((item) => item !== correctAnswer))).slice(0, 3);
+  const wrong = shuffle(unique(distractors.filter((item) => item !== correctAnswer)));
+  while (wrong.length < 3) {
+    const fallback = ["Không có đáp án nào đúng", "Cả hai đáp án đều đúng", "Không xác định"];
+    const candidate = fallback.find((item) => item !== correctAnswer && !wrong.includes(item));
+    if (!candidate) break;
+    wrong.push(candidate);
+  }
   return {
     subject, grade, question, correctAnswer,
     options: shuffle([correctAnswer, ...wrong]),
@@ -56,17 +62,10 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       }
     }));
   } else if (grade === 2) {
-    const pairs = [
-      ["chăm chỉ", "siêng năng"], ["dũng cảm", "gan dạ"], ["yên tĩnh", "im lặng"],
-      ["nhanh nhẹn", "lanh lợi"], ["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"],
-      ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"],
-    ];
-    pairs.forEach(([a, b], i) => {
-      const isSynonym = i < 6;
-      const answer = isSynonym ? b : b;
-      const wrong = isSynonym ? ["lười biếng", "ồn ào", "yếu đuối"] : ["rộng", "dài", "nhanh"];
-      add("vietnamese", grade, isSynonym ? `Từ nào gần nghĩa với “${a}”?` : `Từ nào trái nghĩa với “${a}”?`, answer, wrong, `“${a}” và “${b}” ${isSynonym ? "gần nghĩa" : "trái nghĩa"} với nhau.`, isSynonym ? "tu-dong-nghia" : "tu-trai-nghia");
-    });
+    const synonymPairs = [["chăm chỉ", "siêng năng"], ["dũng cảm", "gan dạ"], ["yên tĩnh", "im lặng"], ["nhanh nhẹn", "lanh lợi"]];
+    const antonymPairs = [["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"], ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"]];
+    synonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào gần nghĩa với “${a}”?`, b, ["lười biếng", "ồn ào", "yếu đuối"], `“${a}” và “${b}” gần nghĩa với nhau.`, "tu-dong-nghia"));
+    antonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào trái nghĩa với “${a}”?`, b, ["rộng", "dài", "nhanh"], `“${a}” và “${b}” trái nghĩa với nhau.`, "tu-trai-nghia"));
     const tasks = [
       ["Bạn Lan đang tưới cây.", "Ai đang tưới cây?", "Bạn Lan", ["đang tưới", "cây", "tưới cây"], "Bạn Lan là người thực hiện hoạt động."],
       ["Đàn chim hót líu lo.", "Con gì hót líu lo?", "Đàn chim", ["líu lo", "hót", "đàn"], "Đàn chim là sự vật được nói đến."],
@@ -217,10 +216,15 @@ export function createArenaQuestionSet(grade: number, count = 10): Question[] {
   } catch { seen = []; }
   const seenSet = new Set(seen);
 
-  const languagePool = [
+  const languageDrafts = [
     ...vietnameseDrafts(g),
     ...englishDrafts(g),
   ];
+  const languagePool: (Question & { family?: string })[] = languageDrafts.map((q, index) => ({
+    ...q,
+    id: `arena-lang-g${g}-${index}`,
+    level: g * 20,
+  }));
   const mathPool: Question[] = [];
   for (let i = 0; i < 500; i++) {
     const level = 1 + (i % 100);
@@ -230,7 +234,7 @@ export function createArenaQuestionSet(grade: number, count = 10): Question[] {
 
   const freshLanguage = languagePool.filter((q) => !seenSet.has(`${q.subject}:${normalizeQuestion(q.question)}`));
   const freshMath = mathPool.filter((q) => !seenSet.has(`math:${normalizeQuestion(q.question)}`));
-  const selected: Question[] = [];
+  const selected: (Question & { family?: string })[] = [];
   const used = new Set<string>();
   const usedFamilies = new Set<string>();
 
@@ -259,7 +263,14 @@ export function createArenaQuestionSet(grade: number, count = 10): Question[] {
   addFrom(freshLanguage.filter((q) => q.subject === "english"), enTarget);
 
   if (selected.length < safeCount) {
-    const remaining = shuffle([...freshMath, ...freshLanguage]);
+    // If the browser has already seen the whole language bank, allow older
+    // questions as a last resort instead of starting a match with fewer items.
+    const remaining = shuffle([
+      ...freshMath,
+      ...freshLanguage,
+      ...mathPool,
+      ...languagePool,
+    ]);
     for (const q of remaining) {
       const key = `${q.subject}:${normalizeQuestion(q.question)}`;
       if (used.has(key)) continue;
