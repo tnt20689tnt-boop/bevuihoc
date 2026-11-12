@@ -112,6 +112,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const meta = SUBJECTS[subject];
   const [level, setLevel] = useState<number | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
   const seenByLevel = useRef(new Map<string, Set<string>>());
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -123,14 +124,59 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const answered = selected !== null;
   const correct = selected === question?.answer;
 
-  function startLevel(value: number) {
+  async function startLevel(value: number) {
     const key = `${profile.grade}-${subject}-${value}`;
     const seen = seenByLevel.current.get(key) ?? new Set<string>();
+    setLoadingQuestions(true);
+    setQuestions([]);
+    setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
+    try {
+      // Ưu tiên ngân hàng câu hỏi online trong Supabase, lọc chính xác môn/lớp/cấp độ.
+      const { data, error } = await (supabase as any).rpc("get_practice_questions", {
+        p_subject: subject === "vietnamese" ? "viet" : subject,
+        p_grade: profile.grade,
+        p_level: value,
+        p_count: 5,
+      });
+      if (error) throw error;
+      const onlineRows = (data ?? []) as Array<{
+        id: string;
+        question_text: string;
+        options: { key: string; text: string }[];
+        correct_answer: string;
+        topic: string | null;
+      }>;
+      const onlineQuestions: Question[] = onlineRows.flatMap(row => {
+        const sourceOptions = Array.isArray(row.options) ? row.options : [];
+        const correctText = sourceOptions.find(option => option.key === row.correct_answer)?.text;
+        if (sourceOptions.length < 2 || !correctText) return [];
+        const choices = shuffle(sourceOptions.map(option => option.text));
+        return [{
+          prompt: row.question_text,
+          choices,
+          answer: choices.indexOf(correctText),
+          hint: row.topic ? `Chủ đề: ${row.topic}. Hãy đọc kỹ câu hỏi và suy nghĩ từng đáp án.` : "Bé hãy đọc kỹ câu hỏi và thử lại nhé.",
+        }];
+      });
+      if (onlineQuestions.length >= 5) {
+        const unique = onlineQuestions.filter(q => !seen.has(q.prompt)).slice(0, 5);
+        const selectedQuestions = unique.length === 5 ? unique : onlineQuestions.slice(0, 5);
+        selectedQuestions.forEach(q => seen.add(q.prompt));
+        seenByLevel.current.set(key, seen);
+        setQuestions(selectedQuestions);
+        return;
+      }
+      toast.error("Ngân hàng online chưa đủ 5 câu cho lựa chọn này. Đang dùng bộ câu hỏi dự phòng.");
+    } catch (error) {
+      console.error("Không tải được ngân hàng câu hỏi online:", error);
+      toast.error("Chưa tải được câu hỏi online. Đang dùng bộ câu hỏi dự phòng.");
+    } finally {
+      setLoadingQuestions(false);
+    }
     const nextSet = makeQuestions(subject, value, profile.grade, seen);
     nextSet.forEach(q => seen.add(q.prompt));
     seenByLevel.current.set(key, seen);
     setQuestions(nextSet);
-    setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
   }
   function chooseAnswer(choice: number) {
     if (answered || finished || !question || level === null) return;
@@ -176,7 +222,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
             <div className="mt-7">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-extrabold">🌟 Chọn cấp độ từ 1 đến 100</h2><span className="rounded-full bg-secondary px-3 py-1 text-sm font-bold">Cấp 1 rất dễ · Cấp 100 thử thách</span></div>
               <div className="grid grid-cols-5 gap-2 sm:grid-cols-10 sm:gap-3">
-                {Array.from({ length: 100 }, (_, i) => i + 1).map(n => <button key={n} onClick={() => startLevel(n)} className={`aspect-square rounded-xl border-2 text-base font-black shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:rounded-2xl sm:text-lg ${n <= 10 ? "border-green-200 bg-green-50 text-green-800 hover:border-green-400" : n <= 30 ? "border-sky-200 bg-sky-50 text-sky-800 hover:border-sky-400" : n <= 60 ? "border-amber-200 bg-amber-50 text-amber-800 hover:border-amber-400" : "border-fuchsia-200 bg-fuchsia-50 text-fuchsia-800 hover:border-fuchsia-400"}`}>{n}</button>)}
+                {Array.from({ length: 100 }, (_, i) => i + 1).map(n => <button key={n} disabled={loadingQuestions} onClick={() => void startLevel(n)} className={`aspect-square rounded-xl border-2 text-base font-black shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:rounded-2xl sm:text-lg ${n <= 10 ? "border-green-200 bg-green-50 text-green-800 hover:border-green-400" : n <= 30 ? "border-sky-200 bg-sky-50 text-sky-800 hover:border-sky-400" : n <= 60 ? "border-amber-200 bg-amber-50 text-amber-800 hover:border-amber-400" : "border-fuchsia-200 bg-fuchsia-50 text-fuchsia-800 hover:border-fuchsia-400"}`}>{n}</button>)}
               </div>
               <p className="mt-5 rounded-2xl bg-secondary/70 p-4 text-center text-sm font-semibold text-muted-foreground">Bé có thể chọn bất kỳ cấp nào. Mỗi cấp có 5 câu hỏi; trả lời đúng được cộng 10 điểm.</p>
             </div>
@@ -186,7 +232,8 @@ function LessonRoom({ profile }: { profile: Profile }) {
                 <div><p className="text-xs font-bold uppercase text-muted-foreground">Đang luyện tập</p><p className="text-xl font-black">Cấp độ {level} / 100</p></div>
                 <div className="text-right"><p className="text-2xl font-black text-primary">⭐ {score}/5</p><p className="text-xs font-bold text-muted-foreground">+{earnedPoints} điểm đã lưu</p></div>
               </div>
-              <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${finished ? 100 : ((index + (answered ? 1 : 0)) / questions.length) * 100}%` }}/></div>
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${questions.length === 0 ? 0 : finished ? 100 : ((index + (answered ? 1 : 0)) / questions.length) * 100}%` }}/></div>
+              {loadingQuestions && <p className="mt-4 rounded-xl bg-secondary p-3 text-center font-semibold text-muted-foreground">Đang tải câu hỏi đúng môn, lớp và cấp độ…</p>}
               {finished ? (
                 <div className="py-9 text-center">
                   <div className="text-6xl">{score === 5 ? "🏆" : score >= 3 ? "🌟" : "💪"}</div>
