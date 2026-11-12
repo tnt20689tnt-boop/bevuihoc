@@ -95,9 +95,15 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "theme-color", content: "#ffb347" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-title", content: "Bé Vui Học" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "mobile-web-app-capable", content: "yes" },
     ],
     links: [
       { rel: "canonical", href: "https://bevuihoc.lovable.app/" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
+      { rel: "apple-touch-icon", href: "/pwa-icon.svg" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
@@ -134,6 +140,15 @@ function RootComponent() {
 
   useEffect(() => {
     void useSettings.persist.rehydrate();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        void navigator.serviceWorker.register("/sw.js").catch((error) => {
+          console.warn("Bé Vui Học: không thể đăng ký chế độ cài đặt PWA.", error);
+        });
+      });
+    }
+
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
