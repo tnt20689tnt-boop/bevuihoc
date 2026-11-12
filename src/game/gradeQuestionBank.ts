@@ -267,7 +267,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     const secondName = pick(names);
     const firstAction = pick(["đọc sách", "tưới cây", "làm bài tập", "vẽ tranh"]);
     const secondAction = pick(["quét nhà", "xếp sách", "chơi cờ", "viết bài"]);
-    return make(`Câu ghép nào diễn tả hai hoạt động của ${name} và ${secondName}?`, `${name} ${firstAction}, còn ${secondName} ${secondAction}.`, [`${name} đang ${firstAction}.`, `${secondName} rất chăm chỉ.`, "Bầu trời hôm nay xanh biếc."], "Câu ghép có từ hai cụm chủ ngữ – vị ngữ trở lên.");
+    return make(`Câu ghép nào diễn tả việc ${name} ${firstAction} và ${secondName} ${secondAction}?`, `${name} ${firstAction}, còn ${secondName} ${secondAction}.`, [`${name} đang ${firstAction}.`, `${secondName} rất chăm chỉ.`, "Bầu trời hôm nay xanh biếc."], "Câu ghép có từ hai cụm chủ ngữ – vị ngữ trở lên.");
   }
   if (stageKind === 3) {
     const synonyms = [["nhân hậu", "nhân ái"], ["siêng năng", "chăm chỉ"], ["dũng cảm", "can đảm"], ["bao la", "mênh mông"], ["hạnh phúc", "sung sướng"], ["trung thực", "thật thà"]];
