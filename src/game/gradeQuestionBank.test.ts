@@ -16,7 +16,7 @@ describe("grade and 100-level practice question bank", () => {
             expect(question.answer).toBeGreaterThanOrEqual(0);
             expect(question.answer).toBeLessThan(4);
             const key = question.prompt.normalize("NFC").toLocaleLowerCase("vi").replace(/\\s+/g, " ").trim();
-            expect(seen.has(key)).toBe(true);
+            expect(previouslySeen.has(key)).toBe(false);\n            expect(seen.has(key)).toBe(true);
           }
         }
       }
