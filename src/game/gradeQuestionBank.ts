@@ -295,10 +295,10 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       const context = pick(["at school", "in the calendar", "during the weekend", "in the morning"]);
       return make(`${name} checks the calendar ${context}. Which day comes after ${item[0]}?`, item[1]!, ["Monday", "Friday", "Sunday"].filter(x => x !== item[1]), "Học thứ tự các ngày trong tuần.");
     }
-    if (kind === 3) { const time = pick([["8 a.m.", "Good morning"], ["2 p.m.", "Good afternoon"], ["6 p.m.", "Good evening"], ["before going to bed", "Good night"]]); const context = pick(["at the school gate", "when meeting a friend", "at home", "on the way to class"]); return make(`What should you say to ${name} ${context} at ${time[0]}?`, time[1]!, ["Good morning", "Goodbye", "Good evening"].filter(x => x !== time[1]), "Chọn lời chào phù hợp với thời điểm."); }
+    if (kind === 3) { const time = pick([["8 a.m.", "Good morning"], ["2 p.m.", "Good afternoon"], ["6 p.m.", "Good evening"], ["before going to bed", "Good night"]]); const context = pick(["at the school gate", "when meeting a friend", "at home", "on the way to class", "during a family visit", "before the English lesson"]); return make(`What should you say to ${name} ${context} at ${time[0]}?`, time[1]!, ["Good morning", "Goodbye", "Good evening"].filter(x => x !== time[1]), "Chọn lời chào phù hợp với thời điểm."); }
     const object = pick(["book", "pencil", "ruler", "bag", "desk", "chair", "apple", "orange"]);
     const article = /^[aeiou]/i.test(object) ? "an" : "a";
-    const context = pick(["in ${name}’s school bag", "on the teacher’s desk", "in the classroom", "at the library"]);
+    const context = pick([`in ${name}’s school bag`, `on ${name}’s desk`, `in ${name}’s classroom`, `at ${name}’s library`]);
     return make(`Complete the sentence ${context}: This is ___ ${object}.`, article, [article === "a" ? "an" : "a", "are", "am"], "Chọn mạo từ a hoặc an theo âm đầu của danh từ.");
   }
   if (grade === 2) {
@@ -313,7 +313,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
     if (kind === 3) {
       const prompts = [["asking a name", "What"], ["asking a place", "Where"], ["asking a time", "When"], ["asking a reason", "Why"]];
       const item = pick(prompts);
-      const context = pick(["in a conversation", "during an interview", "in a classroom dialogue", "when asking a new friend"]);
+      const context = pick(["in a conversation", "during an interview", "in a classroom dialogue", "when asking a new friend", "while visiting a new place"]);
       return make(`${name} needs to ${item[0]} ${context}. Which question word should be used?`, item[1], prompts.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ để hỏi phù hợp với thông tin cần biết.");
     }
     const place = pick(["the table", "the school bag", "the chair", "the desk"]);
@@ -340,10 +340,10 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
     if (kind === 3) {
       const animal = pick(["A bird", "A fish", "A rabbit", "A horse"]);
       const ability = animal === "A fish" ? "swim" : animal === "A rabbit" ? "jump" : animal === "A horse" ? "run" : "fly";
-      const context = pick(["in the wild", "on a farm", "at the zoo", "in a nature book"]);
+      const context = pick(["in the wild", "on a farm", "at the zoo", "in a nature book", "during a science lesson"]);
       return make(`${name} learns that ${animal.toLowerCase()} ___ ${ability} ${context}.`, "can", ["cans", "is", "does"], "Sau can dùng động từ nguyên mẫu.");
     }
-    return make("Choose the opposite of “early”.", "late", ["fast", "small", "young"], "Late là trái nghĩa của early.");
+    const opposites = [["early", "late"], ["strong", "weak"], ["noisy", "quiet"], ["expensive", "cheap"], ["clean", "dirty"]];\n    const item = pick(opposites);\n    const context = pick(["in the story", "in the classroom", "in a vocabulary game", "while describing a person", "during an English lesson"]);\n    return make(`${name} needs the opposite of “${item[0]}” ${context}. Which word is correct?`, item[1], opposites.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ có nghĩa trái ngược.");
   }
   if (grade === 4) {
     if (kind === 0) return make("Complete: We ___ football yesterday.", "played", ["play", "plays", "playing"], "Yesterday thường đi với thì quá khứ đơn.");
