@@ -94,8 +94,8 @@ begin
       and q.grade = p_grade
       and q.term = 'mid1'
       and q.question_type = 'multiple_choice'
-      and jsonb_typeof(q.options) = 'array'
-    order by lower(trim(q.question_text)), abs(q.difficulty - v_target_difficulty), q.created_at desc
+      and jsonb_typeof(q.options) = 'array'\n      and q.difficulty = v_target_difficulty
+    order by lower(trim(q.question_text)), q.created_at desc
   )
   select b.id, b.question_text, b.options, b.correct_answer, b.topic, b.points, b.difficulty
   from unique_bank b
