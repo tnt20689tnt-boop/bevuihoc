@@ -78,8 +78,11 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`${a} × ${b} = ?`, String(answer), [String(answer + a), String(answer - b), String(a + b)], "Vận dụng bảng nhân.");
     }
     if (kind === 1) {
-      const divisor = int(2, 9), answer = int(2, 20 + scale * 2), total = divisor * answer;
-      return make(`${total} : ${divisor} = ?`, String(answer), [String(answer + 1), String(answer - 1), String(total - divisor)], "Phép chia là phép tính ngược của phép nhân.");
+      const subject = pick(["They", "We", "I", "My friends", "The children", "He", "She", "My brother", "My sister"]);
+      const answer = ["He", "She", "My brother", "My sister"].includes(subject) ? "has" : "have";
+      const object = pick(["two storybooks", "a new school bag", "three pencils", "a red bicycle"]);
+      const context = pick(["at home", "before school", "in the classroom", "during the English lesson"]);
+      return make(`${subject} ___ ${object} ${context}.`, answer, ["has", "have", "having"].filter(x => x !== answer).concat(["is"]), "Dùng have với I, you, we, they và has với he, she, it.");
     }
     if (kind === 2) {
       const a = int(100, max), b = int(100, max), answer = a + b;
