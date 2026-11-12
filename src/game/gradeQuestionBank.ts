@@ -32,7 +32,7 @@ const make = (prompt: string, answer: string, distractors: string[], hint: strin
 const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
   const scale = stage;
   if (grade === 1) {
-    const max = Math.min(100, 10 + scale * 9);
+    const max = Math.min(100, 10 + scale);
     const kind = int(0, 4);
     if (kind <= 1) {
       const a = int(0, max - 1), b = int(0, max - a);
@@ -143,7 +143,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   const syllables = ["trăng", "sáng", "sách", "trường", "chim", "phượng", "biển", "rừng", "thầy", "cô", "bạn", "ước mơ"];
   const names = ["Lan", "Minh", "Hoa", "Nam", "Mai", "An", "Bình", "Hà"];
   const name = pick(names), pair = pick(words);
-  const stageKind = Math.min(4, Math.floor((stage - 1) / 2));
+  const stageKind = (stage - 1) % 5;
   if (grade === 1) {
     if (stageKind === 0) {
       const letter = pick(["a", "ă", "â", "b", "c", "d", "đ", "e", "ê", "g", "h", "i", "k", "l", "m", "n", "o", "ô", "ơ", "p", "q", "r", "s", "t", "u", "ư", "v", "x", "y"]);
@@ -242,7 +242,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   const colors = ["red", "blue", "green", "yellow", "purple", "orange", "black", "white"];
   const nouns = ["book", "pencil", "school", "teacher", "friend", "garden", "library", "family"];
   const name = pick(["Mai", "Nam", "Linh", "Tom", "Anna", "Ben"]);
-  const kind = Math.min(4, Math.floor((stage - 1) / 2));
+  const kind = (stage - 1) % 5;
   if (grade === 1) {
     if (kind === 0) { const word = pick(animals); return make(`What is “${word}” in Vietnamese?`, ({cat:"con mèo",dog:"con chó",bird:"con chim",fish:"con cá",rabbit:"con thỏ",tiger:"con hổ",elephant:"con voi",monkey:"con khỉ"} as Record<string,string>)[word]!, ["quả táo","quyển sách","bông hoa"], "Nhớ nghĩa của từ chỉ con vật."); }
     if (kind === 1) { const color = pick(colors); const object = pick(["the sky", "a banana", "grass", "a tomato", "an orange", "the sea"]); return make(`Which color is usually associated with ${object}?`, ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!, colors.filter(x => x !== ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!), "Nhớ từ vựng chỉ màu sắc."); }
@@ -319,7 +319,7 @@ export const generateGradeQuestions = (
   const safeGrade = Math.max(1, Math.min(5, Math.floor(grade) || 1));
   const safeLevel = Math.max(1, Math.min(100, Math.floor(level) || 1));
   const safeCount = Math.max(0, Math.min(20, Math.floor(count) || 0));
-  const stage = Math.ceil(safeLevel / 10);
+  const stage = safeLevel;
   const output: PracticeQuestion[] = [];
   const local = new Set<string>();
   let attempts = 0;
