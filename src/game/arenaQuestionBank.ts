@@ -90,12 +90,12 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       const wrong = categories.filter((x) => x.name !== set.name).map((x) => x.name);
       add("vietnamese", grade, `Từ “${word}” thuộc từ loại nào?`, set.name, wrong, `“${word}” là ${set.name}.`, `tu-loai-${set.name}`);
     }));
-    [
+    ([
       ["Chậm như", "rùa", ["thỏ", "ngựa", "chim"], "Thành ngữ so sánh “Chậm như rùa”."],
       ["Nhanh như", "cắt", ["ốc", "sên", "rùa"], "Thành ngữ quen thuộc là “Nhanh như cắt”."],
       ["Khỏe như", "voi", ["mèo", "kiến", "bướm"], "“Khỏe như voi” chỉ sức khỏe tốt."],
       ["Hiền như", "bụt", ["hổ", "sói", "cáo"], "“Hiền như bụt” chỉ người rất hiền."],
-    ].forEach(([start, answer, wrong, exp]) => add("vietnamese", grade, `${start} …` , answer, wrong, exp, "thanh-ngu"));
+    ] as Array<[string, string, string[], string]>).forEach(([start, answer, wrong, exp]) => add("vietnamese", grade, `${start} …` , answer, wrong, exp, "thanh-ngu"));
     ([
       ["Mặt trời thức dậy sau rặng núi.", "Ai được nhân hóa?", "Mặt trời", ["rặng núi", "thức dậy", "sau"], "Mặt trời được miêu tả như con người thức dậy."],
       ["Những bông hoa mỉm cười trong nắng.", "Sự vật nào được nhân hóa?", "Những bông hoa", ["trong nắng", "mỉm cười", "nắng"], "Bông hoa được gán hành động mỉm cười."],
@@ -109,13 +109,13 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["Hãy giữ gìn lớp học sạch đẹp!", "câu khiến", ["câu kể", "câu hỏi", "câu cảm"]],
     ];
     sentenceTypes.forEach(([sentence, answer, wrong]) => add("vietnamese", grade, `Câu “${sentence}” thuộc kiểu câu nào?`, answer, wrong, `Đây là ${answer}.`, "kieu-cau"));
-    [
+    ([
       ["lung linh", "từ láy", ["bàn ghế", "xe đạp", "học sinh"]],
       ["nhà cửa", "từ ghép", ["long lanh", "xanh xanh", "rì rào"]],
       ["lấp lánh", "từ láy", ["quần áo", "sách vở", "bàn học"]],
       ["bạn bè", "từ ghép", ["mênh mông", "thoang thoảng", "xinh xắn"]],
       ["rì rào", "từ láy", ["nhà cửa", "cây cối", "quần áo"]],
-    ].forEach(([word, answer, wrong]) => add("vietnamese", grade, `“${word}” là từ ghép hay từ láy?`, answer, wrong, `“${word}” là ${answer}.`, "cau-tao-tu"));
+    ] as Array<[string, string, string[]]>).forEach(([word, answer, wrong]) => add("vietnamese", grade, `“${word}” là từ ghép hay từ láy?`, answer, wrong, `“${word}” là ${answer}.`, "cau-tao-tu"));
     ([
       ["Nhờ chăm chỉ luyện tập, Nam tiến bộ rõ rệt.", "Vì sao Nam tiến bộ?", "Vì chăm chỉ luyện tập", ["Vì Nam nghỉ học", "Vì bài tập dễ", "Vì được nghỉ ngơi"], "Nam tiến bộ nhờ chăm chỉ luyện tập."],
       ["Dù trời mưa, các bạn vẫn đến lớp đúng giờ.", "Các bạn đến lớp trong hoàn cảnh nào?", "Trời mưa", ["Trời nắng", "Trời rét", "Trời quang"], "Câu cho biết trời mưa nhưng các bạn vẫn đến lớp."],
