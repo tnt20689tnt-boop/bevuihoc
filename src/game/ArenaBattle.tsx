@@ -6,7 +6,8 @@ import { Character3D, makeAnimState } from "@/game/Character3D";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/hooks/use-player";
 import { toAvatar, type Avatar } from "@/lib/avatar";
-import { generateQuestion, type Question, type Subject } from "./learningEngine";
+import type { Question } from "./learningEngine";
+import { createArenaQuestionSet } from "./arenaQuestionBank";
 
 type Phase = "waiting" | "countdown" | "playing" | "finished";
 type ArenaPlayer = {
@@ -20,8 +21,7 @@ type ArenaPlayer = {
 type GameMessage = { startsAt: number; question: Question; questionIndex: number; questions?: Question[] };
 type Props = { currentGrade: number; profile: Profile; onExit?: () => void };
 
-const SUBJECTS: Subject[] = ["math", "vietnamese", "english"];
-const subjectName: Record<Subject, string> = {
+const subjectName: Record<Question["subject"], string> = {
   math: "Toán học",
   vietnamese: "Tiếng Việt",
   english: "Tiếng Anh",
@@ -29,19 +29,7 @@ const subjectName: Record<Subject, string> = {
 
 const QUESTIONS_PER_MATCH = 10;
 function createMatchQuestions(grade: number): Question[] {
-  const questions: Question[] = [];
-  const seen = new Set<string>();
-  let attempts = 0;
-  while (questions.length < QUESTIONS_PER_MATCH && attempts < 500) {
-    attempts++;
-    const subject = SUBJECTS[Math.floor(Math.random() * SUBJECTS.length)] ?? "math";
-    const candidate = generateQuestion(subject, grade, 50);
-    const key = `${candidate.subject}:${candidate.question.trim().toLocaleLowerCase()}`;
-    if (seen.has(key)) continue;
-    seen.add(key);
-    questions.push(candidate);
-  }
-  return questions;
+  return createArenaQuestionSet(grade, QUESTIONS_PER_MATCH);
 }
 
 function PlayerPodium({ player, index }: { player: ArenaPlayer; index: number }) {
