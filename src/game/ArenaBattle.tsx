@@ -260,7 +260,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       score: scoreRef.current,
       answered: answeredRef.current,
     };
-    const results = players.map((player) => scoreMap[player.id]).filter(Boolean);
+    const results = players.map((player) => scoreMap[player.id]).filter((item): item is MatchScore => Boolean(item));
     setMatchScores(results);
     setPhase("finished");
     setAdvanceAt(null);
@@ -541,8 +541,9 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
               <p className="mt-1 text-sm">{question.explanation}</p>
               <p className="mt-2 text-xs">Điểm của con: {score} • Đã trả lời: {answered} câu</p>
               <div className="mt-4 rounded-xl border border-amber-200/30 bg-slate-950/30 px-4 py-3">
-                <p className="text-sm font-black text-amber-200">⏳ Câu tiếp theo tự động sau {advanceSeconds} giây</p>
-                <p className="mt-1 text-xs text-sky-100/80">Không thí sinh nào được tự bấm chuyển câu. Cả đấu trường sẽ cùng sang câu mới.</p>
+                <p className="text-sm font-black text-amber-200">⏳ Đang chờ thí sinh còn lại trả lời</p>
+                <p className="mt-1 text-xs text-sky-100/80">Nếu hết 10 giây mà vẫn còn người chưa trả lời, hệ thống sẽ tự chuyển câu. Khi cả hai đã chọn, câu mới hiện ngay.</p>
+                <p className="mt-1 text-xs text-sky-100/70">Thời gian dự phòng còn {advanceSeconds} giây.</p>
               </div>
             </div>
           )}
