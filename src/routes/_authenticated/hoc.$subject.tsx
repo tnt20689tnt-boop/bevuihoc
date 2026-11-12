@@ -61,20 +61,30 @@ function LessonRoom({ profile }: { profile: Profile }) {
 
     let onlineQuestions: Question[] = [];
     try {
-      const { data, error } = await (supabase as any).rpc("get_practice_questions", {
+      type OnlineQuestionRow = {
+        id: string;
+        question_text: string;
+        options: { key: string; text: string }[];
+        correct_answer: string;
+        topic: string | null;
+      };
+      const getPracticeQuestions = supabase.rpc as unknown as (
+        functionName: string,
+        args: {
+          p_subject: string;
+          p_grade: number;
+          p_level: number;
+          p_count: number;
+        },
+      ) => Promise<{ data: OnlineQuestionRow[] | null; error: { message: string } | null }>;
+      const { data, error } = await getPracticeQuestions("get_practice_questions", {
         p_subject: subject === "vietnamese" ? "viet" : subject,
         p_grade: profile.grade,
         p_level: value,
         p_count: 5,
       });
       if (error) throw error;
-      const onlineRows = (data ?? []) as Array<{
-        id: string;
-        question_text: string;
-        options: { key: string; text: string }[];
-        correct_answer: string;
-        topic: string | null;
-      }>;
+      const onlineRows = data ?? [];
       const usedThisSet = new Set<string>();
       onlineQuestions = onlineRows.flatMap((row) => {
         const promptKey = normalizeQuestion(row.question_text);
