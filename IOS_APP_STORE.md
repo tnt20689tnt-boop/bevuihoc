@@ -3,6 +3,8 @@
 ## Current iOS integration
 
 - Native container: Capacitor 8.
+- Launch behavior: tapping the installed app icon opens Bé Vui Học directly inside the app's embedded iOS WebView (WKWebView); it does not launch Safari or Chrome and does not show a browser address bar.
+- Library HTML documents are displayed inside an in-app document frame instead of opening a new browser tab.
 - Bundle identifier: `vn.bevuihoc.app` (confirm availability and ownership in Apple Developer before release).
 - Display name: `Bé Vui Học`.
 - Supported device families: iPhone and iPad (universal iOS target).
