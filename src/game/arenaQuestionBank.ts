@@ -134,6 +134,19 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["Lá lành đùm lá rách", "Giúp đỡ người gặp khó khăn", ["Che lá khỏi mưa", "Trồng nhiều cây xanh", "Giữ đồ vật sạch sẽ"], "Câu tục ngữ khuyên con người tương thân tương ái."],
       ["Uống nước nhớ nguồn", "Nhớ ơn những người đi trước", ["Tiết kiệm nước uống", "Bảo vệ nguồn nước", "Tìm nơi có nước"], "Câu tục ngữ nhắc nhớ cội nguồn và lòng biết ơn."],
     ] as Array<[string, string, string[], string]>).forEach(([proverb, q, wrong, exp]) => add("vietnamese", grade, `Ý nghĩa của câu tục ngữ “${proverb}” là gì?`, q, wrong, exp, "giai-nghia-tuc-ngu"));
+    [
+      ["bảo tồn", "giữ gìn", ["phá hủy", "lãng quên", "thay thế"]],
+      ["nhân ái", "thương người", ["ích kỷ", "vô tâm", "thờ ơ"]],
+      ["dũng cảm", "can đảm", ["hèn nhát", "lo lắng", "rụt rè"]],
+      ["lạc quan", "yêu đời", ["bi quan", "chán nản", "buồn bã"]],
+      ["tiết kiệm", "hoang phí", ["dè sẻn", "chắt chiu", "giữ gìn"]],
+    ].forEach(([word, answer, wrong]) => add("vietnamese", grade, `Từ nào ${word === "tiết kiệm" ? "trái nghĩa" : "gần nghĩa"} với “${word}”?`, answer, wrong, `“${word}” và “${answer}” ${word === "tiết kiệm" ? "trái nghĩa" : "gần nghĩa"} với nhau.`, "mo-rong-tu-vung"));
+    [
+      ["Mặc dù trời rét nhưng các bạn vẫn chăm chỉ tập thể dục.", "Quan hệ giữa hai vế câu là gì?", "Tương phản", ["Nguyên nhân – kết quả", "Điều kiện – kết quả", "Tăng tiến"], "“Mặc dù… nhưng” biểu thị quan hệ tương phản."],
+      ["Vì chăm sóc đúng cách nên cây phát triển xanh tốt.", "Quan hệ giữa hai vế câu là gì?", "Nguyên nhân – kết quả", ["Tương phản", "Điều kiện – kết quả", "Liệt kê"], "“Vì… nên” biểu thị nguyên nhân – kết quả."],
+      ["Nếu chúng ta tiết kiệm điện thì sẽ bảo vệ tài nguyên.", "Quan hệ giữa hai vế câu là gì?", "Điều kiện – kết quả", ["Tương phản", "Nguyên nhân – kết quả", "Liệt kê"], "“Nếu… thì” biểu thị điều kiện – kết quả."],
+      ["Không những Mai học giỏi mà bạn còn rất tốt bụng.", "Cặp từ nào thể hiện quan hệ tăng tiến?", "Không những… mà còn", ["Vì… nên", "Tuy… nhưng", "Nếu… thì"], "“Không những… mà còn” biểu thị quan hệ tăng tiến."],
+    ] as Array<[string, string, string, string[], string]>).forEach(([sentence, q, answer, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” ${q}`, answer, wrong, exp, "quan-he-cau"));
   }
   return result;
 };
