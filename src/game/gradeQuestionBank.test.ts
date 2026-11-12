@@ -9,8 +9,8 @@ describe("grade and 100-level practice question bank", () => {
 
   it("creates five distinct, valid questions for every subject, grade, and level without repeating prompts", () => {
     const subjects: PracticeSubject[] = ["math", "vietnamese", "english"];
+    const seen = new Set<string>();
     for (const subject of subjects) {
-      const seen = new Set<string>();
       for (let grade = 1; grade <= 5; grade++) {
         for (let level = 1; level <= 100; level++) {
           const previouslySeen = new Set(seen);
