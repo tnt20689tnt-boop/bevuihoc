@@ -166,7 +166,9 @@ function LessonRoom({ profile }: { profile: Profile }) {
         setQuestions(selectedQuestions);
         return;
       }
-      toast.error("Ngân hàng online chưa đủ 5 câu cho lựa chọn này. Đang dùng bộ câu hỏi dự phòng.");
+      toast.error(
+        "Ngân hàng online chưa đủ 5 câu cho lựa chọn này. Đang dùng bộ câu hỏi dự phòng.",
+      );
     } catch (error) {
       console.error("Không tải được ngân hàng câu hỏi online:", error);
       toast.error("Chưa tải được câu hỏi online. Đang dùng bộ câu hỏi dự phòng.");
