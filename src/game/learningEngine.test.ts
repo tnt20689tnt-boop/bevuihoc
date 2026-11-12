@@ -38,7 +38,7 @@ describe("learning question engine quality guards", () => {
           const questions = generateLevelQuestions(subject, grade, level, 5);
           const normalized = questions.map((item) =>
             item.question.normalize("NFC").toLocaleLowerCase("vi")
-              .replace(/[.,!?;:]/g, "").replace(/\\s+/g, " ").trim(),
+              .replace(/[.,!?;:]/g, "").replace(/\s+/g, " ").trim(),
           );
           expect(new Set(normalized).size).toBe(normalized.length);
         }
