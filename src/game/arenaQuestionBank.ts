@@ -66,7 +66,7 @@ const vietnameseDrafts = (grade: number): Draft[] => {
     const antonymPairs = [["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"], ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"]];
     synonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào gần nghĩa với “${a}”?`, b, ["lười biếng", "ồn ào", "yếu đuối"], `“${a}” và “${b}” gần nghĩa với nhau.`, "tu-dong-nghia"));
     antonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào trái nghĩa với “${a}”?`, b, ["rộng", "dài", "nhanh"], `“${a}” và “${b}” trái nghĩa với nhau.`, "tu-trai-nghia"));
-    const tasks = [
+    const tasks: Array<[string, string, string, string[], string]> = [
       ["Bạn Lan đang tưới cây.", "Ai đang tưới cây?", "Bạn Lan", ["đang tưới", "cây", "tưới cây"], "Bạn Lan là người thực hiện hoạt động."],
       ["Đàn chim hót líu lo.", "Con gì hót líu lo?", "Đàn chim", ["líu lo", "hót", "đàn"], "Đàn chim là sự vật được nói đến."],
       ["Bầu trời hôm nay rất trong xanh.", "Bầu trời hôm nay có đặc điểm gì?", "Trong xanh", ["hôm nay", "bầu trời", "rất"], "Trong xanh nêu đặc điểm của bầu trời."],
@@ -96,13 +96,13 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["Khỏe như", "voi", ["mèo", "kiến", "bướm"], "“Khỏe như voi” chỉ sức khỏe tốt."],
       ["Hiền như", "bụt", ["hổ", "sói", "cáo"], "“Hiền như bụt” chỉ người rất hiền."],
     ].forEach(([start, answer, wrong, exp]) => add("vietnamese", grade, `${start} …` , answer, wrong, exp, "thanh-ngu"));
-    [
+    ([
       ["Mặt trời thức dậy sau rặng núi.", "Ai được nhân hóa?", "Mặt trời", ["rặng núi", "thức dậy", "sau"], "Mặt trời được miêu tả như con người thức dậy."],
       ["Những bông hoa mỉm cười trong nắng.", "Sự vật nào được nhân hóa?", "Những bông hoa", ["trong nắng", "mỉm cười", "nắng"], "Bông hoa được gán hành động mỉm cười."],
       ["Lan chăm sóc vườn rau mỗi chiều.", "Bộ phận trả lời câu hỏi “Ai?” là gì?", "Lan", ["chăm sóc", "vườn rau", "mỗi chiều"], "Lan là chủ thể thực hiện hoạt động."],
-    ].forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc “${sentence}” và xác định: ${q}`, a, wrong, exp, "doc-hieu-ngu-phap"));
+    ] as Array<[string, string, string, string[], string]>).forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc “${sentence}” và xác định: ${q}`, a, wrong, exp, "doc-hieu-ngu-phap"));
   } else if (grade === 4) {
-    const sentenceTypes = [
+    const sentenceTypes: Array<[string, string, string[]]> = [
       ["Sáng nay, em đến trường rất sớm.", "câu kể", ["câu hỏi", "câu cảm", "câu khiến"]],
       ["Bạn đã làm xong bài tập chưa?", "câu hỏi", ["câu kể", "câu cảm", "câu khiến"]],
       ["Ôi, bông hoa đẹp quá!", "câu cảm", ["câu kể", "câu hỏi", "câu khiến"]],
@@ -116,19 +116,19 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["bạn bè", "từ ghép", ["mênh mông", "thoang thoảng", "xinh xắn"]],
       ["rì rào", "từ láy", ["nhà cửa", "cây cối", "quần áo"]],
     ].forEach(([word, answer, wrong]) => add("vietnamese", grade, `“${word}” là từ ghép hay từ láy?`, answer, wrong, `“${word}” là ${answer}.`, "cau-tao-tu"));
-    [
+    ([
       ["Nhờ chăm chỉ luyện tập, Nam tiến bộ rõ rệt.", "Vì sao Nam tiến bộ?", "Vì chăm chỉ luyện tập", ["Vì Nam nghỉ học", "Vì bài tập dễ", "Vì được nghỉ ngơi"], "Nam tiến bộ nhờ chăm chỉ luyện tập."],
       ["Dù trời mưa, các bạn vẫn đến lớp đúng giờ.", "Các bạn đến lớp trong hoàn cảnh nào?", "Trời mưa", ["Trời nắng", "Trời rét", "Trời quang"], "Câu cho biết trời mưa nhưng các bạn vẫn đến lớp."],
       ["Cây phượng nở hoa đỏ rực vào mùa hè.", "Hoa phượng có màu gì?", "Đỏ rực", ["Vàng nhạt", "Trắng muốt", "Tím biếc"], "Thông tin được nêu trực tiếp trong câu."],
-    ].forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc đoạn thông tin: “${sentence}” ${q}`, a, wrong, exp, "doc-hieu"));
+    ] as Array<[string, string, string, string[], string]>).forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc đoạn thông tin: “${sentence}” ${q}`, a, wrong, exp, "doc-hieu"));
   } else {
-    [
+    ([
       ["Tôi rất yêu quê hương mình.", "Đại từ xưng hô là từ nào?", "Tôi", ["rất", "yêu", "quê hương"], "“Tôi” là đại từ xưng hô."],
       ["Chúng em cùng nhau trồng cây.", "Đại từ chỉ người là từ nào?", "Chúng em", ["cùng nhau", "trồng", "cây"], "“Chúng em” dùng để xưng gọi một nhóm người."],
       ["Vì trời mưa nên trận đấu bị hoãn.", "Cặp quan hệ từ biểu thị nguyên nhân – kết quả là gì?", "Vì… nên", ["Tuy… nhưng", "Nếu… thì", "Không những… mà còn"], "“Vì… nên” biểu thị quan hệ nguyên nhân – kết quả."],
       ["Tuy đường xa nhưng Hoa vẫn đi học đúng giờ.", "Cặp quan hệ từ biểu thị tương phản là gì?", "Tuy… nhưng", ["Vì… nên", "Nếu… thì", "Do… nên"], "“Tuy… nhưng” biểu thị sự tương phản."],
       ["Nếu em chăm đọc sách thì vốn từ sẽ phong phú hơn.", "Cặp quan hệ từ biểu thị điều kiện – kết quả là gì?", "Nếu… thì", ["Vì… nên", "Tuy… nhưng", "Mặc dù… nhưng"], "“Nếu… thì” biểu thị điều kiện – kết quả."],
-    ].forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” rồi xác định: ${q}`, a, wrong, exp, "dai-tu-quan-he-tu"));
+    ] as Array<[string, string, string, string[], string]>).forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” rồi xác định: ${q}`, a, wrong, exp, "dai-tu-quan-he-tu"));
     [
       ["Ăn quả nhớ kẻ trồng cây", "Biết ơn người tạo ra thành quả", ["Chỉ thích ăn trái cây", "Phải trồng cây mỗi ngày", "Không nên hái quả"], "Câu tục ngữ nhắc nhở lòng biết ơn."],
       ["Có công mài sắt, có ngày nên kim", "Kiên trì sẽ đạt được thành công", ["Làm việc thật nhanh", "Chỉ cần may mắn", "Không cần cố gắng"], "Tục ngữ đề cao sự kiên trì."],
