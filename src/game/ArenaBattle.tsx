@@ -159,6 +159,49 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     if (message.questions?.length) matchQuestionsRef.current = message.questions;
   }, []);
 
+  const finishMatch = useCallback((message?: MatchFinishedMessage) => {
+    if (message?.matchId && matchIdRef.current && message.matchId !== matchIdRef.current) return;
+    const id = message?.matchId || matchIdRef.current;
+    const scoreMap = { ...playerScoresRef.current };
+    if (message?.scores) {
+      for (const item of message.scores) scoreMap[item.playerId] = item;
+    }
+    scoreMap[profile.id] = {
+      playerId: profile.id,
+      name: self.name,
+      score: scoreRef.current,
+      answered: answeredRef.current,
+    };
+    const results = players.map((player) => scoreMap[player.id]).filter((item): item is MatchScore => Boolean(item));
+    setMatchScores(results);
+    setPhase("finished");
+    setAdvanceAt(null);
+    setAdvanceSeconds(0);
+
+    const opponent = results.find((item) => item.playerId !== profile.id);
+    if (id && opponent && savedMatchRef.current !== id) {
+      savedMatchRef.current = id;
+      setSaveStatus("saving");
+      void supabase.rpc("save_arena_match_result", {
+        p_match_id: id,
+        p_grade: currentGrade,
+        p_score: scoreRef.current,
+        p_opponent_id: opponent.playerId,
+        p_opponent_name: opponent.name,
+        p_opponent_score: opponent.score,
+        p_total_questions: QUESTIONS_PER_MATCH,
+      }).then(({ error }) => {
+        if (error) {
+          savedMatchRef.current = null;
+          setSaveError(error.message);
+          setSaveStatus("error");
+        } else {
+          setSaveStatus("saved");
+        }
+      });
+    }
+  }, [profile.id, self.name, players, currentGrade]);
+
   useEffect(() => {
     let alive = true;
     const channel = supabase.channel("be-vui-hoc-arena-lobby", {
@@ -246,49 +289,6 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     const timer = window.setInterval(update, 100);
     return () => window.clearInterval(timer);
   }, [phase, startsAt]);
-
-  const finishMatch = useCallback((message?: MatchFinishedMessage) => {
-    if (message?.matchId && matchIdRef.current && message.matchId !== matchIdRef.current) return;
-    const id = message?.matchId || matchIdRef.current;
-    const scoreMap = { ...playerScoresRef.current };
-    if (message?.scores) {
-      for (const item of message.scores) scoreMap[item.playerId] = item;
-    }
-    scoreMap[profile.id] = {
-      playerId: profile.id,
-      name: self.name,
-      score: scoreRef.current,
-      answered: answeredRef.current,
-    };
-    const results = players.map((player) => scoreMap[player.id]).filter((item): item is MatchScore => Boolean(item));
-    setMatchScores(results);
-    setPhase("finished");
-    setAdvanceAt(null);
-    setAdvanceSeconds(0);
-
-    const opponent = results.find((item) => item.playerId !== profile.id);
-    if (id && opponent && savedMatchRef.current !== id) {
-      savedMatchRef.current = id;
-      setSaveStatus("saving");
-      void supabase.rpc("save_arena_match_result", {
-        p_match_id: id,
-        p_grade: currentGrade,
-        p_score: scoreRef.current,
-        p_opponent_id: opponent.playerId,
-        p_opponent_name: opponent.name,
-        p_opponent_score: opponent.score,
-        p_total_questions: QUESTIONS_PER_MATCH,
-      }).then(({ error }) => {
-        if (error) {
-          savedMatchRef.current = null;
-          setSaveError(error.message);
-          setSaveStatus("error");
-        } else {
-          setSaveStatus("saved");
-        }
-      });
-    }
-  }, [profile.id, self.name, players, currentGrade]);
 
   const markReady = async () => {
     if (phase !== "waiting" || players.some((player) => player.id === profile.id && player.ready)) return;
