@@ -50,6 +50,20 @@ function LessonRoom({ profile }: { profile: Profile }) {
   async function startLevel(value: number) {
     // Theo dõi câu đã dùng xuyên suốt 100 Level của môn này, không chỉ trong một Level.
     const seen = seenBySubject.current.get(subject) ?? new Set<string>();
+    const storageKey = `bevuihoc:seen-practice-prompts:${subject}`;
+    if (seen.size === 0) {
+      try {
+        const saved = window.localStorage.getItem(storageKey);
+        const savedPrompts: unknown = saved ? JSON.parse(saved) : [];
+        if (Array.isArray(savedPrompts)) {
+          savedPrompts.forEach((prompt) => {
+            if (typeof prompt === "string") seen.add(prompt);
+          });
+        }
+      } catch (storageError) {
+        console.warn("Không đọc được lịch sử câu hỏi đã dùng:", storageError);
+      }
+    }
     setLoadingQuestions(true);
     setQuestions([]);
     setLevel(value);
