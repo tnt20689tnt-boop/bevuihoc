@@ -224,7 +224,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`Bạn ${name} chọn tục ngữ cho chủ đề ${theme} ${context}. Câu nào phù hợp?`, proverb, proverbs.filter(x => x !== proverb).slice(0, 3), "Chọn câu nói về lòng nhân ái và sự sẻ chia.");
   }
   if (grade === 4) {
-    if (stageKind === 0) return make("Câu nào thuộc kiểu câu kể Ai làm gì?", `${name} đang chăm sóc vườn rau.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, vườn rau đẹp quá!`], "Kiểu câu này nêu chủ thể và hoạt động.");
+    if (stageKind === 0) { const action = pick(["chăm sóc vườn rau", "đọc sách trong thư viện", "tưới cây ngoài sân", "giúp mẹ nấu cơm"]); const context = pick(["trong bài kể chuyện", "khi tả hoạt động hằng ngày", "ở giờ luyện câu", "trong đoạn văn"]); return make(`Trong ${context}, câu nào thuộc kiểu Ai làm gì về hoạt động của ${name}?`, `${name} đang ${action}.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, ${action} thật vui!`], "Kiểu câu này nêu chủ thể và hoạt động."); }
     if (stageKind === 1) {
       const reduplicative = pick(["lung linh", "rì rào", "lấp lánh", "xanh xao", "long lanh", "ào ào", "thăm thẳm", "lập lòe"]);
       return make(`Từ nào là từ láy trong nhóm: ${reduplicative}, bàn ghế, sách vở, học sinh?`, reduplicative, ["bàn ghế", "sách vở", "học sinh"], "Từ láy có sự lặp lại âm hoặc vần.");
@@ -233,8 +233,8 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       const compound = pick(["bảo vệ", "học sinh", "quê hương", "bàn ghế", "sách vở", "hoa quả", "nhà cửa", "thầy cô"]);
       return make(`Từ nào là từ ghép trong nhóm: ${compound}, long lanh, lấp lánh, rì rào?`, compound, ["long lanh", "lấp lánh", "rì rào"], "Từ ghép gồm các tiếng có quan hệ về nghĩa.");
     }
-    if (stageKind === 3) { const activity = pick(["đang đọc truyện", "đang tưới cây", "đang viết bài", "đang chăm sóc hoa"]); const object = pick(["trong vườn", "ở lớp", "sau giờ học"]); return make(`Trong câu “${name} ${activity} ${object}”, chủ ngữ là gì?`, name, [activity, object, "truyện"], "Chủ ngữ thường trả lời câu hỏi Ai hoặc Cái gì."); }
-    return make("Câu nào là câu khiến?", "Em hãy giữ gìn sách vở nhé!", ["Sách vở rất đẹp.", "Ai đang giữ sách?", "Ôi, sách mới đẹp quá!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
+    if (stageKind === 3) { const activity = pick(["đang đọc truyện", "đang tưới cây", "đang viết bài", "đang chăm sóc hoa"]); const object = pick(["trong vườn", "ở lớp", "sau giờ học"]); const context = pick(["trong giờ luyện ngữ pháp", "khi phân tích câu", "ở bài tập đọc hiểu", "trong vở bài tập"]); return make(`${context}: trong câu “${name} ${activity} ${object}”, chủ ngữ là gì?`, name, [activity, object, "truyện"], "Chủ ngữ thường trả lời câu hỏi Ai hoặc Cái gì."); }
+    const request = pick(["hãy giữ gìn sách vở", "giúp cô xếp bàn ghế", "đọc bài thật kỹ", "chăm sóc cây xanh"]);\n    return make(`Bạn ${name} muốn nhờ các bạn ${request}. Câu nào là câu khiến?`, `Các bạn hãy ${request} nhé!`, ["Các bạn đang ${request}.", "Ai đã ${request}?", "Ôi, việc đó thật vui!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
   }
   if (stageKind === 0) {
     const pronoun = pick(["Chúng em", "Chúng tôi", "Mình", "Tôi", "Các bạn"]);
