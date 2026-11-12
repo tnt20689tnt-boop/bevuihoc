@@ -50,19 +50,66 @@ const generateMath = (grade: number, lv: number) => {
   let isFloat = false;
 
   if (grade === 1) {
-    const maxNum = lv <= 33 ? 10 : lv <= 66 ? 20 : 100;
-    if (Math.random() > 0.5) {
-      const a = rand(1, maxNum - 1);
-      const b = rand(1, maxNum - a);
-      correctVal = a + b;
-      questionText = `${a} + ${b} bằng bao nhiêu?`;
-      explanation = `${a} + ${b} = ${correctVal}.`;
+    // Grade 1 now uses the exact level, not broad 1-33 / 34-66 / 67-100 bands.
+    // Adjacent levels alternate operation families so Level 1 and Level 2
+    // cannot silently use the same question template.
+    const stage = Math.floor((lv - 1) / 20);
+    const maxNum = Math.min(20, 5 + Math.floor((lv - 1) / 5));
+    const useAddition = lv % 2 === 1;
+
+    if (stage === 0) {
+      if (useAddition) {
+        const a = rand(1, Math.max(1, maxNum - 1));
+        const b = rand(1, maxNum - a);
+        correctVal = a + b;
+        questionText = `${a} + ${b} bằng bao nhiêu?`;
+        explanation = `${a} + ${b} = ${correctVal}.`;
+      } else {
+        const a = rand(2, maxNum);
+        const b = rand(1, a - 1);
+        correctVal = a - b;
+        questionText = `${a} - ${b} bằng bao nhiêu?`;
+        explanation = `${a} - ${b} = ${correctVal}.`;
+      }
+    } else if (stage === 1) {
+      if (useAddition) {
+        const answer = rand(Math.ceil(maxNum / 2), maxNum);
+        const a = rand(1, answer - 1);
+        const b = answer - a;
+        correctVal = answer;
+        questionText = `Điền số còn thiếu: ${a} + ? = ${answer}`;
+        explanation = `Số cần điền là ${answer} - ${a} = ${b}.`;
+        correctVal = b;
+      } else {
+        const a = rand(Math.ceil(maxNum / 2), maxNum);
+        const answer = rand(1, a - 1);
+        correctVal = answer;
+        questionText = `Điền số còn thiếu: ${a} - ? = ${a - answer}`;
+        explanation = `Số cần điền là ${a} - ${a - answer} = ${answer}.`;
+      }
+    } else if (stage === 2) {
+      const a = rand(1, maxNum);
+      const b = rand(1, maxNum);
+      const symbol = a > b ? ">" : a < b ? "<" : "=";
+      correctVal = symbol === ">" ? 1 : symbol === "<" ? 2 : 3;
+      questionText = `Điền dấu thích hợp: ${a} □ ${b}`;
+      explanation = `${a} ${symbol} ${b}.`;
+      // Comparison answers are represented by a number for the common
+      // multiple-choice renderer, then mapped to readable symbols below.
+      correctVal = symbol as unknown as number;
+    } else if (stage === 3) {
+      const a = rand(1, Math.max(1, maxNum - 2));
+      const b = rand(1, Math.max(1, maxNum - a));
+      const c = rand(1, Math.max(1, maxNum - a - b));
+      correctVal = a + b + c;
+      questionText = `Có ${a} quả táo, thêm ${b} quả rồi thêm ${c} quả. Có tất cả bao nhiêu quả?`;
+      explanation = `${a} + ${b} + ${c} = ${correctVal} quả.`;
     } else {
       const a = rand(2, maxNum);
-      const b = rand(1, a);
+      const b = rand(1, a - 1);
       correctVal = a - b;
-      questionText = `${a} - ${b} bằng bao nhiêu?`;
-      explanation = `${a} - ${b} = ${correctVal}.`;
+      questionText = `Có ${a} chiếc kẹo, cho bạn ${b} chiếc. Còn lại bao nhiêu chiếc?`;
+      explanation = `${a} - ${b} = ${correctVal} chiếc.`;
     }
   } else if (grade === 2) {
     const type = lv <= 33 ? rand(1, 2) : lv <= 66 ? 3 : rand(1, 3);
