@@ -88,12 +88,35 @@ const generateMath = (grade: number, lv: number) => {
         explanation = `Số cần điền là ${a} - ${a - answer} = ${answer}.`;
       }
     } else if (stage === 2) {
-      const a = rand(1, maxNum);
-      const b = rand(1, maxNum);
-      const larger = Math.max(a, b);
-      correctVal = larger;
-      questionText = `Trong hai số ${a} và ${b}, số nào lớn hơn hoặc bằng số kia?`;
-      explanation = `Số lớn hơn hoặc bằng là ${larger}.`;
+      // Comparison skills are tested with clear, distinct tasks. Never ask
+      // which number is "greater than or equal to" the other.
+      const task = lv % 4;
+      if (task === 0) {
+        const a = rand(1, Math.max(1, maxNum - 2));
+        const b = a + 2;
+        correctVal = a + 1;
+        questionText = `Điền số thích hợp vào ô trống: ${a} < □ < ${b}`;
+        explanation = `Số nằm giữa ${a} và ${b} là ${correctVal}.`;
+      } else {
+        let a = rand(1, maxNum);
+        let b = rand(1, maxNum);
+        while (b === a) b = rand(1, maxNum);
+        const smaller = Math.min(a, b);
+        const larger = Math.max(a, b);
+        if (task === 1) {
+          correctVal = larger;
+          questionText = `Trong hai số ${a} và ${b}, số nào lớn hơn?`;
+          explanation = `${larger} lớn hơn ${smaller}.`;
+        } else if (task === 2) {
+          correctVal = smaller;
+          questionText = `Trong hai số ${a} và ${b}, số nào bé hơn?`;
+          explanation = `${smaller} bé hơn ${larger}.`;
+        } else {
+          correctVal = smaller;
+          questionText = `Sắp xếp ${a} và ${b} theo thứ tự từ bé đến lớn. Số đứng trước là số nào?`;
+          explanation = `Thứ tự từ bé đến lớn là ${smaller}, ${larger}.`;
+        }
+      }
     } else if (stage === 3) {
       const a = rand(1, Math.max(1, maxNum - 2));
       const b = rand(1, Math.max(1, maxNum - a));
