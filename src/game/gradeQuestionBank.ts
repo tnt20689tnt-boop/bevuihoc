@@ -180,15 +180,18 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   if (grade === 2) {
     if (stageKind === 0) {
       const noun = pick(["quyển vở", "cây bàng", "con mèo", "cô giáo", "chiếc xe", "bông hoa", "dòng sông", "ngôi trường"]);
-      const place = pick(["trong sân trường", "ở thư viện", "trên đường đi học", "gần nhà"]);\n      return make(`Trong câu “${name} nhìn thấy ${noun} ${place}”, từ nào chỉ sự vật?`, noun, ["chạy", "xinh đẹp", "nhanh chóng"], "Từ chỉ sự vật gọi tên người, vật, cây cối.");
+      const place = pick(["trong sân trường", "ở thư viện", "trên đường đi học", "gần nhà"]);
+      return make(`Trong câu “${name} nhìn thấy ${noun} ${place}”, từ nào chỉ sự vật?`, noun, ["chạy", "xinh đẹp", "nhanh chóng"], "Từ chỉ sự vật gọi tên người, vật, cây cối.");
     }
     if (stageKind === 1) {
       const adjective = pick(["hiền lành", "xanh biếc", "cao lớn", "chăm ngoan", "dịu dàng", "rực rỡ", "sạch sẽ", "vui vẻ"]);
-      const context = pick(["trong lời nhận xét của cô giáo", "khi kể về người bạn", "trong bài văn miêu tả", "ở tiết học Tiếng Việt"]);\n      return make(`Bạn ${name} được khen là “${adjective}” ${context}. Từ nào chỉ đặc điểm?`, adjective, ["đọc sách", "cái bàn", "học sinh"], "Từ chỉ đặc điểm nêu tính chất hoặc màu sắc.");
+      const context = pick(["trong lời nhận xét của cô giáo", "khi kể về người bạn", "trong bài văn miêu tả", "ở tiết học Tiếng Việt"]);
+      return make(`Bạn ${name} được khen là “${adjective}” ${context}. Từ nào chỉ đặc điểm?`, adjective, ["đọc sách", "cái bàn", "học sinh"], "Từ chỉ đặc điểm nêu tính chất hoặc màu sắc.");
     }
     if (stageKind === 2) {
       const action = pick(["đang viết", "nhảy dây", "đọc sách", "quét nhà", "tưới cây", "xếp hàng", "đàn hát", "tập thể dục"]);
-      const time = pick(["Mỗi sáng", "Sau giờ học", "Cuối tuần", "Trước khi đi ngủ"]);\n      return make(`${time}, ${name} thường ${action}. Cụm từ nào chỉ hoạt động?`, action, ["màu đỏ", "hiền hậu", "quyển truyện"], "Từ chỉ hoạt động trả lời câu hỏi làm gì.");
+      const time = pick(["Mỗi sáng", "Sau giờ học", "Cuối tuần", "Trước khi đi ngủ"]);
+      return make(`${time}, ${name} thường ${action}. Cụm từ nào chỉ hoạt động?`, action, ["màu đỏ", "hiền hậu", "quyển truyện"], "Từ chỉ hoạt động trả lời câu hỏi làm gì.");
     }
     if (stageKind === 3) { const context = pick(["trong bài đọc", "ở lớp học", "trong câu chuyện", "khi miêu tả bạn bè"]); return make(`Bạn ${name} tìm từ trái nghĩa với “${pair[0]}” ${context}. Từ cần tìm là gì?`, pair[2], [pair[1], pair[3], "vui vẻ"], "Tìm từ có nghĩa trái ngược."); }
     const topics = [
