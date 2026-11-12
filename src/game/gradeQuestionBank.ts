@@ -333,9 +333,11 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`Complete: ${subject} ___ to school ${context}.`, `${verb}s`, [verb, `${verb}ing`, `${verb}ed`], "Với chủ ngữ số ít ở hiện tại đơn, động từ thường thêm -s.");
     }
     if (kind === 1) {
-      const subject = pick(["They", "We", "I", "My friends", "The children"]);
-      const answer = subject === "They" || subject === "We" || subject === "I" || subject === "My friends" || subject === "The children" ? "have" : "has";
-      return make(`Choose the correct form: ${subject} ___ a new school bag.`, answer, ["has", "have", "having"].filter(x => x !== answer).concat(["is"]), "Dùng have với I, you, we, they và has với he, she, it.");
+      const subject = pick(["They", "We", "I", "My friends", "The children", "He", "She", "My brother", "My sister"]);
+      const answer = ["He", "She", "My brother", "My sister"].includes(subject) ? "has" : "have";
+      const object = pick(["two storybooks", "a new school bag", "three pencils", "a red bicycle"]);
+      const context = pick(["at home", "before school", "in the classroom", "during the English lesson"]);
+      return make(`${subject} ___ ${object} ${context}.`, answer, ["has", "have", "having"].filter(x => x !== answer).concat(["is"]), "Dùng have với I, you, we, they và has với he, she, it.");
     }
     if (kind === 2) {
       const count = int(2, 8), object = pick(["pencils", "books", "rulers", "erasers", "chairs"]);
