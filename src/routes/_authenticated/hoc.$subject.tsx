@@ -142,6 +142,11 @@ function LessonRoom({ profile }: { profile: Profile }) {
       toast.error("Chưa tạo đủ câu hỏi mới cho Level này. Vui lòng thử lại.");
     }
     seenBySubject.current.set(subject, seen);
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify([...seen].slice(-3000)));
+    } catch (storageError) {
+      console.warn("Không lưu được lịch sử câu hỏi đã dùng:", storageError);
+    }
     setQuestions(shuffle(selectedQuestions));
   }
   function chooseAnswer(choice: number) {
