@@ -107,6 +107,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const [playerScores, setPlayerScores] = useState<Record<string, MatchScore>>({});
   const [answeredPlayerIds, setAnsweredPlayerIds] = useState<string[]>([]);
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const matchQuestionsRef = useRef<Question[]>([]);
   const scoreRef = useRef(0);
   const answeredRef = useRef(0);
@@ -145,6 +146,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       setAnswered(0);
       setMatchScores([]);
       setSaveError(null);
+      setSaveStatus("idle");
       setMatchId(message.matchId);
       matchIdRef.current = message.matchId;
       setPlayerScores({});
@@ -265,6 +267,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     const opponent = results.find((item) => item.playerId !== profile.id);
     if (id && opponent && savedMatchRef.current !== id) {
       savedMatchRef.current = id;
+      setSaveStatus("saving");
       void supabase.rpc("save_arena_match_result", {
         p_match_id: id,
         p_grade: currentGrade,
@@ -277,6 +280,9 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         if (error) {
           savedMatchRef.current = null;
           setSaveError(error.message);
+          setSaveStatus("error");
+        } else {
+          setSaveStatus("saved");
         }
       });
     }
@@ -416,6 +422,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     setPlayerScores({});
     setAnsweredPlayerIds([]);
     setSaveError(null);
+    setSaveStatus("idle");
     onExit?.();
   };
 
@@ -446,6 +453,16 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         <span className="rounded-full bg-white/10 px-4 py-2 font-bold">🎲 Câu hỏi ngẫu nhiên 3 môn</span>
         <span className="rounded-full bg-white/10 px-4 py-2 font-bold">⭐ {score} điểm của con</span>
       </div>
+      {phase === "playing" && (
+        <div className="mt-3 flex flex-wrap justify-center gap-2 text-xs">
+          {players.map((player) => (
+            <span key={player.id} className="rounded-full border border-white/15 bg-white/10 px-3 py-2 font-bold">
+              {player.name}: {playerScores[player.id]?.score ?? 0} điểm
+              {answeredPlayerIds.includes(player.id) ? " • Đã trả lời ✓" : " • Đang làm"}
+            </span>
+          ))}
+        </div>
+      )}
 
       {phase === "waiting" && (
         <section className="mx-auto mt-5 max-w-2xl rounded-3xl border border-amber-200/30 bg-white/10 p-5 text-center">
@@ -482,12 +499,15 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
             ))}
           </div>
           <p className="mt-3 text-sm text-sky-100">Con đã trả lời {answered} câu. Mã trận: {matchId?.slice(0, 8) || "—"}</p>
-          {saveError ? (
+          {saveStatus === "saving" ? (
+            <p className="mt-2 text-sm text-amber-200">Đang lưu kết quả trận đấu…</p>
+          ) : saveStatus === "saved" ? (
+            <p className="mt-2 text-sm text-emerald-200">✓ Đã lưu kết quả vào mục Thi đấu.</p>
+          ) : saveStatus === "error" ? (
             <p className="mt-2 text-sm font-bold text-rose-300">Chưa lưu được kết quả: {saveError}</p>
           ) : (
-            <p className="mt-2 text-sm text-emerald-200">✓ Kết quả trận đấu đã được gửi lưu vào mục Thi đấu.</p>
-          )
-          }
+            <p className="mt-2 text-sm text-sky-100/80">Đang hoàn tất lưu kết quả…</p>
+          )}
           <p className="mt-1 text-xs text-sky-100/70">Trận đấu đã kết thúc. Chờ các bé trở về sảnh để bắt đầu lượt mới.</p>
           <button onClick={leaveCompetition} className="mt-5 rounded-full bg-amber-300 px-7 py-3 font-black text-slate-950">VỀ SẢNH ĐẤU TRƯỜNG</button>
         </section>
