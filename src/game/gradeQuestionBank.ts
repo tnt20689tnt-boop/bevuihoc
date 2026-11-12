@@ -243,7 +243,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   if (stageKind === 0) {
     const pronoun = pick(["Chúng em", "Chúng tôi", "Mình", "Tôi", "Các bạn"]);
     const action = pick(["bảo vệ môi trường", "đọc sách mỗi ngày", "giúp đỡ bạn bè", "chăm sóc vườn trường"]);
-    return make(`Trong câu “${pronoun} cùng nhau ${action}”, đại từ xưng hô là từ nào?`, pronoun, ["cùng nhau", action, "mỗi ngày"], "Đại từ xưng hô dùng để chỉ người đang nói, nghe hoặc được nhắc đến.");
+    const context = pick(["trong giờ sinh hoạt", "ở câu lạc bộ", "trong buổi lao động", "sau giờ học"]);\n    return make(`Bạn ${name} viết câu ${context}: “${pronoun} cùng nhau ${action}”. Đại từ xưng hô là từ nào?`, pronoun, ["cùng nhau", action, "mỗi ngày"], "Đại từ xưng hô dùng để chỉ người đang nói, nghe hoặc được nhắc đến.");
   }
   if (stageKind === 1) {
     const relations = [
@@ -270,7 +270,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   }
   const image = pick(["Mặt trời như quả cầu lửa", "Tiếng suối trong như tiếng hát", "Bạn Nam nhanh như sóc", "Mái tóc bà trắng như mây"]);
   const context = pick(["trong bài văn miêu tả", "ở giờ đọc hiểu", "trong câu chuyện của bạn", "khi phân tích hình ảnh"]);
-  return make(`Biện pháp tu từ trong câu “${image}” là gì ${context}?`, "So sánh", ["Nhân hóa", "Điệp từ", "Ẩn dụ"], "Từ ngữ so sánh hoặc hình ảnh tương đồng giúp nhận ra phép so sánh.");
+  return make(`Bạn ${name} phân tích câu “${image}” ${context}. Biện pháp tu từ được sử dụng là gì?`, "So sánh", ["Nhân hóa", "Điệp từ", "Ẩn dụ"], "Từ ngữ so sánh hoặc hình ảnh tương đồng giúp nhận ra phép so sánh.");
 };
 
 const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
