@@ -79,10 +79,15 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
   if (grade === 3) {
     const kind = int(0, 4), max = Math.min(10000, 100 + scale * 100);
     if (kind === 0) {
-      const a = int(2, 9), b = int(2, 9), answer = a * b;
-      return make(`${a} × ${b} = ?`, String(answer), [String(answer + a), String(answer - b), String(a + b)], "Vận dụng bảng nhân.");
-    }
-    if (kind === 1) {
+    const precision = scale <= 20 ? 1 : scale <= 60 ? 2 : 3;
+    const factor = 10 ** precision;
+    const maxValue = Math.min(110, 10 + scale);
+    const a = int(factor, Math.round(maxValue * factor)) / factor;
+    const b = int(factor, Math.round(maxValue * factor)) / factor;
+    const answer = Math.round((a + b) * factor) / factor;
+    return make(`${a.toFixed(precision)} + ${b.toFixed(precision)} = ?`, answer.toFixed(precision), [(answer + 1 / factor).toFixed(precision), (answer - 1 / factor).toFixed(precision), (answer + 1).toFixed(precision)], "Đặt thẳng hàng các chữ số cùng hàng thập phân.");
+  }
+  if (kind === 1) {
       const subject = pick(["They", "We", "I", "My friends", "The children", "He", "She", "My brother", "My sister"]);
       const answer = ["He", "She", "My brother", "My sister"].includes(subject) ? "has" : "have";
       const object = pick(["two storybooks", "a new school bag", "three pencils", "a red bicycle"]);
