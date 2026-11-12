@@ -155,7 +155,12 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
       const answer = pick(examples[onset]!);
       return make(`Tiếng nào có âm đầu “${onset}”?`, answer, ["bàn", "mèo", "cô", "gỗ", "hoa"].filter(x => x !== answer), "Nghe âm đầu tiên khi đọc tiếng.");
     }
-    if (stageKind === 2) return make(`Từ nào có vần “${word.slice(-2)}”?`, word, ["bàn", "mẹ", "cá", "bé"].filter(x => x !== word).concat(["nhà"]), "Đọc phần vần ở cuối tiếng.");
+    if (stageKind === 2) {
+      const rhymeGroups = [["an", "bàn", "lan", "can", "tan"], ["ong", "bóng", "sông", "cong", "mong"], ["at", "cát", "mát", "hát", "bát"], ["ang", "bàng", "sáng", "nàng", "mang"], ["ơi", "chơi", "bơi", "lời", "mời"]];
+      const group = pick(rhymeGroups);
+      const answer = group[int(1, 4)]!;
+      return make(`Tiếng nào có vần “${group[0]}”?`, answer, group.slice(1).filter(x => x !== answer).concat(["mẹ", "cá"]), "Đọc phần vần ở cuối tiếng.");
+    }
     if (stageKind === 3) {
       const action = pick(["đi học", "đọc sách", "vẽ tranh", "đá bóng", "hát múa"]);
       const correct = `${name} ${action}.`;
