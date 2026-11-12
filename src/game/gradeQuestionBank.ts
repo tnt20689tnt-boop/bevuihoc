@@ -387,7 +387,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   }
   if (kind === 0) {
     const subject = pick(["We", "I", "Mai", "Nam", "My family"]);
-    const activity = pick(["visit our grandparents", "go to the museum", "have a picnic", "travel to Da Nang"]);
+    const activity = pick(["visit grandparents", "go to a museum", "have a picnic", "travel to Da Nang"]);
     const context = pick(["next Sunday", "during the summer holiday", "after the exam", "next weekend", "in December"]);
     return make(`${subject} ___ ${activity} ${context}.`, "will", ["did", "are", "was"], "Will dùng để nói về tương lai.");
   }
@@ -410,7 +410,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   }
   const subject = pick(["She", "He", "They", "My parents", "Mai"]);
   const place = pick(["the museum", "the zoo", "the library", "the park"]);
-  const context = pick(["with her family", "after lunch", "during the holiday", "with their classmates", "in the morning"]);
+  const context = pick(["with the family", "after lunch", "during the holiday", "with classmates", "in the morning"]);
   return make(`${subject} ___ to ${place} last Sunday ${context}.`, "went", ["go", "goes", "going"], "Go có dạng quá khứ là went.");
 };
 
