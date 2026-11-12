@@ -142,7 +142,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   ];
   const syllables = ["trăng", "sáng", "sách", "trường", "chim", "phượng", "biển", "rừng", "thầy", "cô", "bạn", "ước mơ"];
   const names = ["Lan", "Minh", "Hoa", "Nam", "Mai", "An", "Bình", "Hà"];
-  const name = pick(names), word = pick(syllables), pair = pick(words);
+  const name = pick(names), pair = pick(words);
   const stageKind = Math.min(4, Math.floor((stage - 1) / 2));
   if (grade === 1) {
     if (stageKind === 0) {
@@ -209,10 +209,31 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     if (stageKind === 3) return make(`Trong câu “${name} đang đọc truyện”, chủ ngữ là gì?`, name, ["đang đọc", "đọc truyện", "truyện"], "Chủ ngữ thường trả lời câu hỏi Ai hoặc Cái gì.");
     return make("Câu nào là câu khiến?", "Em hãy giữ gìn sách vở nhé!", ["Sách vở rất đẹp.", "Ai đang giữ sách?", "Ôi, sách mới đẹp quá!"], "Câu khiến dùng để yêu cầu, đề nghị hoặc khuyên bảo.");
   }
-  if (stageKind === 0) return make("Đại từ trong câu nào được dùng để xưng hô?", "Chúng em sẽ cố gắng học tập.", ["Cánh đồng rất rộng.", "Bầu trời xanh biếc.", "Những bông hoa nở rộ."], "Đại từ có thể dùng để xưng hô hoặc thay thế.");
-  if (stageKind === 1) return make("Cặp quan hệ từ nào biểu thị nguyên nhân – kết quả?", "Vì… nên…", ["Tuy… nhưng…", "Nếu… thì…", "Không những… mà còn…"], "Vì nêu nguyên nhân, nên nêu kết quả.");
-  if (stageKind === 2) return make("Câu nào là câu ghép?", `${name} đọc sách, còn ${pick(names)} làm bài tập.`, ["Trời hôm nay rất đẹp.", "Những chú chim đang hót.", "Bông hoa màu đỏ."], "Câu ghép có từ hai cụm chủ ngữ – vị ngữ trở lên.");
-  if (stageKind === 3) return make("Từ nào gần nghĩa với “nhân hậu”?", pick(["nhân ái", "hiền từ", "tốt bụng"]), ["độc ác", "ích kỷ", "thô lỗ"], "Tìm từ có nghĩa gần giống.");
+  if (stageKind === 0) {
+    const pronoun = pick(["Chúng em", "Chúng tôi", "Mình", "Tôi", "Các bạn"]);
+    return make(`Trong câu “${pronoun} cùng nhau bảo vệ môi trường”, đại từ xưng hô là từ nào?`, pronoun, ["bảo vệ", "môi trường", "cùng nhau"], "Đại từ xưng hô dùng để chỉ người đang nói, nghe hoặc được nhắc đến.");
+  }
+  if (stageKind === 1) {
+    const relations = [
+      ["nguyên nhân – kết quả", "Vì… nên…", ["Tuy… nhưng…", "Nếu… thì…", "Không những… mà còn…"]],
+      ["giả thiết – kết quả", "Nếu… thì…", ["Vì… nên…", "Tuy… nhưng…", "Không những… mà còn…"]],
+      ["tương phản", "Tuy… nhưng…", ["Vì… nên…", "Nếu… thì…", "Không những… mà còn…"]],
+      ["tăng tiến", "Không những… mà còn…", ["Vì… nên…", "Nếu… thì…", "Tuy… nhưng…"]],
+    ] as const;
+    const relation = pick(relations);
+    return make(`Cặp quan hệ từ nào biểu thị quan hệ ${relation[0]}?`, relation[1], [...relation[2]], "Xác định ý nghĩa quan hệ giữa hai vế câu.");
+  }
+  if (stageKind === 2) {
+    const secondName = pick(names);
+    const firstAction = pick(["đọc sách", "tưới cây", "làm bài tập", "vẽ tranh"]);
+    const secondAction = pick(["quét nhà", "xếp sách", "chơi cờ", "viết bài"]);
+    return make(`Câu ghép nào diễn tả hai hoạt động của ${name} và ${secondName}?`, `${name} ${firstAction}, còn ${secondName} ${secondAction}.`, [`${name} đang ${firstAction}.`, `${secondName} rất chăm chỉ.`, "Bầu trời hôm nay xanh biếc."], "Câu ghép có từ hai cụm chủ ngữ – vị ngữ trở lên.");
+  }
+  if (stageKind === 3) {
+    const synonyms = [["nhân hậu", "nhân ái"], ["siêng năng", "chăm chỉ"], ["dũng cảm", "can đảm"], ["bao la", "mênh mông"], ["hạnh phúc", "sung sướng"], ["trung thực", "thật thà"]];
+    const item = pick(synonyms);
+    return make(`Từ nào gần nghĩa với “${item[0]}”?`, item[1], ["độc ác", "ích kỷ", "thô lỗ"], "Tìm từ có nghĩa gần giống.");
+  }
   return make("Biện pháp tu từ trong câu “Mặt trời như quả cầu lửa” là gì?", "So sánh", ["Nhân hóa", "Điệp từ", "Ẩn dụ"], "Từ “như” báo hiệu phép so sánh.");
 };
 
@@ -224,23 +245,54 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   const kind = Math.min(4, Math.floor((stage - 1) / 2));
   if (grade === 1) {
     if (kind === 0) { const word = pick(animals); return make(`What is “${word}” in Vietnamese?`, ({cat:"con mèo",dog:"con chó",bird:"con chim",fish:"con cá",rabbit:"con thỏ",tiger:"con hổ",elephant:"con voi",monkey:"con khỉ"} as Record<string,string>)[word]!, ["quả táo","quyển sách","bông hoa"], "Nhớ nghĩa của từ chỉ con vật."); }
-    if (kind === 1) { const color = pick(colors); return make(`Which word names the color “${color}”?`, color, colors.filter(x => x !== color).slice(0,3), "Nhận biết và đọc tên màu sắc."); }
-    if (kind === 2) return make("How many days are there in a week?", "Seven", ["Five", "Six", "Eight"], "Một tuần có bảy ngày.");
-    if (kind === 3) return make("Choose the correct greeting in the morning.", "Good morning", ["Good night", "Goodbye", "Good evening"], "Dùng Good morning vào buổi sáng.");
-    return make("Complete: This is ___ book.", "a", ["an", "are", "am"], "Dùng a trước danh từ số ít bắt đầu bằng phụ âm.");
+    if (kind === 1) { const color = pick(colors); const object = pick(["the sky", "a banana", "grass", "a tomato", "an orange", "the sea"]); return make(`Which color is usually associated with ${object}?`, ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!, colors.filter(x => x !== ({ "the sky":"blue", "a banana":"yellow", "grass":"green", "a tomato":"red", "an orange":"orange", "the sea":"blue" } as Record<string,string>)[object]!), "Nhớ từ vựng chỉ màu sắc."); }
+    if (kind === 2) {
+      const days = [["Monday", "Tuesday"], ["Tuesday", "Wednesday"], ["Wednesday", "Thursday"], ["Thursday", "Friday"], ["Friday", "Saturday"], ["Saturday", "Sunday"]];
+      const item = pick(days);
+      return make(`Which day comes after ${item[0]}?`, item[1]!, ["Monday", "Friday", "Sunday"].filter(x => x !== item[1]), "Học thứ tự các ngày trong tuần.");
+    }
+    if (kind === 3) return make(`What should you say to ${name} when you meet at 8 a.m.?`, "Good morning", ["Good night", "Goodbye", "Good evening"], "Dùng Good morning vào buổi sáng.");
+    const object = pick(["book", "pencil", "ruler", "bag", "desk", "chair", "apple", "orange"]);
+    const article = /^[aeiou]/i.test(object) ? "an" : "a";
+    return make(`Complete: This is ___ ${object}.`, article, [article === "a" ? "an" : "a", "are", "am"], "Chọn mạo từ a hoặc an theo âm đầu của danh từ.");
   }
   if (grade === 2) {
     if (kind === 0) { const noun = pick(nouns); return make(`What is “${noun}” in Vietnamese?`, ({book:"quyển sách",pencil:"bút chì",school:"trường học",teacher:"giáo viên",friend:"bạn bè",garden:"khu vườn",library:"thư viện",family:"gia đình"} as Record<string,string>)[noun]!, ["con mèo","quả cam","màu xanh"], "Ôn từ vựng quen thuộc."); }
-    if (kind === 1) return make("Choose the plural form of “box”.", "boxes", ["boxs", "boxies", "box"], "Danh từ kết thúc bằng x thường thêm -es.");
+    if (kind === 1) {
+      const singular = pick(["box", "bus", "class", "dish", "watch", "baby"]);
+      const plural = singular === "baby" ? "babies" : `${singular}es`;
+      return make(`Choose the plural form of “${singular}”.`, plural, [`${singular}s`, `${singular}ies`, singular], "Chú ý quy tắc thêm -es hoặc đổi y thành -ies.");
+    }
     if (kind === 2) return make(`Complete: ${name} ___ my friend.`, "is", ["am", "are", "be"], "Dùng is với chủ ngữ số ít.");
-    if (kind === 3) return make("Choose the correct question word for asking a name.", "What", ["Where", "How many", "When"], "What is your name? dùng để hỏi tên.");
-    return make("Choose the correct preposition: The book is ___ the table.", "on", ["in", "under to", "between of"], "On nghĩa là ở trên bề mặt.");
+    if (kind === 3) {
+      const prompts = [["asking a name", "What"], ["asking a place", "Where"], ["asking a time", "When"], ["asking a reason", "Why"]];
+      const item = pick(prompts);
+      return make(`Which question word is used for ${item[0]}?`, item[1], prompts.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ để hỏi phù hợp với thông tin cần biết.");
+    }
+    const place = pick(["the table", "the school bag", "the chair", "the desk"]);
+    const relation = pick(["on", "under", "in"]);
+    return make(`The pencil is ${relation === "on" ? "___" : "___"} ${place}. Choose the correct preposition.`, relation, ["on", "under", "in"].filter(x => x !== relation).concat(["between"]), "On là ở trên, under là ở dưới, in là ở trong.");
   }
   if (grade === 3) {
-    if (kind === 0) return make(`Complete: ${name} ___ to school every day.`, "goes", ["go", "going", "went"], "Với he/she/tên một người ở hiện tại đơn, động từ thường thêm -s.");
-    if (kind === 1) return make("Choose the correct form: They ___ two cats.", "have", ["has", "having", "is"], "Dùng have với they.");
-    if (kind === 2) return make("Complete: There ___ three pencils on the desk.", "are", ["is", "am", "be"], "Dùng are với danh từ số nhiều.");
-    if (kind === 3) return make("Choose the correct modal verb: A bird ___ fly.", "can", ["cans", "is", "does"], "Sau can dùng động từ nguyên mẫu.");
+    if (kind === 0) {
+      const subject = pick(["Mai", "Nam", "Linh", "My brother", "My sister", "Tom"]);
+      const verb = pick(["go", "walk", "cycle", "travel"]);
+      return make(`Complete: ${subject} ___ to school every day.`, `${verb}s`, [verb, `${verb}ing`, `${verb}ed`], "Với chủ ngữ số ít ở hiện tại đơn, động từ thường thêm -s.");
+    }
+    if (kind === 1) {
+      const subject = pick(["They", "We", "I", "My friends", "The children"]);
+      const answer = subject === "They" || subject === "We" || subject === "I" || subject === "My friends" || subject === "The children" ? "have" : "has";
+      return make(`Choose the correct form: ${subject} ___ a new school bag.`, answer, ["has", "have", "having"].filter(x => x !== answer).concat(["is"]), "Dùng have với I, you, we, they và has với he, she, it.");
+    }
+    if (kind === 2) {
+      const count = int(2, 8), object = pick(["pencils", "books", "rulers", "erasers", "chairs"]);
+      return make(`There ___ ${count} ${object} in the classroom.`, "are", ["is", "am", "be"], "Dùng are với danh từ số nhiều.");
+    }
+    if (kind === 3) {
+      const animal = pick(["A bird", "A fish", "A rabbit", "A horse"]);
+      const ability = animal === "A fish" ? "swim" : animal === "A rabbit" ? "jump" : animal === "A horse" ? "run" : "fly";
+      return make(`${animal} ___ ${ability}.`, "can", ["cans", "is", "does"], "Sau can dùng động từ nguyên mẫu.");
+    }
     return make("Choose the opposite of “early”.", "late", ["fast", "small", "young"], "Late là trái nghĩa của early.");
   }
   if (grade === 4) {
