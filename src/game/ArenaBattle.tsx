@@ -18,7 +18,9 @@ type ArenaPlayer = {
   joinedAt: number;
   ready: boolean;
 };
-type GameMessage = { startsAt: number; question: Question; questionIndex: number; questions?: Question[] };
+type MatchScore = { playerId: string; name: string; score: number; answered: number };
+type GameMessage = { matchId: string; startsAt: number; question: Question; questionIndex: number; questions?: Question[] };
+type MatchFinishedMessage = { matchId: string; total: number; scores: MatchScore[] };
 type Props = { currentGrade: number; profile: Profile; onExit?: () => void };
 
 const subjectName: Record<Question["subject"], string> = {
@@ -100,7 +102,18 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const [answered, setAnswered] = useState(0);
   const [advanceAt, setAdvanceAt] = useState<number | null>(null);
   const [advanceSeconds, setAdvanceSeconds] = useState(0);
+  const [matchId, setMatchId] = useState<string | null>(null);
+  const [matchScores, setMatchScores] = useState<MatchScore[]>([]);
+  const [playerScores, setPlayerScores] = useState<Record<string, MatchScore>>({});
+  const [answeredPlayerIds, setAnsweredPlayerIds] = useState<string[]>([]);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const matchQuestionsRef = useRef<Question[]>([]);
+  const scoreRef = useRef(0);
+  const answeredRef = useRef(0);
+  const matchIdRef = useRef<string | null>(null);
+  const playerScoresRef = useRef<Record<string, MatchScore>>({});
+  const answeredPlayerIdsRef = useRef<string[]>([]);
+  const savedMatchRef = useRef<string | null>(null);
   const channelRef = useRef<RealtimeChannel | null>(null);
   const lastQuestionAction = useRef(0);
   const questionIndexRef = useRef(0);
@@ -115,16 +128,29 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     ready: false,
   }), [profile.id, profile.display_name, profile.avatar, currentGrade]);
 
-  const applyGameStart = useCallback((message: GameMessage) => {
+  const applyGameStart = useCallback((message: GameMessage, isNewMatch = false) => {
     setQuestion(message.question);
     setQuestionIndex(message.questionIndex);
     questionIndexRef.current = message.questionIndex;
     setSelected(null);
     setStartsAt(message.startsAt);
-    setPhase("countdown");
-    setCountdown(3);
-    setScore(0);
-    setAnswered(0);
+    setPhase(isNewMatch ? "countdown" : "playing");
+    setCountdown(isNewMatch ? 3 : 0);
+    if (isNewMatch) {
+      scoreRef.current = 0;
+      answeredRef.current = 0;
+      playerScoresRef.current = {};
+      savedMatchRef.current = null;
+      setScore(0);
+      setAnswered(0);
+      setMatchScores([]);
+      setSaveError(null);
+      setMatchId(message.matchId);
+      matchIdRef.current = message.matchId;
+      setPlayerScores({});
+    }
+    answeredPlayerIdsRef.current = [];
+    setAnsweredPlayerIds([]);
     setAdvanceAt(null);
     setAdvanceSeconds(0);
     if (message.questions?.length) matchQuestionsRef.current = message.questions;
@@ -157,20 +183,36 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       .on("broadcast", { event: "game-start" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
         const message = payload as GameMessage;
-        if (typeof message.startsAt === "number" && message.question?.question && Array.isArray(message.question.options)) applyGameStart(message);
+        if (typeof message.startsAt === "number" && message.question?.question && Array.isArray(message.question.options)) applyGameStart(message, true);
       })
       .on("broadcast", { event: "answer-submitted" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
-        const message = payload as { questionIndex?: number; advanceAt?: number };
-        if (message.questionIndex === questionIndexRef.current && typeof message.advanceAt === "number") {
+        const message = payload as {
+          questionIndex?: number; advanceAt?: number; playerId?: string;
+          playerName?: string; scoreAfter?: number; answeredAfter?: number;
+        };
+        if (message.questionIndex !== questionIndexRef.current) return;
+        if (typeof message.advanceAt === "number") {
           setAdvanceAt((current) => current === null ? message.advanceAt! : Math.min(current, message.advanceAt!));
         }
+        if (message.playerId && message.playerId !== profile.id) {
+          const nextScore: MatchScore = {
+            playerId: message.playerId,
+            name: message.playerName || "Thí sinh",
+            score: Number(message.scoreAfter) || 0,
+            answered: Number(message.answeredAfter) || 0,
+          };
+          playerScoresRef.current = { ...playerScoresRef.current, [message.playerId]: nextScore };
+          setPlayerScores({ ...playerScoresRef.current });
+          if (!answeredPlayerIdsRef.current.includes(message.playerId)) {
+            answeredPlayerIdsRef.current = [...answeredPlayerIdsRef.current, message.playerId];
+            setAnsweredPlayerIds([...answeredPlayerIdsRef.current]);
+          }
+        }
       })
-      .on("broadcast", { event: "match-finished" }, () => {
+      .on("broadcast", { event: "match-finished" }, ({ payload }) => {
         if (!alive) return;
-        setPhase("finished");
-        setAdvanceAt(null);
-        setAdvanceSeconds(0);
+        finishMatch(payload && typeof payload === "object" ? payload as MatchFinishedMessage : undefined);
       })
       .on("broadcast", { event: "next-question" }, ({ payload }) => {
         if (!alive || !payload || typeof payload !== "object") return;
@@ -188,7 +230,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       if (channelRef.current === channel) channelRef.current = null;
       void supabase.removeChannel(channel);
     };
-  }, [profile.id, self, applyGameStart]);
+  }, [profile.id, self, applyGameStart, finishMatch]);
 
   useEffect(() => {
     if (phase !== "countdown" || startsAt === null) return;
@@ -201,6 +243,44 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     const timer = window.setInterval(update, 100);
     return () => window.clearInterval(timer);
   }, [phase, startsAt]);
+
+  const finishMatch = useCallback((message?: MatchFinishedMessage) => {
+    const id = message?.matchId || matchIdRef.current;
+    const scoreMap = { ...playerScoresRef.current };
+    if (message?.scores) {
+      for (const item of message.scores) scoreMap[item.playerId] = item;
+    }
+    scoreMap[profile.id] = {
+      playerId: profile.id,
+      name: self.name,
+      score: scoreRef.current,
+      answered: answeredRef.current,
+    };
+    const results = players.map((player) => scoreMap[player.id]).filter(Boolean);
+    setMatchScores(results);
+    setPhase("finished");
+    setAdvanceAt(null);
+    setAdvanceSeconds(0);
+
+    const opponent = results.find((item) => item.playerId !== profile.id);
+    if (id && opponent && savedMatchRef.current !== id) {
+      savedMatchRef.current = id;
+      void supabase.rpc("save_arena_match_result", {
+        p_match_id: id,
+        p_grade: currentGrade,
+        p_score: scoreRef.current,
+        p_opponent_id: opponent.playerId,
+        p_opponent_name: opponent.name,
+        p_opponent_score: opponent.score,
+        p_total_questions: QUESTIONS_PER_MATCH,
+      }).then(({ error }) => {
+        if (error) {
+          savedMatchRef.current = null;
+          setSaveError(error.message);
+        }
+      });
+    }
+  }, [profile.id, self.name, players, currentGrade]);
 
   const markReady = async () => {
     if (phase !== "waiting" || players.some((player) => player.id === profile.id && player.ready)) return;
@@ -215,36 +295,47 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     const questions = createMatchQuestions(currentGrade);
     matchQuestionsRef.current = questions;
     const message: GameMessage = {
+      matchId: crypto.randomUUID(),
       startsAt: Date.now() + 3000,
       question: questions[0]!,
       questions,
       questionIndex: 1,
     };
-    applyGameStart(message);
+    applyGameStart(message, true);
     void channelRef.current?.send({ type: "broadcast", event: "game-start", payload: message });
   }, [players, phase, profile.id, currentGrade, applyGameStart]);
 
   const nextQuestion = useCallback(() => {
     if (Date.now() - lastQuestionAction.current < 1200) return;
     lastQuestionAction.current = Date.now();
-    if (questionIndexRef.current >= QUESTIONS_PER_MATCH) {
-      setPhase("finished");
-      setAdvanceAt(null);
-      void channelRef.current?.send({ type: "broadcast", event: "match-finished", payload: { total: QUESTIONS_PER_MATCH } });
+    if (questionIndexRef.current >= QUESTIONS_PER_MATCH || !matchQuestionsRef.current[questionIndexRef.current]) {
+      const scores = players.map((player) => {
+        const current = playerScoresRef.current[player.id];
+        return player.id === profile.id
+          ? { playerId: profile.id, name: self.name, score: scoreRef.current, answered: answeredRef.current }
+          : current || { playerId: player.id, name: player.name, score: 0, answered: 0 };
+      });
+      const finished: MatchFinishedMessage = {
+        matchId: matchIdRef.current || crypto.randomUUID(),
+        total: QUESTIONS_PER_MATCH,
+        scores,
+      };
+      finishMatch(finished);
+      void channelRef.current?.send({ type: "broadcast", event: "match-finished", payload: finished });
       return;
     }
     const nextIndex = questionIndexRef.current + 1;
     const next = matchQuestionsRef.current[nextIndex - 1];
-    if (!next) {
-      setPhase("finished");
-      setAdvanceAt(null);
-      void channelRef.current?.send({ type: "broadcast", event: "match-finished", payload: { total: questionIndexRef.current } });
-      return;
-    }
-    const message: GameMessage = { startsAt: Date.now() + 3000, question: next, questionIndex: nextIndex };
+    if (!next) return;
+    const message: GameMessage = {
+      matchId: matchIdRef.current || crypto.randomUUID(),
+      startsAt: Date.now(),
+      question: next,
+      questionIndex: nextIndex,
+    };
     applyGameStart(message);
     void channelRef.current?.send({ type: "broadcast", event: "next-question", payload: message });
-  }, [applyGameStart]);
+  }, [applyGameStart, finishMatch, players, profile.id, self.name]);
 
   useEffect(() => {
     if (phase !== "playing" || advanceAt === null) return;
@@ -265,12 +356,40 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     // Việc một bé trả lời không khóa đáp án của các bé còn lại.
     if (!question || selected !== null || phase !== "playing") return;
     setSelected(value);
-    setAnswered((n) => n + 1);
-    if (value === question.correctAnswer) setScore((n) => n + 1);
+    const isCorrect = value === question.correctAnswer;
+    const nextScore = scoreRef.current + (isCorrect ? 1 : 0);
+    const nextAnswered = answeredRef.current + 1;
+    scoreRef.current = nextScore;
+    answeredRef.current = nextAnswered;
+    setScore(nextScore);
+    setAnswered(nextAnswered);
+    const ownScore: MatchScore = { playerId: profile.id, name: self.name, score: nextScore, answered: nextAnswered };
+    playerScoresRef.current = { ...playerScoresRef.current, [profile.id]: ownScore };
+    setPlayerScores({ ...playerScoresRef.current });
+    if (!answeredPlayerIdsRef.current.includes(profile.id)) {
+      answeredPlayerIdsRef.current = [...answeredPlayerIdsRef.current, profile.id];
+      setAnsweredPlayerIds([...answeredPlayerIdsRef.current]);
+    }
     const deadline = Date.now() + 10000;
     setAdvanceAt((current) => current === null ? deadline : Math.min(current, deadline));
-    void channelRef.current?.send({ type: "broadcast", event: "answer-submitted", payload: { questionIndex, advanceAt: deadline } });
+    void channelRef.current?.send({
+      type: "broadcast",
+      event: "answer-submitted",
+      payload: {
+        questionIndex,
+        advanceAt: deadline,
+        playerId: profile.id,
+        playerName: self.name,
+        scoreAfter: nextScore,
+        answeredAfter: nextAnswered,
+      },
+    });
   };
+
+  useEffect(() => {
+    if (phase !== "playing" || players.length < 2 || players[0]?.id !== profile.id) return;
+    if (players.every((player) => answeredPlayerIds.includes(player.id))) nextQuestion();
+  }, [phase, players, profile.id, answeredPlayerIds, nextQuestion]);
 
   const leaveCompetition = () => {
     const activeChannel = channelRef.current;
@@ -278,6 +397,11 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     channelRef.current = null;
     matchQuestionsRef.current = [];
     questionIndexRef.current = 0;
+    scoreRef.current = 0;
+    answeredRef.current = 0;
+    matchIdRef.current = null;
+    playerScoresRef.current = {};
+    answeredPlayerIdsRef.current = [];
     startSentRef.current = false;
     setPhase("waiting");
     setStartsAt(null);
@@ -287,6 +411,11 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     setAnswered(0);
     setAdvanceAt(null);
     setAdvanceSeconds(0);
+    setMatchId(null);
+    setMatchScores([]);
+    setPlayerScores({});
+    setAnsweredPlayerIds([]);
+    setSaveError(null);
     onExit?.();
   };
 
