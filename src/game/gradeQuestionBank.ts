@@ -358,13 +358,13 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       const subject = pick(["We", "Mai", "Nam", "My friends", "The children"]);
       const activity = pick(["football", "badminton", "chess", "volleyball"]);
       const context = pick(["after school", "at the sports center", "last weekend", "in the playground", "with our classmates"]);
-      return make(`${subject} ___ ${activity} ${context}.`, "played", ["play", "plays", "playing"], "Yesterday hoặc mốc thời gian quá khứ đi với thì quá khứ đơn.");
+      return make(`${subject} ___ ${activity} ${context}.`, "played", ["play", "plays", "playing"], "Dùng thì quá khứ đơn cho hoạt động đã xảy ra.");
     }
     if (kind === 1) {
       const subject = pick(["The children", "Mai and Nam", "My friends", "The boys"]);
-      const activity = pick(["running", "dancing", "singing", "playing"]);
+      const activity = pick([["run", "running"], ["dance", "dancing"], ["sing", "singing"], ["play", "playing"]]);
       const context = pick(["in the school yard", "at the park", "near the playground", "after class", "during break time"]);
-      return make(`Look! ${subject} ___ ${context}.`, `are ${activity}`, ["play", "plays", "played"], "Look! diễn tả hành động đang xảy ra; dùng am/is/are + V-ing.");
+      return make(`Look! ${subject} ___ ${context}.`, `are ${activity[1]}`, ["play", "plays", "played"], "Look! diễn tả hành động đang xảy ra; dùng are + V-ing.");
     }
     if (kind === 2) {
       const pairs = [["A giraffe", "a goat", "tall", "taller"], ["An elephant", "a dog", "big", "bigger"], ["A train", "a bicycle", "fast", "faster"], ["A whale", "a fish", "large", "larger"]];
