@@ -1,0 +1,23 @@
+{
+  "id": "/",
+  "name": "Bé Vui Học",
+  "short_name": "Bé Vui Học",
+  "description": "Thế giới học tập 3D vui nhộn dành cho bé.",
+  "lang": "vi",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "any",
+  "background_color": "#fff8e9",
+  "theme_color": "#ffb347",
+  "categories": ["education", "kids"],
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
