@@ -364,13 +364,13 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       const subject = pick(["The children", "Mai and Nam", "My friends", "The boys"]);
       const activity = pick([["run", "running"], ["dance", "dancing"], ["sing", "singing"], ["play", "playing"]]);
       const context = pick(["in the school yard", "at the park", "near the playground", "after class", "during break time"]);
-      return make(`Look! ${subject} ___ ${context}.`, `are ${activity[1]}`, ["play", "plays", "played"], "Look! diễn tả hành động đang xảy ra; dùng are + V-ing.");
+      return make(`${name} sees this scene: Look! ${subject} ___ ${context}.`, `are ${activity[1]}`, ["play", "plays", "played"], "Look! diễn tả hành động đang xảy ra; dùng are + V-ing.");
     }
     if (kind === 2) {
       const pairs = [["A giraffe", "a goat", "tall", "taller"], ["An elephant", "a dog", "big", "bigger"], ["A train", "a bicycle", "fast", "faster"], ["A whale", "a fish", "large", "larger"]];
       const item = pick(pairs);
       const context = pick(["in the animal world", "on a race track", "in a size comparison", "in a science lesson", "in the story"]);
-      return make(`${item[0]} is ___ than ${item[1]} ${context}.`, item[3], [item[2], `${item[2]}est`, `more ${item[2]}`], "Dùng dạng so sánh hơn để so sánh hai sự vật.");
+      return make(`${name} reads this comparison ${context}: ${item[0]} is ___ than ${item[1]}.`, item[3], [item[2], `${item[2]}est`, `more ${item[2]}`], "Dùng dạng so sánh hơn để so sánh hai sự vật.");
     }
     if (kind === 3) {
       const subject = pick(["I", "We", "Mai", "Nam", "My sister"]);
