@@ -202,7 +202,9 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
       });
     }
   }, [profile.id, self.name, players, currentGrade]);
-  finishMatchRef.current = finishMatch;
+  useEffect(() => {
+    finishMatchRef.current = finishMatch;
+  }, [finishMatch]);
 
   useEffect(() => {
     let alive = true;
