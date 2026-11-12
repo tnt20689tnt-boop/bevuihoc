@@ -8,7 +8,7 @@ type RankingMode = "arena" | "leaderboard" | "honor";
 type PlayerRow = { id: string; display_name: string; grade: number; points: number; correct: number; goals: number };
 
 const config = {
-  arena: { icon: "⚔️", title: "Đấu trường thi đua", subtitle: "Cùng học tập, tích lũy điểm và vươn lên trên bảng thi đua." },
+  arena: { icon: "⚔️", title: "Đấu trường thi đua", subtitle: "Xem lịch sử từng trận, tỉ số và người chiến thắng của con." },
   leaderboard: { icon: "🏆", title: "Bảng xếp hạng", subtitle: "Thứ hạng được tính tự động từ điểm học tập thực tế của các bé." },
   honor: { icon: "👑", title: "Sảnh vinh danh", subtitle: "Tôn vinh những bạn chăm chỉ và có thành tích học tập nổi bật." },
 };
@@ -47,6 +47,24 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
     refetchOnWindowFocus: true,
   });
 
+  const { data: arenaMatches, isLoading: matchesLoading, error: matchesError } = useQuery({
+    queryKey: ["arena-match-history", profile?.id],
+    enabled: mode === "arena" && !!profile?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("arena_match_results")
+        .select("match_id, display_name, opponent_name, grade, score, opponent_score, total_questions, outcome, created_at")
+        .eq("user_id", profile!.id)
+        .order("created_at", { ascending: false })
+        .limit(30);
+      if (error) throw error;
+      return data ?? [];
+    },
+    staleTime: 0,
+    refetchOnMount: "always",
+    refetchOnWindowFocus: true,
+  });
+
   return (
     <div className="min-h-screen bg-gradient-sky">
       <TopBar profile={profile} />
@@ -57,6 +75,50 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
             <h1 className="mt-2 text-3xl font-extrabold text-foreground">{page.title}</h1>
             <p className="mx-auto mt-2 max-w-xl text-muted-foreground">{page.subtitle}</p>
           </div>
+
+          {mode === "arena" && (
+            <section className="mt-7">
+              <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
+                <div>
+                  <h2 className="text-xl font-extrabold text-foreground">📋 Lịch sử thi đấu</h2>
+                  <p className="text-sm text-muted-foreground">Kết quả các trận của tài khoản đang đăng nhập.</p>
+                </div>
+                <span className="text-xs text-muted-foreground">Tối đa 30 trận gần nhất</span>
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-border">
+                {matchesLoading ? (
+                  <div className="p-6 text-center text-muted-foreground">Đang tải kết quả thi đấu…</div>
+                ) : matchesError ? (
+                  <div className="p-6 text-center text-destructive">Chưa tải được lịch sử. Bé thử tải lại trang nhé.</div>
+                ) : !arenaMatches?.length ? (
+                  <div className="p-6 text-center text-muted-foreground">Chưa có trận đấu nào được lưu. Sau khi hoàn thành trận đầu tiên, kết quả và người chiến thắng sẽ xuất hiện ở đây.</div>
+                ) : (
+                  <div className="divide-y divide-border">
+                    {arenaMatches.map((match) => {
+                      const resultLabel = match.outcome === "win"
+                        ? `🏆 ${match.display_name} chiến thắng`
+                        : match.outcome === "loss"
+                          ? `🏆 ${match.opponent_name} chiến thắng`
+                          : "🤝 Hai thí sinh hòa nhau";
+                      return (
+                        <div key={match.match_id} className="flex flex-col gap-2 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+                          <div className="min-w-0">
+                            <div className="font-extrabold text-foreground">{match.display_name} – {match.opponent_name}</div>
+                            <div className="text-xs text-muted-foreground">Lớp {match.grade} • {new Date(match.created_at).toLocaleString("vi-VN")}</div>
+                            <div className="mt-1 text-sm font-bold text-amber-600 dark:text-amber-300">{resultLabel}</div>
+                          </div>
+                          <div className="shrink-0 text-left text-2xl font-black tabular-nums text-primary sm:text-right">
+                            {match.score} – {match.opponent_score}
+                            <div className="text-xs font-medium text-muted-foreground">{match.total_questions} câu hỏi</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
 
           {mode === "honor" && data && data.length > 0 && (
             <div className="mt-7 grid grid-cols-3 items-end gap-2 sm:gap-4">
