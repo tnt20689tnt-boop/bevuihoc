@@ -90,13 +90,10 @@ const generateMath = (grade: number, lv: number) => {
     } else if (stage === 2) {
       const a = rand(1, maxNum);
       const b = rand(1, maxNum);
-      const symbol = a > b ? ">" : a < b ? "<" : "=";
-      correctVal = symbol === ">" ? 1 : symbol === "<" ? 2 : 3;
-      questionText = `Điền dấu thích hợp: ${a} □ ${b}`;
-      explanation = `${a} ${symbol} ${b}.`;
-      // Comparison answers are represented by a number for the common
-      // multiple-choice renderer, then mapped to readable symbols below.
-      correctVal = symbol as unknown as number;
+      const larger = Math.max(a, b);
+      correctVal = larger;
+      questionText = `Trong hai số ${a} và ${b}, số nào lớn hơn hoặc bằng số kia?`;
+      explanation = `Số lớn hơn hoặc bằng là ${larger}.`;
     } else if (stage === 3) {
       const a = rand(1, Math.max(1, maxNum - 2));
       const b = rand(1, Math.max(1, maxNum - a));
