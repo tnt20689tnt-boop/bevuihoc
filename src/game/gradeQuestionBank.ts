@@ -331,12 +331,12 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
     }
     if (kind === 2) {
       const count = int(2, 8), object = pick(["pencils", "books", "rulers", "erasers", "chairs"]);
-      return make(`There ___ ${count} ${object} in the classroom.`, "are", ["is", "am", "be"], "Dùng are với danh từ số nhiều.");
+      const place = pick(["in the classroom", "on the teacher’s desk", "in the school library", "near the window"]);\n      return make(`There ___ ${count} ${object} ${place}.`, "are", ["is", "am", "be"], "Dùng are với danh từ số nhiều.");
     }
     if (kind === 3) {
       const animal = pick(["A bird", "A fish", "A rabbit", "A horse"]);
       const ability = animal === "A fish" ? "swim" : animal === "A rabbit" ? "jump" : animal === "A horse" ? "run" : "fly";
-      return make(`${animal} ___ ${ability}.`, "can", ["cans", "is", "does"], "Sau can dùng động từ nguyên mẫu.");
+      const context = pick(["in the wild", "on a farm", "at the zoo", "in a nature book"]);\n      return make(`${name} learns that ${animal.toLowerCase()} ___ ${ability} ${context}.`, "can", ["cans", "is", "does"], "Sau can dùng động từ nguyên mẫu.");
     }
     return make("Choose the opposite of “early”.", "late", ["fast", "small", "young"], "Late là trái nghĩa của early.");
   }
