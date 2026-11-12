@@ -317,9 +317,10 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`${name} needs to ${item[0]} ${context}. Which question word should be used?`, item[1], prompts.filter(x => x[1] !== item[1]).slice(0, 3).map(x => x[1]), "Chọn từ để hỏi phù hợp với thông tin cần biết.");
     }
     const place = pick(["the table", "the school bag", "the chair", "the desk"]);
+    const object = pick(["pencil", "book", "ruler", "eraser"]);
     const relation = pick(["on", "under", "in"]);
-    const context = pick(["in the classroom", "at the library", "on the study desk", "in the bedroom"]);
-    return make(`${name} is describing a pencil ${context}: The pencil is ___ ${place}. Choose the correct preposition.`, relation, ["on", "under", "in"].filter(x => x !== relation).concat(["between"]), "On là ở trên, under là ở dưới, in là ở trong.");
+    const context = pick(["in the classroom", "at the library", "on the study desk", "in the bedroom", "during an English lesson"]);
+    return make(`${name} is describing a ${object} ${context}: The ${object} is ___ ${place}. Choose the correct preposition.`, relation, ["on", "under", "in"].filter(x => x !== relation).concat(["between"]), "On là ở trên, under là ở dưới, in là ở trong.");
   }
   if (grade === 3) {
     if (kind === 0) {
