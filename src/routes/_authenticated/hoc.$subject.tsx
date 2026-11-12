@@ -4,6 +4,7 @@ import { GameShell } from "@/components/AppShell";
 import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { generateGradeQuestions } from "@/game/gradeQuestionBank";
 
 type Question = { prompt: string; choices: string[]; answer: number; hint: string };
 type Subject = "math" | "vietnamese" | "english";
@@ -12,19 +13,6 @@ const SUBJECTS: Record<Subject, { title: string; emoji: string; intro: string }>
   vietnamese: { title: "Tiếng Việt", emoji: "📖", intro: "Học chữ, ghép vần, đọc từ và câu." },
   english: { title: "Tiếng Anh", emoji: "🌍", intro: "Học chữ cái, màu sắc, con vật và câu giao tiếp." },
 };
-const WORDS: [string, string][] = [
-  ["cat", "con mèo"], ["dog", "con chó"], ["apple", "quả táo"], ["book", "quyển sách"],
-  ["sun", "mặt trời"], ["moon", "mặt trăng"], ["bird", "con chim"], ["fish", "con cá"],
-  ["red", "màu đỏ"], ["blue", "màu xanh"], ["green", "màu xanh lá"], ["milk", "sữa"],
-  ["pen", "bút mực"], ["bag", "cặp sách"], ["egg", "quả trứng"], ["cake", "bánh ngọt"],
-  ["one", "số một"], ["two", "số hai"], ["three", "số ba"], ["four", "số bốn"],
-  ["mother", "mẹ"], ["father", "bố"], ["school", "trường học"], ["friend", "bạn bè"],
-  ["happy", "vui vẻ"], ["water", "nước"], ["flower", "bông hoa"], ["orange", "quả cam"],
-];
-const LETTERS = ["a", "ă", "â", "b", "c", "d", "đ", "e", "ê", "g", "h", "i", "k", "l", "m", "n", "o", "ô", "ơ", "p", "q", "r", "s", "t", "u", "ư", "v", "x", "y"];
-const VI_WORDS = ["bé", "bà", "ba", "mẹ", "bố", "cá", "gà", "hoa", "nhà", "mèo", "chó", "bút", "vở", "sách", "trường", "bạn", "đẹp", "ngoan", "chăm", "học"];
-const SHAPES = ["hình tròn", "hình vuông", "hình tam giác", "hình chữ nhật"];
-
 function shuffle<T>(items: T[]): T[] {
   const result = [...items];
   for (let i = result.length - 1; i > 0; i--) {
@@ -33,73 +21,8 @@ function shuffle<T>(items: T[]): T[] {
   }
   return result;
 }
-function pick<T>(items: T[]): T {
-  return items[Math.floor(Math.random() * items.length)]!;
-}
-function makeQuestions(subject: Subject, level: number, grade: number, seen: Set<string>): Question[] {
-  // Khối lớp quyết định điểm xuất phát; mỗi 10 cấp lại tăng độ khó.
-  const tier = Math.min(9, Math.floor((level - 1) / 10) + Math.max(0, grade - 1));
-  const make = (prompt: string, answer: string, pool: string[], hint: string): Question => {
-    const choices = shuffle([answer, ...shuffle([...new Set(pool.filter(v => v !== answer))]).slice(0, 3)]);
-    return { prompt, choices, answer: choices.indexOf(answer), hint };
-  };
-  let questions: Question[] = [];
-  if (subject === "math") {
-    const max = [5, 10, 20, 30, 50, 100, 200, 500, 1000, 10000][tier]!;
-    const a = 1 + Math.floor(Math.random() * Math.max(2, Math.floor(max / 2)));
-    const b = 1 + Math.floor(Math.random() * Math.max(2, Math.floor(max / 2)));
-    const big = Math.max(a, b), small = Math.min(a, b), sum = a + b, diff = big - small;
-    const distract = (answer: number) => [String(answer + 1), String(Math.max(0, answer - 1)), String(answer + 2), String(answer + 3)];
-    questions = [
-      make(`${a} + ${b} bằng bao nhiêu?`, String(sum), distract(sum), `Đếm thêm ${b} bước từ ${a}.`),
-      make(`Số nào lớn hơn: ${a} hay ${b}?`, String(big), [String(small), String(big + 1), String(Math.max(0, small - 1)), String(big + 2)], "So sánh giá trị của hai số nhé."),
-      make(`${big} - ${small} bằng bao nhiêu?`, String(diff), distract(diff), "Lấy số lớn trừ số bé."),
-      make(`Có ${a} quả táo, mẹ cho thêm ${b} quả. Có tất cả bao nhiêu quả?`, String(sum), distract(sum), "Muốn tìm tất cả, bé dùng phép cộng."),
-      tier >= 6
-        ? make(`${small * 2} chia 2 bằng bao nhiêu?`, String(small), [String(small + 1), String(Math.max(0, small - 1)), String(small * 2), String(small + 2)], "Chia thành hai phần bằng nhau.")
-        : tier >= 4
-          ? make(`${small} nhân 2 bằng bao nhiêu?`, String(small * 2), [String(small + 1), String(small * 3), String(small * 2 + 1), String(small)], "Nhân 2 là cộng số đó với chính nó.")
-          : make(`Hình nào có 3 cạnh?`, "hình tam giác", SHAPES, "Hình tam giác có 3 cạnh.")
-    ];
-  } else if (subject === "vietnamese") {
-    const letter = pick(LETTERS);
-    const word = pick(VI_WORDS);
-    questions = [
-      make("Chữ nào đứng đầu bảng chữ cái tiếng Việt?", "a", ["b", "c", "d"], "Chữ a đứng đầu bảng chữ cái tiếng Việt."),
-      make(`Đây là chữ gì: “${letter}”?`, letter, shuffle(LETTERS.filter(x => x !== letter)).slice(0, 3), "Quan sát hình dáng của chữ nhé."),
-      make(`Chọn từ “${word}” được viết đúng.`, word, shuffle(VI_WORDS.filter(x => x !== word)).slice(0, 3), "Bé đọc chậm từng tiếng để nhận ra từ."),
-      make("Từ nào chỉ người?", "mẹ", ["bàn", "hoa", "bút"], "Mẹ là từ chỉ người."),
-      make("Cuối câu hỏi thường có dấu gì?", "dấu hỏi (?)", ["dấu chấm (.)", "dấu phẩy (,)", "dấu chấm than (!)"], "Câu hỏi kết thúc bằng dấu hỏi.")
-    ];
-    if (tier >= 2) questions[0] = make("Từ nào viết đúng chính tả?", "chăm chỉ", ["trăm chỉ", "chăm chĩ", "trăm chĩ"], "Từ đúng là chăm chỉ.");
-    if (tier >= 4) questions[1] = make("Từ nào chỉ hoạt động?", "chạy", ["bông hoa", "màu đỏ", "hiền lành"], "Chạy là từ chỉ hoạt động.");
-    if (tier >= 6) questions[2] = make("Từ trái nghĩa với “cao” là gì?", "thấp", ["dài", "to", "rộng"], "Cao và thấp là hai từ trái nghĩa.");
-    if (tier >= 8) questions[3] = make("Trong câu “Lan đang đọc sách”, ai đọc sách?", "Lan", ["sách", "đang", "bạn Nam"], "Lan là người thực hiện hoạt động đọc.");
-  } else {
-    const pair = pick(WORDS);
-    const other = pick(WORDS.filter(w => w[0] !== pair[0]));
-    const pool = WORDS.map(w => w[1]);
-    questions = [
-      make(`“${pair[0]}” nghĩa là gì?`, pair[1], pool, `${pair[0]} có nghĩa là ${pair[1]}.`),
-      make("“Hello” có nghĩa là gì?", "Xin chào", ["Tạm biệt", "Cảm ơn", "Xin lỗi"], "Hello dùng để chào hỏi."),
-      make("“Thank you” có nghĩa là gì?", "Cảm ơn", ["Xin chào", "Tạm biệt", "Xin lỗi"], "Thank you nghĩa là cảm ơn."),
-      make("Màu “red” là màu gì?", "Màu đỏ", ["Màu xanh", "Màu vàng", "Màu tím"], "Red nghĩa là màu đỏ."),
-      make(`Từ nào có nghĩa là “${other[1]}”?`, other[0], WORDS.filter(w => w[0] !== other[0]).slice(0, 3).map(w => w[0]), `${other[0]} nghĩa là ${other[1]}.`)
-    ];
-    if (tier >= 2) questions[1] = make("“Good morning” nghĩa là gì?", "Chào buổi sáng", ["Chúc ngủ ngon", "Tạm biệt", "Chào buổi tối"], "Good morning là lời chào buổi sáng.");
-    if (tier >= 4) questions[2] = make("Chọn câu đúng:", "I am a student.", ["I is a student.", "I are a student.", "I be a student."], "Với I, ta dùng am.");
-    if (tier >= 6) questions[3] = make("“I like apples” nghĩa là gì?", "Tôi thích táo", ["Tôi ăn bánh", "Tôi có một con mèo", "Tôi đi học"], "I like nghĩa là tôi thích.");
-    if (tier >= 8) questions[4] = make("Điền từ: She ___ happy.", "is", ["am", "are", "be"], "She đi với is.");
-  }
-  // Tránh lặp câu trong một bộ và ưu tiên câu chưa từng xuất hiện ở cấp này.
-  const unique = new Map<string, Question>();
-  for (const q of shuffle(questions)) if (!unique.has(q.prompt)) unique.set(q.prompt, q);
-  const fresh = [...unique.values()].filter(q => !seen.has(q.prompt));
-  const chosen = shuffle(fresh).slice(0, 5);
-  const fallback = shuffle([...unique.values()].filter(q => !chosen.some(c => c.prompt === q.prompt)));
-  while (chosen.length < 5 && fallback.length) chosen.push(fallback.pop()!);
-  return shuffle(chosen);
-}
+const normalizeQuestion = (value: string) =>
+  value.normalize("NFC").toLocaleLowerCase("vi").replace(/\s+/g, " ").trim();
 
 export const Route = createFileRoute("/_authenticated/hoc/$subject")({
   head: () => ({ meta: [{ title: "Phòng học – Bé Học Vui" }, { name: "description", content: "Chọn cấp độ Toán, Tiếng Việt và Tiếng Anh từ 1 đến 100." }] }),
@@ -113,7 +36,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const [level, setLevel] = useState<number | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loadingQuestions, setLoadingQuestions] = useState(false);
-  const seenByLevel = useRef(new Map<string, Set<string>>());
+  const seenBySubject = useRef(new Map<string, Set<string>>());
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -125,13 +48,19 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const correct = selected === question?.answer;
 
   async function startLevel(value: number) {
-    const key = `${profile.grade}-${subject}-${value}`;
-    const seen = seenByLevel.current.get(key) ?? new Set<string>();
+    // Theo dõi câu đã dùng xuyên suốt 100 Level của môn này, không chỉ trong một Level.
+    const seen = seenBySubject.current.get(subject) ?? new Set<string>();
     setLoadingQuestions(true);
     setQuestions([]);
-    setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
+    setLevel(value);
+    setIndex(0);
+    setSelected(null);
+    setScore(0);
+    setEarnedPoints(0);
+    setFinished(false);
+
+    let onlineQuestions: Question[] = [];
     try {
-      // Ưu tiên ngân hàng câu hỏi online trong Supabase, lọc chính xác môn/lớp/cấp độ.
       const { data, error } = await (supabase as any).rpc("get_practice_questions", {
         p_subject: subject === "vietnamese" ? "viet" : subject,
         p_grade: profile.grade,
@@ -146,10 +75,20 @@ function LessonRoom({ profile }: { profile: Profile }) {
         correct_answer: string;
         topic: string | null;
       }>;
-      const onlineQuestions: Question[] = onlineRows.flatMap(row => {
+      const usedThisSet = new Set<string>();
+      onlineQuestions = onlineRows.flatMap(row => {
+        const promptKey = normalizeQuestion(row.question_text);
         const sourceOptions = Array.isArray(row.options) ? row.options : [];
         const correctText = sourceOptions.find(option => option.key === row.correct_answer)?.text;
-        if (sourceOptions.length < 2 || !correctText) return [];
+        if (
+          !row.question_text ||
+          seen.has(promptKey) ||
+          usedThisSet.has(promptKey) ||
+          sourceOptions.length !== 4 ||
+          !correctText ||
+          new Set(sourceOptions.map(option => option.text)).size !== 4
+        ) return [];
+        usedThisSet.add(promptKey);
         const choices = shuffle(sourceOptions.map(option => option.text));
         return [{
           prompt: row.question_text,
@@ -158,27 +97,28 @@ function LessonRoom({ profile }: { profile: Profile }) {
           hint: row.topic ? `Chủ đề: ${row.topic}. Hãy đọc kỹ câu hỏi và suy nghĩ từng đáp án.` : "Bé hãy đọc kỹ câu hỏi và thử lại nhé.",
         }];
       });
-      if (onlineQuestions.length >= 5) {
-        const unique = onlineQuestions.filter(q => !seen.has(q.prompt)).slice(0, 5);
-        const selectedQuestions = unique.length === 5 ? unique : onlineQuestions.slice(0, 5);
-        selectedQuestions.forEach(q => seen.add(q.prompt));
-        seenByLevel.current.set(key, seen);
-        setQuestions(selectedQuestions);
-        return;
-      }
-      toast.error(
-        "Ngân hàng online chưa đủ 5 câu cho lựa chọn này. Đang dùng bộ câu hỏi dự phòng.",
-      );
+      onlineQuestions.forEach(question => seen.add(normalizeQuestion(question.prompt)));
     } catch (error) {
       console.error("Không tải được ngân hàng câu hỏi online:", error);
-      toast.error("Chưa tải được câu hỏi online. Đang dùng bộ câu hỏi dự phòng.");
+      toast.error("Chưa tải được ngân hàng online. Hệ thống sẽ dùng bộ câu hỏi theo lớp và Level.");
     } finally {
       setLoadingQuestions(false);
     }
-    const nextSet = makeQuestions(subject, value, profile.grade, seen);
-    nextSet.forEach(q => seen.add(q.prompt));
-    seenByLevel.current.set(key, seen);
-    setQuestions(nextSet);
+
+    // Ngân hàng online hiện là nguồn bổ sung; bộ sinh tạo đủ 5 câu riêng cho lớp và Level.
+    const generated = generateGradeQuestions(
+      subject,
+      profile.grade,
+      value,
+      Math.max(0, 5 - onlineQuestions.length),
+      seen,
+    );
+    const selectedQuestions = [...onlineQuestions, ...generated].slice(0, 5);
+    if (selectedQuestions.length < 5) {
+      toast.error("Chưa tạo đủ câu hỏi mới cho Level này. Vui lòng thử lại.");
+    }
+    seenBySubject.current.set(subject, seen);
+    setQuestions(shuffle(selectedQuestions));
   }
   function chooseAnswer(choice: number) {
     if (answered || finished || !question || level === null) return;
