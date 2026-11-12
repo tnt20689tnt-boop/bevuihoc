@@ -22,7 +22,7 @@ function draft(
   explanation: string,
   family: string,
 ): Draft {
-  const wrong = shuffle(unique(distractors.filter((item) => item !== correctAnswer)));
+  const wrong = shuffle(unique(distractors.filter((item) => item !== correctAnswer))).slice(0, 3);
   while (wrong.length < 3) {
     const fallback = ["Không có đáp án nào đúng", "Cả hai đáp án đều đúng", "Không xác định"];
     const candidate = fallback.find((item) => item !== correctAnswer && !wrong.includes(item));
@@ -61,8 +61,8 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       }
     }));
   } else if (grade === 2) {
-    const synonymPairs = [["chăm chỉ", "siêng năng"], ["dũng cảm", "gan dạ"], ["yên tĩnh", "im lặng"], ["nhanh nhẹn", "lanh lợi"]];
-    const antonymPairs = [["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"], ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"]];
+    const synonymPairs: Array<[string, string]> = [["chăm chỉ", "siêng năng"], ["dũng cảm", "gan dạ"], ["yên tĩnh", "im lặng"], ["nhanh nhẹn", "lanh lợi"]];
+    const antonymPairs: Array<[string, string]> = [["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"], ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"]];
     synonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào gần nghĩa với “${a}”?`, b, ["lười biếng", "ồn ào", "yếu đuối"], `“${a}” và “${b}” gần nghĩa với nhau.`, "tu-dong-nghia"));
     antonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào trái nghĩa với “${a}”?`, b, ["rộng", "dài", "nhanh"], `“${a}” và “${b}” trái nghĩa với nhau.`, "tu-trai-nghia"));
     const tasks: Array<[string, string, string, string[], string]> = [
@@ -73,12 +73,12 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["Mẹ em nấu bữa tối.", "Ai nấu bữa tối?", "Mẹ em", ["bữa tối", "nấu", "tối"], "Mẹ em là người nấu bữa tối."],
     ];
     tasks.forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” rồi trả lời: ${q}`, a, wrong, exp, "doc-hieu-cau"));
-    [
+    ([
       ["sạch sẽ", "sạch sẻ", "sạch xẽ", "sạch sẹ"],
       ["xinh xắn", "sinh xắn", "xinh sắn", "sinh sắn"],
       ["nghỉ ngơi", "ngỉ ngơi", "nghĩ ngơi", "nghỉ ngi"],
       ["trường học", "chường học", "trường hộc", "chường hộc"],
-    ].forEach(([correct, ...wrong]) => add("vietnamese", grade, "Chọn cách viết đúng chính tả.", correct, wrong, `Cách viết đúng là “${correct}”.`, "chinh-ta"));
+    ] as Array<[string, ...string[]]>).forEach(([correct, ...wrong]) => add("vietnamese", grade, "Chọn cách viết đúng chính tả.", correct, wrong, `Cách viết đúng là “${correct}”.`, "chinh-ta"));
   } else if (grade === 3) {
     const categories = [
       { name: "danh từ", words: ["dòng sông", "học sinh", "cánh đồng", "bác thợ mộc", "tiếng trống"] },
@@ -134,14 +134,14 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["Lá lành đùm lá rách", "Giúp đỡ người gặp khó khăn", ["Che lá khỏi mưa", "Trồng nhiều cây xanh", "Giữ đồ vật sạch sẽ"], "Câu tục ngữ khuyên con người tương thân tương ái."],
       ["Uống nước nhớ nguồn", "Nhớ ơn những người đi trước", ["Tiết kiệm nước uống", "Bảo vệ nguồn nước", "Tìm nơi có nước"], "Câu tục ngữ nhắc nhớ cội nguồn và lòng biết ơn."],
     ] as Array<[string, string, string[], string]>).forEach(([proverb, q, wrong, exp]) => add("vietnamese", grade, `Ý nghĩa của câu tục ngữ “${proverb}” là gì?`, q, wrong, exp, "giai-nghia-tuc-ngu"));
-    [
+    ([
       ["bảo tồn", "giữ gìn", ["phá hủy", "lãng quên", "thay thế"]],
       ["nhân ái", "thương người", ["ích kỷ", "vô tâm", "thờ ơ"]],
       ["dũng cảm", "can đảm", ["hèn nhát", "lo lắng", "rụt rè"]],
       ["lạc quan", "yêu đời", ["bi quan", "chán nản", "buồn bã"]],
       ["tiết kiệm", "hoang phí", ["dè sẻn", "chắt chiu", "giữ gìn"]],
-    ].forEach(([word, answer, wrong]) => add("vietnamese", grade, `Từ nào ${word === "tiết kiệm" ? "trái nghĩa" : "gần nghĩa"} với “${word}”?`, answer, wrong, `“${word}” và “${answer}” ${word === "tiết kiệm" ? "trái nghĩa" : "gần nghĩa"} với nhau.`, "mo-rong-tu-vung"));
-    [
+    ] as Array<[string, string, string[]]>).forEach(([word, answer, wrong]) => add("vietnamese", grade, `Từ nào ${word === "tiết kiệm" ? "trái nghĩa" : "gần nghĩa"} với “${word}”?`, answer, wrong, `“${word}” và “${answer}” ${word === "tiết kiệm" ? "trái nghĩa" : "gần nghĩa"} với nhau.`, "mo-rong-tu-vung"));
+    ([
       ["Mặc dù trời rét nhưng các bạn vẫn chăm chỉ tập thể dục.", "Quan hệ giữa hai vế câu là gì?", "Tương phản", ["Nguyên nhân – kết quả", "Điều kiện – kết quả", "Tăng tiến"], "“Mặc dù… nhưng” biểu thị quan hệ tương phản."],
       ["Vì chăm sóc đúng cách nên cây phát triển xanh tốt.", "Quan hệ giữa hai vế câu là gì?", "Nguyên nhân – kết quả", ["Tương phản", "Điều kiện – kết quả", "Liệt kê"], "“Vì… nên” biểu thị nguyên nhân – kết quả."],
       ["Nếu chúng ta tiết kiệm điện thì sẽ bảo vệ tài nguyên.", "Quan hệ giữa hai vế câu là gì?", "Điều kiện – kết quả", ["Tương phản", "Nguyên nhân – kết quả", "Liệt kê"], "“Nếu… thì” biểu thị điều kiện – kết quả."],
