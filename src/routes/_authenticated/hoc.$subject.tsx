@@ -232,7 +232,8 @@ function LessonRoom({ profile }: { profile: Profile }) {
                 <div><p className="text-xs font-bold uppercase text-muted-foreground">Đang luyện tập</p><p className="text-xl font-black">Cấp độ {level} / 100</p></div>
                 <div className="text-right"><p className="text-2xl font-black text-primary">⭐ {score}/5</p><p className="text-xs font-bold text-muted-foreground">+{earnedPoints} điểm đã lưu</p></div>
               </div>
-              <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${finished ? 100 : ((index + (answered ? 1 : 0)) / questions.length) * 100}%` }}/></div>
+              <div className="mt-4 h-3 overflow-hidden rounded-full bg-muted"><div className="h-full rounded-full bg-primary transition-all" style={{ width: `${questions.length === 0 ? 0 : finished ? 100 : ((index + (answered ? 1 : 0)) / questions.length) * 100}%` }}/></div>
+              {loadingQuestions && <p className="mt-4 rounded-xl bg-secondary p-3 text-center font-semibold text-muted-foreground">Đang tải câu hỏi đúng môn, lớp và cấp độ…</p>}
               {finished ? (
                 <div className="py-9 text-center">
                   <div className="text-6xl">{score === 5 ? "🏆" : score >= 3 ? "🌟" : "💪"}</div>
