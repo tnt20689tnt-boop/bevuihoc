@@ -201,7 +201,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     ];
     const topic = pick(topics);
     const context = pick(["trong giờ học", "khi trò chuyện", "trong bài tập đọc"]);
-    return make(`Trong tình huống ${context}, câu nào dùng để ${topic[0]}?`, topic[1], [`Bạn ${name} học lớp hai.`, `Ôi, quyển sách đẹp quá!`, `Hãy mở sách ra.`], "Câu hỏi dùng để hỏi và thường kết thúc bằng dấu hỏi.");
+    return make(`Bạn ${name} đang luyện cách ${topic[0]} ${context}. Câu nào phù hợp?`, topic[1], [`Bạn ${name} học lớp hai.`, `Ôi, quyển sách đẹp quá!`, `Hãy mở sách ra.`], "Câu hỏi dùng để hỏi và thường kết thúc bằng dấu hỏi.");
   }
   if (grade === 3) {
     if (stageKind === 0) {
