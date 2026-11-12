@@ -330,7 +330,7 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       const subject = pick(["Mai", "Nam", "Linh", "My brother", "My sister", "Tom"]);
       const verb = pick(["go", "walk", "cycle", "travel"]);
       const context = pick(["on weekdays", "before 7 a.m.", "with a friend", "by bus", "after breakfast"]);
-      return make(`Complete: ${subject} ___ to school ${context}.`, `${verb}s`, [verb, `${verb}ing`, `${verb}ed`], "Với chủ ngữ số ít ở hiện tại đơn, động từ thường thêm -s.");
+      return make(`Complete with the correct form of “${verb}”: ${subject} ___ to school ${context}.`, `${verb}s`, [verb, `${verb}ing`, `${verb}ed`], "Với chủ ngữ số ít ở hiện tại đơn, động từ thường thêm -s.");
     }
     if (kind === 1) {
       const subject = pick(["They", "We", "I", "My friends", "The children", "He", "She", "My brother", "My sister"]);
