@@ -3,7 +3,7 @@
 insert into public.question_bank
 (subject, grade, term, topic, question_text, question_type, options, correct_answer, points, difficulty)
 values
-('math',1,'mid1','cộng trong phạm vi 10','7 + 2 = ?', 'multiple_choice', jsonb_build_array(jsonb_build_object('key','A','text','7'),jsonb_build_object('key','B','text','9'),jsonb_build_object('key','C','text','8'),jsonb_build_object('key','D','text','10')), 'A', 1, 1),
+('math',1,'mid1','cộng trong phạm vi 10','7 + 2 = ?', 'multiple_choice', jsonb_build_array(jsonb_build_object('key','A','text','7'),jsonb_build_object('key','B','text','9'),jsonb_build_object('key','C','text','8'),jsonb_build_object('key','D','text','10')), 'B', 1, 1),
 ('math',1,'mid1','trừ trong phạm vi 10','9 - 4 = ?', 'multiple_choice', jsonb_build_array(jsonb_build_object('key','A','text','4'),jsonb_build_object('key','B','text','5'),jsonb_build_object('key','C','text','6'),jsonb_build_object('key','D','text','3')), 'B', 1, 2),
 ('math',1,'mid1','so sánh số','Số nào lớn hơn: 8 hay 5?', 'multiple_choice', jsonb_build_array(jsonb_build_object('key','A','text','5'),jsonb_build_object('key','B','text','8'),jsonb_build_object('key','C','text','Hai số bằng nhau'),jsonb_build_object('key','D','text','7')), 'B', 1, 3),
 ('math',2,'mid1','cộng có nhớ','34 + 25 = ?', 'multiple_choice', jsonb_build_array(jsonb_build_object('key','A','text','59'),jsonb_build_object('key','B','text','58'),jsonb_build_object('key','C','text','69'),jsonb_build_object('key','D','text','49')), 'A', 1, 1),
