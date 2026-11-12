@@ -375,10 +375,9 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
       return make(`${name} reads this comparison ${context}: ${item[0]} is ___ than ${item[1]}.`, item[3], [item[2], `${item[2]}est`, `more ${item[2]}`], "Dùng dạng so sánh hơn để so sánh hai sự vật.");
     }
     if (kind === 3) {
-      const subject = pick(["I", "We", "Mai", "Nam", "My sister"]);
-      const action = pick(["brush my teeth", "do homework", "read books", "help my parents"]);
+      const action = pick(["brush my teeth", "do my homework", "read books", "help my parents"]);
       const context = pick(["before bedtime", "after school", "every morning", "on weekdays", "at home"]);
-      return make(`${subject} ___ ${action} ${context}.`, "always", ["yesterday", "tomorrow", "last"], "Always diễn tả tần suất.");
+      return make(`${name} writes about a daily routine ${context}: I ___ ${action}.`, "always", ["yesterday", "tomorrow", "last"], "Always diễn tả tần suất.");
     }
     const prompts = [["ask about a place", "Where"], ["ask about a person", "Who"], ["ask about a time", "When"], ["ask about a reason", "Why"]];
     const item = pick(prompts);
