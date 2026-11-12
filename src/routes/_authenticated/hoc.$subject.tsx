@@ -128,10 +128,11 @@ function LessonRoom({ profile }: { profile: Profile }) {
     const key = `${profile.grade}-${subject}-${value}`;
     const seen = seenByLevel.current.get(key) ?? new Set<string>();
     setLoadingQuestions(true);
+    setQuestions([]);
     setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
     try {
       // Ưu tiên ngân hàng câu hỏi online trong Supabase, lọc chính xác môn/lớp/cấp độ.
-      const { data, error } = await supabase.rpc("get_practice_questions", {
+      const { data, error } = await (supabase as any).rpc("get_practice_questions", {
         p_subject: subject === "vietnamese" ? "viet" : subject,
         p_grade: profile.grade,
         p_level: value,
@@ -146,20 +147,16 @@ function LessonRoom({ profile }: { profile: Profile }) {
         topic: string | null;
       }>;
       const onlineQuestions: Question[] = onlineRows.flatMap(row => {
-        const choices = Array.isArray(row.options) ? row.options.map(option => option.text) : [];
-        const answer = Array.isArray(row.options) ? row.options.findIndex(option => option.key === row.correct_answer) : -1;
-        if (choices.length < 2 || answer < 0) return [];
+        const sourceOptions = Array.isArray(row.options) ? row.options : [];
+        const correctText = sourceOptions.find(option => option.key === row.correct_answer)?.text;
+        if (sourceOptions.length < 2 || !correctText) return [];
+        const choices = shuffle(sourceOptions.map(option => option.text));
         return [{
           prompt: row.question_text,
-          choices: shuffle(choices),
-          answer: choices.indexOf(row.options[answer]!.text),
+          choices,
+          answer: choices.indexOf(correctText),
           hint: row.topic ? `Chủ đề: ${row.topic}. Hãy đọc kỹ câu hỏi và suy nghĩ từng đáp án.` : "Bé hãy đọc kỹ câu hỏi và thử lại nhé.",
         }];
-      }).map(q => {
-        // Giữ nguyên đáp án đúng sau khi xáo trộn lựa chọn.
-        const correctText = onlineRows.find(row => row.question_text === q.prompt)?.options.find(option => option.key === onlineRows.find(row => row.question_text === q.prompt)?.correct_answer)?.text;
-        const choices = q.choices;
-        return { ...q, answer: correctText ? choices.indexOf(correctText) : q.answer };
       });
       if (onlineQuestions.length >= 5) {
         const unique = onlineQuestions.filter(q => !seen.has(q.prompt)).slice(0, 5);
