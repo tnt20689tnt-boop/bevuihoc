@@ -230,7 +230,7 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
     return make(`Bạn ${name} chọn tục ngữ cho chủ đề ${theme} ${context}. Câu nào phù hợp?`, proverb, proverbs.filter(x => x !== proverb).slice(0, 3), "Chọn câu nói về lòng nhân ái và sự sẻ chia.");
   }
   if (grade === 4) {
-    if (stageKind === 0) { const action = pick(["chăm sóc vườn rau", "đọc sách trong thư viện", "tưới cây ngoài sân", "giúp mẹ nấu cơm"]); const context = pick(["trong bài kể chuyện", "khi tả hoạt động hằng ngày", "ở giờ luyện câu", "trong đoạn văn"]); return make(`Trong ${context}, câu nào thuộc kiểu Ai làm gì về hoạt động của ${name}?`, `${name} đang ${action}.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, ${action} thật vui!`], "Kiểu câu này nêu chủ thể và hoạt động."); }
+    if (stageKind === 0) { const action = pick(["chăm sóc vườn rau", "đọc sách trong thư viện", "tưới cây ngoài sân", "giúp mẹ nấu cơm"]); const context = pick(["trong bài kể chuyện", "khi tả hoạt động hằng ngày", "ở giờ luyện câu", "trong đoạn văn"]); return make(`Trong ${context}, câu nào thuộc kiểu Ai làm gì khi ${name} ${action}?`, `${name} đang ${action}.`, [`${name} rất chăm chỉ.`, `${name} là học sinh lớp bốn.`, `Ôi, ${action} thật vui!`], "Kiểu câu này nêu chủ thể và hoạt động."); }
     if (stageKind === 1) {
       const reduplicative = pick(["lung linh", "rì rào", "lấp lánh", "xanh xao", "long lanh", "ào ào", "thăm thẳm", "lập lòe"]);
       const context = pick(["trong bài văn tả cảnh", "khi miêu tả âm thanh", "ở bài tập từ láy", "trong đoạn văn của bạn"]);
