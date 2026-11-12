@@ -112,6 +112,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const meta = SUBJECTS[subject];
   const [level, setLevel] = useState<number | null>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(false);
   const seenByLevel = useRef(new Map<string, Set<string>>());
   const [index, setIndex] = useState(0);
   const [selected, setSelected] = useState<number | null>(null);
@@ -123,14 +124,62 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const answered = selected !== null;
   const correct = selected === question?.answer;
 
-  function startLevel(value: number) {
+  async function startLevel(value: number) {
     const key = `${profile.grade}-${subject}-${value}`;
     const seen = seenByLevel.current.get(key) ?? new Set<string>();
+    setLoadingQuestions(true);
+    setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
+    try {
+      // Ưu tiên ngân hàng câu hỏi online trong Supabase, lọc chính xác môn/lớp/cấp độ.
+      const { data, error } = await supabase.rpc("get_practice_questions", {
+        p_subject: subject === "vietnamese" ? "viet" : subject,
+        p_grade: profile.grade,
+        p_level: value,
+        p_count: 5,
+      });
+      if (error) throw error;
+      const onlineRows = (data ?? []) as Array<{
+        id: string;
+        question_text: string;
+        options: { key: string; text: string }[];
+        correct_answer: string;
+        topic: string | null;
+      }>;
+      const onlineQuestions: Question[] = onlineRows.flatMap(row => {
+        const choices = Array.isArray(row.options) ? row.options.map(option => option.text) : [];
+        const answer = Array.isArray(row.options) ? row.options.findIndex(option => option.key === row.correct_answer) : -1;
+        if (choices.length < 2 || answer < 0) return [];
+        return [{
+          prompt: row.question_text,
+          choices: shuffle(choices),
+          answer: choices.indexOf(row.options[answer]!.text),
+          hint: row.topic ? `Chủ đề: ${row.topic}. Hãy đọc kỹ câu hỏi và suy nghĩ từng đáp án.` : "Bé hãy đọc kỹ câu hỏi và thử lại nhé.",
+        }];
+      }).map(q => {
+        // Giữ nguyên đáp án đúng sau khi xáo trộn lựa chọn.
+        const correctText = onlineRows.find(row => row.question_text === q.prompt)?.options.find(option => option.key === onlineRows.find(row => row.question_text === q.prompt)?.correct_answer)?.text;
+        const choices = q.choices;
+        return { ...q, answer: correctText ? choices.indexOf(correctText) : q.answer };
+      });
+      if (onlineQuestions.length >= 5) {
+        const unique = onlineQuestions.filter(q => !seen.has(q.prompt)).slice(0, 5);
+        const selectedQuestions = unique.length === 5 ? unique : onlineQuestions.slice(0, 5);
+        selectedQuestions.forEach(q => seen.add(q.prompt));
+        seenByLevel.current.set(key, seen);
+        setQuestions(selectedQuestions);
+        return;
+      }
+      toast.error("Ngân hàng online chưa đủ 5 câu cho lựa chọn này. Đang dùng bộ câu hỏi dự phòng.");
+    } catch (error) {
+      console.error("Không tải được ngân hàng câu hỏi online:", error);
+      toast.error("Chưa tải được câu hỏi online. Đang dùng bộ câu hỏi dự phòng.");
+    } finally {
+      setLoadingQuestions(false);
+    }
     const nextSet = makeQuestions(subject, value, profile.grade, seen);
     nextSet.forEach(q => seen.add(q.prompt));
     seenByLevel.current.set(key, seen);
     setQuestions(nextSet);
-    setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
   }
   function chooseAnswer(choice: number) {
     if (answered || finished || !question || level === null) return;
@@ -176,7 +225,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
             <div className="mt-7">
               <div className="mb-4 flex flex-wrap items-center justify-between gap-2"><h2 className="text-xl font-extrabold">🌟 Chọn cấp độ từ 1 đến 100</h2><span className="rounded-full bg-secondary px-3 py-1 text-sm font-bold">Cấp 1 rất dễ · Cấp 100 thử thách</span></div>
               <div className="grid grid-cols-5 gap-2 sm:grid-cols-10 sm:gap-3">
-                {Array.from({ length: 100 }, (_, i) => i + 1).map(n => <button key={n} onClick={() => startLevel(n)} className={`aspect-square rounded-xl border-2 text-base font-black shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:rounded-2xl sm:text-lg ${n <= 10 ? "border-green-200 bg-green-50 text-green-800 hover:border-green-400" : n <= 30 ? "border-sky-200 bg-sky-50 text-sky-800 hover:border-sky-400" : n <= 60 ? "border-amber-200 bg-amber-50 text-amber-800 hover:border-amber-400" : "border-fuchsia-200 bg-fuchsia-50 text-fuchsia-800 hover:border-fuchsia-400"}`}>{n}</button>)}
+                {Array.from({ length: 100 }, (_, i) => i + 1).map(n => <button key={n} disabled={loadingQuestions} onClick={() => void startLevel(n)} className={`aspect-square rounded-xl border-2 text-base font-black shadow-sm transition hover:-translate-y-1 hover:shadow-md sm:rounded-2xl sm:text-lg ${n <= 10 ? "border-green-200 bg-green-50 text-green-800 hover:border-green-400" : n <= 30 ? "border-sky-200 bg-sky-50 text-sky-800 hover:border-sky-400" : n <= 60 ? "border-amber-200 bg-amber-50 text-amber-800 hover:border-amber-400" : "border-fuchsia-200 bg-fuchsia-50 text-fuchsia-800 hover:border-fuchsia-400"}`}>{n}</button>)}
               </div>
               <p className="mt-5 rounded-2xl bg-secondary/70 p-4 text-center text-sm font-semibold text-muted-foreground">Bé có thể chọn bất kỳ cấp nào. Mỗi cấp có 5 câu hỏi; trả lời đúng được cộng 10 điểm.</p>
             </div>
