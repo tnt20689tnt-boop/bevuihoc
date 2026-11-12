@@ -55,7 +55,7 @@ const mathQuestion = (grade: number, stage: number): PracticeQuestion => {
     const max = 20 + scale * 98;
     const kind = int(0, 4);
     if (kind <= 1) {
-      const a = int(10, max), b = int(1, Math.min(max, 1000 - a));
+      const a = int(10, max - 1), b = int(1, 999 - a);
       const answer = a + b;
       return make(`${a} + ${b} = ?`, String(answer), [String(answer + 1), String(answer - 1), String(answer + 10)], "Cộng lần lượt hàng đơn vị và hàng chục.");
     }
@@ -143,13 +143,18 @@ const vietnameseQuestion = (grade: number, stage: number): PracticeQuestion => {
   const syllables = ["trăng", "sáng", "sách", "trường", "chim", "phượng", "biển", "rừng", "thầy", "cô", "bạn", "ước mơ"];
   const names = ["Lan", "Minh", "Hoa", "Nam", "Mai", "An", "Bình", "Hà"];
   const name = pick(names), word = pick(syllables), pair = pick(words);
-  const stageKind = (stage - 1) % 5;
+  const stageKind = Math.min(4, Math.floor((stage - 1) / 2));
   if (grade === 1) {
     if (stageKind === 0) {
       const letter = pick(["a", "ă", "â", "b", "c", "d", "đ", "e", "ê", "g", "h", "i", "k", "l", "m", "n", "o", "ô", "ơ", "p", "q", "r", "s", "t", "u", "ư", "v", "x", "y"]);
       return make(`Chữ nào giống chữ “${letter}”?`, letter, ["b", "d", "m"].filter(x => x !== letter).concat(["a", "e", "o"].filter(x => x !== letter)), "Quan sát nét chữ và dấu của chữ cái.");
     }
-    if (stageKind === 1) return make(`Tiếng nào có âm đầu “${pick(["b", "m", "c", "g", "h", "t"])}”?`, pick(["ba", "mẹ", "cá", "gà", "hoa", "táo"]), ["bàn", "mèo", "cô", "gỗ"], "Nghe âm đầu tiên khi đọc tiếng.");
+    if (stageKind === 1) {
+      const onset = pick(["b", "m", "c", "g", "h", "t"]);
+      const examples: Record<string, string[]> = { b: ["ba", "bé", "bà"], m: ["mẹ", "mèo", "mũ"], c: ["cá", "cô", "cờ"], g: ["gà", "gỗ", "gấu"], h: ["hoa", "hồ", "hè"], t: ["táo", "tay", "tủ"] };
+      const answer = pick(examples[onset]!);
+      return make(`Tiếng nào có âm đầu “${onset}”?`, answer, ["bàn", "mèo", "cô", "gỗ", "hoa"].filter(x => x !== answer), "Nghe âm đầu tiên khi đọc tiếng.");
+    }
     if (stageKind === 2) return make(`Từ nào có vần “${word.slice(-2)}”?`, word, ["bàn", "mẹ", "cá", "bé"].filter(x => x !== word).concat(["nhà"]), "Đọc phần vần ở cuối tiếng.");
     if (stageKind === 3) return make("Câu nào được viết đúng đầu câu và dấu kết thúc?", "Bé đi học.", ["bé đi học.", "Bé đi học", "bé đi học"], "Đầu câu viết hoa và cuối câu có dấu câu.");
     return make("Từ nào chỉ hoạt động?", pick(["chạy", "đọc", "hát", "viết"]), ["cái bàn", "bông hoa", "màu đỏ"], "Từ chỉ hoạt động cho biết người hoặc vật làm gì.");
@@ -187,10 +192,10 @@ const englishQuestion = (grade: number, stage: number): PracticeQuestion => {
   const colors = ["red", "blue", "green", "yellow", "purple", "orange", "black", "white"];
   const nouns = ["book", "pencil", "school", "teacher", "friend", "garden", "library", "family"];
   const name = pick(["Mai", "Nam", "Linh", "Tom", "Anna", "Ben"]);
-  const kind = (stage - 1) % 5;
+  const kind = Math.min(4, Math.floor((stage - 1) / 2));
   if (grade === 1) {
     if (kind === 0) { const word = pick(animals); return make(`What is “${word}” in Vietnamese?`, ({cat:"con mèo",dog:"con chó",bird:"con chim",fish:"con cá",rabbit:"con thỏ",tiger:"con hổ",elephant:"con voi",monkey:"con khỉ"} as Record<string,string>)[word]!, ["quả táo","quyển sách","bông hoa"], "Nhớ nghĩa của từ chỉ con vật."); }
-    if (kind === 1) { const color = pick(colors); return make(`What color is “${color}”?`, color, colors.filter(x => x !== color).slice(0,3), "Nhận biết và đọc tên màu sắc."); }
+    if (kind === 1) { const color = pick(colors); return make(`Which word names the color “${color}”?`, color, colors.filter(x => x !== color).slice(0,3), "Nhận biết và đọc tên màu sắc."); }
     if (kind === 2) return make("How many days are there in a week?", "Seven", ["Five", "Six", "Eight"], "Một tuần có bảy ngày.");
     if (kind === 3) return make("Choose the correct greeting in the morning.", "Good morning", ["Good night", "Goodbye", "Good evening"], "Dùng Good morning vào buổi sáng.");
     return make("Complete: This is ___ book.", "a", ["an", "are", "am"], "Dùng a trước danh từ số ít bắt đầu bằng phụ âm.");
