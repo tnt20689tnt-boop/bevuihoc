@@ -62,7 +62,7 @@ export function BookReader({ bookId, book, onClose }: Props) {
     const grade = row?.grade ?? book?.grade;
     const hasPdf = isPdf(row?.content_pdf_url) || isPdf(row?.file_url ?? book?.file_url);
     const hasHtml = !!row?.content_html || (!!row?.file_url && !isPdf(row.file_url));
-    if (!subject || !grade || hasPdf || hasHtml || loading || error) {
+    if (!subject || !grade || hasPdf || hasHtml || loading) {
       setGeneratedPdf(null);
       return;
     }
@@ -104,8 +104,6 @@ export function BookReader({ bookId, book, onClose }: Props) {
         <div className="min-h-0 flex-1 overflow-auto bg-slate-100 p-2">
           {loading ? (
             <p className="p-5 text-center">Đang tải nội dung sách…</p>
-          ) : error ? (
-            <p className="p-5 text-center text-red-600">{error}</p>
           ) : pdf ? (
             <iframe title="Đọc sách PDF" src={pdf + "#toolbar=1&navpanes=1&view=FitH"} className="h-full min-h-[75vh] w-full rounded-lg border bg-white" />
           ) : generatedPdf ? (
@@ -114,6 +112,8 @@ export function BookReader({ bookId, book, onClose }: Props) {
             <iframe title="Nội dung sách" srcDoc={html} sandbox="" className="h-full min-h-[75vh] w-full rounded-lg border bg-white" />
           ) : htmlFile ? (
             <iframe title="Nội dung tài liệu" src={htmlFile} sandbox="allow-same-origin" className="h-full min-h-[75vh] w-full rounded-lg border bg-white" />
+          ) : error ? (
+            <p className="p-5 text-center text-red-600">{error}</p>
           ) : (
             <p className="p-5 text-center text-slate-600">Sách này chưa có file đọc phù hợp.</p>
           )}
