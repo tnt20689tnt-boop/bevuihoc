@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           created_at: string
           display_name: string
+          duration_seconds: number
           grade: number
           match_id: string
           opponent_id: string | null
@@ -31,6 +32,7 @@ export type Database = {
         Insert: {
           created_at?: string
           display_name: string
+          duration_seconds?: number
           grade: number
           match_id: string
           opponent_id?: string | null
@@ -44,6 +46,7 @@ export type Database = {
         Update: {
           created_at?: string
           display_name?: string
+          duration_seconds?: number
           grade?: number
           match_id?: string
           opponent_id?: string | null
@@ -639,6 +642,21 @@ export type Database = {
         Returns: string
       }
       finish_session: { Args: { p_session: string }; Returns: Json }
+      get_arena_matches: {
+        Args: { p_limit?: number }
+        Returns: {
+          created_at: string
+          duration_seconds: number
+          grade: number
+          match_id: string
+          player_a: string
+          player_b: string
+          score_a: number
+          score_b: number
+          total_questions: number
+          winner: string
+        }[]
+      }
       get_contest_question: { Args: { p_contest: string }; Returns: Json }
       get_leaderboard: {
         Args: { p_grade?: number; p_limit?: number; p_period: string }
@@ -706,6 +724,19 @@ export type Database = {
       promote_my_grade_if_due: { Args: never; Returns: number }
       save_arena_match_result: {
         Args: {
+          p_grade: number
+          p_match_id: string
+          p_opponent_id: string
+          p_opponent_name: string
+          p_opponent_score: number
+          p_score: number
+          p_total_questions: number
+        }
+        Returns: undefined
+      }
+      save_arena_match_result_v2: {
+        Args: {
+          p_duration_seconds: number
           p_grade: number
           p_match_id: string
           p_opponent_id: string
