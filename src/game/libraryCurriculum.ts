@@ -102,7 +102,7 @@ function createLesson(subject: Subject, grade: Grade, topic: string, index: numb
             ? ["Xác định chủ ngữ và vị ngữ trong câu: “Những chú chim hót líu lo.”", "Tìm 2 từ láy miêu tả âm thanh.", "Viết đoạn văn 6–8 câu tả một đồ vật."]
             : ["Đặt câu với một cặp quan hệ từ.", "Tìm nghĩa gốc và nghĩa chuyển của từ “mắt”.", "Viết đoạn văn 8–10 câu tả một cảnh đẹp."];
     return {
-      title: `Bài ${index + 1}. ${topic}`,
+      title: `Bài ${index + 1}. ${topic} (Lớp ${grade})`,
       knowledge: `Ở lớp ${grade}, khi học nội dung “${topic}”, em cần đọc kỹ ngữ liệu, xác định từ ngữ hoặc chi tiết quan trọng và giải thích bằng câu đầy đủ. Chú ý viết hoa đầu câu, dùng dấu câu phù hợp và kiểm tra chính tả sau khi viết.`,
       example: examples[index % examples.length],
       exercises: exercises.map((exercise) => `${exercise} (ngữ liệu: ${topic})`),
