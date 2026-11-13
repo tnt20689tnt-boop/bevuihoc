@@ -83,10 +83,10 @@ function createLesson(subject: Subject, grade: Grade, topic: string, index: numb
             ? ["Tính: 2/7 + 3/7 = ?", "Tính: 125 × 24 = ?", "Một hình chữ nhật dài 12 cm, rộng 7 cm. Tính chu vi."]
             : ["Tính: 4,25 + 2,8 = ?", "Tìm 15% của 200.", "Một xe đi 45 km trong 1 giờ. Đi trong 3 giờ được bao nhiêu ki-lô-mét nếu vận tốc không đổi?"];
     return {
-      title: `Bài ${index + 1}. ${topic}`,
+      title: `Bài ${index + 1}. ${topic} (Lớp ${grade})`,
       knowledge: `${topic} là nội dung quan trọng trong chương trình Toán lớp ${grade}. ${MATH_GUIDES[grade]} Hãy ghi phép tính, trình bày từng bước và ghi đáp số kèm đơn vị nếu đề bài yêu cầu.`,
       example: examples[index % examples.length],
-      exercises,
+      exercises: exercises.map((exercise) => `${exercise} (chuyên đề: ${topic})`),
       guidance: "Tự làm từng câu vào vở, sau đó kiểm tra phép tính và đơn vị. Với bài toán có lời văn, viết câu lời giải, phép tính và đáp số.",
     };
   }
@@ -105,7 +105,7 @@ function createLesson(subject: Subject, grade: Grade, topic: string, index: numb
       title: `Bài ${index + 1}. ${topic}`,
       knowledge: `Ở lớp ${grade}, khi học nội dung “${topic}”, em cần đọc kỹ ngữ liệu, xác định từ ngữ hoặc chi tiết quan trọng và giải thích bằng câu đầy đủ. Chú ý viết hoa đầu câu, dùng dấu câu phù hợp và kiểm tra chính tả sau khi viết.`,
       example: examples[index % examples.length],
-      exercises,
+      exercises: exercises.map((exercise) => `${exercise} (ngữ liệu: ${topic})`),
       guidance: "Đáp án có thể khác nhau nếu diễn đạt đúng yêu cầu. Khi tự kiểm tra, đối chiếu đúng nội dung, đủ ý, chính tả, viết hoa và dấu câu.",
     };
   }
@@ -120,10 +120,10 @@ function createLesson(subject: Subject, grade: Grade, topic: string, index: numb
           ? ["Write two sentences about your daily routine.", "Complete: They ____ (play) football now.", "Give directions using “turn left” or “turn right”."]
           : ["Change into the past: “I visit my friend.”", "Write three sentences about your next holiday.", "Complete: You ____ eat more fruit. (advice)"];
   return {
-    title: `Lesson ${index + 1}. ${topic}`,
+    title: `Lesson ${index + 1}. ${topic} (Grade ${grade})`,
     knowledge: `This lesson develops Grade ${grade} vocabulary, sentence patterns and communication for “${topic}”. Read each model sentence aloud, notice the word order, then replace key words to make a sentence about yourself. Listen, repeat, read and write.`,
     example: examples[index % examples.length],
-    exercises,
+    exercises: exercises.map((exercise) => `${exercise} (topic: ${topic})`),
     guidance: "Check spelling, capital letters and full stops. Practise saying each answer aloud and make sure the sentence matches the question.",
   };
 }
