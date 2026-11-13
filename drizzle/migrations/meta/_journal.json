@@ -29,6 +29,20 @@
       "when": 1794549764447,
       "tag": "0003_restrict_profiles_select",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794562412176,
+      "tag": "0004_arena_match_results",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794562434323,
+      "tag": "0005_arena_duration_and_public_feed",
+      "breakpoints": true
     }
   ]
 }

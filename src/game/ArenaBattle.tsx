@@ -112,6 +112,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   const scoreRef = useRef(0);
   const answeredRef = useRef(0);
   const matchIdRef = useRef<string | null>(null);
+  const matchStartRef = useRef<number>(Date.now());
   const playerScoresRef = useRef<Record<string, MatchScore>>({});
   const answeredPlayerIdsRef = useRef<string[]>([]);
   const savedMatchRef = useRef<string | null>(null);
@@ -139,6 +140,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     setPhase(isNewMatch ? "countdown" : "playing");
     setCountdown(isNewMatch ? 3 : 0);
     if (isNewMatch) {
+      matchStartRef.current = message.startsAt;
       scoreRef.current = 0;
       answeredRef.current = 0;
       lastQuestionAction.current = 0;
@@ -183,7 +185,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     if (id && opponent && savedMatchRef.current !== id) {
       savedMatchRef.current = id;
       setSaveStatus("saving");
-      void (supabase as unknown as SupabaseClient).rpc("save_arena_match_result", {
+      void (supabase as unknown as SupabaseClient).rpc("save_arena_match_result_v2", {
         p_match_id: id,
         p_grade: currentGrade,
         p_score: scoreRef.current,
@@ -191,6 +193,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
         p_opponent_name: opponent.name,
         p_opponent_score: opponent.score,
         p_total_questions: QUESTIONS_PER_MATCH,
+        p_duration_seconds: Math.max(0, Math.round((Date.now() - matchStartRef.current) / 1000)),
       }).then(({ error }) => {
         if (error) {
           savedMatchRef.current = null;

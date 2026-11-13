@@ -211,6 +211,98 @@ const englishDrafts = (grade: number): Draft[] => {
   return result;
 };
 
+
+const rnd = (min: number, max: number) => min + Math.floor(Math.random() * (max - min + 1));
+const pick = <T,>(items: T[]): T => items[Math.floor(Math.random() * items.length)]!;
+const numberWrong = (answer: number, spread = 3) =>
+  unique([answer + 1, answer - 1, answer + spread, answer - spread, answer + 2, answer * 2].filter((n) => n >= 0 && n !== answer).map(String));
+const FRUITS = ["🍎", "🍌", "🍇", "🍓", "🍊", "🍉", "🍒", "🥕", "⭐", "🐟", "🐱", "🚗"];
+const ANIMALS: Array<[string, string]> = [["🐘", "voi"], ["🦒", "hươu cao cổ"], ["🐰", "thỏ"], ["🐢", "rùa"], ["🦆", "vịt"], ["🐟", "cá"], ["🐔", "gà"], ["🐮", "bò"], ["🐒", "khỉ"], ["🦋", "bướm"]];
+const SHAPES = ["🟡", "🟦", "🔺", "⭐", "🟣", "❤️", "🟩", "🔶"];
+const IDIOMS: Array<[string, string, string[]]> = [
+  ["🐢 + 🐇 ➜ 🏁", "Chậm mà chắc", ["Nhanh như chớp", "Ăn cây nào rào cây ấy", "Uống nước nhớ nguồn"]],
+  ["💧 + 🌊 ➜ 🏔️", "Uống nước nhớ nguồn", ["Có công mài sắt có ngày nên kim", "Lá lành đùm lá rách", "Học ăn học nói"]],
+  ["🔨 + 🪡 ⏳", "Có công mài sắt có ngày nên kim", ["Chậm mà chắc", "Ăn quả nhớ kẻ trồng cây", "Gần mực thì đen"]],
+  ["🍃✅ 🤝 🍃❌", "Lá lành đùm lá rách", ["Uống nước nhớ nguồn", "Một cây làm chẳng nên non", "Tốt gỗ hơn tốt nước sơn"]],
+  ["🍊 ➜ 🌳 👨‍🌾", "Ăn quả nhớ kẻ trồng cây", ["Ăn cháo đá bát", "Học thầy không tày học bạn", "Có chí thì nên"]],
+  ["🌳 ❌⛰️ | 🌳🌳🌳 ✅⛰️", "Một cây làm chẳng nên non, ba cây chụm lại nên hòn núi cao", ["Lá lành đùm lá rách", "Chậm mà chắc", "Gần mực thì đen"]],
+  ["🖋️⚫ ➜ ⚫ | 💡 ➜ ✨", "Gần mực thì đen, gần đèn thì rạng", ["Tốt gỗ hơn tốt nước sơn", "Có chí thì nên", "Uống nước nhớ nguồn"]],
+];
+
+/** Endless procedural picture puzzles: emoji equations, patterns, clocks, counting, shadows. */
+function visualDraft(grade: number, kind: number): Draft {
+  const g = grade;
+  switch (kind % 9) {
+    case 0: { // emoji equation system
+      const [a, b] = shuffle(FRUITS).slice(0, 2) as [string, string];
+      const va = rnd(1, g <= 2 ? 5 : 12), vb = rnd(1, g <= 2 ? 5 : 12);
+      const ans = g >= 3 ? va * vb + va : vb;
+      const q = g >= 3
+        ? `🧩 Đố hình: ${a} + ${a} = ${va * 2}; ${a} + ${b} = ${va + vb}. Vậy ${a} × ${b} + ${a} = ?`
+        : `🧩 Đố hình: ${a} + ${a} = ${va * 2}; ${a} + ${b} = ${va + vb}. Vậy ${b} = ?`;
+      return draft("math", g, q, String(ans), numberWrong(ans), `${a} = ${va}, ${b} = ${vb}.`, "emoji-equation");
+    }
+    case 1: { // shape pattern
+      const len = g <= 2 ? 2 : 3;
+      const unit = shuffle(SHAPES).slice(0, len);
+      const shown = Array.from({ length: len * 2 + 1 }, (_, i) => unit[i % len]!);
+      const ans = unit[(len * 2 + 1) % len]!;
+      return draft("math", g, `🔁 Quy luật hình: ${shown.join(" ")} ❓ — hình tiếp theo là gì?`, ans, SHAPES.filter((x) => x !== ans), `Nhóm ${unit.join(" ")} lặp lại liên tục.`, "shape-pattern");
+    }
+    case 2: { // number pattern
+      const start = rnd(1, 10), step = rnd(2, g + 3);
+      const mult = g >= 4 && Math.random() < 0.4;
+      const seq = Array.from({ length: 5 }, (_, i) => mult ? start * 2 ** i : start + step * i);
+      const ans = seq[4]!;
+      return draft("math", g, `🔢 Dãy số: ${seq.slice(0, 4).join(", ")}, ❓`, String(ans), numberWrong(ans, step), mult ? "Mỗi số gấp đôi số trước." : `Mỗi số hơn số trước ${step} đơn vị.`, "number-pattern");
+    }
+    case 3: { // counting emoji
+      const e = pick(FRUITS), n = rnd(3, g <= 2 ? 10 : 18);
+      const other = pick(FRUITS.filter((x) => x !== e)), m = rnd(2, 6);
+      const row = shuffle([...Array(n).fill(e), ...Array(m).fill(other)]).join("");
+      return draft("math", g, `👀 Đếm nhanh: có bao nhiêu ${e} trong hàng ${row}?`, String(n), numberWrong(n, 2), `Có ${n} ${e} và ${m} ${other}.`, "counting");
+    }
+    case 4: { // clock
+      const h = rnd(1, 12), m = g <= 1 ? 0 : g === 2 ? pick([0, 30]) : pick([0, 15, 30, 45, 5, 50]);
+      const fmt = (hh: number, mm: number) => `${hh} giờ${mm ? ` ${mm} phút` : ""}`;
+      const ans = fmt(h, m);
+      return draft("math", g, `🕒 Kim ngắn chỉ gần số ${h}, kim dài chỉ số ${m === 0 ? 12 : m / 5}. Đồng hồ chỉ mấy giờ?`, ans,
+        [fmt(h % 12 + 1, m), fmt(h, (m + 30) % 60), fmt(m === 0 ? 12 : m / 5, h * 5 % 60)], "Kim ngắn chỉ giờ, kim dài chỉ phút (mỗi số = 5 phút).", "clock");
+    }
+    case 5: { // shadow animal
+      const [emoji, name] = pick(ANIMALS);
+      return draft("vietnamese", g, `🌑 Đố bóng: con vật ${emoji} này tên là gì?`, name, ANIMALS.map(([, n]) => n), `${emoji} là con ${name}.`, "shadow");
+    }
+    case 6: { // balance scale
+      const e = pick(FRUITS), w = rnd(2, 9), k = rnd(2, 4);
+      return draft("math", g, `⚖️ Cân thăng bằng: ${Array(k).fill(e).join("")} = ${k * w} kg. Một ${e} nặng bao nhiêu kg?`, String(w), numberWrong(w), `${k * w} : ${k} = ${w}.`, "balance");
+    }
+    case 7: { // stacked blocks
+      const layers = rnd(2, g + 1);
+      const total = (layers * (layers + 1)) / 2;
+      const art = Array.from({ length: layers }, (_, i) => "🟫".repeat(i + 1)).join(" / ");
+      return draft("math", g, `🧱 Tháp khối xếp từng tầng: ${art}. Tháp có tất cả bao nhiêu khối?`, String(total), numberWrong(total, layers), `1 + 2 + … + ${layers} = ${total}.`, "blocks");
+    }
+    default: { // picture idiom
+      const [pic, ans, wrong] = pick(IDIOMS);
+      return draft("vietnamese", g, `🖼️ Đuổi hình bắt chữ: ${pic} là câu tục ngữ nào?`, ans, wrong, `Đáp án: “${ans}”.`, "picture-idiom");
+    }
+  }
+}
+
+export function createVisualPuzzles(grade: number, count: number): Question[] {
+  const g = Math.max(1, Math.min(5, Math.floor(grade) || 1));
+  const seen = new Set<string>();
+  const out: Question[] = [];
+  for (let i = 0; out.length < count && i < count * 20; i++) {
+    const d = visualDraft(g, rnd(0, 8) + (i % 9));
+    if (seen.has(d.question)) continue;
+    seen.add(d.question);
+    out.push({ ...d, id: `arena-visual-${g}-${i}`, level: g * 20 });
+  }
+  return out;
+}
+
 const normalizeQuestion = (question: string) =>
   question.normalize("NFC").toLocaleLowerCase("vi")
     .replace(/[“”"'.,!?;:]/g, "")
@@ -266,9 +358,11 @@ export function createArenaQuestionSet(grade: number, count = 10): Question[] {
 
   const safeCount = Math.max(1, Math.min(30, Math.floor(count) || 10));
   // Keep all three subjects represented in every normal 10-question match.
-  const mathTarget = Math.ceil(safeCount * 0.4);
-  const viTarget = Math.floor(safeCount * 0.3);
-  const enTarget = safeCount - mathTarget - viTarget;
+  const visualTarget = Math.floor(safeCount * 0.3);
+  const mathTarget = Math.ceil(safeCount * 0.3);
+  const viTarget = Math.floor(safeCount * 0.2);
+  const enTarget = safeCount - mathTarget - viTarget - visualTarget;
+  addFrom(createVisualPuzzles(g, 40), visualTarget);
   addFrom(freshMath, mathTarget);
   addFrom(freshLanguage.filter((q) => q.subject === "vietnamese"), viTarget);
   addFrom(freshLanguage.filter((q) => q.subject === "english"), enTarget);
