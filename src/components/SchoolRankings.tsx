@@ -2,9 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { TopBar } from "@/components/AppShell";
 import { useMyProfile } from "@/hooks/use-player";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+// Arena results are not in the generated database types yet.
+const untypedSupabase = supabase as unknown as SupabaseClient;
+
 type RankingMode = "arena" | "leaderboard" | "honor";
+type ArenaMatchRow = { match_id: string; display_name: string; opponent_name: string; grade: number; score: number; opponent_score: number; total_questions: number; outcome: "win" | "loss" | "draw"; created_at: string };
 type PlayerRow = { id: string; display_name: string; grade: number; points: number; correct: number; goals: number };
 
 const config = {
@@ -40,14 +45,14 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
     queryKey: ["arena-match-history", profile?.id],
     enabled: mode === "arena" && !!profile?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await untypedSupabase
         .from("arena_match_results")
         .select("match_id, display_name, opponent_name, grade, score, opponent_score, total_questions, outcome, created_at")
         .eq("user_id", profile!.id)
         .order("created_at", { ascending: false })
         .limit(30);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as ArenaMatchRow[];
     },
     staleTime: 0,
     refetchOnMount: "always",

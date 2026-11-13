@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
-import type { RealtimeChannel } from "@supabase/supabase-js";
+import type { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
 import { Character3D, makeAnimState } from "@/game/Character3D";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/hooks/use-player";
@@ -183,7 +183,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     if (id && opponent && savedMatchRef.current !== id) {
       savedMatchRef.current = id;
       setSaveStatus("saving");
-      void supabase.rpc("save_arena_match_result", {
+      void (supabase as unknown as SupabaseClient).rpc("save_arena_match_result", {
         p_match_id: id,
         p_grade: currentGrade,
         p_score: scoreRef.current,

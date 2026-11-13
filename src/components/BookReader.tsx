@@ -6,7 +6,7 @@ import type { Book } from "@/game/types";
 import { ScreenOverlay } from "@/game/ScreenOverlay";
 
 const supabase = typedSupabase as unknown as SupabaseClient;
-type Props = { bookId: string; book?: Book; onClose: () => void };
+type Props = { bookId: string; book?: Book | undefined; onClose: () => void };
 type ContentRow = {
   title: string;
   content_html: string | null;
