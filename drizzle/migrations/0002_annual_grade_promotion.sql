@@ -69,7 +69,7 @@ BEGIN
 
   RETURN v_grade;
 END;
-$;
+$$;
 --> statement-breakpoint
 
 REVOKE ALL ON FUNCTION public.promote_my_grade_if_due() FROM PUBLIC;
