@@ -2,9 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { TopBar } from "@/components/AppShell";
 import { useMyProfile } from "@/hooks/use-player";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
+// Arena results are not in the generated database types yet.
+const untypedSupabase = supabase as unknown as SupabaseClient;
+
 type RankingMode = "arena" | "leaderboard" | "honor";
+type ArenaMatchRow = { match_id: string; display_name: string; opponent_name: string; grade: number; score: number; opponent_score: number; total_questions: number; outcome: "win" | "loss" | "draw"; created_at: string };
 type PlayerRow = { id: string; display_name: string; grade: number; points: number; correct: number; goals: number };
 
 const config = {
@@ -20,28 +25,16 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
     queryKey: ["school-rankings", profile?.id],
     enabled: mode !== "arena" && !!profile?.id,
     queryFn: async (): Promise<PlayerRow[]> => {
-      const [{ data: profiles, error: profileError }, { data: events, error: eventError }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, grade").limit(1000),
-        supabase.from("point_events").select("user_id, points, correct, goals").limit(10000),
-      ]);
-      if (profileError) throw profileError;
-      if (eventError) throw eventError;
-      const totals = new Map<string, { points: number; correct: number; goals: number }>();
-      for (const event of events ?? []) {
-        const current = totals.get(event.user_id) ?? { points: 0, correct: 0, goals: 0 };
-        current.points += event.points ?? 0;
-        current.correct += event.correct ?? 0;
-        current.goals += event.goals ?? 0;
-        totals.set(event.user_id, current);
-      }
-      return (profiles ?? [])
-        .map((student) => {
-          const total = totals.get(student.id) ?? { points: 0, correct: 0, goals: 0 };
-          return { id: student.id, display_name: student.display_name, grade: student.grade, ...total };
-        })
-        .filter((student) => student.points > 0 || student.id === profile?.id)
-        .sort((a, b) => b.points - a.points || b.correct - a.correct || a.display_name.localeCompare(b.display_name, "vi"))
-        .slice(0, 100);
+      const { data: rows, error: rankingError } = await supabase.rpc("get_school_ranking", { p_limit: 100 });
+      if (rankingError) throw rankingError;
+      return (rows ?? []).map((row) => ({
+        id: row.id,
+        display_name: row.display_name,
+        grade: row.grade,
+        points: Number(row.points ?? 0),
+        correct: Number(row.correct ?? 0),
+        goals: Number(row.goals ?? 0),
+      }));
     },
     staleTime: 0,
     refetchOnMount: "always",
@@ -52,14 +45,14 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
     queryKey: ["arena-match-history", profile?.id],
     enabled: mode === "arena" && !!profile?.id,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await untypedSupabase
         .from("arena_match_results")
         .select("match_id, display_name, opponent_name, grade, score, opponent_score, total_questions, outcome, created_at")
         .eq("user_id", profile!.id)
         .order("created_at", { ascending: false })
         .limit(30);
       if (error) throw error;
-      return data ?? [];
+      return (data ?? []) as ArenaMatchRow[];
     },
     staleTime: 0,
     refetchOnMount: "always",

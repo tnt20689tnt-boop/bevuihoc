@@ -61,8 +61,8 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       }
     }));
   } else if (grade === 2) {
-    const synonymPairs = [["chăm chỉ", "siêng năng"], ["dũng cảm", "gan dạ"], ["yên tĩnh", "im lặng"], ["nhanh nhẹn", "lanh lợi"]];
-    const antonymPairs = [["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"], ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"]];
+    const synonymPairs: Array<[string, string]> = [["chăm chỉ", "siêng năng"], ["dũng cảm", "gan dạ"], ["yên tĩnh", "im lặng"], ["nhanh nhẹn", "lanh lợi"]];
+    const antonymPairs: Array<[string, string]> = [["đoàn kết", "chia rẽ"], ["thật thà", "gian dối"], ["cao", "thấp"], ["nóng", "lạnh"], ["vui", "buồn"], ["sáng", "tối"]];
     synonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào gần nghĩa với “${a}”?`, b, ["lười biếng", "ồn ào", "yếu đuối"], `“${a}” và “${b}” gần nghĩa với nhau.`, "tu-dong-nghia"));
     antonymPairs.forEach(([a, b]) => add("vietnamese", grade, `Từ nào trái nghĩa với “${a}”?`, b, ["rộng", "dài", "nhanh"], `“${a}” và “${b}” trái nghĩa với nhau.`, "tu-trai-nghia"));
     const tasks: Array<[string, string, string, string[], string]> = [
@@ -73,12 +73,12 @@ const vietnameseDrafts = (grade: number): Draft[] => {
       ["Mẹ em nấu bữa tối.", "Ai nấu bữa tối?", "Mẹ em", ["bữa tối", "nấu", "tối"], "Mẹ em là người nấu bữa tối."],
     ];
     tasks.forEach(([sentence, q, a, wrong, exp]) => add("vietnamese", grade, `Đọc câu “${sentence}” rồi trả lời: ${q}`, a, wrong, exp, "doc-hieu-cau"));
-    [
+    ([
       ["sạch sẽ", "sạch sẻ", "sạch xẽ", "sạch sẹ"],
       ["xinh xắn", "sinh xắn", "xinh sắn", "sinh sắn"],
       ["nghỉ ngơi", "ngỉ ngơi", "nghĩ ngơi", "nghỉ ngi"],
       ["trường học", "chường học", "trường hộc", "chường hộc"],
-    ].forEach(([correct, ...wrong]) => add("vietnamese", grade, "Chọn cách viết đúng chính tả.", correct, wrong, `Cách viết đúng là “${correct}”.`, "chinh-ta"));
+    ] as Array<[string, ...string[]]>).forEach(([correct, ...wrong]) => add("vietnamese", grade, "Chọn cách viết đúng chính tả.", correct, wrong, `Cách viết đúng là “${correct}”.`, "chinh-ta"));
   } else if (grade === 3) {
     const categories = [
       { name: "danh từ", words: ["dòng sông", "học sinh", "cánh đồng", "bác thợ mộc", "tiếng trống"] },

@@ -197,7 +197,7 @@ function buildPdf(images: Uint8Array[]): Blob {
   }
   const trailer = `trailer\n<< /Size ${objects.length} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF`;
   parts.push(ascii(xref + trailer));
-  return new Blob(parts, { type: "application/pdf" });
+  return new Blob(parts as BlobPart[], { type: "application/pdf" });
 }
 
 export async function createLibraryPdf(subject: Subject, grade: Grade, documentTitle?: string): Promise<string> {
