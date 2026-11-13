@@ -25,6 +25,6 @@ export function Library({currentGrade}:Props){
  <Text position={[0,3.08,21.78]} fontSize={.19} color="#8b674b" anchorX="center" anchorY="middle">MỖI CUỐN SÁCH - MỘT HÀNH TRÌNH KHÁM PHÁ</Text>
  {shelves.map(s=><Shelf key={s.subject} position={[s.x,0,-15]} subject={s.subject} grade={currentGrade} books={visible.filter(b=>b.subject===s.subject)} borrowedIds={borrowed} onSelectBook={setSelected} onSelectShelf={()=>setShelfRequest(s.subject)}/>)}
  <ReadingTable position={[0,0,8]}/><pointLight position={[0,4,0]} intensity={2.1} distance={46} color="#fff0d4"/><pointLight position={[0,3,28]} intensity={1.0} distance={32} color="#ffe2ad"/>
- {active&&<BookPopup book={active} loan={loan} onClose={()=>setSelected(null)} onBorrow={borrowBook} onReturn={returnBook} onRead={id=>{setReadingBookId(id);setSelected(null);}}/>}{readingBookId&&<BookReader bookId={readingBookId} onClose={()=>setReadingBookId(null)}/>}
+ {active&&<BookPopup book={active} loan={loan} onClose={()=>setSelected(null)} onBorrow={borrowBook} onReturn={returnBook} onRead={id=>{setReadingBookId(id);setSelected(null);}}/>}{readingBookId&&<BookReader bookId={readingBookId} book={books.find((book)=>book.id===readingBookId)} onClose={()=>setReadingBookId(null)}/>}
  </group>;
 }
