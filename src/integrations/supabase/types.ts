@@ -14,48 +14,6 @@ export type Database = {
   }
   public: {
     Tables: {
-      arena_match_results: {
-        Row: {
-          created_at: string
-          display_name: string
-          grade: number
-          match_id: string
-          opponent_id: string | null
-          opponent_name: string
-          opponent_score: number
-          outcome: string
-          score: number
-          total_questions: number
-          user_id: string
-        }
-        Insert: {
-          created_at?: string
-          display_name: string
-          grade: number
-          match_id: string
-          opponent_id?: string | null
-          opponent_name: string
-          opponent_score: number
-          outcome: string
-          score: number
-          total_questions: number
-          user_id: string
-        }
-        Update: {
-          created_at?: string
-          display_name?: string
-          grade?: number
-          match_id?: string
-          opponent_id?: string | null
-          opponent_name?: string
-          opponent_score?: number
-          outcome?: string
-          score?: number
-          total_questions?: number
-          user_id?: string
-        }
-        Relationships: []
-      }
       badges: {
         Row: {
           active: boolean
@@ -694,18 +652,6 @@ export type Database = {
       }
       promote_my_grade_if_due: { Args: never; Returns: number }
       start_contest: { Args: { p_contest: string }; Returns: undefined }
-      save_arena_match_result: {
-        Args: {
-          p_grade: number
-          p_match_id: string
-          p_opponent_id: string
-          p_opponent_name: string
-          p_opponent_score: number
-          p_score: number
-          p_total_questions: number
-        }
-        Returns: undefined
-      }
       start_session: {
         Args: {
           p_difficulty?: string
