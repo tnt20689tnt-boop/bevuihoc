@@ -20,28 +20,16 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
     queryKey: ["school-rankings", profile?.id],
     enabled: mode !== "arena" && !!profile?.id,
     queryFn: async (): Promise<PlayerRow[]> => {
-      const [{ data: profiles, error: profileError }, { data: events, error: eventError }] = await Promise.all([
-        supabase.from("profiles").select("id, display_name, grade").limit(1000),
-        supabase.from("point_events").select("user_id, points, correct, goals").limit(10000),
-      ]);
-      if (profileError) throw profileError;
-      if (eventError) throw eventError;
-      const totals = new Map<string, { points: number; correct: number; goals: number }>();
-      for (const event of events ?? []) {
-        const current = totals.get(event.user_id) ?? { points: 0, correct: 0, goals: 0 };
-        current.points += event.points ?? 0;
-        current.correct += event.correct ?? 0;
-        current.goals += event.goals ?? 0;
-        totals.set(event.user_id, current);
-      }
-      return (profiles ?? [])
-        .map((student) => {
-          const total = totals.get(student.id) ?? { points: 0, correct: 0, goals: 0 };
-          return { id: student.id, display_name: student.display_name, grade: student.grade, ...total };
-        })
-        .filter((student) => student.points > 0 || student.id === profile?.id)
-        .sort((a, b) => b.points - a.points || b.correct - a.correct || a.display_name.localeCompare(b.display_name, "vi"))
-        .slice(0, 100);
+      const { data: rows, error: rankingError } = await supabase.rpc("get_school_ranking", { p_limit: 100 });
+      if (rankingError) throw rankingError;
+      return (rows ?? []).map((row) => ({
+        id: row.id,
+        display_name: row.display_name,
+        grade: row.grade,
+        points: Number(row.points ?? 0),
+        correct: Number(row.correct ?? 0),
+        goals: Number(row.goals ?? 0),
+      }));
     },
     staleTime: 0,
     refetchOnMount: "always",
