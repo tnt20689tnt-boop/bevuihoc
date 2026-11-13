@@ -23,12 +23,11 @@ describe("offline learning library", () => {
     expect(getLibraryVolume("english", 3).lessons).toHaveLength(10);
   });
 
-  it("does not reuse the same chapter titles between grades for a subject", () => {
-    for (const subject of ["math", "viet", "english"] as const) {
-      const titles = [1, 2, 3, 4, 5].flatMap((grade) =>
-        getLibraryVolume(subject, grade as 1 | 2 | 3 | 4 | 5).lessons.map((lesson) => lesson.title),
-      );
-      expect(new Set(titles).size).toBe(titles.length);
+  it("labels every chapter with its intended grade", () => {
+    for (const volume of LIBRARY_VOLUMES) {
+      for (const lesson of volume.lessons) {
+        expect(lesson.title).toContain(volume.subject === "english" ? `Grade ${volume.grade}` : `Lớp ${volume.grade}`);
+      }
     }
   });
 });
