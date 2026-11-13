@@ -631,6 +631,17 @@ export type Database = {
           topic: string
         }[]
       }
+      get_school_ranking: {
+        Args: { p_limit?: number }
+        Returns: {
+          correct: number
+          display_name: string
+          goals: number
+          grade: number
+          id: string
+          points: number
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
