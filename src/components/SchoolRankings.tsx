@@ -9,7 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 const untypedSupabase = supabase as unknown as SupabaseClient;
 
 type RankingMode = "arena" | "leaderboard" | "honor";
-type ArenaMatchRow = { match_id: string; display_name: string; opponent_name: string; grade: number; score: number; opponent_score: number; total_questions: number; outcome: "win" | "loss" | "draw"; created_at: string };
+type ArenaMatchRow = { match_id: string; player_a: string; player_b: string; winner: string | null; score_a: number; score_b: number; total_questions: number; grade: number; duration_seconds: number; created_at: string };
+const formatDuration = (s: number) => s >= 60 ? `${Math.floor(s / 60)} phút ${s % 60} giây` : `${s} giây`;
 type PlayerRow = { id: string; display_name: string; grade: number; points: number; correct: number; goals: number };
 
 const config = {
@@ -43,14 +44,10 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
 
   const { data: arenaMatches, isLoading: matchesLoading, error: matchesError } = useQuery({
     queryKey: ["arena-match-history", profile?.id],
+    refetchInterval: 15000,
     enabled: mode === "arena" && !!profile?.id,
     queryFn: async () => {
-      const { data, error } = await untypedSupabase
-        .from("arena_match_results")
-        .select("match_id, display_name, opponent_name, grade, score, opponent_score, total_questions, outcome, created_at")
-        .eq("user_id", profile!.id)
-        .order("created_at", { ascending: false })
-        .limit(30);
+      const { data, error } = await untypedSupabase.rpc("get_arena_matches", { p_limit: 50 });
       if (error) throw error;
       return (data ?? []) as ArenaMatchRow[];
     },
@@ -75,9 +72,9 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
               <div className="mb-3 flex flex-wrap items-end justify-between gap-2">
                 <div>
                   <h2 className="text-xl font-extrabold text-foreground">📋 Lịch sử thi đấu</h2>
-                  <p className="text-sm text-muted-foreground">Kết quả các trận của tài khoản đang đăng nhập.</p>
+                  <p className="text-sm text-muted-foreground">Các trận đấu 1v1 trực tiếp mới nhất của toàn trường.</p>
                 </div>
-                <span className="text-xs text-muted-foreground">Tối đa 30 trận gần nhất</span>
+                <span className="text-xs text-muted-foreground">Tự cập nhật mỗi 15 giây</span>
               </div>
               <div className="overflow-hidden rounded-2xl border border-border">
                 {matchesLoading ? (
@@ -89,21 +86,24 @@ export function SchoolRankings({ mode }: { mode: RankingMode }) {
                 ) : (
                   <div className="divide-y divide-border">
                     {arenaMatches.map((match) => {
-                      const resultLabel = match.outcome === "win"
-                        ? `🏆 ${match.display_name} chiến thắng`
-                        : match.outcome === "loss"
-                          ? `🏆 ${match.opponent_name} chiến thắng`
-                          : "🤝 Hai thí sinh hòa nhau";
+                      const draw = !match.winner;
+                      const d = new Date(match.created_at);
                       return (
-                        <div key={match.match_id} className="flex flex-col gap-2 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
-                          <div className="min-w-0">
-                            <div className="font-extrabold text-foreground">{match.display_name} – {match.opponent_name}</div>
-                            <div className="text-xs text-muted-foreground">Lớp {match.grade} • {new Date(match.created_at).toLocaleString("vi-VN")}</div>
-                            <div className="mt-1 text-sm font-bold text-amber-600 dark:text-amber-300">{resultLabel}</div>
+                        <div key={match.match_id} className="bg-card p-4">
+                          <div className="text-xs font-bold uppercase tracking-wide text-muted-foreground">⚔️ Trận đối kháng 1v1 • Lớp {match.grade}</div>
+                          <div className="mt-2 flex flex-wrap items-center justify-between gap-3">
+                            <div className="min-w-0 text-lg font-extrabold text-foreground">
+                              <span className={draw ? "" : "text-primary"}>{draw ? "🤝 " : "👑 "}{match.player_a}{draw ? "" : " (Thắng)"}</span>
+                              <span className="mx-2 text-muted-foreground">✕</span>
+                              <span>{match.player_b}</span>
+                            </div>
+                            <div className="text-2xl font-black tabular-nums text-primary">{match.score_a} – {match.score_b}</div>
                           </div>
-                          <div className="shrink-0 text-left text-2xl font-black tabular-nums text-primary sm:text-right">
-                            {match.score} – {match.opponent_score}
-                            <div className="text-xs font-medium text-muted-foreground">{match.total_questions} câu hỏi</div>
+                          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted-foreground">
+                            <span>📅 {d.toLocaleDateString("vi-VN")} {d.toLocaleTimeString("vi-VN", { hour: "2-digit", minute: "2-digit" })}</span>
+                            <span>✅ {match.player_a}: {match.score_a}/{match.total_questions} câu</span>
+                            <span>✅ {match.player_b}: {match.score_b}/{match.total_questions} câu</span>
+                            <span>⏱️ {match.duration_seconds > 0 ? formatDuration(match.duration_seconds) : "—"}</span>
                           </div>
                         </div>
                       );
