@@ -40,11 +40,11 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
 
 export function naturalizeMath(text: string): string {
   return text
-    .replace(/(\\d+)\\s*\\+\\s*(\\d+)/g, "$1 cộng $2")
-    .replace(/(\\d+)\\s*[-−]\\s*(\\d+)/g, "$1 trừ $2")
-    .replace(/(\\d+)\\s*[×x]\\s*(\\d+)/gi, "$1 nhân $2")
-    .replace(/(\\d+)\\s*[÷/]\\s*(\\d+)/g, "$1 chia $2")
-    .replace(/=\\s*\\?/g, " bằng mấy?")
+    .replace(/(\d+)\s*\+\s*(\d+)/g, "$1 cộng $2")
+    .replace(/(\d+)\s*[-−]\s*(\d+)/g, "$1 trừ $2")
+    .replace(/(\d+)\s*[×x]\s*(\d+)/gi, "$1 nhân $2")
+    .replace(/(\d+)\s*[÷/]\s*(\d+)/g, "$1 chia $2")
+    .replace(/=\s*\?/g, " bằng mấy?")
     .replace(/=/g, " bằng ");
 }
 
@@ -55,7 +55,7 @@ export async function speakQuiz(question: string, options: string[], locale = "v
   await speakOne((locale.startsWith("en") ? "Question. " : "Câu hỏi. ") + spokenQuestion, locale, token);
   for (let i = 0; i < options.length; i++) {
     if (token !== runToken) return;
-    const option = options[i].replace(/^([A-D])\\.\\s*/, "");
+    const option = options[i].replace(/^([A-D])\.\s*/, "");
     await speakOne(`${locale.startsWith("en") ? "Option" : "Đáp án"} ${["A", "B", "C", "D"][i] ?? i + 1}. ${math && locale.startsWith("vi") ? naturalizeMath(option) : option}`, locale, token);
   }
 }
