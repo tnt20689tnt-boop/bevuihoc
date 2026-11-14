@@ -65,3 +65,12 @@ export function speakFeedback(correct: boolean, message: string, locale = "vi-VN
   const token = runToken;
   void speakOne((correct ? "Chính xác! " : "Chưa đúng. ") + message, locale, token);
 }
+
+export async function speakSequence(lines: string[], locale = "vi-VN") {
+  stopSpeech();
+  const token = runToken;
+  for (const line of lines) {
+    if (token !== runToken) return;
+    await speakOne(line, locale, token);
+  }
+}
