@@ -9,14 +9,22 @@ export function stopSpeech() {
   activeUtterance = null;
 }
 
-export function primeSpeech() {
+export function primeSpeech(locale = "vi-VN") {
   const synth = getSpeech();
   if (!synth) return;
   synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(" ");
-  utterance.volume = 0;
-  utterance.lang = "vi-VN";
+  const utterance = new SpeechSynthesisUtterance(locale.startsWith("en") ? "Let's begin!" : "Bắt đầu học nhé!");
+  utterance.lang = locale;
+  utterance.rate = 0.9;
+  const voices = synth.getVoices();
+  const voice = voices.find(v => v.lang.toLowerCase() === locale.toLowerCase())
+    ?? voices.find(v => v.lang.toLowerCase().startsWith(locale.slice(0, 2).toLowerCase()));
+  if (voice) utterance.voice = voice;
+  activeUtterance = utterance;
+  utterance.onend = () => { if (activeUtterance === utterance) activeUtterance = null; };
+  utterance.onerror = () => { if (activeUtterance === utterance) activeUtterance = null; };
   synth.speak(utterance);
+  synth.resume();
 }
 
 function speakOne(text: string, locale: string, token: number): Promise<void> {
