@@ -1,50 +1,74 @@
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 let runToken = 0;
-const getSpeech = () => typeof window !== "undefined" && "speechSynthesis" in window ? window.speechSynthesis : null;
+
+const getSpeech = () => {
+  try {
+    return typeof window !== "undefined" && "speechSynthesis" in window ? window.speechSynthesis : null;
+  } catch {
+    return null;
+  }
+};
 
 export function stopSpeech() {
   runToken += 1;
-  const synth = getSpeech();
-  if (synth) synth.cancel();
+  try {
+    const synth = getSpeech();
+    if (synth) synth.cancel();
+  } catch {
+    // Ignore unavailable speech engines.
+  }
   activeUtterance = null;
 }
 
 export function primeSpeech(locale = "vi-VN") {
-  const synth = getSpeech();
-  if (!synth) return;
-  synth.cancel();
-  const utterance = new SpeechSynthesisUtterance(locale.startsWith("en") ? "Let's begin!" : "Bắt đầu học nhé!");
-  utterance.lang = locale;
-  utterance.rate = 0.9;
-  const voices = synth.getVoices();
-  const voice = voices.find(v => v.lang.toLowerCase() === locale.toLowerCase())
-    ?? voices.find(v => v.lang.toLowerCase().startsWith(locale.slice(0, 2).toLowerCase()));
-  if (voice) utterance.voice = voice;
-  activeUtterance = utterance;
-  utterance.onend = () => { if (activeUtterance === utterance) activeUtterance = null; };
-  utterance.onerror = () => { if (activeUtterance === utterance) activeUtterance = null; };
-  synth.speak(utterance);
-  synth.resume();
-}
-
-function speakOne(text: string, locale: string, token: number): Promise<void> {
-  const synth = getSpeech();
-  if (!synth || token !== runToken || !text.trim()) return Promise.resolve();
-  return new Promise(resolve => {
-    const utterance = new SpeechSynthesisUtterance(text);
+  try {
+    const synth = getSpeech();
+    if (!synth || typeof SpeechSynthesisUtterance === "undefined") return;
+    synth.cancel();
+    const utterance = new SpeechSynthesisUtterance(locale.startsWith("en") ? "Let's begin!" : "Bắt đầu học nhé!");
     utterance.lang = locale;
     utterance.rate = 0.9;
-    utterance.pitch = 1;
     const voices = synth.getVoices();
     const voice = voices.find(v => v.lang.toLowerCase() === locale.toLowerCase())
       ?? voices.find(v => v.lang.toLowerCase().startsWith(locale.slice(0, 2).toLowerCase()));
     if (voice) utterance.voice = voice;
     activeUtterance = utterance;
-    utterance.onend = () => { if (activeUtterance === utterance) activeUtterance = null; resolve(); };
-    utterance.onerror = () => { if (activeUtterance === utterance) activeUtterance = null; resolve(); };
+    utterance.onend = () => { if (activeUtterance === utterance) activeUtterance = null; };
+    utterance.onerror = () => { if (activeUtterance === utterance) activeUtterance = null; };
     synth.speak(utterance);
     synth.resume();
-  });
+  } catch {
+    activeUtterance = null;
+  }
+}
+
+function speakOne(text: string, locale: string, token: number): Promise<void> {
+  try {
+    const synth = getSpeech();
+    if (!synth || typeof SpeechSynthesisUtterance === "undefined" || token !== runToken || !text.trim()) return Promise.resolve();
+    return new Promise(resolve => {
+      try {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = locale;
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        const voices = synth.getVoices();
+        const voice = voices.find(v => v.lang.toLowerCase() === locale.toLowerCase())
+          ?? voices.find(v => v.lang.toLowerCase().startsWith(locale.slice(0, 2).toLowerCase()));
+        if (voice) utterance.voice = voice;
+        activeUtterance = utterance;
+        utterance.onend = () => { if (activeUtterance === utterance) activeUtterance = null; resolve(); };
+        utterance.onerror = () => { if (activeUtterance === utterance) activeUtterance = null; resolve(); };
+        synth.speak(utterance);
+        synth.resume();
+      } catch {
+        activeUtterance = null;
+        resolve();
+      }
+    });
+  } catch {
+    return Promise.resolve();
+  }
 }
 
 export function naturalizeMath(text: string): string {
@@ -65,7 +89,7 @@ export async function speakQuiz(question: string, options: string[], locale = "v
   for (let i = 0; i < options.length; i++) {
     if (token !== runToken) return;
     const option = options[i].replace(/^([A-D])\.\s*/, "");
-    await speakOne(`${locale.startsWith("en") ? "Option" : "Đáp án"} ${["A", "B", "C", "D"][i] ?? i + 1}. ${math && locale.startsWith("vi") ? naturalizeMath(option) : option}`, locale, token);
+    await speakOne(\`\${locale.startsWith("en") ? "Option" : "Đáp án"} \${["A", "B", "C", "D"][i] ?? i + 1}. \${math && locale.startsWith("vi") ? naturalizeMath(option) : option}\`, locale, token);
   }
 }
 
