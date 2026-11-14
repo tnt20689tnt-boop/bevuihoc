@@ -43,6 +43,7 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
     utterance.onend = () => { if (activeUtterance === utterance) activeUtterance = null; resolve(); };
     utterance.onerror = () => { if (activeUtterance === utterance) activeUtterance = null; resolve(); };
     synth.speak(utterance);
+    synth.resume();
   });
 }
 
