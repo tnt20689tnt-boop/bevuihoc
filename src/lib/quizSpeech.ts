@@ -38,7 +38,7 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
   });
 }
 
-function naturalizeMath(text: string): string {
+export function naturalizeMath(text: string): string {
   return text
     .replace(/(\\d+)\\s*\\+\\s*(\\d+)/g, "$1 cộng $2")
     .replace(/(\\d+)\\s*[-−]\\s*(\\d+)/g, "$1 trừ $2")
@@ -52,7 +52,7 @@ export async function speakQuiz(question: string, options: string[], locale = "v
   stopSpeech();
   const token = runToken;
   const spokenQuestion = math && locale.startsWith("vi") ? naturalizeMath(question) : question;
-  await speakOne("Câu hỏi. " + spokenQuestion, locale, token);
+  await speakOne((locale.startsWith("en") ? "Question. " : "Câu hỏi. ") + spokenQuestion, locale, token);
   for (let i = 0; i < options.length; i++) {
     if (token !== runToken) return;
     const option = options[i].replace(/^([A-D])\\.\\s*/, "");
@@ -63,7 +63,7 @@ export async function speakQuiz(question: string, options: string[], locale = "v
 export function speakFeedback(correct: boolean, message: string, locale = "vi-VN") {
   stopSpeech();
   const token = runToken;
-  void speakOne((correct ? "Chính xác! " : "Chưa đúng. ") + message, locale, token);
+  void speakOne((locale.startsWith("en") ? (correct ? "Correct! " : "Not quite. ") : (correct ? "Chính xác! " : "Chưa đúng. ")) + message, locale, token);
 }
 
 export async function speakSequence(lines: string[], locale = "vi-VN") {
