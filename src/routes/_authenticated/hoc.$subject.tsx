@@ -5,6 +5,7 @@ import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
 import { generateLessonQuestions, loadSeenQuestionPrompts, saveSeenQuestionPrompts } from "@/game/questionBank";
 import { toast } from "sonner";
+import { primeSpeech, speakQuiz, speakFeedback, stopSpeech } from "@/lib/quizSpeech";
 
 type Question = { prompt: string; choices: string[]; answer: number; hint: string };
 type Subject = "math" | "vietnamese" | "english";
@@ -34,8 +35,17 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const question = questions[index];
   const answered = selected !== null;
   const correct = selected === question?.answer;
+  const speechLocale = subject === "english" && question && !/[À-ỹ]/i.test(question.prompt) ? "en-US" : "vi-VN";
+
+  useEffect(() => {
+    if (!question || level === null || finished) return;
+    void speakQuiz(question.prompt, question.choices, speechLocale);
+    return () => stopSpeech();
+  }, [question?.prompt, question?.choices, level, finished, speechLocale]);
 
   function startLevel(value: number) {
+    // Kích hoạt bộ đọc ngay trong thao tác chạm của bé (đặc biệt cần thiết trên iPhone Safari).
+    primeSpeech(subject === "english" ? "vi-VN" : "vi-VN");
     const key = `${profile.id}-${profile.grade}-${subject}-${value}`;
     const seen = seenByLevel.current.get(key) ?? loadSeenQuestionPrompts(key);
     let nextSet = generateLessonQuestions(subject, value, profile.grade, seen, 5);
@@ -56,6 +66,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
   function chooseAnswer(choice: number) {
     if (answered || finished || !question || level === null) return;
     setSelected(choice);
+    speakFeedback(choice === question.answer, question.hint, speechLocale);
     if (choice === question.answer) {
       setScore(v => v + 1); setSavingPoints(true);
       void supabase.rpc("award_lesson_points", {
