@@ -25,6 +25,7 @@ type Props = {
 
 export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }: Props) {
   const [peers, setPeers] = useState<CampusPeer[]>([]);
+  const [showPresenceDetails, setShowPresenceDetails] = useState(false);
   const publicNameRef = useRef(profile.display_name);
   publicNameRef.current = profile.display_name?.trim() || "Bạn học";
   const channelRef = useRef<RealtimeChannel | null>(null);
@@ -154,27 +155,44 @@ export function CampusMultiplayer({ roomId, profile, positionRef, onSelectPeer }
     <group>
       {roomId === "library" && (
         <Html fullscreen zIndexRange={[250, 0]}>
-          <aside className="pointer-events-none fixed left-3 top-24 z-20 w-44 max-w-[38vw] sm:left-5 sm:top-28 sm:w-48">
-            <section className="pointer-events-auto overflow-hidden rounded-xl border border-white/80 bg-[#fffaf0]/95 text-slate-800 shadow-xl backdrop-blur">
-              <header className="flex items-center justify-between bg-emerald-700 px-2.5 py-1.5 text-white">
-                <div><p className="text-[10px] font-black">👥 BÉ ĐANG Ở THƯ VIỆN</p><p className="text-[9px] text-emerald-100">Kết nối trực tiếp</p></div>
-                <span className="rounded-full bg-white/20 px-1.5 py-0.5 text-[10px] font-black">{peers.length + 1}</span>
-              </header>
-              <div className="max-h-36 space-y-0.5 overflow-y-auto p-1.5">
-                <div className="flex items-center gap-2 rounded-lg bg-emerald-50 p-1.5">
-                  <span className="text-base">🎓</span>
-                  <div className="min-w-0 flex-1"><p className="truncate text-[10px] font-extrabold">{profile.display_name || "Bạn"} (bạn)</p><p className="text-[9px] text-emerald-700">Lớp {profile.grade} · {locateShelf(positionRef.current.x, positionRef.current.z)}</p></div>
-                  <span className="h-2 w-2 rounded-full bg-emerald-500" />
-                </div>
-                {peers.map((peer) => (
-                  <div key={peer.id} className="flex items-center gap-2 rounded-lg p-1.5 hover:bg-amber-50">
-                    <span className="text-base">🧒</span>
-                    <div className="min-w-0 flex-1"><p className="truncate text-[10px] font-extrabold">{peer.name || "Bạn học"}</p><p className="text-[9px] text-slate-500">Lớp {peer.grade ?? "—"} · {locateShelf(peer.x, peer.z)}</p></div>
-                    <span className="h-2 w-2 rounded-full bg-emerald-500" />
+          <aside className="pointer-events-none fixed left-2 top-24 z-20 w-36 max-w-[42vw] sm:left-4 sm:top-28 sm:w-40">
+            <section className="pointer-events-auto overflow-hidden rounded-xl border border-white/80 bg-[#fffaf0]/95 text-slate-800 shadow-lg backdrop-blur">
+              <button
+                type="button"
+                onClick={() => setShowPresenceDetails((open) => !open)}
+                aria-expanded={showPresenceDetails}
+                className="flex w-full items-center justify-between gap-2 bg-emerald-700 px-2 py-2 text-left text-white"
+              >
+                <span className="min-w-0">
+                  <span className="block truncate text-[10px] font-black">👥 Ở THƯ VIỆN</span>
+                  <span className="block text-[9px] text-emerald-100">Đang trực tuyến</span>
+                </span>
+                <span className="flex h-5 min-w-5 shrink-0 items-center justify-center rounded-full bg-white/20 px-1 text-[10px] font-black">{peers.length + 1}</span>
+                <span className="shrink-0 text-[10px]">{showPresenceDetails ? "▲" : "▼"}</span>
+              </button>
+              {showPresenceDetails && (
+                <div className="max-h-28 space-y-1 overflow-y-auto p-1.5">
+                  <div className="flex items-center gap-1.5 rounded-lg bg-emerald-50 p-1.5">
+                    <span className="text-sm">🎓</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[10px] font-extrabold">{profile.display_name || "Bạn"} (bạn)</p>
+                      <p className="truncate text-[9px] text-emerald-700">Lớp {profile.grade} · {locateShelf(positionRef.current.x, positionRef.current.z)}</p>
+                    </div>
+                    <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
                   </div>
-                ))}
-                {peers.length === 0 && <p className="px-1.5 py-2 text-center text-[9px] leading-4 text-slate-500">Chưa có bạn nào khác trong thư viện. Khi bạn bè vào, nhân vật sẽ hiện tại đây và trong không gian 3D.</p>}
-              </div>
+                  {peers.map((peer) => (
+                    <div key={peer.id} className="flex items-center gap-1.5 rounded-lg p-1.5 hover:bg-amber-50">
+                      <span className="text-sm">🧒</span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[10px] font-extrabold">{peer.name || "Bạn học"}</p>
+                        <p className="truncate text-[9px] text-slate-500">Lớp {peer.grade ?? "—"} · {locateShelf(peer.x, peer.z)}</p>
+                      </div>
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
+                    </div>
+                  ))}
+                  {peers.length === 0 && <p className="px-1 py-1.5 text-center text-[9px] leading-3 text-slate-500">Chưa có bạn nào khác trong thư viện.</p>}
+                </div>
+              )}
             </section>
           </aside>
         </Html>
