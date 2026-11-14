@@ -89,7 +89,7 @@ export async function speakQuiz(question: string, options: string[], locale = "v
   for (let i = 0; i < options.length; i++) {
     if (token !== runToken) return;
     const option = options[i].replace(/^([A-D])\.\s*/, "");
-    await speakOne(\`\${locale.startsWith("en") ? "Option" : "Đáp án"} \${["A", "B", "C", "D"][i] ?? i + 1}. \${math && locale.startsWith("vi") ? naturalizeMath(option) : option}\`, locale, token);
+    await speakOne(`${locale.startsWith("en") ? "Option" : "Đáp án"} ${["A", "B", "C", "D"][i] ?? i + 1}. ${math && locale.startsWith("vi") ? naturalizeMath(option) : option}`, locale, token);
   }
 }
 
