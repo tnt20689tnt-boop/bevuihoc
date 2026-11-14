@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GameShell } from "@/components/AppShell";
 import type { Profile } from "@/hooks/use-player";
@@ -45,7 +45,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
 
   function startLevel(value: number) {
     // Kích hoạt bộ đọc ngay trong thao tác chạm của bé (đặc biệt cần thiết trên iPhone Safari).
-    primeSpeech(subject === "english" ? "vi-VN" : "vi-VN");
+    primeSpeech("vi-VN");
     const key = `${profile.id}-${profile.grade}-${subject}-${value}`;
     const seen = seenByLevel.current.get(key) ?? loadSeenQuestionPrompts(key);
     let nextSet = generateLessonQuestions(subject, value, profile.grade, seen, 5);
