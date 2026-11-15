@@ -16,7 +16,6 @@ function selectVoice(voices: SpeechSynthesisVoice[], locale: string) {
   const normalized = locale.toLowerCase();
   return voices.find((voice) => voice.lang.toLowerCase() === normalized)
     ?? voices.find((voice) => voice.lang.toLowerCase().startsWith(normalized.slice(0, 2)))
-    ?? voices.find((voice) => voice.lang.toLowerCase().startsWith("vi"))
     ?? voices[0];
 }
 
@@ -163,6 +162,38 @@ export function naturalizeMath(text: string): string {
     .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 phần $2")
     .replace(/=\s*\?/g, " bằng mấy?")
     .replace(/=/g, " bằng ");
+}
+
+export function speakTest(locale = "vi-VN") {
+  const synth = getSpeech();
+  if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+    speechState = "unsupported";
+    lastSpeechError = "Safari chưa hỗ trợ đọc văn bản trên thiết bị này.";
+    return;
+  }
+  stopSpeech();
+  const utterance = new SpeechSynthesisUtterance(
+    locale.startsWith("en") ? "Hello! The sound is working." : "Xin chào! Âm thanh đang hoạt động tốt."
+  );
+  utterance.lang = locale;
+  utterance.rate = 0.88;
+  utterance.volume = 1;
+  const voice = selectVoice(synth.getVoices(), locale);
+  if (voice) utterance.voice = voice;
+  utterance.onend = () => { speechState = "ready"; };
+  utterance.onerror = (event) => {
+    speechState = "error";
+    lastSpeechError = event.error || "Không phát được âm thanh.";
+  };
+  try {
+    speechState = "speaking";
+    lastSpeechError = null;
+    synth.speak(utterance);
+    synth.resume();
+  } catch (error) {
+    speechState = "error";
+    lastSpeechError = error instanceof Error ? error.message : String(error);
+  }
 }
 
 export async function speakQuiz(question: string, options: string[], locale = "vi-VN", math = false) {
