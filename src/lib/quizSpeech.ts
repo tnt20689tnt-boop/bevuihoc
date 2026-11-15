@@ -135,7 +135,9 @@ export function naturalizeMath(text: string): string {
     .replace(/(\d+)\s*[÷/]\s*(\d+)/g, "$1 chia $2")
     .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 phần $2")
     .replace(/=\s*\?/g, " bằng mấy?")
-    .replace(/=/g, " bằng ");
+    .replace(/=/g, " bằng ")
+    .replace(/[\t ]{2,}/g, " ")
+    .trim();
 }
 
 export function speakTest(locale = "vi-VN") {
@@ -179,9 +181,16 @@ export async function speakQuiz(question: string, options: string[], locale = "v
   await speakOne((locale.startsWith("en") ? "Question. " : "Câu hỏi. ") + spokenQuestion, locale, token);
   for (let i = 0; i < options.length; i++) {
     if (token !== runToken) return;
-    const option = options[i].replace(/^([A-D])\.\s*/, "");
+    const option = (options[i] ?? "").replace(/^([A-D])\.\s*/, "");
     await speakOne(`${locale.startsWith("en") ? "Option" : "Đáp án"} ${["A", "B", "C", "D"][i] ?? i + 1}. ${math && locale.startsWith("vi") ? naturalizeMath(option) : option}`, locale, token);
   }
+}
+
+export function speakQuizOption(option: string, index: number, locale = "vi-VN", math = false) {
+  const letter = ["A", "B", "C", "D"][index] ?? String(index + 1);
+  const spokenOption = math && locale.startsWith("vi") ? naturalizeMath(option) : option;
+  const prefix = locale.startsWith("en") ? `Option ${letter}.` : `Đáp án ${letter}.`;
+  void speakSequence([`${prefix} ${spokenOption}`], locale);
 }
 
 export function speakFeedback(correct: boolean, message: string, locale = "vi-VN") {

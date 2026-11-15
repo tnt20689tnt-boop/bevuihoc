@@ -8,7 +8,7 @@ import type { Profile } from "@/hooks/use-player";
 import { toAvatar, type Avatar } from "@/lib/avatar";
 import type { Question } from "./learningEngine";
 import { createArenaQuestionSet } from "./arenaQuestionBank";
-import { primeSpeech, speakFeedback, speakQuiz, stopSpeech, speakTest } from "@/lib/quizSpeech";
+import { primeSpeech, speakFeedback, speakQuiz, speakQuizOption, stopSpeech, speakTest } from "@/lib/quizSpeech";
 
 type Phase = "waiting" | "countdown" | "playing" | "finished";
 type ArenaPlayer = {
@@ -549,9 +549,14 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
             {question.options.map((option, index) => {
               const right = selected !== null && option === question.correctAnswer;
               const wrong = selected === option && !right;
-              return <button key={question.id + "-" + index} onClick={() => answer(option)} disabled={selected !== null} className={`rounded-2xl border-2 px-4 py-4 text-left font-bold transition ${right ? "border-emerald-300 bg-emerald-500 text-white" : wrong ? "border-rose-300 bg-rose-500 text-white" : "border-white/20 bg-slate-950/45 hover:border-amber-300"} disabled:cursor-default`}>
-                <span className="mr-3 inline-grid h-8 w-8 place-items-center rounded-lg bg-white/15">{String.fromCharCode(65 + index)}</span>{option}
-              </button>;
+              const letter = String.fromCharCode(65 + index);
+              const locale = question.subject === "english" ? "en-US" : "vi-VN";
+              return <div key={question.id + "-" + index} className="flex min-w-0 gap-2">
+                <button onClick={() => answer(option)} disabled={selected !== null} className={`min-w-0 flex-1 rounded-2xl border-2 px-4 py-4 text-left font-bold transition ${right ? "border-emerald-300 bg-emerald-500 text-white" : wrong ? "border-rose-300 bg-rose-500 text-white" : "border-white/20 bg-slate-950/45 hover:border-amber-300"} disabled:cursor-default`}>
+                  <span className="mr-3 inline-grid h-8 w-8 place-items-center rounded-lg bg-white/15">{letter}</span>{option}
+                </button>
+                <button type="button" onClick={() => speakQuizOption(option, index, locale, question.subject === "math")} aria-label={`Nghe phương án ${letter}: ${option}`} title={`Nghe phương án ${letter}`} className="min-w-12 rounded-xl border border-sky-200 bg-sky-100 px-3 font-bold text-sky-900 hover:bg-white">🔊</button>
+              </div>;
             })}
           </div>
           {selected !== null && (

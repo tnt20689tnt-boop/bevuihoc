@@ -5,7 +5,7 @@ import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
 import { generateLessonQuestions, loadSeenQuestionPrompts, saveSeenQuestionPrompts } from "@/game/questionBank";
 import { toast } from "sonner";
-import { speakQuiz, speakFeedback, stopSpeech, speakTest } from "@/lib/quizSpeech";
+import { speakQuiz, speakFeedback, speakQuizOption, stopSpeech, speakTest } from "@/lib/quizSpeech";
 
 type Question = { prompt: string; choices: string[]; answer: number; hint: string };
 type Subject = "math" | "vietnamese" | "english";
@@ -150,7 +150,11 @@ function LessonRoom({ profile }: { profile: Profile }) {
                     {question.choices.map((choice, i) => {
                       const isCorrect = answered && i === question.answer;
                       const isWrong = answered && selected === i && !correct;
-                      return <button key={`${index}-${i}`} onClick={() => chooseAnswer(i)} disabled={answered} className={`min-h-14 rounded-2xl border-2 px-4 py-3 text-left font-bold transition ${isCorrect ? "border-green-500 bg-green-50 text-green-800" : isWrong ? "border-red-400 bg-red-50 text-red-800" : "border-border bg-card hover:border-primary"} ${answered && !isCorrect && !isWrong ? "opacity-60" : ""}`}><span className="mr-3 inline-grid h-8 w-8 place-items-center rounded-full bg-muted text-sm">{String.fromCharCode(65+i)}</span>{choice}</button>;
+                      const letter = String.fromCharCode(65 + i);
+                      return <div key={`${index}-${i}`} className="flex min-w-0 gap-2">
+                        <button onClick={() => chooseAnswer(i)} disabled={answered} className={`min-h-14 min-w-0 flex-1 rounded-2xl border-2 px-4 py-3 text-left font-bold transition ${isCorrect ? "border-green-500 bg-green-50 text-green-800" : isWrong ? "border-red-400 bg-red-50 text-red-800" : "border-border bg-card hover:border-primary"} ${answered && !isCorrect && !isWrong ? "opacity-60" : ""}`}><span className="mr-3 inline-grid h-8 w-8 place-items-center rounded-full bg-muted text-sm">{letter}</span>{choice}</button>
+                        <button type="button" onClick={() => speakQuizOption(choice, i, speechLocale, subject === "math")} aria-label={`Nghe phương án ${letter}: ${choice}`} title={`Nghe phương án ${letter}`} className="min-h-14 min-w-12 rounded-xl border-2 border-sky-200 bg-sky-50 px-3 font-bold text-sky-800 hover:bg-sky-100">🔊</button>
+                      </div>;
                     })}
                   </div>
                   {answered && <div className={`mt-5 rounded-2xl p-4 ${correct ? "bg-green-100 text-green-900" : "bg-amber-100 text-amber-900"}`}><p className="font-extrabold">{correct ? "🎉 Chính xác! Bé giỏi quá!" : "🌱 Chưa đúng, mình cùng học nhé!"}</p><p className="mt-1 text-sm">{question.hint}</p></div>}
