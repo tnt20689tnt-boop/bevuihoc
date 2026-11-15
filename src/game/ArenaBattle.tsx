@@ -8,6 +8,7 @@ import type { Profile } from "@/hooks/use-player";
 import { toAvatar, type Avatar } from "@/lib/avatar";
 import type { Question } from "./learningEngine";
 import { createArenaQuestionSet } from "./arenaQuestionBank";
+import { primeSpeech, speakFeedback, speakQuiz, stopSpeech } from "@/lib/quizSpeech";
 
 type Phase = "waiting" | "countdown" | "playing" | "finished";
 type ArenaPlayer = {
@@ -298,6 +299,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
   }, [phase, startsAt]);
 
   const markReady = async () => {
+    primeSpeech("vi-VN");
     if (phase !== "waiting" || players.some((player) => player.id === profile.id && player.ready)) return;
     setPlayers((current) => current.map((player) => player.id === profile.id ? { ...player, ready: true } : player));
     await channelRef.current?.track({ ...self, joinedAt: players.find((player) => player.id === profile.id)?.joinedAt ?? Date.now(), ready: true });
@@ -372,6 +374,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     if (!question || selected !== null || phase !== "playing") return;
     setSelected(value);
     const isCorrect = value === question.correctAnswer;
+    speakFeedback(isCorrect, question.explanation || (isCorrect ? "Con làm rất tốt!" : `Đáp án đúng là ${question.correctAnswer}.`), question.subject === "english" ? "en-US" : "vi-VN");
     const nextScore = scoreRef.current + (isCorrect ? 1 : 0);
     const nextAnswered = answeredRef.current + 1;
     scoreRef.current = nextScore;
@@ -435,6 +438,15 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
     setSaveStatus("idle");
     onExit?.();
   };
+
+  useEffect(() => {
+    if (phase !== "playing" || !question) return;
+    const locale = question.subject === "english" ? "en-US" : "vi-VN";
+    void speakQuiz(question.question, question.options, locale, question.subject === "math");
+    return () => stopSpeech();
+  }, [question?.id, phase]);
+
+  useEffect(() => () => stopSpeech(), []);
 
   const correct = !!question && selected === question.correctAnswer;
   const subject = question ? subjectName[question.subject] : "";
