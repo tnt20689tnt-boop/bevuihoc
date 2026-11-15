@@ -156,12 +156,12 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
 
 export function naturalizeMath(text: string): string {
   return text
-    .replace(/(\d+)\s*\\+\s*(\d+)/g, "$1 cộng $2")
+    .replace(/(\d+)\s*\+\s*(\d+)/g, "$1 cộng $2")
     .replace(/(\d+)\s*[-−]\s*(\d+)/g, "$1 trừ $2")
     .replace(/(\d+)\s*[×x]\s*(\d+)/gi, "$1 nhân $2")
     .replace(/(\d+)\s*[÷/]\s*(\d+)/g, "$1 chia $2")
     .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 phần $2")
-    .replace(/=\s*\\?/g, " bằng mấy?")
+    .replace(/=\s*\?/g, " bằng mấy?")
     .replace(/=/g, " bằng ");
 }
 
