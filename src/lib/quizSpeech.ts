@@ -4,8 +4,6 @@ let runToken = 0;
 let speechState: SpeechState = "ready";
 let lastSpeechError: string | null = null;
 let unlockInstalled = false;
-let voicesReady: Promise<SpeechSynthesisVoice[]> | null = null;
-
 const getSpeech = (): SpeechSynthesis | null => {
   try {
     return typeof window !== "undefined" && "speechSynthesis" in window ? window.speechSynthesis : null;
@@ -13,26 +11,6 @@ const getSpeech = (): SpeechSynthesis | null => {
     return null;
   }
 };
-
-function loadVoices(synth: SpeechSynthesis): Promise<SpeechSynthesisVoice[]> {
-  const current = synth.getVoices();
-  if (current.length) return Promise.resolve(current);
-  if (!voicesReady) {
-    voicesReady = new Promise((resolve) => {
-      let settled = false;
-      const finish = () => {
-        if (settled) return;
-        settled = true;
-        synth.removeEventListener?.("voiceschanged", finish);
-        resolve(synth.getVoices());
-      };
-      synth.addEventListener?.("voiceschanged", finish);
-      // Safari sometimes does not emit voiceschanged; use the voices available on the next task.
-      window.setTimeout(finish, 1200);
-    });
-  }
-  return voicesReady;
-}
 
 function selectVoice(voices: SpeechSynthesisVoice[], locale: string) {
   const normalized = locale.toLowerCase();
