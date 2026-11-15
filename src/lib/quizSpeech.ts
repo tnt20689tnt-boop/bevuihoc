@@ -3,7 +3,6 @@ let activeUtterance: SpeechSynthesisUtterance | null = null;
 let runToken = 0;
 let speechState: SpeechState = "ready";
 let lastSpeechError: string | null = null;
-let unlockInstalled = false;
 const getSpeech = (): SpeechSynthesis | null => {
   try {
     return typeof window !== "undefined" && "speechSynthesis" in window ? window.speechSynthesis : null;
@@ -19,33 +18,6 @@ function selectVoice(voices: SpeechSynthesisVoice[], locale: string) {
     ?? voices[0];
 }
 
-function installGestureUnlock() {
-  if (unlockInstalled || typeof document === "undefined") return;
-  unlockInstalled = true;
-  const unlock = () => {
-    const synth = getSpeech();
-    if (!synth || typeof SpeechSynthesisUtterance === "undefined") return;
-    try {
-      // A short, muted utterance inside the user's first tap unlocks speech on iOS Safari.
-      const utterance = new SpeechSynthesisUtterance(" ");
-      utterance.volume = 0;
-      utterance.rate = 1;
-      synth.speak(utterance);
-      synth.resume();
-    } catch (error) {
-      lastSpeechError = error instanceof Error ? error.message : String(error);
-      speechState = "error";
-    }
-    document.removeEventListener("pointerdown", unlock, true);
-    document.removeEventListener("touchend", unlock, true);
-    document.removeEventListener("keydown", unlock, true);
-  };
-  document.addEventListener("pointerdown", unlock, true);
-  document.addEventListener("touchend", unlock, true);
-  document.addEventListener("keydown", unlock, true);
-}
-if (typeof document !== "undefined") installGestureUnlock();
-
 export function getSpeechStatus() {
   const synth = getSpeech();
   return {
@@ -60,7 +32,9 @@ export function getSpeechStatus() {
 export function stopSpeech() {
   runToken += 1;
   const synth = getSpeech();
-  if (synth) {
+  // Avoid calling cancel() when idle: iOS Safari can silence the next utterance
+  // if cancel() races with a fresh speak() from the same tap.
+  if (synth && (activeUtterance || synth.speaking || synth.pending)) {
     try { synth.cancel(); } catch (error) {
       lastSpeechError = error instanceof Error ? error.message : String(error);
     }
@@ -171,7 +145,9 @@ export function speakTest(locale = "vi-VN") {
     lastSpeechError = "Safari chưa hỗ trợ đọc văn bản trên thiết bị này.";
     return;
   }
-  stopSpeech();
+  // Do not cancel an idle speech queue here; on iOS Safari that can swallow
+  // the utterance triggered by the current tap.
+  if (activeUtterance || synth.speaking || synth.pending) stopSpeech();
   const utterance = new SpeechSynthesisUtterance(
     locale.startsWith("en") ? "Hello! The sound is working." : "Xin chào! Âm thanh đang hoạt động tốt."
   );
