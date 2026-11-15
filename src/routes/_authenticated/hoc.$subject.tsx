@@ -5,7 +5,7 @@ import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
 import { generateLessonQuestions, loadSeenQuestionPrompts, saveSeenQuestionPrompts } from "@/game/questionBank";
 import { toast } from "sonner";
-import { primeSpeech, speakQuiz, speakFeedback, stopSpeech } from "@/lib/quizSpeech";
+import { speakQuiz, speakFeedback, stopSpeech } from "@/lib/quizSpeech";
 
 type Question = { prompt: string; choices: string[]; answer: number; hint: string };
 type Subject = "math" | "vietnamese" | "english";
@@ -37,15 +37,11 @@ function LessonRoom({ profile }: { profile: Profile }) {
   const correct = selected === question?.answer;
   const speechLocale = subject === "english" && question && !/[À-ỹ]/i.test(question.prompt) ? "en-US" : "vi-VN";
 
-  useEffect(() => {
-    if (!question || level === null || finished) return;
-    void speakQuiz(question.prompt, question.choices, speechLocale);
-    return () => stopSpeech();
-  }, [question?.prompt, question?.choices, level, finished, speechLocale]);
+  // Chỉ dừng giọng đọc khi rời phòng học. Trên iPhone Safari, phát âm thanh
+  // phải bắt đầu trực tiếp từ thao tác chạm, không gọi trễ trong useEffect.
+  useEffect(() => () => stopSpeech(), []);
 
   function startLevel(value: number) {
-    // Kích hoạt bộ đọc ngay trong thao tác chạm của bé (đặc biệt cần thiết trên iPhone Safari).
-    primeSpeech("vi-VN");
     const key = `${profile.id}-${profile.grade}-${subject}-${value}`;
     const seen = seenByLevel.current.get(key) ?? loadSeenQuestionPrompts(key);
     let nextSet = generateLessonQuestions(subject, value, profile.grade, seen, 5);
@@ -62,6 +58,11 @@ function LessonRoom({ profile }: { profile: Profile }) {
     saveSeenQuestionPrompts(key, seen);
     setQuestions(nextSet);
     setLevel(value); setIndex(0); setSelected(null); setScore(0); setEarnedPoints(0); setFinished(false);
+    const first = nextSet[0];
+    if (first) {
+      const locale = subject === "english" && !/[À-ỹ]/i.test(first.prompt) ? "en-US" : "vi-VN";
+      void speakQuiz(first.prompt, first.choices, locale, subject === "math");
+    }
   }
   function chooseAnswer(choice: number) {
     if (answered || finished || !question || level === null) return;
@@ -86,8 +87,18 @@ function LessonRoom({ profile }: { profile: Profile }) {
     }
   }
   function nextQuestion() {
-    if (index === questions.length - 1) setFinished(true);
-    else { setIndex(v => v + 1); setSelected(null); }
+    if (index === questions.length - 1) {
+      setFinished(true);
+    } else {
+      const nextIndex = index + 1;
+      const next = questions[nextIndex];
+      setIndex(nextIndex);
+      setSelected(null);
+      if (next) {
+        const locale = subject === "english" && !/[À-ỹ]/i.test(next.prompt) ? "en-US" : "vi-VN";
+        void speakQuiz(next.prompt, next.choices, locale, subject === "math");
+      }
+    }
   }
   function backToLevels() { setLevel(null); setIndex(0); setSelected(null); setScore(0); setFinished(false); }
 
