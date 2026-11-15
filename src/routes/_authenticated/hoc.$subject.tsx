@@ -5,7 +5,7 @@ import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
 import { generateLessonQuestions, loadSeenQuestionPrompts, saveSeenQuestionPrompts } from "@/game/questionBank";
 import { toast } from "sonner";
-import { speakQuiz, speakFeedback, stopSpeech } from "@/lib/quizSpeech";
+import { speakQuiz, speakFeedback, stopSpeech, speakTest } from "@/lib/quizSpeech";
 
 type Question = { prompt: string; choices: string[]; answer: number; hint: string };
 type Subject = "math" | "vietnamese" | "english";
@@ -145,7 +145,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
               ) : question ? (
                 <div className="mt-7">
                   <p className="text-sm font-extrabold text-primary">CÂU {index + 1} / {questions.length}</p>
-                  <h2 className="mt-3 text-2xl font-extrabold leading-snug">{question.prompt}</h2>
+                  <div className="mt-3 flex flex-wrap items-center justify-between gap-2"><h2 className="min-w-0 flex-1 text-2xl font-extrabold leading-snug">{question.prompt}</h2><div className="flex shrink-0 gap-2"><button type="button" onClick={() => speakTest(speechLocale)} className="rounded-xl border border-sky-300 bg-sky-50 px-3 py-2 text-sm font-extrabold text-sky-800">🔊 Nghe thử</button><button type="button" onClick={() => speakQuiz(question.prompt, question.choices, speechLocale, subject === "math")} className="rounded-xl bg-sky-600 px-3 py-2 text-sm font-extrabold text-white">📢 Đọc câu hỏi + đáp án</button></div></div>
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     {question.choices.map((choice, i) => {
                       const isCorrect = answered && i === question.answer;
