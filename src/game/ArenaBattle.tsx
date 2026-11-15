@@ -8,7 +8,7 @@ import type { Profile } from "@/hooks/use-player";
 import { toAvatar, type Avatar } from "@/lib/avatar";
 import type { Question } from "./learningEngine";
 import { createArenaQuestionSet } from "./arenaQuestionBank";
-import { primeSpeech, speakFeedback, speakQuiz, stopSpeech } from "@/lib/quizSpeech";
+import { primeSpeech, speakFeedback, speakQuiz, stopSpeech, speakTest } from "@/lib/quizSpeech";
 
 type Phase = "waiting" | "countdown" | "playing" | "finished";
 type ArenaPlayer = {
@@ -492,7 +492,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
           <h2 className="mt-2 text-xl font-black text-amber-200">CÁC THÍ SINH VÀO VỊ TRÍ!</h2>
           <p className="mt-2 text-sm text-sky-100">Mỗi bé phải nhấn SẴN SÀNG. Bé bấm trước sẽ đứng chờ; đủ cả 2 bé sẵn sàng, trận đấu tự động bắt đầu.</p>
           <p className="mt-3 text-sm font-black text-amber-200">{players.filter((player) => player.ready).length}/{Math.max(2, players.length)} bé đã sẵn sàng</p>
-          <button onClick={markReady} disabled={players.some((player) => player.id === profile.id && player.ready)} className="mt-4 rounded-full bg-emerald-400 px-9 py-4 text-lg font-black text-slate-950 shadow-lg transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60">{players.some((player) => player.id === profile.id && player.ready) ? "✓ CON ĐÃ SẴN SÀNG" : "🙋 SẴN SÀNG"}</button>
+          <div className="mt-4 flex flex-wrap justify-center gap-2"><button onClick={() => speakTest("vi-VN")} className="rounded-full border border-sky-200 bg-sky-100 px-5 py-3 font-black text-sky-900">🔊 Nghe thử</button><button onClick={markReady} disabled={players.some((player) => player.id === profile.id && player.ready)} className="rounded-full bg-emerald-400 px-9 py-4 text-lg font-black text-slate-950 shadow-lg transition hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60">{players.some((player) => player.id === profile.id && player.ready) ? "✓ CON ĐÃ SẴN SÀNG" : "🙋 SẴN SÀNG"}</button></div>
         </section>
       )}
 
@@ -544,7 +544,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
             <span>🎲 CÂU HỎI NGẪU NHIÊN • {subject.toUpperCase()}</span>
             <span>CÂU {questionIndex}/{QUESTIONS_PER_MATCH}</span>
           </div>
-          <h2 className="mt-4 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
+          <div className="mt-3 flex justify-end"><button onClick={() => speakQuiz(question.question, question.options, question.subject === "english" ? "en-US" : "vi-VN", question.subject === "math")} className="rounded-full border border-sky-200 bg-sky-100 px-4 py-2 text-sm font-black text-sky-900">🔊 Đọc lại câu hỏi</button></div><h2 className="mt-2 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {question.options.map((option, index) => {
               const right = selected !== null && option === question.correctAnswer;
