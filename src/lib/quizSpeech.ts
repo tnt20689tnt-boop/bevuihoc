@@ -1,4 +1,6 @@
-type SpeechState = "ready" | "unsupported" | "loading-voices" | "speaking" | "error";
+type SpeechState = "ready" | "unsupported" | "loading-voices" | "speaking" | "paused" | "error";
+let isMuted = false;
+try { isMuted = typeof window !== "undefined" && window.localStorage.getItem("bevuihoc_speech_muted") === "true"; } catch { /* Storage may be unavailable in private browsing. */ }
 let activeUtterance: SpeechSynthesisUtterance | null = null;
 let runToken = 0;
 let speechState: SpeechState = "ready";
@@ -26,6 +28,8 @@ export function getSpeechStatus() {
     error: lastSpeechError,
     voices: synth?.getVoices().length ?? 0,
     speaking: Boolean(synth?.speaking),
+    paused: Boolean(synth?.paused),
+    isMuted,
   };
 }
 
@@ -84,7 +88,7 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
     lastSpeechError = "Thiết bị hoặc trình duyệt không hỗ trợ Speech Synthesis.";
     return Promise.resolve();
   }
-  if (token !== runToken || !text.trim()) return Promise.resolve();
+  if (isMuted || token !== runToken || !text.trim()) return Promise.resolve();
 
   return new Promise((resolve) => {
     let settled = false;
@@ -138,6 +142,39 @@ export function naturalizeMath(text: string): string {
     .replace(/=/g, " bằng ")
     .replace(/[\t ]{2,}/g, " ")
     .trim();
+}
+
+export function detectLocale(text: string, defaultSubject?: string): string {
+  if (defaultSubject === "english" && !/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(text)) return "en-US";
+  return "vi-VN";
+}
+
+export function isSpeechMuted(): boolean { return isMuted; }
+
+export function setSpeechMuted(muted: boolean) {
+  isMuted = muted;
+  try { if (typeof window !== "undefined") window.localStorage.setItem("bevuihoc_speech_muted", String(muted)); } catch { /* Ignore unavailable storage. */ }
+  if (muted) stopSpeech();
+}
+
+export function pauseSpeech() {
+  const synth = getSpeech();
+  if (synth?.speaking && !synth.paused) {
+    try { synth.pause(); speechState = "paused"; } catch { /* Browser may reject pause. */ }
+  }
+}
+
+export function resumeSpeech() {
+  const synth = getSpeech();
+  if (synth?.paused) {
+    try { synth.resume(); speechState = "speaking"; } catch { /* Browser may reject resume. */ }
+  }
+}
+
+export function togglePauseSpeech() {
+  const synth = getSpeech();
+  if (synth?.paused) resumeSpeech();
+  else pauseSpeech();
 }
 
 export function speakTest(locale = "vi-VN") {
