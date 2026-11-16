@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GameShell } from "@/components/AppShell";
+import { SpeechControls } from "@/components/SpeechControls";
 import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
 import { generateLessonQuestions, loadSeenQuestionPrompts, saveSeenQuestionPrompts } from "@/game/questionBank";
@@ -145,7 +146,7 @@ function LessonRoom({ profile }: { profile: Profile }) {
               ) : question ? (
                 <div className="mt-7">
                   <p className="text-sm font-extrabold text-primary">CÂU {index + 1} / {questions.length}</p>
-                  <div className="mt-3 flex flex-col gap-4"><h2 className="w-full break-words text-2xl font-extrabold leading-snug">{question.prompt}</h2><div className="flex w-full flex-wrap gap-2"><button type="button" onClick={() => speakTest(speechLocale)} className="min-h-11 flex-1 rounded-xl border border-sky-300 bg-sky-50 px-3 py-2 text-sm font-extrabold text-sky-800">🔊 Nghe thử</button><button type="button" onClick={() => speakQuiz(question.prompt, question.choices, speechLocale, subject === "math")} className="min-h-11 flex-1 rounded-xl bg-sky-600 px-3 py-2 text-sm font-extrabold text-white">📢 Đọc câu hỏi + đáp án</button></div></div>
+                  <div className="mt-3 flex flex-col gap-4"><h2 className="w-full break-words text-2xl font-extrabold leading-snug">{question.prompt}</h2><SpeechControls question={question.prompt} options={question.choices} locale={speechLocale} isMath={subject === "math"} /></div>
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     {question.choices.map((choice, i) => {
                       const isCorrect = answered && i === question.answer;
