@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { naturalizeMath, speakQuizOption, stopSpeech } from "@/lib/quizSpeech";
+import { detectLocale, naturalizeMath, speakQuizOption, stopSpeech } from "@/lib/quizSpeech";
 
 class FakeUtterance {
   lang = "";
@@ -20,6 +20,16 @@ describe("quiz speech", () => {
 
   it("naturalizes arithmetic expressions for children", () => {
     expect(naturalizeMath("3 + 4 = ?")).toBe("3 cộng 4 bằng mấy?");
+  });
+
+  it("reads elementary measurement units and keeps question punctuation natural", () => {
+    expect(naturalizeMath("5 cm²; 3 + 4 = ?")).toContain("5 xăng ti mét vuông");
+    expect(naturalizeMath("3 + 4 = ?")).toBe("3 cộng 4 bằng mấy?");
+  });
+
+  it("detects Vietnamese instructions inside English lessons", () => {
+    expect(detectLocale("Choose the correct answer", "english")).toBe("en-US");
+    expect(detectLocale("Chọn đáp án đúng", "english")).toBe("vi-VN");
   });
 
   it("speaks a selected option with its letter and localized math wording", async () => {
