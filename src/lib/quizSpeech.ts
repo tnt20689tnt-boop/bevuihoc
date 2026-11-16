@@ -251,7 +251,7 @@ export async function speakQuiz(question: string, options: string[], locale = "v
   await speakOne((questionLocale.startsWith("en") ? "Question. " : "Câu hỏi: ") + spokenQuestion, questionLocale, token);
   for (let i = 0; i < options.length; i++) {
     if (token !== runToken || isMuted) return;
-    const option = (options[i] ?? "").replace(/^([A-D])\\.\\s*/, "");
+    const option = (options[i] ?? "").replace(/^([A-D])\.\s*/, "");
     const optionLocale = detectLocale(option, locale.startsWith("en") ? "english" : undefined);
     const spokenOption = math && optionLocale.startsWith("vi") ? naturalizeMath(option) : option;
     const prefix = optionLocale.startsWith("en") ? "Option" : "Đáp án";
