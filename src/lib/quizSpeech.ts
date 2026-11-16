@@ -168,7 +168,7 @@ export function naturalizeMath(text: string): string {
     .replace(/🐟/g, " con cá ")
     .replace(/⚖️/g, " cân đĩa ")
     .replace(/⏰|🕒/g, " đồng hồ ")
-    .replace(/\[\?\]|\?/g, " hỏi chấm ")
+    .replace(/\[\?\]/g, " hỏi chấm ")
     .replace(/\s{2,}/g, " ")
     .trim();
 }
