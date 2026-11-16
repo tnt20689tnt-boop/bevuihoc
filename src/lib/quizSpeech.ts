@@ -272,7 +272,7 @@ export function speakFeedback(correct: boolean, message: string, locale = "vi-VN
   stopSpeech();
   if (isMuted) return;
   const activeLocale = detectLocale(message, locale.startsWith("en") ? "english" : undefined);
-  const prefix = activeLocale.startsWith("en"
+  const prefix = activeLocale.startsWith("en")
     ? (correct ? "Correct! " : "Not quite. ")
     : (correct ? "Chính xác! " : "Chưa đúng. ");
   void speakOne(prefix + message, activeLocale, runToken);
