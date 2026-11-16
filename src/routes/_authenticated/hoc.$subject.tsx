@@ -6,7 +6,7 @@ import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
 import { generateLessonQuestions, loadSeenQuestionPrompts, saveSeenQuestionPrompts } from "@/game/questionBank";
 import { toast } from "sonner";
-import { speakQuiz, speakFeedback, speakQuizOption, stopSpeech, speakTest } from "@/lib/quizSpeech";
+import { speakQuiz, speakFeedback, speakQuizOption, stopSpeech } from "@/lib/quizSpeech";
 
 type Question = { prompt: string; choices: string[]; answer: number; hint: string };
 type Subject = "math" | "vietnamese" | "english";
