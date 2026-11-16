@@ -3,6 +3,7 @@ import { Canvas } from "@react-three/fiber";
 import { Html } from "@react-three/drei";
 import type { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
 import { Character3D, makeAnimState } from "@/game/Character3D";
+import { SpeechControls } from "@/components/SpeechControls";
 import { supabase } from "@/integrations/supabase/client";
 import type { Profile } from "@/hooks/use-player";
 import { toAvatar, type Avatar } from "@/lib/avatar";
@@ -544,7 +545,7 @@ export function ArenaBattle({ currentGrade, profile, onExit }: Props) {
             <span>🎲 CÂU HỎI NGẪU NHIÊN • {subject.toUpperCase()}</span>
             <span>CÂU {questionIndex}/{QUESTIONS_PER_MATCH}</span>
           </div>
-          <div className="mt-3 flex justify-end"><button onClick={() => speakQuiz(question.question, question.options, question.subject === "english" ? "en-US" : "vi-VN", question.subject === "math")} className="rounded-full border border-sky-200 bg-sky-100 px-4 py-2 text-sm font-black text-sky-900">🔊 Đọc lại câu hỏi</button></div><h2 className="mt-2 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2>
+          <h2 className="mt-3 text-center text-xl font-black leading-relaxed sm:text-2xl">{question.question}</h2><div className="mt-3"><SpeechControls question={question.question} options={question.options} locale={question.subject === "english" ? "en-US" : "vi-VN"} isMath={question.subject === "math"} /></div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
             {question.options.map((option, index) => {
               const right = selected !== null && option === question.correctAnswer;
