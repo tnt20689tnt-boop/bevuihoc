@@ -48,6 +48,7 @@ export function stopSpeech() {
 }
 
 export function primeSpeech(locale = "vi-VN") {
+  if (isMuted) return;
   const synth = getSpeech();
   if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
     speechState = "unsupported";
@@ -207,6 +208,7 @@ export function togglePauseSpeech() {
 }
 
 export function speakTest(locale = "vi-VN") {
+  if (isMuted) return;
   const synth = getSpeech();
   if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
     speechState = "unsupported";
@@ -242,27 +244,38 @@ export function speakTest(locale = "vi-VN") {
 
 export async function speakQuiz(question: string, options: string[], locale = "vi-VN", math = false) {
   stopSpeech();
+  if (isMuted) return;
   const token = runToken;
-  const spokenQuestion = math && locale.startsWith("vi") ? naturalizeMath(question) : question;
-  await speakOne((locale.startsWith("en") ? "Question. " : "Câu hỏi. ") + spokenQuestion, locale, token);
+  const questionLocale = detectLocale(question, locale.startsWith("en") ? "english" : undefined);
+  const spokenQuestion = math && questionLocale.startsWith("vi") ? naturalizeMath(question) : question;
+  await speakOne((questionLocale.startsWith("en") ? "Question. " : "Câu hỏi: ") + spokenQuestion, questionLocale, token);
   for (let i = 0; i < options.length; i++) {
-    if (token !== runToken) return;
-    const option = (options[i] ?? "").replace(/^([A-D])\.\s*/, "");
-    await speakOne(`${locale.startsWith("en") ? "Option" : "Đáp án"} ${["A", "B", "C", "D"][i] ?? i + 1}. ${math && locale.startsWith("vi") ? naturalizeMath(option) : option}`, locale, token);
+    if (token !== runToken || isMuted) return;
+    const option = (options[i] ?? "").replace(/^([A-D])\\.\\s*/, "");
+    const optionLocale = detectLocale(option, locale.startsWith("en") ? "english" : undefined);
+    const spokenOption = math && optionLocale.startsWith("vi") ? naturalizeMath(option) : option;
+    const prefix = optionLocale.startsWith("en") ? "Option" : "Đáp án";
+    await speakOne(prefix + " " + (["A", "B", "C", "D"][i] ?? (i + 1)) + ". " + spokenOption, optionLocale, token);
   }
 }
 
 export function speakQuizOption(option: string, index: number, locale = "vi-VN", math = false) {
+  if (isMuted) return;
   const letter = ["A", "B", "C", "D"][index] ?? String(index + 1);
-  const spokenOption = math && locale.startsWith("vi") ? naturalizeMath(option) : option;
-  const prefix = locale.startsWith("en") ? `Option ${letter}.` : `Đáp án ${letter}.`;
-  void speakSequence([`${prefix} ${spokenOption}`], locale);
+  const activeLocale = detectLocale(option, locale.startsWith("en") ? "english" : undefined);
+  const spokenOption = math && activeLocale.startsWith("vi") ? naturalizeMath(option) : option;
+  const prefix = activeLocale.startsWith("en") ? "Option " + letter + "." : "Đáp án " + letter + ".";
+  void speakSequence([prefix + " " + spokenOption], activeLocale);
 }
 
 export function speakFeedback(correct: boolean, message: string, locale = "vi-VN") {
   stopSpeech();
-  const token = runToken;
-  void speakOne((locale.startsWith("en") ? (correct ? "Correct! " : "Not quite. ") : (correct ? "Chính xác! " : "Chưa đúng. ")) + message, locale, token);
+  if (isMuted) return;
+  const activeLocale = detectLocale(message, locale.startsWith("en") ? "english" : undefined);
+  const prefix = activeLocale.startsWith("en"
+    ? (correct ? "Correct! " : "Not quite. ")
+    : (correct ? "Chính xác! " : "Chưa đúng. ");
+  void speakOne(prefix + message, activeLocale, runToken);
 }
 
 export async function speakSequence(lines: string[], locale = "vi-VN") {
