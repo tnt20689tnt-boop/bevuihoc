@@ -5,7 +5,7 @@ import { createLibraryPdf } from "@/game/libraryPdf";
 import { getLibraryVolume, LIBRARY_VOLUMES } from "@/game/libraryCurriculum";
 import { useGeneratedExam, type ExamSubject, type ExamTerm, type GeneratedQuestion } from "@/hooks/useGeneratedExam";
 import type { Grade } from "./types";
-import { primeSpeech, speakQuiz, speakFeedback, speakSequence, naturalizeMath, stopSpeech, speakTest } from "@/lib/quizSpeech";
+import { primeSpeech, speakQuiz, speakFeedback, speakSequence, naturalizeMath, stopSpeech } from "@/lib/quizSpeech";
 
 type Props = { grade: Grade; requestedSubject?: ExamSubject | null; onRequestHandled?: () => void };
 type Doc = { title: string; author: string; year: number; pages?: number; fileUrl?: string };
