@@ -35,7 +35,7 @@ export function SpeechControls({ question, options, locale = "vi-VN", isMath = f
     return () => window.clearInterval(interval);
   }, []);
 
-  useEffect(() => () => stopSpeech(), [question]);
+  useEffect(() => () => stopSpeech(), []);
 
   const replay = () => {
     if (!muted) void speakQuiz(question, options, locale, isMath);
