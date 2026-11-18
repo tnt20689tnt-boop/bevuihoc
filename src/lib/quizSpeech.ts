@@ -166,7 +166,7 @@ export function naturalizeMath(text: string): string {
     .replace(/(\d+)\s*ml\b/gi, "$1 mi li lít")
     .replace(/(\d+)\s*cl\b/gi, "$1 xăng ti lít")
     .replace(/(\d+)\s*dl\b/gi, "$1 đề xi lít")
-    .replace(/(\d+)\s*(g|l)\b/gi, (_m, n: string, unit: string) => unit.toLowerCase() === "g" ? \`\${n} gam\` : \`\${n} lít\`)
+    .replace(/(\d+)\s*(g|l)\b/gi, (_m, n: string, unit: string) => unit.toLowerCase() === "g" ? n + " gam" : n + " lít")
     .replace(/(\d+)\s*°\s*C/gi, "$1 độ xê")
     .replace(/🍎/g, " quả táo ")
     .replace(/🍌/g, " quả chuối ")
