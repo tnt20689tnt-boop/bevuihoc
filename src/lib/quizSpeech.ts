@@ -2,6 +2,8 @@ type SpeechState = "ready" | "unsupported" | "loading-voices" | "speaking" | "pa
 let isMuted = false;
 try { isMuted = typeof window !== "undefined" && window.localStorage.getItem("bevuihoc_speech_muted") === "true"; } catch { /* Storage may be unavailable in private browsing. */ }
 let activeUtterance: SpeechSynthesisUtterance | null = null;
+let currentAudio: HTMLAudioElement | null = null;
+let currentAudioUrl: string | null = null;
 let runToken = 0;
 let speechState: SpeechState = "ready";
 let lastSpeechError: string | null = null;
@@ -20,15 +22,92 @@ function selectVoice(voices: SpeechSynthesisVoice[], locale: string) {
     ?? voices[0];
 }
 
+function hasNativeVoice(locale: string): boolean {
+  const synth = getSpeech();
+  if (!synth) return false;
+  const prefix = locale.toLowerCase().slice(0, 2);
+  return synth.getVoices().some((voice) => voice.lang.toLowerCase().startsWith(prefix));
+}
+
+function releaseCloudAudio(audio: HTMLAudioElement, url: string) {
+  audio.onended = null;
+  audio.onerror = null;
+  if (currentAudio === audio) currentAudio = null;
+  if (currentAudioUrl === url) currentAudioUrl = null;
+  try {
+    audio.pause();
+    audio.removeAttribute("src");
+    audio.load();
+  } catch { /* Ignore browser cleanup errors. */ }
+  URL.revokeObjectURL(url);
+}
+
+async function playCloudTts(text: string, token: number): Promise<void> {
+  if (token !== runToken || isMuted || !text.trim()) return;
+  let url: string | null = null;
+  let audio: HTMLAudioElement | null = null;
+
+  try {
+    const response = await fetch("/api/public/speech", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: text.slice(0, 300) }),
+    });
+    if (!response.ok) {
+      const detail = await response.text().catch(() => "");
+      throw new Error(detail || `Cloud TTS failed (${response.status})`);
+    }
+    if (token !== runToken || isMuted) return;
+
+    const blob = await response.blob();
+    if (!blob.size) throw new Error("Máy chủ không trả về dữ liệu âm thanh.");
+    if (token !== runToken || isMuted) return;
+
+    url = URL.createObjectURL(blob);
+    audio = new Audio(url);
+    currentAudio = audio;
+    currentAudioUrl = url;
+    speechState = "speaking";
+    lastSpeechError = null;
+
+    await new Promise<void>((resolve) => {
+      let settled = false;
+      const finish = (error?: string) => {
+        if (settled) return;
+        settled = true;
+        if (error && token === runToken) {
+          speechState = "error";
+          lastSpeechError = error;
+        } else if (token === runToken) {
+          speechState = "ready";
+        }
+        releaseCloudAudio(audio!, url!);
+        resolve();
+      };
+      audio!.onended = () => finish();
+      audio!.onerror = () => finish("Không phát được tệp giọng đọc AI.");
+      audio!.play().catch((error: unknown) => {
+        finish(error instanceof Error ? error.message : "Trình duyệt chưa cho phép phát âm thanh. Hãy chạm nút Nghe thử.");
+      });
+    });
+  } catch (error) {
+    if (audio && url) releaseCloudAudio(audio, url);
+    if (token === runToken) {
+      speechState = "error";
+      lastSpeechError = error instanceof Error ? error.message : "Không tạo được giọng đọc AI.";
+    }
+  }
+}
+
 export function getSpeechStatus() {
   const synth = getSpeech();
   return {
-    supported: Boolean(synth && typeof SpeechSynthesisUtterance !== "undefined"),
+    supported: Boolean((synth && typeof SpeechSynthesisUtterance !== "undefined") || typeof window !== "undefined"),
     state: speechState,
     error: lastSpeechError,
     voices: synth?.getVoices().length ?? 0,
-    speaking: Boolean(synth?.speaking),
-    paused: Boolean(synth?.paused),
+    speaking: Boolean(synth?.speaking || currentAudio),
+    paused: Boolean(synth?.paused || currentAudio?.paused),
     isMuted,
   };
 }
@@ -36,15 +115,16 @@ export function getSpeechStatus() {
 export function stopSpeech() {
   runToken += 1;
   const synth = getSpeech();
-  // Avoid calling cancel() when idle: iOS Safari can silence the next utterance
-  // if cancel() races with a fresh speak() from the same tap.
   if (synth && (activeUtterance || synth.speaking || synth.pending)) {
     try { synth.cancel(); } catch (error) {
       lastSpeechError = error instanceof Error ? error.message : String(error);
     }
   }
+  if (currentAudio && currentAudioUrl) {
+    releaseCloudAudio(currentAudio, currentAudioUrl);
+  }
   activeUtterance = null;
-  if (speechState === "speaking") speechState = "ready";
+  speechState = "ready";
 }
 
 export function primeSpeech(locale = "vi-VN") {
@@ -83,51 +163,70 @@ export function primeSpeech(locale = "vi-VN") {
 }
 
 function speakOne(text: string, locale: string, token: number): Promise<void> {
+  if (isMuted || token !== runToken || !text.trim()) return Promise.resolve();
   const synth = getSpeech();
-  if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
+  const canUseNative = Boolean(synth && typeof SpeechSynthesisUtterance !== "undefined" && hasNativeVoice(locale));
+
+  if (!canUseNative) {
+    if (locale.startsWith("vi")) return playCloudTts(text, token);
     speechState = "unsupported";
-    lastSpeechError = "Thiết bị hoặc trình duyệt không hỗ trợ Speech Synthesis.";
+    lastSpeechError = "Thiết bị chưa có giọng đọc phù hợp cho ngôn ngữ này.";
     return Promise.resolve();
   }
-  if (isMuted || token !== runToken || !text.trim()) return Promise.resolve();
 
   return new Promise((resolve) => {
     let settled = false;
+    let fallbackStarted = false;
     let fallbackTimer: number | undefined;
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = locale;
+    utterance.rate = 0.9;
+    utterance.pitch = 1;
+    utterance.volume = 0.9;
+    const voice = selectVoice(synth!.getVoices(), locale);
+    if (voice) utterance.voice = voice;
+
     const finish = (error?: string) => {
       if (settled) return;
       settled = true;
-      if (fallbackTimer !== undefined) window.clearTimeout(fallbackTimer);
+      if (fallbackTimer !== undefined && typeof window !== "undefined") window.clearTimeout(fallbackTimer);
       if (activeUtterance === utterance) activeUtterance = null;
-      if (error) {
-        lastSpeechError = error;
+      if (error && token === runToken) {
         speechState = "error";
+        lastSpeechError = error;
       } else if (token === runToken) {
         speechState = "ready";
       }
       resolve();
     };
 
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = locale;
-    utterance.rate = 0.9;
-    utterance.pitch = 1;
-    utterance.volume = 0.85;
-    const voices = synth.getVoices();
-    const voice = selectVoice(voices, locale);
-    if (voice) utterance.voice = voice;
+    const fallbackToCloud = (error: string) => {
+      if (settled || fallbackStarted) return;
+      fallbackStarted = true;
+      if (fallbackTimer !== undefined) window.clearTimeout(fallbackTimer);
+      if (activeUtterance === utterance) activeUtterance = null;
+      if (locale.startsWith("vi") && token === runToken && !isMuted) {
+        void playCloudTts(text, token).then(() => finish());
+      } else {
+        finish(error);
+      }
+    };
+
     utterance.onend = () => finish();
-    utterance.onerror = (event) => finish(event.error || "Trình duyệt từ chối phát âm thanh.");
+    utterance.onerror = (event) => fallbackToCloud(event.error || "Trình duyệt không phát được giọng đọc.");
     activeUtterance = utterance;
     speechState = "speaking";
     lastSpeechError = null;
+
     try {
-      synth.speak(utterance);
-      synth.resume();
-      // Prevent a browser speech queue from leaving the next answer stuck forever.
-      fallbackTimer = window.setTimeout(() => finish("Đọc quá thời gian chờ. Hãy chạm nút Nghe thử để bật lại âm thanh."), 20000);
+      synth!.speak(utterance);
+      synth!.resume();
+      fallbackTimer = window.setTimeout(
+        () => fallbackToCloud("Giọng đọc của trình duyệt bị treo."),
+        20000,
+      );
     } catch (error) {
-      finish(error instanceof Error ? error.message : String(error));
+      fallbackToCloud(error instanceof Error ? error.message : "Không khởi động được giọng đọc.");
     }
   });
 }

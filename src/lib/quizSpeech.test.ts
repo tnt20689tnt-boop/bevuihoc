@@ -43,7 +43,7 @@ describe("quiz speech", () => {
     const utterances: FakeUtterance[] = [];
     const synthesis = {
       cancel: vi.fn(),
-      getVoices: () => [],
+      getVoices: () => [{ lang: "vi-VN" }] as SpeechSynthesisVoice[],
       resume: vi.fn(),
       speak: (utterance: FakeUtterance) => {
         utterances.push(utterance);
