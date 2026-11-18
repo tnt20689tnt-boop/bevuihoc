@@ -136,9 +136,12 @@ export function primeSpeech(locale = "vi-VN") {
 function speakOne(text: string, locale: string, token: number): Promise<void> {
   if (isMuted || token !== runToken || !text.trim()) return Promise.resolve();
   const synth = getSpeech();
-  // Dùng bộ đọc trình duyệt ngay cả khi danh sách giọng tạm thời trống (Safari/iOS)
-  const canUseNative = Boolean(synth && typeof SpeechSynthesisUtterance !== "undefined");
+  // Chỉ dùng bộ đọc của máy khi thực sự có giọng đọc phù hợp (hasNativeVoice)
+  const canUseNative = Boolean(
+    synth && typeof SpeechSynthesisUtterance !== "undefined" && hasNativeVoice(locale)
+  );
 
+  // Nếu máy không có giọng tiếng Việt, chuyển ngay sang giọng đọc AI
   if (!canUseNative) {
     if (locale.startsWith("vi")) return playCloudTts(text, token);
     speechState = "unsupported";
