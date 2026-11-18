@@ -129,37 +129,8 @@ export function stopSpeech() {
 
 export function primeSpeech(locale = "vi-VN") {
   if (isMuted) return;
-  const synth = getSpeech();
-  if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
-    speechState = "unsupported";
-    lastSpeechError = "Trình duyệt không hỗ trợ đọc văn bản.";
-    return;
-  }
-  try {
-    // Called directly by a real user gesture (e.g. pressing Ready/Start).
-    const utterance = new SpeechSynthesisUtterance(locale.startsWith("en") ? "Audio is ready." : "Âm thanh đã sẵn sàng.");
-    utterance.lang = locale;
-    utterance.rate = 0.9;
-    utterance.volume = 0.65;
-    const voices = synth.getVoices();
-    const voice = selectVoice(voices, locale);
-    if (voice) utterance.voice = voice;
-    activeUtterance = utterance;
-    utterance.onend = () => { if (activeUtterance === utterance) activeUtterance = null; };
-    utterance.onerror = (event) => {
-      if (activeUtterance === utterance) activeUtterance = null;
-      lastSpeechError = event.error || "Không phát được âm thanh.";
-      speechState = "error";
-    };
-    synth.speak(utterance);
-    synth.resume();
-    speechState = "speaking";
-    lastSpeechError = null;
-  } catch (error) {
-    activeUtterance = null;
-    speechState = "error";
-    lastSpeechError = error instanceof Error ? error.message : String(error);
-  }
+  const sample = locale.startsWith("en") ? "Audio is ready." : "Âm thanh đã sẵn sàng.";
+  void speakOne(sample, locale, runToken);
 }
 
 function speakOne(text: string, locale: string, token: number): Promise<void> {
@@ -206,7 +177,7 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
       if (fallbackTimer !== undefined) window.clearTimeout(fallbackTimer);
       if (activeUtterance === utterance) activeUtterance = null;
       if (locale.startsWith("vi") && token === runToken && !isMuted) {
-        void playCloudTts(text, token).then(() => finish());
+        void playCloudTts(text, token).then(() => finish(speechState === "error" ? (lastSpeechError ?? "Không phát được giọng đọc AI.") : undefined));
       } else {
         finish(error);
       }
@@ -323,36 +294,11 @@ export function togglePauseSpeech() {
 export function speakTest(locale = "vi-VN") {
   if (isMuted) return;
   const synth = getSpeech();
-  if (!synth || typeof SpeechSynthesisUtterance === "undefined") {
-    speechState = "unsupported";
-    lastSpeechError = "Safari chưa hỗ trợ đọc văn bản trên thiết bị này.";
-    return;
-  }
-  // Do not cancel an idle speech queue here; on iOS Safari that can swallow
-  // the utterance triggered by the current tap.
-  if (activeUtterance || synth.speaking || synth.pending) stopSpeech();
-  const utterance = new SpeechSynthesisUtterance(
-    locale.startsWith("en") ? "Hello! The sound is working." : "Xin chào! Âm thanh đang hoạt động tốt."
-  );
-  utterance.lang = locale;
-  utterance.rate = 0.88;
-  utterance.volume = 1;
-  const voice = selectVoice(synth.getVoices(), locale);
-  if (voice) utterance.voice = voice;
-  utterance.onend = () => { speechState = "ready"; };
-  utterance.onerror = (event) => {
-    speechState = "error";
-    lastSpeechError = event.error || "Không phát được âm thanh.";
-  };
-  try {
-    speechState = "speaking";
-    lastSpeechError = null;
-    synth.speak(utterance);
-    synth.resume();
-  } catch (error) {
-    speechState = "error";
-    lastSpeechError = error instanceof Error ? error.message : String(error);
-  }
+  if (activeUtterance || currentAudio || synth?.speaking || synth?.pending) stopSpeech();
+  const sample = locale.startsWith("en")
+    ? "Hello! The sound is working."
+    : "Xin chào! Âm thanh đang hoạt động tốt.";
+  void speakOne(sample, locale, runToken);
 }
 
 export async function speakQuiz(question: string, options: string[], locale = "vi-VN", math = false) {
