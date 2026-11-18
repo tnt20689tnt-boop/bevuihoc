@@ -134,25 +134,40 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
 
 export function naturalizeMath(text: string): string {
   return text
+    .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 phần $2")
     .replace(/(\d+)\s*\+\s*(\d+)/g, "$1 cộng $2")
     .replace(/(\d+)\s*[-−]\s*(\d+)/g, "$1 trừ $2")
     .replace(/(\d+)\s*[×x*]\s*(\d+)/gi, "$1 nhân $2")
     .replace(/(\d+)\s*[÷:]\s*(\d+)/g, "$1 chia $2")
-    .replace(/(\d+)\s*\/\s*(\d+)/g, "$1 phần $2")
+    .replace(/(\d+)[,.](\d+)/g, "$1 phẩy $2")
     .replace(/=\s*\?/g, " bằng mấy?")
     .replace(/=/g, " bằng ")
-    .replace(/(\d+)\s*cm²(?=\s|$|[.,!?;:])/gi, "$1 xăng ti mét vuông")
-    .replace(/(\d+)\s*dm²(?=\s|$|[.,!?;:])/gi, "$1 đề xi mét vuông")
-    .replace(/(\d+)\s*km²(?=\s|$|[.,!?;:])/gi, "$1 ki lô mét vuông")
-    .replace(/(\d+)\s*m²(?=\s|$|[.,!?;:])/gi, "$1 mét vuông")
+    .replace(/(\d+)\s*km²\b/gi, "$1 ki lô mét vuông")
+    .replace(/(\d+)\s*hm²\b/gi, "$1 héc tô mét vuông")
+    .replace(/(\d+)\s*dam²\b/gi, "$1 đề ca mét vuông")
+    .replace(/(\d+)\s*dm²\b/gi, "$1 đề xi mét vuông")
+    .replace(/(\d+)\s*cm²\b/gi, "$1 xăng ti mét vuông")
+    .replace(/(\d+)\s*mm²\b/gi, "$1 mi li mét vuông")
+    .replace(/(\d+)\s*m²\b/gi, "$1 mét vuông")
+    .replace(/(\d+)\s*dm³\b/gi, "$1 đề xi mét khối")
+    .replace(/(\d+)\s*cm³\b/gi, "$1 xăng ti mét khối")
+    .replace(/(\d+)\s*m³\b/gi, "$1 mét khối")
     .replace(/(\d+)\s*km\b/gi, "$1 ki lô mét")
+    .replace(/(\d+)\s*hm\b/gi, "$1 héc tô mét")
+    .replace(/(\d+)\s*dam\b/gi, "$1 đề ca mét")
     .replace(/(\d+)\s*dm\b/gi, "$1 đề xi mét")
     .replace(/(\d+)\s*cm\b/gi, "$1 xăng ti mét")
     .replace(/(\d+)\s*mm\b/gi, "$1 mi li mét")
     .replace(/(\d+)\s*kg\b/gi, "$1 ki lô gam")
+    .replace(/(\d+)\s*mg\b/gi, "$1 mi li gam")
+    .replace(/(\d+)\s*dag\b/gi, "$1 đề ca gam")
+    .replace(/(\d+)\s*dg\b/gi, "$1 đề xi gam")
+    .replace(/(\d+)\s*cg\b/gi, "$1 xăng ti gam")
     .replace(/(\d+)\s*ml\b/gi, "$1 mi li lít")
-    .replace(/(\d+)\s*g\b/gi, "$1 gam")
-    .replace(/(\d+)\s*l\b/gi, "$1 lít")
+    .replace(/(\d+)\s*cl\b/gi, "$1 xăng ti lít")
+    .replace(/(\d+)\s*dl\b/gi, "$1 đề xi lít")
+    .replace(/(\d+)\s*(g|l)\b/gi, (_m, n: string, unit: string) => unit.toLowerCase() === "g" ? \`\${n} gam\` : \`\${n} lít\`)
+    .replace(/(\d+)\s*°\s*C/gi, "$1 độ xê")
     .replace(/🍎/g, " quả táo ")
     .replace(/🍌/g, " quả chuối ")
     .replace(/🍊/g, " quả cam ")
@@ -173,7 +188,6 @@ export function naturalizeMath(text: string): string {
     .replace(/\s{2,}/g, " ")
     .trim();
 }
-
 export function detectLocale(text: string, defaultSubject?: string): string {
   if (defaultSubject === "english" && !/[àáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữỳýỵỷỹđ]/i.test(text)) return "en-US";
   return "vi-VN";

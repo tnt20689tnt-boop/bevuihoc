@@ -27,6 +27,13 @@ describe("quiz speech", () => {
     expect(naturalizeMath("3 + 4 = ?")).toBe("3 cộng 4 bằng mấy?");
   });
 
+  it("reads elementary fractions, decimals and measurement units naturally", () => {
+    expect(naturalizeMath("3/4")).toBe("3 phần 4");
+    expect(naturalizeMath("2,5 kg")).toBe("2 phẩy 5 ki lô gam");
+    expect(naturalizeMath("12 km; 5 m²; 250 ml")).toContain("12 ki lô mét");
+    expect(naturalizeMath("5 m²")).toBe("5 mét vuông");
+  });
+
   it("detects Vietnamese instructions inside English lessons", () => {
     expect(detectLocale("Choose the correct answer", "english")).toBe("en-US");
     expect(detectLocale("Chọn đáp án đúng", "english")).toBe("vi-VN");

@@ -2,6 +2,14 @@
 import { useSettings } from "@/stores/settings";
 
 let ctx: AudioContext | null = null;
+const activeSources = new Set<AudioScheduledSourceNode>();
+
+export function stopAllSound() {
+  for (const source of activeSources) {
+    try { source.stop(); } catch { /* Source may have already ended. */ }
+  }
+  activeSources.clear();
+}
 
 function audio(): AudioContext | null {
   if (typeof window === "undefined") return null;
@@ -27,6 +35,8 @@ function tone(freq: number, start: number, dur: number, type: OscillatorType = "
   g.gain.exponentialRampToValueAtTime(vol, t0 + 0.02);
   g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
   o.connect(g).connect(a.destination);
+  activeSources.add(o);
+  o.onended = () => activeSources.delete(o);
   o.start(t0);
   o.stop(t0 + dur + 0.05);
 }
@@ -46,6 +56,8 @@ function noise(start: number, dur: number, vol = 0.12) {
   const g = a.createGain();
   g.gain.value = vol;
   src.connect(f).connect(g).connect(a.destination);
+  activeSources.add(src);
+  src.onended = () => activeSources.delete(src);
   src.start(a.currentTime + start);
 }
 
