@@ -33,7 +33,7 @@ export function CampusHUD({
 
   useEffect(() => {
     setSpeechMuted(muted);
-    return () => stopSpeech();
+    return () => { stopSpeech(); stopAllSound(); };
   }, [muted, roomId]);
 
   const toggleAudio = () => {

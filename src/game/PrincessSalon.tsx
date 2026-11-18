@@ -105,6 +105,7 @@ export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Pr
       const nextAvatar: SalonAvatar = { ...saved, hairColor: look.hair, makeup: look, princessLooks: looks };
       const { error } = await supabase.from("profiles").update({ avatar: nextAvatar }).eq("id", profile.id);
       if (error) throw error;
+      sfx.correct();
       toast.success("Đã lưu 12 nàng công chúa của bé! ✨");
       setDone(true);
     } catch {
