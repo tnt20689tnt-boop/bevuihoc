@@ -4,6 +4,7 @@ import type { Profile } from "@/hooks/use-player";
 import { takeFootballShot } from "@/game/football.functions";
 import type { FootballDirection } from "@/lib/football-scoring";
 import { toast } from "sonner";
+import { sfx } from "@/lib/sound";
 
 const lanes: { id: FootballDirection; label: string; arrow: string }[] = [
   { id: "left", label: "GÓC TRÁI", arrow: "↖" },
@@ -40,6 +41,7 @@ export function FootballGame({ profile }: { profile: Profile }) {
     }
     if (round >= 5 && nextPlayerScore !== nextOpponentScore) {
       setGameOver(true);
+      if (nextPlayerScore > nextOpponentScore) sfx.fanfare(); else sfx.whistle();
       toast.success(nextPlayerScore > nextOpponentScore ? "Bé chiến thắng loạt sút!" : "Đối thủ thắng lượt này, bé cố gắng lần sau nhé!");
       return;
     }
@@ -53,6 +55,7 @@ export function FootballGame({ profile }: { profile: Profile }) {
   async function playerShoot() {
     if (busy || gameOver) return;
     setBusy(true);
+    sfx.kick();
     setOutcome(null);
     setShotDirection(aim);
     try {
@@ -61,6 +64,7 @@ export function FootballGame({ profile }: { profile: Profile }) {
       setPlayerScore(nextPlayerScore);
       setKeeperDirection(result.goalkeeperDirection);
       setOutcome({ scored: result.scored, byPlayer: true, text: result.scored ? "BẠN GHI BÀN!" : "THỦ MÔN CẢN PHÁ!" });
+      if (result.scored) sfx.goal(); else sfx.save();
       if (result.scored) {
         toast.success(`Ghi bàn! +${result.points} điểm ⚽`);
         if (result.newBadges.length) toast.success("Bé vừa nhận huy hiệu mới!");
@@ -81,6 +85,7 @@ export function FootballGame({ profile }: { profile: Profile }) {
   function playerSave() {
     if (busy || gameOver) return;
     setBusy(true);
+    sfx.kick();
     const aiShot = lanes[Math.floor(Math.random() * lanes.length)]!.id;
     setShotDirection(aiShot);
     setKeeperDirection(keeperAim);
@@ -88,6 +93,7 @@ export function FootballGame({ profile }: { profile: Profile }) {
     const nextOpponentScore = opponentScore + (saved ? 0 : 1);
     setOpponentScore(nextOpponentScore);
     setOutcome({ scored: !saved, byPlayer: false, text: saved ? "BẠN CẢN PHÁ!" : "ĐỐI THỦ GHI BÀN!" });
+    if (saved) sfx.save(); else sfx.goal();
     window.setTimeout(() => {
       setOutcome(null);
       setKeeperDirection(null);

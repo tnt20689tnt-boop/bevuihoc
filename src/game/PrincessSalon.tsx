@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import type { Avatar } from "@/lib/avatar";
 import type { Profile } from "@/hooks/use-player";
+import { sfx } from "@/lib/sound";
 
 type Makeup = { lipstick: string; blush: string; shadow: string; hair: string };
 type ModelLook = { hair: string; top: string; bottom: string; shoes: string; accessory: string };
@@ -59,16 +60,19 @@ export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Pr
   const look: Makeup = looks[activeId] ?? defaultLook(princess);
 
   function update(type: keyof Makeup, color: string) {
+    sfx.click();
     setLooks((prev) => ({ ...prev, [activeId]: { ...(prev[activeId] ?? defaultLook(princess)), [type]: color } }));
     setDone(false);
   }
 
   function resetLook() {
+    sfx.pop();
     setLooks((prev) => ({ ...prev, [activeId]: { lipstick: "#ff6b81", blush: "transparent", shadow: "transparent", hair: princess.hair } }));
     setDone(false);
   }
 
   function addSticker(emoji: string) {
+    sfx.pop();
     setStickers((prev) => [...prev, { id: Date.now() + Math.random(), emoji, x: 50, y: 18 + (prev.length % 4) * 12 }]);
   }
 
@@ -86,6 +90,7 @@ export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Pr
       const nextAvatar: SalonAvatar = { ...saved, modelLook };
       const { error } = await supabase.from("profiles").update({ avatar: nextAvatar }).eq("id", profile.id);
       if (error) throw error;
+      sfx.correct();
       toast.success("Đã lưu người mẫu của bé! 💖");
     } catch {
       toast.error("Chưa lưu được người mẫu. Bé thử lại nhé!");
@@ -123,7 +128,7 @@ export function PrincessSalon({ profile, initialMode = "makeup" }: { profile: Pr
       {activeMode === "makeup" && <>
       <nav className="mb-2 flex w-full max-w-5xl shrink-0 gap-1.5 overflow-x-auto rounded-2xl bg-white/55 p-2 shadow-inner" aria-label="Chọn công chúa">
         {PRINCESSES.map((p) => (
-          <button key={p.id} onClick={() => setActiveId(p.id)} aria-pressed={activeId === p.id}
+          <button key={p.id} onClick={() => { sfx.pop(); setActiveId(p.id); }} aria-pressed={activeId === p.id}
             className={`flex min-w-[76px] flex-col items-center rounded-xl px-2 py-1 text-[11px] font-extrabold transition-all sm:min-w-[88px] sm:text-xs ${activeId === p.id ? "scale-105 bg-pink-500 text-white shadow-lg" : "bg-white/70 text-pink-700 hover:bg-pink-100"}`}>
             <span className="text-xl sm:text-2xl">{p.emoji}</span><span>{p.name}</span>
           </button>
