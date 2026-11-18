@@ -7,6 +7,8 @@ import { useIsAdmin, useMyProfile, type Profile } from "@/hooks/use-player";
 import { useSettings } from "@/stores/settings";
 import { AvatarBadge } from "@/components/AvatarBadge";
 import { cn } from "@/lib/utils";
+import { setSpeechMuted, stopSpeech } from "@/lib/quizSpeech";
+import { stopAllSound } from "@/lib/sound";
 
 const NAV = [
   { to: "/the-gioi", label: "Thế giới", icon: Globe2 },
@@ -19,10 +21,17 @@ const NAV = [
 export function SoundToggle({ className }: { className?: string }) {
   const muted = useSettings((s) => s.muted);
   const toggle = useSettings((s) => s.toggleMuted);
+  useEffect(() => { setSpeechMuted(muted); }, [muted]);
+  const toggleAudio = () => {
+    const nextMuted = !muted;
+    toggle();
+    setSpeechMuted(nextMuted);
+    if (nextMuted) { stopSpeech(); stopAllSound(); }
+  };
   return (
     <button
       type="button"
-      onClick={toggle}
+      onClick={toggleAudio}
       aria-label={muted ? "Bật âm thanh" : "Tắt âm thanh"}
       className={cn(
         "grid h-10 w-10 place-items-center rounded-xl border-2 border-border bg-card text-foreground shadow-chunky active:translate-y-0.5",

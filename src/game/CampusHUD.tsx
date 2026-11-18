@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { DoorOpen, Map, Move, Volume2, VolumeX, X } from "lucide-react";
-import { useSettings } from "@/stores/settings";
-import { setSpeechMuted, stopSpeech } from "@/lib/quizSpeech";
+import { DoorOpen, Map, Move, X } from "lucide-react";
+import { stopSpeech } from "@/lib/quizSpeech";
 import { stopAllSound } from "@/lib/sound";
 import { ROOMS, ROOM_IDS, type Activity, type Portal, type RoomId } from "@/game/rooms";
 import type { Profile } from "@/hooks/use-player";
@@ -29,19 +28,9 @@ export function CampusHUD({
   onMove,
 }: CampusHUDProps) {
   const [mapOpen, setMapOpen] = useState(false);
-  const muted = useSettings((state) => state.muted);
-
   useEffect(() => {
-    setSpeechMuted(muted);
     return () => { stopSpeech(); stopAllSound(); };
-  }, [muted, roomId]);
-
-  const toggleAudio = () => {
-    const nextMuted = !useSettings.getState().muted;
-    useSettings.getState().toggleMuted();
-    setSpeechMuted(nextMuted);
-    if (nextMuted) { stopSpeech(); stopAllSound(); }
-  };
+  }, [roomId]);
   const joystickRef = useRef<HTMLDivElement>(null);
   const [knob, setKnob] = useState({ x: 0, y: 0 });
   const pointerId = useRef<number | null>(null);
@@ -104,17 +93,6 @@ export function CampusHUD({
       </section>
 
       <div className="pointer-events-auto absolute right-3 top-3 flex gap-2 sm:right-5 sm:top-5">
-        <button
-          type="button"
-          onClick={toggleAudio}
-          aria-label={muted ? "Bật âm thanh toàn trường" : "Tắt âm thanh toàn trường"}
-          aria-pressed={!muted}
-          title={muted ? "Bật âm thanh" : "Tắt âm thanh"}
-          className={`inline-flex items-center gap-2 rounded-xl border border-white/80 px-3 py-2.5 text-sm font-extrabold shadow-lg backdrop-blur-lg transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 ${muted ? "bg-rose-100/95 text-rose-800" : "bg-[#fffdf7]/90 text-emerald-900 hover:bg-white"}`}
-        >
-          {muted ? <VolumeX size={17} /> : <Volume2 size={17} />}
-          <span className="hidden sm:inline">{muted ? "Âm thanh tắt" : "Âm thanh bật"}</span>
-        </button>
         <button
           type="button"
           onClick={() => setMapOpen((open) => !open)}
