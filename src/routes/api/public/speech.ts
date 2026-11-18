@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateSpeech } from "@lovable.dev/ai-gateway";
 
-export const Route = createFileRoute("/api/public/speech" as never)({
+export const Route = createFileRoute("/api/public/speech")({
   server: {
     handlers: {
       POST: async ({ request }) => {
