@@ -136,7 +136,7 @@ export function primeSpeech(locale = "vi-VN") {
 function speakOne(text: string, locale: string, token: number): Promise<void> {
   if (isMuted || token !== runToken || !text.trim()) return Promise.resolve();
   const synth = getSpeech();
-  const canUseNative = Boolean(synth && typeof SpeechSynthesisUtterance !== "undefined" && hasNativeVoice(locale));
+  // Use the browser speech engine even when its voice list is still empty or it has no exact locale match.\n  // This is more reliable on Safari/iOS, where getVoices() can initially return an empty list.\n  const canUseNative = Boolean(synth && typeof SpeechSynthesisUtterance !== "undefined");
 
   if (!canUseNative) {
     if (locale.startsWith("vi")) return playCloudTts(text, token);
@@ -194,7 +194,7 @@ function speakOne(text: string, locale: string, token: number): Promise<void> {
       synth!.resume();
       fallbackTimer = window.setTimeout(
         () => fallbackToCloud("Giọng đọc của trình duyệt bị treo."),
-        20000,
+        9000,
       );
     } catch (error) {
       fallbackToCloud(error instanceof Error ? error.message : "Không khởi động được giọng đọc.");
