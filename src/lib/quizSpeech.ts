@@ -30,6 +30,7 @@ let currentAudioPlaying = false;
 let currentSource: AudioBufferSourceNode | null = null;
 let currentSourcePlaying = false;
 const audioBufferCache = new Map<string, AudioBuffer>();
+const audioBufferPromises = new Map<string, Promise<AudioBuffer | null>>();
 let audioCtx: AudioContext | null = null;
 
 function getAudioContext(): AudioContext | null {
@@ -148,6 +149,37 @@ function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Không tạo hoặc phát được giọng đọc AI.";
 }
 
+async function prefetchCloudTts(text: string): Promise<void> {
+  const cacheKey = text.trim();
+  const ctx = getAudioContext();
+  if (!cacheKey || !ctx || audioBufferCache.has(cacheKey) || audioBufferPromises.has(cacheKey)) return;
+  const task = (async (): Promise<AudioBuffer | null> => {
+    try {
+      const response = await fetch("/api/public/speech", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "audio/*" },
+        body: JSON.stringify({ text: cacheKey.slice(0, 300) }),
+      });
+      if (!response.ok) return null;
+      const contentType = response.headers.get("content-type") ?? "";
+      const bytes = await response.arrayBuffer();
+      const format = inspectAudioFormat(new Uint8Array(bytes), contentType);
+      if (!bytes.byteLength || !format.mimeType) return null;
+      const buffer = await ctx.decodeAudioData(bytes.slice(0));
+      if (audioBufferCache.size >= 40) audioBufferCache.clear();
+      audioBufferCache.set(cacheKey, buffer);
+      return buffer;
+    } catch {
+      // Prefetch is best-effort; playback retries and reports any real error.
+      return null;
+    } finally {
+      audioBufferPromises.delete(cacheKey);
+    }
+  })();
+  audioBufferPromises.set(cacheKey, task);
+  await task;
+}
+
 async function playCloudTts(text: string, token: number, forceFresh = false): Promise<void> {
   if (token !== runToken || isMuted || !text.trim()) return;
   speechState = "loading-audio";
@@ -157,6 +189,8 @@ async function playCloudTts(text: string, token: number, forceFresh = false): Pr
     const ctx = getAudioContext();
     const cacheKey = text.trim();
     let buffer = ctx && !forceFresh ? audioBufferCache.get(cacheKey) : undefined;
+    const pendingBuffer = ctx && !forceFresh ? audioBufferPromises.get(cacheKey) : undefined;
+    if (!buffer && pendingBuffer) buffer = (await pendingBuffer) ?? undefined;
     let bytes: ArrayBuffer | null = null;
     let mimeType: string | null = null;
 
@@ -598,6 +632,25 @@ export async function speakText(text: string, locale = "vi-VN") {
   if (isMuted) return;
   primeSpeech(locale);
   await speakOne(text, locale, runToken);
+}
+
+export function prepareQuizSpeech(question: string, options: string[], locale = "vi-VN", math = false): void {
+  if (isMuted || (!question.trim() && options.length === 0)) return;
+  const isEnglish = locale.toLowerCase().startsWith("en");
+  const activeLocale = isEnglish ? "en-US" : "vi-VN";
+  const spokenQuestion = math && !isEnglish ? naturalizeMath(question) : question;
+  const letters = ["A", "B", "C", "D"];
+  const optionsText = options.map((option, index) => {
+    const clean = (option ?? "").replace(/^([A-D])\\.\\s*/, "");
+    const spoken = math && !isEnglish ? naturalizeMath(clean) : clean;
+    return isEnglish
+      ? `Option ${letters[index] ?? index + 1}: ${spoken}`
+      : `Đáp án ${letters[index] ?? index + 1}: ${spoken}`;
+  }).filter(Boolean).join(". ");
+  const fullText = isEnglish
+    ? `Question: ${spokenQuestion}. ${optionsText}`
+    : `Câu hỏi: ${spokenQuestion}. ${optionsText}`;
+  for (const chunk of splitSpeechText(fullText)) void prefetchCloudTts(chunk);
 }
 
 export async function speakQuiz(question: string, options: string[], locale = "vi-VN", math = false) {
