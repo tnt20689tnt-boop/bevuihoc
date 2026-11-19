@@ -3,6 +3,7 @@ import {
   getSpeechStatus,
   isSpeechMuted,
   pauseSpeech,
+  prepareQuizSpeech,
   resumeSpeech,
   setSpeechMuted,
   speakQuiz,
@@ -28,6 +29,12 @@ export function SpeechControls({ question, options, text, locale = "vi-VN", isMa
   const [state, setState] = useState(() => getSpeechStatus().state);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const [diagnostics, setDiagnostics] = useState<SpeechDiagnostics>(() => getSpeechStatus().diagnostics);
+  const optionsCacheKey = options.join("\u0000");
+
+  // Prepare the AI voice as soon as a new question appears, not after the child presses replay.
+  useEffect(() => {
+    if (text === undefined) prepareQuizSpeech(question, options, locale, isMath);
+  }, [question, optionsCacheKey, locale, isMath, text]);
 
   useEffect(() => {
     const refresh = () => {
