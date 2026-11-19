@@ -641,7 +641,7 @@ export function prepareQuizSpeech(question: string, options: string[], locale = 
   const spokenQuestion = math && !isEnglish ? naturalizeMath(question) : question;
   const letters = ["A", "B", "C", "D"];
   const optionsText = options.map((option, index) => {
-    const clean = (option ?? "").replace(/^([A-D])\\.\\s*/, "");
+    const clean = (option ?? "").replace(/^([A-D])\.\s*/, "");
     const spoken = math && !isEnglish ? naturalizeMath(clean) : clean;
     return isEnglish
       ? `Option ${letters[index] ?? index + 1}: ${spoken}`
