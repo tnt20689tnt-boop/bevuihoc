@@ -47,16 +47,45 @@ function getAudioContext(): AudioContext | null {
   return audioCtx;
 }
 
-// Unlock Web Audio synchronously on the first real user interaction.
-if (typeof window !== "undefined") {
-  const unlockAudio = () => {
-    const ctx = getAudioContext();
-    if (ctx?.state === "suspended") void ctx.resume().catch((error: unknown) => {
+function unlockAudioContext(ctx: AudioContext | null): void {
+  if (!ctx || ctx.state === "closed") return;
+  if (ctx.state === "suspended") {
+    void ctx.resume().catch((error: unknown) => {
       lastSpeechError = errorMessage(error);
       speechState = "error";
       speechDiagnostics.error = lastSpeechError;
       speechDiagnostics.playback = "blocked";
     });
+  }
+  // iOS Safari may require a source to be started during the actual tap, not
+  // merely a deferred resume() before audio fetched from the network is ready.
+  try {
+    const buffer = ctx.createBuffer(1, 1, ctx.sampleRate || 24000);
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
+    gain.gain.value = 0;
+    source.buffer = buffer;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+    source.onended = () => {
+      try {
+        source.disconnect();
+        gain.disconnect();
+      } catch {
+        /* Already disconnected. */
+      }
+    };
+    source.start(0);
+  } catch (error) {
+    lastSpeechError = `Không thể mở khóa âm thanh trên thiết bị: ${errorMessage(error)}`;
+    speechDiagnostics.error = lastSpeechError;
+  }
+}
+
+// Unlock Web Audio synchronously on the first real user interaction.
+if (typeof window !== "undefined") {
+  const unlockAudio = () => {
+    unlockAudioContext(getAudioContext());
     window.removeEventListener("pointerdown", unlockAudio);
     window.removeEventListener("touchstart", unlockAudio);
     window.removeEventListener("keydown", unlockAudio);
@@ -325,11 +354,7 @@ export function stopSpeech() {
 
 export function primeSpeech(_locale = "vi-VN") {
   if (isMuted) return;
-  const ctx = getAudioContext();
-  if (ctx?.state === "suspended") void ctx.resume().catch((error: unknown) => {
-    lastSpeechError = errorMessage(error);
-    speechState = "error";
-  });
+  unlockAudioContext(getAudioContext());
 }
 
 

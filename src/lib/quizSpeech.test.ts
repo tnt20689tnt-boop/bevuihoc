@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { detectLocale, naturalizeMath, speakQuizOption, splitSpeechText, stopSpeech } from "@/lib/quizSpeech";
+import {
+  detectLocale,
+  naturalizeMath,
+  primeSpeech,
+  speakQuizOption,
+  splitSpeechText,
+  stopSpeech,
+} from "@/lib/quizSpeech";
 
 class FakeUtterance {
   lang = "";
@@ -88,5 +95,42 @@ describe("quiz speech", () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(speak).not.toHaveBeenCalled();
+  });
+
+  it("unlocks Web Audio synchronously with a silent source for iOS Safari", () => {
+    const start = vi.fn();
+    const resume = vi.fn().mockResolvedValue(undefined);
+    class FakeAudioContext {
+      state: AudioContextState = "suspended";
+      sampleRate = 24_000;
+      destination = {} as AudioDestinationNode;
+      resume = resume;
+      createBuffer = vi.fn(() => ({}) as AudioBuffer);
+      createBufferSource() {
+        return {
+          buffer: null,
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+          start,
+          onended: null,
+        } as unknown as AudioBufferSourceNode;
+      }
+      createGain() {
+        return {
+          gain: { value: 1 },
+          connect: vi.fn(),
+          disconnect: vi.fn(),
+        } as unknown as GainNode;
+      }
+    }
+    vi.stubGlobal(
+      "window",
+      { AudioContext: FakeAudioContext } as unknown as Window & typeof globalThis,
+    );
+
+    primeSpeech("vi-VN");
+
+    expect(resume).toHaveBeenCalledOnce();
+    expect(start).toHaveBeenCalledOnce();
   });
 });
