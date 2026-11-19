@@ -637,7 +637,6 @@ export async function speakText(text: string, locale = "vi-VN") {
 export function prepareQuizSpeech(question: string, options: string[], locale = "vi-VN", math = false): void {
   if (isMuted || (!question.trim() && options.length === 0)) return;
   const isEnglish = locale.toLowerCase().startsWith("en");
-  const activeLocale = isEnglish ? "en-US" : "vi-VN";
   const spokenQuestion = math && !isEnglish ? naturalizeMath(question) : question;
   const letters = ["A", "B", "C", "D"];
   const optionsText = options.map((option, index) => {
@@ -647,10 +646,13 @@ export function prepareQuizSpeech(question: string, options: string[], locale = 
       ? `Option ${letters[index] ?? index + 1}: ${spoken}`
       : `Đáp án ${letters[index] ?? index + 1}: ${spoken}`;
   }).filter(Boolean).join(". ");
-  const fullText = isEnglish
-    ? `Question: ${spokenQuestion}. ${optionsText}`
-    : `Câu hỏi: ${spokenQuestion}. ${optionsText}`;
-  for (const chunk of splitSpeechText(fullText)) void prefetchCloudTts(chunk);
+  // Generate the short question audio separately so it can start before
+  // the longer answer-options audio is ready.
+  const questionText = isEnglish ? `Question: ${spokenQuestion}` : `Câu hỏi: ${spokenQuestion}`;
+  const optionsSpeech = optionsText ? optionsText : "";
+  for (const chunk of [...splitSpeechText(questionText), ...splitSpeechText(optionsSpeech)]) {
+    void prefetchCloudTts(chunk);
+  }
 }
 
 export async function speakQuiz(question: string, options: string[], locale = "vi-VN", math = false) {
@@ -659,7 +661,6 @@ export async function speakQuiz(question: string, options: string[], locale = "v
   primeSpeech(locale);
   const token = runToken;
   const isEnglish = locale.toLowerCase().startsWith("en");
-  const activeLocale = isEnglish ? "en-US" : "vi-VN";
   const spokenQuestion = math && !isEnglish ? naturalizeMath(question) : question;
   const letters = ["A", "B", "C", "D"];
   const optionsText = options.map((option, index) => {
@@ -669,10 +670,14 @@ export async function speakQuiz(question: string, options: string[], locale = "v
       ? `Option ${letters[index] ?? index + 1}: ${spoken}`
       : `Đáp án ${letters[index] ?? index + 1}: ${spoken}`;
   }).join(". ");
-  const fullText = isEnglish
-    ? `Question: ${spokenQuestion}. ${optionsText}`
-    : `Câu hỏi: ${spokenQuestion}. ${optionsText}`;
-  await speakOne(fullText, activeLocale, token);
+
+  // Do not make the child wait for the entire question plus all four options.
+  // Play the question as soon as its shorter AI audio is ready, then continue
+  // with the answer options while preserving the selected AI voice.
+  const questionText = isEnglish ? `Question: ${spokenQuestion}` : `Câu hỏi: ${spokenQuestion}`;
+  await speakOne(questionText, isEnglish ? "en-US" : "vi-VN", token);
+  if (token !== runToken || isMuted || speechState === "error" || !optionsText) return;
+  await speakOne(optionsText, isEnglish ? "en-US" : "vi-VN", token);
 }
 
 export function speakQuizOption(option: string, index: number, locale = "vi-VN", math = false) {
