@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { generateSpeech } from "@lovable.dev/ai-gateway";
+import { inspectAudioFormat } from "@/lib/audio-format";
 
 export const Route = createFileRoute("/api/public/speech")({
   server: {
@@ -34,18 +35,21 @@ export const Route = createFileRoute("/api/public/speech")({
             },
           });
           const blob = await audio.blob();
-          if (!blob.size) throw new Error("The speech service returned an empty audio file.");
+          const bytes = await blob.arrayBuffer();
+          const format = inspectAudioFormat(new Uint8Array(bytes), blob.type);
+          if (!format.mimeType) throw new Error(format.error || "The speech service returned an unsupported audio format.");
 
-          return new Response(blob, {
+          return new Response(bytes, {
             headers: {
-              "Content-Type": blob.type || "audio/wav",
+              "Content-Type": format.mimeType,
               "Cache-Control": "private, max-age=86400",
               "X-Content-Type-Options": "nosniff",
             },
           });
         } catch (error) {
-          console.error("AI speech generation failed:", error);
-          return new Response("Speech generation failed", { status: 502 });
+          const requestId = crypto.randomUUID();
+          console.error("AI speech generation failed:", { requestId, error });
+          return Response.json({ error: "Speech generation failed", requestId }, { status: 502 });
         }
       },
     },

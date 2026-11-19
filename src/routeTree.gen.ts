@@ -30,6 +30,7 @@ import { Route as AuthenticatedTaoNguoiMauRouteImport } from './routes/_authenti
 import { Route as AuthenticatedTheGioiRouteImport } from './routes/_authenticated/the-gioi'
 import { Route as AuthenticatedThiDauRouteImport } from './routes/_authenticated/thi-dau'
 import { Route as AuthenticatedHocSubjectRouteImport } from './routes/_authenticated/hoc.$subject'
+import { Route as ApiPublicSpeechRouteImport } from './routes/api/public/speech'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -138,6 +139,11 @@ const AuthenticatedHocSubjectRoute = AuthenticatedHocSubjectRouteImport.update({
   path: '/hoc/$subject',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiPublicSpeechRoute = ApiPublicSpeechRouteImport.update({
+  id: '/api/public/speech',
+  path: '/api/public/speech',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/the-gioi': typeof AuthenticatedTheGioiRoute
   '/thi-dau': typeof AuthenticatedThiDauRoute
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
+  '/api/public/speech': typeof ApiPublicSpeechRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/the-gioi': typeof AuthenticatedTheGioiRoute
   '/thi-dau': typeof AuthenticatedThiDauRoute
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
+  '/api/public/speech': typeof ApiPublicSpeechRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -206,6 +214,7 @@ export interface FileRoutesById {
   '/_authenticated/the-gioi': typeof AuthenticatedTheGioiRoute
   '/_authenticated/thi-dau': typeof AuthenticatedThiDauRoute
   '/_authenticated/hoc/$subject': typeof AuthenticatedHocSubjectRoute
+  '/api/public/speech': typeof ApiPublicSpeechRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/the-gioi'
     | '/thi-dau'
     | '/hoc/$subject'
+    | '/api/public/speech'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -252,6 +262,7 @@ export interface FileRouteTypes {
     | '/the-gioi'
     | '/thi-dau'
     | '/hoc/$subject'
+    | '/api/public/speech'
   id:
     | '__root__'
     | '/'
@@ -275,6 +286,7 @@ export interface FileRouteTypes {
     | '/_authenticated/the-gioi'
     | '/_authenticated/thi-dau'
     | '/_authenticated/hoc/$subject'
+    | '/api/public/speech'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -287,6 +299,7 @@ export interface RootRouteChildren {
   TiengAnhLop2Route: typeof TiengAnhLop2Route
   ToanLop1Route: typeof ToanLop1Route
   ToanLop2Route: typeof ToanLop2Route
+  ApiPublicSpeechRoute: typeof ApiPublicSpeechRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -438,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHocSubjectRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/speech': {
+      id: '/api/public/speech'
+      path: '/api/public/speech'
+      fullPath: '/api/public/speech'
+      preLoaderRoute: typeof ApiPublicSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -484,6 +504,7 @@ const rootRouteChildren: RootRouteChildren = {
   TiengAnhLop2Route: TiengAnhLop2Route,
   ToanLop1Route: ToanLop1Route,
   ToanLop2Route: ToanLop2Route,
+  ApiPublicSpeechRoute: ApiPublicSpeechRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

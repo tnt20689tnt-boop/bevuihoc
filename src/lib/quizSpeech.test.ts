@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { detectLocale, naturalizeMath, speakQuizOption, stopSpeech } from "@/lib/quizSpeech";
+import { detectLocale, naturalizeMath, speakQuizOption, splitSpeechText, stopSpeech } from "@/lib/quizSpeech";
 
 class FakeUtterance {
   lang = "";
@@ -39,6 +39,13 @@ describe("quiz speech", () => {
     expect(detectLocale("Chọn đáp án đúng", "english")).toBe("vi-VN");
   });
 
+  it("splits long speech into bounded chunks without dropping words", () => {
+    const text = `${"bé học toán ".repeat(40)}hết câu`;
+    const chunks = splitSpeechText(text, 80);
+    expect(chunks.every((chunk) => chunk.length <= 80)).toBe(true);
+    expect(chunks.join(" ")).toBe(text.trim().replace(/\s+/g, " "));
+  });
+
   it("speaks a selected option with its letter and localized math wording", async () => {
     const utterances: FakeUtterance[] = [];
     const synthesis = {
@@ -61,5 +68,25 @@ describe("quiz speech", () => {
     expect(utterances).toHaveLength(1);
     expect(utterances[0]?.text).toBe("Đáp án C. 3 nhân 4");
     expect(utterances[0]?.lang).toBe("vi-VN");
+  });
+
+  it("does not select an unrelated browser voice as a fallback", async () => {
+    const speak = vi.fn();
+    const synthesis = {
+      cancel: vi.fn(),
+      getVoices: () => [{ lang: "en-US" }] as SpeechSynthesisVoice[],
+      resume: vi.fn(),
+      speak,
+      pending: false,
+      speaking: false,
+    };
+    vi.stubGlobal("window", { speechSynthesis: synthesis, setTimeout, clearTimeout });
+    vi.stubGlobal("SpeechSynthesisUtterance", FakeUtterance);
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+
+    speakQuizOption("quả táo", 0, "vi-VN");
+    await new Promise((resolve) => setTimeout(resolve, 0));
+
+    expect(speak).not.toHaveBeenCalled();
   });
 });
