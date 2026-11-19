@@ -155,8 +155,8 @@ export function getSpeechStatus() {
     state: speechState,
     error: lastSpeechError,
     voices: synth?.getVoices().length ?? 0,
-    speaking: Boolean(synth?.speaking || currentAudio),
-    paused: Boolean(synth?.paused || currentAudio?.paused),
+    speaking: Boolean(synth?.speaking || currentAudio || currentSource),
+    paused: Boolean(synth?.paused || currentAudio?.paused || audioCtx?.state === "suspended"),
     isMuted,
   };
 }
