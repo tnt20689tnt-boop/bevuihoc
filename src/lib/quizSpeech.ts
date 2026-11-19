@@ -185,60 +185,55 @@ export function primeSpeech(locale = "vi-VN") {
 }
 
 
-function speakOne(text: string, locale: string, token: number): Promise<void> {
-  if (isMuted || token !== runToken || !text.trim()) return Promise.resolve();
-  const synth = getSpeech();
-  const canUseNative = Boolean(synth && typeof SpeechSynthesisUtterance !== "undefined" && hasNativeVoice(locale));
-  if (!canUseNative) return playCloudTts(text, token);
+async function speakOne(text: string, locale: string, token: number): Promise<void> {
+  if (isMuted || token !== runToken || !text.trim()) return;
 
-  return new Promise((resolve) => {
-    let settled = false;
-    let fallbackStarted = false;
-    let fallbackTimer: number | undefined;
+  // Cloud TTS first: this avoids silently trusting a browser voice that may
+  // report onend even when the device produces no audible output.
+  try {
+    await playCloudTts(text, token);
+    if (token !== runToken || isMuted) return;
+    if (speechState !== "error") return;
+  } catch (error) {
+    if (token === runToken) {
+      speechState = "error";
+      lastSpeechError = error instanceof Error ? error.message : "Không phát được giọng đọc AI.";
+    }
+  }
+
+  // Native speech is a real fallback if the cloud service or audio decoder fails.
+  const synth = getSpeech();
+  if (!synth || typeof SpeechSynthesisUtterance === "undefined" || !hasNativeVoice(locale)) return;
+  if (token !== runToken || isMuted) return;
+
+  await new Promise<void>((resolve) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = locale;
     utterance.rate = 0.92;
     utterance.pitch = 1;
     utterance.volume = 1;
-    const voice = selectVoice(synth!.getVoices(), locale);
+    const voice = selectVoice(synth.getVoices(), locale);
     if (voice) utterance.voice = voice;
 
-    const finish = (error?: string) => {
-      if (settled) return;
-      settled = true;
-      if (fallbackTimer !== undefined) window.clearTimeout(fallbackTimer);
-      if (activeUtterance === utterance) activeUtterance = null;
-      if (error && token === runToken) {
-        speechState = "error";
-        lastSpeechError = error;
-      } else if (token === runToken) speechState = "ready";
-      resolve();
-    };
-
-    const fallbackToCloud = (reason: string) => {
-      if (settled || fallbackStarted) return;
-      fallbackStarted = true;
-      if (fallbackTimer !== undefined) window.clearTimeout(fallbackTimer);
-      try { synth!.cancel(); } catch { /* Ignore cancellation errors. */ }
-      if (activeUtterance === utterance) activeUtterance = null;
-      if (token === runToken && !isMuted) {
-        void playCloudTts(text, token).then(() =>
-          finish(speechState === "error" ? (lastSpeechError ?? reason) : undefined)
-        );
-      } else finish();
-    };
-
-    utterance.onend = () => finish();
-    utterance.onerror = (event) => fallbackToCloud(event.error || "Trình duyệt không phát được giọng đọc.");
     activeUtterance = utterance;
     speechState = "speaking";
     lastSpeechError = null;
+    const finish = (error?: string) => {
+      if (activeUtterance === utterance) activeUtterance = null;
+      if (token === runToken) {
+        speechState = error ? "error" : "ready";
+        lastSpeechError = error ?? null;
+      }
+      resolve();
+    };
+    utterance.onend = () => finish();
+    utterance.onerror = (event) => finish("Giọng đọc dự phòng của trình duyệt lỗi: " + event.error);
     try {
-      synth!.speak(utterance);
-      synth!.resume();
-      fallbackTimer = window.setTimeout(() => fallbackToCloud("Giọng đọc của trình duyệt bị treo."), 9000);
+      synth.cancel();
+      synth.speak(utterance);
+      synth.resume();
     } catch (error) {
-      fallbackToCloud(error instanceof Error ? error.message : "Không khởi động được giọng đọc.");
+      finish(error instanceof Error ? error.message : "Không khởi động được giọng đọc trình duyệt.");
     }
   });
 }
