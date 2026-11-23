@@ -252,7 +252,8 @@ export function PrincessWardrobe3D({ profile }: { profile: Profile }) {
     headwear: "tiara",
     shoes: "pink-heels",
   });
-  const [saving, setSaving] = useState(false);\n  const [runway, setRunway] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [runway, setRunway] = useState(false);
   const anim = useRef<AnimState>(makeAnimState());
   const activeOptions = OPTIONS[zone];
 
