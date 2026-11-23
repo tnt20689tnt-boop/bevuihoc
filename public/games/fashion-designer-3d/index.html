@@ -3,87 +3,153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Đang mở Barbee Fashion...</title>
+<title>✨ Anime Fashion Studio ✨</title>
 <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        background: linear-gradient(135deg, #ff9a9e, #fecfef);
-        height: 100vh;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: #4a2c3a;
-        overflow: hidden;
-    }
-    .card {
-        background: rgba(255, 255, 255, 0.95);
-        padding: 40px 50px;
-        border-radius: 30px;
-        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
-        text-align: center;
-        backdrop-filter: blur(10px);
-        animation: popIn 0.5s ease-out;
-    }
-    @keyframes popIn {
-        0% { transform: scale(0.9); opacity: 0; }
-        100% { transform: scale(1); opacity: 1; }
-    }
-    h1 {
-        font-size: 24px;
-        margin-bottom: 10px;
-        color: #e91e63;
-        font-weight: 800;
-    }
-    p {
-        font-size: 15px;
-        color: #777;
-        margin-bottom: 25px;
-    }
-    .spinner {
-        width: 50px;
-        height: 50px;
-        border: 5px solid rgba(240, 98, 146, 0.2);
-        border-top-color: #f06292;
-        border-radius: 50%;
-        animation: spin 1s linear infinite;
-        margin: 0 auto 20px auto;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .btn {
-        background: linear-gradient(45deg, #f06292, #f48fb1);
-        color: #fff;
-        text-decoration: none;
-        padding: 15px 35px;
-        border-radius: 25px;
-        font-weight: bold;
-        font-size: 16px;
-        display: inline-block;
-        transition: 0.3s;
-        box-shadow: 0 5px 15px rgba(240, 98, 146, 0.4);
-    }
-    .btn:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 8px 25px rgba(240, 98, 146, 0.6);
-    }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #f0e6f5; height: 100vh; display: flex; overflow: hidden; }
+.character-stage { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; background: radial-gradient(circle, #fff, #e6d3f0); overflow: hidden; }
+.avatar-container { position: relative; width: 350px; height: 600px; }
+.layer { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s; pointer-events: none; }
+.z-bg { z-index: 1; } .z-back-hair { z-index: 2; } .z-body { z-index: 3; } .z-eyes { z-index: 4; } .z-clothes { z-index: 5; } .z-front-hair { z-index: 6; } .z-acc { z-index: 7; }
+.ui-panel { width: 400px; background: #fff; border-left: 3px solid #d1b3e6; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.05); z-index: 10; }
+.ui-header { padding: 20px; background: #d1b3e6; color: #fff; text-align: center; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+.tabs { display: flex; background: #f9f5fc; border-bottom: 2px solid #eadcf5; overflow-x: auto; }
+.tab-btn { flex: 1; padding: 12px 5px; border: none; background: none; cursor: pointer; font-weight: bold; color: #9c7bb5; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; transition: 0.2s; }
+.tab-btn.active { color: #6a1b9a; border-bottom: 3px solid #6a1b9a; background: #fff; }
+.tab-icon { font-size: 20px; }
+.items-grid { flex: 1; padding: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; overflow-y: auto; align-content: start; }
+.items-grid::-webkit-scrollbar { width: 6px; } .items-grid::-webkit-scrollbar-thumb { background: #d1b3e6; border-radius: 4px; }
+.item-btn { aspect-ratio: 1; background: #fff; border: 2px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; padding: 5px; }
+.item-btn:hover { border-color: #d1b3e6; transform: scale(1.05); }
+.item-btn.active { border-color: #6a1b9a; box-shadow: 0 0 8px rgba(106, 27, 154, 0.4); background: #f9f5fc; }
+.item-btn img { width: 100%; height: 100%; object-fit: contain; }
+.action-bar { padding: 15px; background: #f9f5fc; border-top: 2px solid #eadcf5; display: flex; gap: 10px; }
+.btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; font-size: 14px; }
+.btn-random { background: #9c7bb5; } .btn-download { background: #6a1b9a; }
+.btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
+@media (max-width: 700px) {
+ body { flex-direction: column; height: 100dvh; }
+ .character-stage { min-height: 0; flex: 1; }
+ .avatar-container { height: min(52vh, 500px); width: min(100%, 300px); }
+ .ui-panel { width: 100%; height: 48vh; min-height: 300px; border-left: 0; border-top: 3px solid #d1b3e6; }
+ .ui-header { padding: 10px; }
+ .items-grid { padding: 10px; }
+}
 </style>
 </head>
 <body>
-    <div class="card">
-        <h1>✨ Đang mở Barbee Fashion ✨</h1>
-        <p>Hệ thống đang tự động chuyển hướng bạn đến game...</p>
-        <div class="spinner"></div>
-        <!-- Nút dự phòng nếu trình duyệt chặn tự động chuyển -->
-        <a href="https://plix.gg/vi/games/barbee-fashion-influencer" class="btn">
-            🎮 Click vào đây nếu không tự chuyển
-        </a>
-    </div>
-    <script>
-        // Chuyển trang sau một giây.
-        // Việc điều hướng trong iframe vẫn có thể bị website đích từ chối.
-        setTimeout(function() {
-            window.location.href = "https://plix.gg/vi/games/barbee-fashion-influencer";
-        }, 1000);
-    </script>
+<div class="character-stage">
+ <div class="avatar-container" id="avatar-container">
+  <img id="img-bg" class="layer z-bg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><circle cx='150' cy='250' r='140' fill='%23fce4ec'/></svg>">
+  <img id="img-back-hair" class="layer z-back-hair" src="">
+  <img id="img-body" class="layer z-body" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><ellipse cx='150' cy='110' rx='45' ry='55' fill='%23ffe0d5'/><path d='M 110 160 Q 150 150 190 160 L 180 300 Q 150 320 120 300 Z' fill='%23ffe0d5'/><path d='M 120 300 L 120 450 Q 120 460 130 460 L 140 460 Q 150 460 150 450 L 150 300 Z' fill='%23ffe0d5'/><path d='M 150 300 L 150 450 Q 150 460 160 460 L 170 460 Q 180 460 180 450 L 180 300 Z' fill='%23ffe0d5'/><path d='M 110 170 Q 80 220 90 300 Q 100 310 110 300 Q 110 240 130 200 Z' fill='%23ffe0d5'/><path d='M 190 170 Q 220 220 210 300 Q 200 310 190 300 Q 190 240 170 200 Z' fill='%23ffe0d5'/></svg>">
+  <img id="img-clothes" class="layer z-clothes" src="">
+  <img id="img-front-hair" class="layer z-front-hair" src="">
+  <img id="img-acc" class="layer z-acc" src="" style="display:none;">
+  <img class="layer z-eyes" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><ellipse cx='130' cy='110' rx='8' ry='12' fill='%23333'/><ellipse cx='170' cy='110' rx='8' ry='12' fill='%23333'/><circle cx='128' cy='106' r='3' fill='%23fff'/><circle cx='168' cy='106' r='3' fill='%23fff'/><path d='M 145 130 Q 150 138 155 130' stroke='%23e91e63' stroke-width='2' fill='none' stroke-linecap='round'/><ellipse cx='110' cy='125' rx='6' ry='4' fill='%23ff9eb5' opacity='0.5'/><ellipse cx='190' cy='125' rx='6' ry='4' fill='%23ff9eb5' opacity='0.5'/></svg>">
+ </div>
+</div>
+<div class="ui-panel">
+ <div class="ui-header">Anime Fashion</div>
+ <div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('hair', this)"><span class="tab-icon">💇</span>Tóc</button>
+  <button class="tab-btn" onclick="switchTab('dress', this)"><span class="tab-icon">👗</span>Váy</button>
+  <button class="tab-btn" onclick="switchTab('acc', this)"><span class="tab-icon">🎀</span>Phụ kiện</button>
+  <button class="tab-btn" onclick="switchTab('bg', this)"><span class="tab-icon">🖼️</span>Nền</button>
+ </div>
+ <div class="items-grid" id="items-container"></div>
+ <div class="action-bar">
+  <button class="btn btn-random" onclick="randomize()">🎲 Ngẫu Nhiên</button>
+  <button class="btn btn-download" onclick="takePhoto()">📸 Chụp Ảnh</button>
+ </div>
+</div>
+<script>
+const DB = {
+ hair: [
+  { id:'h1', name:'Dài', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M90,100 Q70,250 60,350 Q150,380 240,350 Q230,250 210,100 Z' fill='%234a2c3a'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M105,110 Q105,40 150,40 Q195,40 195,110 Q195,130 150,130 Q105,130 105,110 Z' fill='%234a2c3a'/><path d='M95,100 Q85,140 100,180 L110,150 Z' fill='%234a2c3a'/></svg>" },
+  { id:'h2', name:'Twin', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,120 Q60,250 50,350 Q100,380 120,350 L130,200 L170,200 L180,350 Q200,380 250,350 Q240,250 200,120 Z' fill='%23f8b500'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,100 Q110,50 150,50 Q190,50 190,100 Q190,120 150,120 Q110,120 110,100 Z' fill='%23f8b500'/></svg>" },
+  { id:'h3', name:'Búi', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,110 Q100,160 110,200 Q150,210 190,200 Q200,160 190,110 Z' fill='%23ff6b9d'/><circle cx='150' cy='50' r='25' fill='%23ff6b9d'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M115,110 Q115,60 150,60 Q185,60 185,110 Q185,130 150,130 Q115,130 115,110 Z' fill='%23ff6b9d'/></svg>" },
+  { id:'h4', name:'Bob', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,110 Q90,180 110,230 Q150,250 190,230 Q210,180 200,110 Z' fill='%234facfe'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,110 Q100,50 150,50 Q200,50 200,110 Q200,130 150,130 Q100,130 100,110 Z' fill='%234facfe'/></svg>" }
+ ],
+ dress: [
+  { id:'d1', name:'Dạ hội', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,280 L110,280 Z' fill='%23e91e63'/><path d='M110,280 L190,280 L230,400 Q150,430 70,400 Z' fill='%23e91e63'/></svg>" },
+  { id:'d2', name:'Xòe A', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,260 L110,260 Z' fill='%234facfe'/><path d='M110,260 L190,260 L210,350 L90,350 Z' fill='%234facfe'/></svg>" },
+  { id:'d3', name:'Yếm', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M125,180 L175,180 L185,260 L115,260 Z' fill='%23f8b500'/><path d='M115,260 L185,260 L200,380 Q150,400 100,380 Z' fill='%23f8b500'/></svg>" },
+  { id:'d4', name:'Công chúa', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,270 L110,270 Z' fill='%23a18cd1'/><path d='M110,270 L190,270 L240,420 Q150,450 60,420 Z' fill='%23a18cd1'/></svg>" }
+ ],
+ acc: [
+  { id:'a1', name:'Kính', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><circle cx='130' cy='110' r='12' fill='none' stroke='%23333' stroke-width='3'/><circle cx='170' cy='110' r='12' fill='none' stroke='%23333' stroke-width='3'/><line x1='142' y1='110' x2='158' y2='110' stroke='%23333' stroke-width='3'/></svg>" },
+  { id:'a2', name:'Mũ', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,60 L190,60 L200,110 L100,110 Z' fill='%23ff6b9d'/><path d='M120,60 L120,30 L180,30 L180,60 Z' fill='%23ff6b9d'/></svg>" },
+  { id:'a3', name:'Vương miện', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,60 L130,30 L150,50 L170,30 L180,60 Z' fill='%23ffd700'/><circle cx='150' cy='45' r='5' fill='%23ff0000'/></svg>" }
+ ],
+ bg: [
+  { id:'b1', name:'Studio', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23fce4ec'/></svg>" },
+  { id:'b2', name:'Sự kiện', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23e8eaf6'/></svg>" },
+  { id:'b3', name:'Dạo phố', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23e0f7fa'/></svg>" },
+  { id:'b4', name:'Biển', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23bbdefb'/></svg>" }
+ ]
+};
+let state = { hair:0, dress:0, acc:-1, bg:0, tab:'hair' };
+const container = document.getElementById('items-container');
+function updateAvatar() {
+ document.getElementById('img-back-hair').src = DB.hair[state.hair].back;
+ document.getElementById('img-front-hair').src = DB.hair[state.hair].front;
+ document.getElementById('img-clothes').src = DB.dress[state.dress].img;
+ const accImg = document.getElementById('img-acc');
+ if (state.acc >= 0) { accImg.src = DB.acc[state.acc].img; accImg.style.display = 'block'; }
+ else { accImg.style.display = 'none'; }
+ document.getElementById('img-bg').src = DB.bg[state.bg].img;
+}
+function switchTab(tab, btn) {
+ state.tab = tab;
+ document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+ btn.classList.add('active');
+ renderItems();
+}
+function renderItems() {
+ container.innerHTML = '';
+ if (state.tab === 'bg') {
+  DB.bg.forEach((item, i) => {
+   const div = document.createElement('div');
+   div.className = 'item-btn' + (state.bg === i ? ' active' : '');
+   div.innerHTML = '<img src="' + item.img + '">';
+   div.onclick = () => { state.bg = i; updateAvatar(); renderItems(); };
+   container.appendChild(div);
+  });
+  return;
+ }
+ const items = DB[state.tab];
+ if (state.tab === 'acc') {
+  const noneDiv = document.createElement('div');
+  noneDiv.className = 'item-btn' + (state.acc === -1 ? ' active' : '');
+  noneDiv.innerHTML = '<span style="font-size:20px">❌</span>';
+  noneDiv.onclick = () => { state.acc = -1; updateAvatar(); renderItems(); };
+  container.appendChild(noneDiv);
+ }
+ items.forEach((item, i) => {
+  const div = document.createElement('div');
+  div.className = 'item-btn' + (state[state.tab] === i ? ' active' : '');
+  if (state.tab === 'hair') div.innerHTML = '<img src="' + item.front + '" style="transform:scale(1.5)">';
+  else div.innerHTML = '<img src="' + item.img + '">';
+  div.onclick = () => { state[state.tab] = i; updateAvatar(); renderItems(); };
+  container.appendChild(div);
+ });
+}
+function randomize() {
+ state.hair = Math.floor(Math.random() * DB.hair.length);
+ state.dress = Math.floor(Math.random() * DB.dress.length);
+ state.bg = Math.floor(Math.random() * DB.bg.length);
+ state.acc = Math.random() > 0.5 ? Math.floor(Math.random() * DB.acc.length) : -1;
+ updateAvatar(); renderItems();
+}
+function takePhoto() {
+ alert('📸 Đã chụp ảnh!');
+ const avatar = document.getElementById('avatar-container');
+ avatar.style.transform = 'scale(1.1)';
+ setTimeout(() => avatar.style.transform = 'scale(1)', 200);
+}
+renderItems();
+updateAvatar();
+</script>
 </body>
 </html>
