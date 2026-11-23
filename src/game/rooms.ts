@@ -104,7 +104,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { x: 0, z: 9.5, label: "Sảnh vinh danh", icon: "👑", to: "/sanh-vinh-danh" },
     ],
     obstacles: [
-      { x: -20, z: -4, r: 3.1 },
+      { x: 0, z: 0, r: 3.1 },
       ...PLAZA_PORTALS.map((portal) => { const [x, z] = portalBuildingPosition(portal); return { x, z, r: portal.to === "arena" ? 2.15 : 3.35 }; }),
     ],
   },
