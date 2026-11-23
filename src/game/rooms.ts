@@ -2,6 +2,7 @@ import mathImg from "@/assets/room-math.jpg";
 import vietImg from "@/assets/room-vietnamese.jpg";
 import engImg from "@/assets/room-english.jpg";
 import salonImg from "@/assets/room-salon.jpg";
+import salonImg from "@/assets/room-salon.jpg";
 import footballImg from "@/assets/room-football.jpg";
 
 export type RoomId =
@@ -49,6 +50,7 @@ export const PLAZA_PORTALS: Portal[] = [
   { to: "math", x: -7.731092, z: -2.577031 },
   { to: "vietnamese", x: 7.731092, z: -2.577031 },
   { to: "english", x: 0, z: -13.5 },
+  { to: "girls", x: -8.91727, z: 6.777125 },
   { to: "girls", x: -8.91727, z: 6.777125 },
   { to: "boys", x: 10.052813, z: -11.599399 },
   { to: "arena", x: -10.052813, z: -11.599399 },
@@ -198,6 +200,21 @@ export const ROOMS: Record<RoomId, RoomDef> = {
       { x: -7, z: -4, r: 1.8 },
       { x: 7, z: -4, r: 1.6 },
     ],
+  },
+  girls: {
+    id: "girls",
+    name: "Khu vui chơi bé gái – Salon làm đẹp",
+    short: "Salon",
+    emoji: "💄",
+    color: "#ff6fa8",
+    ground: ["#ffe1ee", "#ffcce2"],
+    sky: "#ffd6ea",
+    image: salonImg,
+    blurb: "Khu salon thời trang và làm đẹp.",
+    radius: 14,
+    portals: [EXIT],
+    activities: [{ x: -2.1, z: -5, label: "Vào Salon thời trang", icon: "👗", to: "/salon" }],
+    obstacles: [{ x: 0, z: -10, r: 2.4 }],
   },
   girls: {
     id: "girls",
