@@ -23,10 +23,8 @@ import { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenti
 import { Route as AuthenticatedHoSoRouteImport } from './routes/_authenticated/ho-so'
 import { Route as AuthenticatedNhanVatRouteImport } from './routes/_authenticated/nhan-vat'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
-import { Route as AuthenticatedSalonRouteImport } from './routes/_authenticated/salon'
 import { Route as AuthenticatedSanBongRouteImport } from './routes/_authenticated/san-bong'
 import { Route as AuthenticatedSanhVinhDanhRouteImport } from './routes/_authenticated/sanh-vinh-danh'
-import { Route as AuthenticatedTaoNguoiMauRouteImport } from './routes/_authenticated/tao-nguoi-mau'
 import { Route as AuthenticatedTheGioiRouteImport } from './routes/_authenticated/the-gioi'
 import { Route as AuthenticatedThiDauRouteImport } from './routes/_authenticated/thi-dau'
 import { Route as AuthenticatedHocSubjectRouteImport } from './routes/_authenticated/hoc.$subject'
@@ -102,11 +100,6 @@ const AuthenticatedQuanTriRoute = AuthenticatedQuanTriRouteImport.update({
   path: '/quan-tri',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const AuthenticatedSalonRoute = AuthenticatedSalonRouteImport.update({
-  id: '/salon',
-  path: '/salon',
-  getParentRoute: () => AuthenticatedRouteRoute,
-} as any)
 const AuthenticatedSanBongRoute = AuthenticatedSanBongRouteImport.update({
   id: '/san-bong',
   path: '/san-bong',
@@ -116,12 +109,6 @@ const AuthenticatedSanhVinhDanhRoute =
   AuthenticatedSanhVinhDanhRouteImport.update({
     id: '/sanh-vinh-danh',
     path: '/sanh-vinh-danh',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
-const AuthenticatedTaoNguoiMauRoute =
-  AuthenticatedTaoNguoiMauRouteImport.update({
-    id: '/tao-nguoi-mau',
-    path: '/tao-nguoi-mau',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedTheGioiRoute = AuthenticatedTheGioiRouteImport.update({
@@ -159,10 +146,8 @@ export interface FileRoutesByFullPath {
   '/ho-so': typeof AuthenticatedHoSoRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
-  '/salon': typeof AuthenticatedSalonRoute
   '/san-bong': typeof AuthenticatedSanBongRoute
   '/sanh-vinh-danh': typeof AuthenticatedSanhVinhDanhRoute
-  '/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/the-gioi': typeof AuthenticatedTheGioiRoute
   '/thi-dau': typeof AuthenticatedThiDauRoute
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
@@ -182,10 +167,8 @@ export interface FileRoutesByTo {
   '/ho-so': typeof AuthenticatedHoSoRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
-  '/salon': typeof AuthenticatedSalonRoute
   '/san-bong': typeof AuthenticatedSanBongRoute
   '/sanh-vinh-danh': typeof AuthenticatedSanhVinhDanhRoute
-  '/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/the-gioi': typeof AuthenticatedTheGioiRoute
   '/thi-dau': typeof AuthenticatedThiDauRoute
   '/hoc/$subject': typeof AuthenticatedHocSubjectRoute
@@ -207,10 +190,8 @@ export interface FileRoutesById {
   '/_authenticated/ho-so': typeof AuthenticatedHoSoRoute
   '/_authenticated/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
-  '/_authenticated/salon': typeof AuthenticatedSalonRoute
   '/_authenticated/san-bong': typeof AuthenticatedSanBongRoute
   '/_authenticated/sanh-vinh-danh': typeof AuthenticatedSanhVinhDanhRoute
-  '/_authenticated/tao-nguoi-mau': typeof AuthenticatedTaoNguoiMauRoute
   '/_authenticated/the-gioi': typeof AuthenticatedTheGioiRoute
   '/_authenticated/thi-dau': typeof AuthenticatedThiDauRoute
   '/_authenticated/hoc/$subject': typeof AuthenticatedHocSubjectRoute
@@ -232,10 +213,8 @@ export interface FileRouteTypes {
     | '/ho-so'
     | '/nhan-vat'
     | '/quan-tri'
-    | '/salon'
     | '/san-bong'
     | '/sanh-vinh-danh'
-    | '/tao-nguoi-mau'
     | '/the-gioi'
     | '/thi-dau'
     | '/hoc/$subject'
@@ -255,10 +234,8 @@ export interface FileRouteTypes {
     | '/ho-so'
     | '/nhan-vat'
     | '/quan-tri'
-    | '/salon'
     | '/san-bong'
     | '/sanh-vinh-danh'
-    | '/tao-nguoi-mau'
     | '/the-gioi'
     | '/thi-dau'
     | '/hoc/$subject'
@@ -279,10 +256,8 @@ export interface FileRouteTypes {
     | '/_authenticated/ho-so'
     | '/_authenticated/nhan-vat'
     | '/_authenticated/quan-tri'
-    | '/_authenticated/salon'
     | '/_authenticated/san-bong'
     | '/_authenticated/sanh-vinh-danh'
-    | '/_authenticated/tao-nguoi-mau'
     | '/_authenticated/the-gioi'
     | '/_authenticated/thi-dau'
     | '/_authenticated/hoc/$subject'
@@ -402,13 +377,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedQuanTriRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/salon': {
-      id: '/_authenticated/salon'
-      path: '/salon'
-      fullPath: '/salon'
-      preLoaderRoute: typeof AuthenticatedSalonRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/san-bong': {
       id: '/_authenticated/san-bong'
       path: '/san-bong'
@@ -421,13 +389,6 @@ declare module '@tanstack/react-router' {
       path: '/sanh-vinh-danh'
       fullPath: '/sanh-vinh-danh'
       preLoaderRoute: typeof AuthenticatedSanhVinhDanhRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
-    '/_authenticated/tao-nguoi-mau': {
-      id: '/_authenticated/tao-nguoi-mau'
-      path: '/tao-nguoi-mau'
-      fullPath: '/tao-nguoi-mau'
-      preLoaderRoute: typeof AuthenticatedTaoNguoiMauRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/the-gioi': {
@@ -467,10 +428,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHoSoRoute: typeof AuthenticatedHoSoRoute
   AuthenticatedNhanVatRoute: typeof AuthenticatedNhanVatRoute
   AuthenticatedQuanTriRoute: typeof AuthenticatedQuanTriRoute
-  AuthenticatedSalonRoute: typeof AuthenticatedSalonRoute
   AuthenticatedSanBongRoute: typeof AuthenticatedSanBongRoute
   AuthenticatedSanhVinhDanhRoute: typeof AuthenticatedSanhVinhDanhRoute
-  AuthenticatedTaoNguoiMauRoute: typeof AuthenticatedTaoNguoiMauRoute
   AuthenticatedTheGioiRoute: typeof AuthenticatedTheGioiRoute
   AuthenticatedThiDauRoute: typeof AuthenticatedThiDauRoute
   AuthenticatedHocSubjectRoute: typeof AuthenticatedHocSubjectRoute
@@ -482,10 +441,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHoSoRoute: AuthenticatedHoSoRoute,
   AuthenticatedNhanVatRoute: AuthenticatedNhanVatRoute,
   AuthenticatedQuanTriRoute: AuthenticatedQuanTriRoute,
-  AuthenticatedSalonRoute: AuthenticatedSalonRoute,
   AuthenticatedSanBongRoute: AuthenticatedSanBongRoute,
   AuthenticatedSanhVinhDanhRoute: AuthenticatedSanhVinhDanhRoute,
-  AuthenticatedTaoNguoiMauRoute: AuthenticatedTaoNguoiMauRoute,
   AuthenticatedTheGioiRoute: AuthenticatedTheGioiRoute,
   AuthenticatedThiDauRoute: AuthenticatedThiDauRoute,
   AuthenticatedHocSubjectRoute: AuthenticatedHocSubjectRoute,

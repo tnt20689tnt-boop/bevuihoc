@@ -12,7 +12,7 @@ export type Activity = {
   z: number;
   label: string;
   icon: string;
-  to: "/hoc/$subject" | "/salon" | "/tao-nguoi-mau" | "/san-bong" | "/thi-dau" | "/bang-xep-hang" | "/sanh-vinh-danh";
+  to: "/hoc/$subject" | "/san-bong" | "/thi-dau" | "/bang-xep-hang" | "/sanh-vinh-danh";
   params?: { subject: string };
 };
 
@@ -199,8 +199,6 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     radius: 14,
     portals: [EXIT],
     activities: [
-      { x: -2.1, z: -5, label: "Vào Salon làm đẹp", icon: "💄", to: "/salon" },
-      { x: 3.6, z: -5, label: "Tạo người mẫu", icon: "👗", to: "/tao-nguoi-mau" },
     ],
     obstacles: [{ x: 0, z: -10, r: 2.4 }],
   },
