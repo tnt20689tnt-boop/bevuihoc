@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Bé Học Vui — Fashion Designer 3D</title>
+<style>
+  :root{
+    --pink:#ffd6e8; --pink2:#ff9ec7; --purple:#c9b6ff; --blue:#bfe3ff;
+    --yellow:#fff3b0; --mint:#c8f7dc; --ink:#5a4a6a; --card:#ffffff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI',Arial,sans-serif;background:#ffeef6;color:var(--ink);}
+  #app{position:fixed;inset:0;}
+  canvas{display:block;}
+
+  /* ---------- Loading ---------- */
+  #loading{position:fixed;inset:0;background:linear-gradient(135deg,#ffd6e8,#c9b6ff);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;transition:opacity .6s;}
+  #loading h1{font-size:2rem;color:#fff;text-shadow:0 3px 10px rgba(180,120,220,.5);margin-bottom:14px;}
+  #loading .bar{width:220px;height:14px;background:#ffffff88;border-radius:99px;overflow:hidden;}
+  #loading .bar>div{height:100%;width:40%;background:#fff;border-radius:99px;animation:load 1.2s infinite ease-in-out;}
+  @keyframes load{0%{transform:translateX(-100%)}100%{transform:translateX(280%)}}
+
+  /* ---------- Top bar ---------- */
+  #topbar{position:fixed;top:10px;left:10px;right:10px;display:flex;gap:8px;align-items:center;z-index:20;pointer-events:none;}
+  #topbar>*{pointer-events:auto;}
+  .brand{background:#ffffffdd;border-radius:99px;padding:8px 16px;font-weight:800;color:#e05a9b;box-shadow:0 4px 14px rgba(230,120,180,.25);font-size:.95rem;white-space:nowrap;}
+  .chip{background:#ffffffdd;border:none;border-radius:99px;padding:8px 14px;font-weight:700;color:var(--ink);cursor:pointer;box-shadow:0 4px 12px rgba(150,110,200,.2);font-size:.85rem;transition:.15s;}
+  .chip:hover{transform:translateY(-2px);background:#fff;}
+  .chip.active{background:linear-gradient(135deg,#ff9ec7,#c9b6ff);color:#fff;}
+  #movePad{position:fixed;left:12px;bottom:12px;z-index:20;display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(3,44px);gap:4px;}
+  #movePad button{border:none;border-radius:14px;background:#ffffffcc;font-size:1.1rem;color:#e05a9b;font-weight:800;box-shadow:0 3px 10px rgba(200,120,190,.25);cursor:pointer;}
+  #movePad button:active{background:var(--pink2);color:#fff;}
+  #movePad .up{grid-column:2;grid-row:1}#movePad .left{grid-column:1;grid-row:2}#movePad .down{grid-column:2;grid-row:3}#movePad .right{grid-column:3;grid-row:2}#movePad .mid{grid-column:2;grid-row:2;background:#fff0f7}
+
+  /* ---------- Panel ---------- */
+  #panel{position:fixed;top:64px;right:10px;bottom:12px;width:330px;max-width:calc(100vw - 20px);background:#ffffffee;backdrop-filter:blur(10px);border-radius:22px;box-shadow:0 10px 40px rgba(180,120,220,.3);z-index:19;display:flex;flex-direction:column;overflow:hidden;transition:transform .35s cubic-bezier(.4,1.4,.6,1);}
+  #panel.hidden{transform:translateX(calc(100% + 20px));}
+  #tabs{display:flex;flex-wrap:wrap;gap:6px;padding:10px;border-bottom:2px solid #ffe3f1;}
+  .tab{flex:1;min-width:56px;border:none;border-radius:12px;padding:8px 4px;font-size:.72rem;font-weight:800;color:#a08bb5;background:#f6eefc;cursor:pointer;transition:.15s;}
+  .tab.active{background:linear-gradient(135deg,#ff9ec7,#c9b6ff);color:#fff;box-shadow:0 3px 10px rgba(220,130,200,.4);}
+  #panelBody{flex:1;overflow-y:auto;padding:12px;}
+  #panelBody::-webkit-scrollbar{width:6px}#panelBody::-webkit-scrollbar-thumb{background:#e5c9f2;border-radius:99px}
+  .secTitle{font-size:.8rem;font-weight:800;color:#c07bb0;margin:10px 0 6px;text-transform:uppercase;letter-spacing:.5px;}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .item{background:#fdf7ff;border:2px solid #f2e3fb;border-radius:14px;padding:8px 4px;text-align:center;cursor:pointer;transition:.15s;user-select:none;}
+  .item:hover{transform:translateY(-2px);border-color:#ffb8d9;}
+  .item.active{border-color:#ff7fb8;background:#ffe9f4;box-shadow:0 3px 10px rgba(255,127,184,.3);}
+  .sw{width:34px;height:34px;border-radius:50%;margin:0 auto 4px;border:3px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.15);}
+  .item .n{font-size:.62rem;font-weight:700;color:#8a759c;line-height:1.1;}
+  .rowBtns{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;}
+  .btn{flex:1;min-width:90px;border:none;border-radius:14px;padding:10px;font-weight:800;font-size:.78rem;color:#fff;cursor:pointer;transition:.15s;box-shadow:0 4px 12px rgba(200,120,190,.3);}
+  .btn:active{transform:scale(.95);}
+  .btn.pink{background:linear-gradient(135deg,#ff9ec7,#ff7fb8);}
+  .btn.purple{background:linear-gradient(135deg,#c9b6ff,#a98ef0);}
+  .btn.blue{background:linear-gradient(135deg,#8fd0ff,#5aa9f0);}
+  .btn.mint{background:linear-gradient(135deg,#7fe0b0,#4cc38a);}
+  .btn.gray{background:linear-gradient(135deg,#cbb9d9,#a893bd);}
+  .favRow{display:flex;align-items:center;gap:8px;background:#fdf3ff;border-radius:12px;padding:8px;margin-bottom:8px;}
+  .favRow img{width:52px;height:52px;border-radius:10px;object-fit:cover;background:#eee;}
+  .favRow .t{flex:1;font-size:.75rem;font-weight:700;}
+  .favRow button{border:none;border-radius:8px;padding:6px 10px;font-size:.7rem;font-weight:800;cursor:pointer;color:#fff;}
+  #togglePanel{position:fixed;top:64px;right:10px;z-index:21;border:none;border-radius:99px;padding:10px 14px;background:linear-gradient(135deg,#ff9ec7,#c9b6ff);color:#fff;font-weight:800;cursor:pointer;box-shadow:0 6px 18px rgba(220,130,200,.45);transition:.2s;}
+  #toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);background:#5a4a6add;color:#fff;padding:10px 20px;border-radius:99px;font-weight:700;font-size:.85rem;z-index:50;transition:.3s;pointer-events:none;}
+  #toast.show{transform:translateX(-50%) translateY(0);}
+  #areaBtns{position:fixed;left:12px;bottom:160px;z-index:20;display:flex;flex-direction:column;gap:6px;}
+  #areaBtns button{border:none;border-radius:99px;padding:7px 12px;background:#ffffffd0;font-size:.7rem;font-weight:800;color:#a06bd0;cursor:pointer;box-shadow:0 3px 10px rgba(160,107,208,.25);}
+  #areaBtns button:hover{background:#f3e6ff;}
+  @media (max-width:640px){
+    #panel{top:auto;right:8px;left:8px;bottom:8px;width:auto;height:46%;border-radius:20px 20px 0 0;}
+    #panel.hidden{transform:translateY(calc(100% + 20px));}
+    #togglePanel{top:auto;bottom:calc(46% + 16px);right:8px;}
+    #panel.hidden ~ #togglePanel{bottom:16px;}
+    #movePad{left:8px;bottom:auto;top:120px;grid-template-columns:repeat(3,40px);grid-template-rows:repeat(3,40px);}
+    #areaBtns{left:8px;bottom:auto;top:56px;flex-direction:row;flex-wrap:wrap;max-width:70vw;}
+    .brand{font-size:.75rem;padding:6px 10px;}
+  }
+</style>
+</head>
+<body>
+<div id="loading"><h1>🎀 Fashion Designer 3D 🎀</h1><div class="bar"><div></div></div></div>
+<div id="app"></div>
+
+<div id="topbar">
+  <div class="brand">🎀 Bé Học Vui • Fashion 3D</div>
+  <button class="chip" id="btnIdle">🧍 Đứng</button>
+  <button class="chip" id="btnWalkAnim">🚶 Đi bộ</button>
+  <button class="chip" id="btnWave">👋 Vẫy tay</button>
+  <button class="chip" id="btnSpin">🌀 Xoay</button>
+  <button class="chip" id="btnJump">🐰 Nhảy</button>
+</div>
+
+<div id="areaBtns">
+  <button data-area="runway">🌟 Sàn diễn</button>
+  <button data-area="makeup">💄 Trang điểm</button>
+  <button data-area="wardrobe">👗 Tủ váy</button>
+  <button data-area="photo">📸 Chụp ảnh</button>
+  <button data-area="sofa">🛋️ Sofa</button>
+</div>
+
+<div id="movePad">
+  <button class="up" data-k="up">▲</button>
+  <button class="left" data-k="left">◀</button>
+  <button class="mid" data-k="mid">●</button>
+  <button class="right" data-k="right">▶</button>
+  <button class="down" data-k="down">▼</button>
+</div>
+
+<button id="togglePanel">🎨 Tủ đồ</button>
+<div id="panel">
+  <div id="tabs"></div>
+  <div id="panelBody"></div>
+</div>
+<div id="toast"></div>
+
+<script type="importmap">
+{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ============================================================
+   FASHION DESIGNER 3D — studio thờ trang cao cấp cho bé
+   ============================================================ */
+
+// ---------- Renderer / Scene / Camera ----------
+const app = document.getElementById('app');
+const renderer = new THREE.WebGLRenderer({ antialias:true, preserveDrawingBuffer:true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+app.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0xffeaf4);
+scene.fog = new THREE.Fog(0xffeaf4, 30, 70);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(6, 4.2, 9);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 2.2;
+controls.maxDistance = 26;
+controls.maxPolarAngle = Math.PI * 0.49;
+controls.target.set(0, 1.1, 0);
+
+// ---------- Lights ----------
+scene.add(new THREE.HemisphereLight(0xfff5fa, 0xd9c2e8, 0.85));
+const sun = new THREE.DirectionalLight(0xfff0dd, 1.1);
+sun.position.set(8, 14, 6);
+sun.castShadow = true;
+sun.shadow.mapSize.set(2048, 2048);
+sun.shadow.camera.left = -18; sun.shadow.camera.right = 18;
+sun.shadow.camera.top = 18; sun.shadow.camera.bottom = -18;
+scene.add(sun);
+
+// ---------- Helpers ----------
+const M = (c, r=0.55, m=0.05) => new THREE.MeshStandardMaterial({ color:c, roughness:r, metalness:m });
+const PASTELS = [0xffc2dd,0xc9b6ff,0xbfe3ff,0xfff3b0,0xc8f7dc,0xffd9b3,0xff9ec7,0xa8e6cf,0xffb7b2,0xdcd3ff];
+function mesh(geo, mat, x=0,y=0,z=0, cast=true, recv=true){ const o=new THREE.Mesh(geo,mat); o.position.set(x,y,z); o.castShadow=cast; o.receiveShadow=recv; return o; }
+
+// ---------- Sàn bóng + tường ----------
+const floor = mesh(new THREE.CircleGeometry(30, 64), new THREE.MeshStandardMaterial({ color:0xfdeaf3, roughness:0.18, metalness:0.35 }), 0,0,0, false, true);
+floor.rotation.x = -Math.PI/2;
+scene.add(floor);
+// thảm tròi trung tâm
+const rug = mesh(new THREE.CircleGeometry(4.2, 48), M(0xffd6e8, 0.9), 0, 0.012, 2.5, false, true);
+rug.rotation.x = -Math.PI/2; scene.add(rug);
+const rugRing = mesh(new THREE.RingGeometry(4.2, 4.55, 48), M(0xffffff, 0.9), 0, 0.014, 2.5, false, true);
+rugRing.rotation.x = -Math.PI/2; scene.add(rugRing);
+
+function wall(w,h,x,y,z,ry,color=0xfbe4f2){
+  const wd = mesh(new THREE.PlaneGeometry(w,h), M(color, 0.95), x, y, z, false, true);
+  wd.rotation.y = ry; scene.add(wd); return wd;
+}
+wall(40, 10, 0, 5, -14, 0);          // tường sau
+wall(40, 10, -16, 5, 0, Math.PI/2);  // tường trái
+wall(40, 10, 16, 5, 0, -Math.PI/2);  // tường phải
+// cửa sổ sáng trên tường sau
+for (let i=-2;i<=2;i++){
+  const win = mesh(new THREE.PlaneGeometry(3.4,4.6), new THREE.MeshStandardMaterial({color:0xfff9e0, emissive:0xfff3c0, emissiveIntensity:0.7, roughness:0.4}), i*6.5, 4.6, -13.95, false, false);
+  scene.add(win);
+  scene.add(mesh(new THREE.BoxGeometry(3.6,0.15,0.1), M(0xffffff,0.6), i*6.5, 7, -13.9));
+  scene.add(mesh(new THREE.BoxGeometry(3.6,0.15,0.1), M(0xffffff,0.6), i*6.5, 2.2, -13.9));
+}
+
+// ---------- RUNWAY sàn diễn ----------
+const runway = new THREE.Group();
+const rwBase = mesh(new THREE.BoxGeometry(2.6, 0.35, 12), M(0xffffff, 0.15, 0.4), 0, 0.175, -6);
+runway.add(rwBase);
+const rwTop = mesh(new THREE.BoxGeometry(2.4, 0.06, 11.8), new THREE.MeshStandardMaterial({color:0xffd6e8, roughness:0.08, metalness:0.6}), 0, 0.37, -6, false, true);
+runway.add(rwTop);
+// đèn 2 bên runway
+const sideLights = [];
+for (let z=-11; z<=-1; z+=2){
+  for (const sx of [-1.7, 1.7]){
+    const lamp = mesh(new THREE.CylinderGeometry(0.1,0.14,0.9,8), M(0xdcc8f0,0.4,0.6), sx, 0.45, z);
+    const bulb = mesh(new THREE.SphereGeometry(0.14,12,12), new THREE.MeshStandardMaterial({color:0xfff2b0, emissive:0xffe27a, emissiveIntensity:2.2}), sx, 0.95, z, false, false);
+    runway.add(lamp, bulb);
+  }
+}
+// khung backdrop cuối runway
+runway.add(mesh(new THREE.BoxGeometry(5.4,0.25,0.25), M(0xc9b6ff,0.4,0.5), 0, 3.6, -12));
+runway.add(mesh(new THREE.BoxGeometry(0.25,3.6,0.25), M(0xc9b6ff,0.4,0.5), -2.6, 1.8, -12));
+runway.add(mesh(new THREE.BoxGeometry(0.25,3.6,0.25), M(0xc9b6ff,0.4,0.5), 2.6, 1.8, -12));
+scene.add(runway);
+// sàn catwalk mở rộng cuối runway
+scene.add(mesh(new THREE.CylinderGeometry(2.8,2.8,0.35,32), M(0xffffff,0.15,0.4), 0, 0.175, -12));
+// spotlight chiếu ngườ mẫu
+const spot = new THREE.SpotLight(0xfff0fa, 60, 30, Math.PI/7, 0.45, 1.6);
+spot.position.set(0, 9, -4); spot.castShadow = true;
+const spotTarget = new THREE.Object3D(); scene.add(spotTarget);
+spot.target = spotTarget; scene.add(spot);
+
+// ---------- Kim tuyến (sparkles) ----------
+function makeSparkles(cx, cz, w, d, n, color=0xffd700){
+  const g = new THREE.BufferGeometry();
+  const pos = new Float32Array(n*3);
+  for (let i=0;i<n;i++){ pos[i*3]=cx+(Math.random()-0.5)*w; pos[i*3+1]=Math.random()*4; pos[i*3+2]=cz+(Math.random()-0.5)*d; }
+  g.setAttribute('position', new THREE.BufferAttribute(pos,3));
+  const p = new THREE.Points(g, new THREE.PointsMaterial({ color, size:0.08, transparent:true, opacity:0.9, depthWrite:false, blending:THREE.AdditiveBlending }));
+  scene.add(p); return p;
+}
+const spark1 = makeSparkles(0,-6, 3, 12, 220);
+const spark2 = makeSparkles(0, 2.5, 8, 8, 160, 0xffb8e6);
+
+// ---------- Khu tủ váy (phải) ----------
+const wardrobe = new THREE.Group();
+function rack(x, z, ry, colors){
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(0.05,0.05,2.2,8), M(0xe8c8a0,0.5), -0.9, 1.1, 0));
+  g.add(mesh(new THREE.CylinderGeometry(0.05,0.05,2.2,8), M(0xe8c8a0,0.5), 0.9, 1.1, 0));
+  g.add(mesh(new THREE.CylinderGeometry(0.04,0.04,1.9,8), M(0xd9a86c,0.4,0.5), 0, 2.1, 0)).rotation.z = Math.PI/2;
+  colors.forEach((c,i)=>{
+    const dx = -0.7 + i*0.35;
+    g.add(mesh(new THREE.CylinderGeometry(0.02,0.02,0.3,6), M(0xbbbbbb,0.3,0.8), dx, 1.95, 0));
+    const dress = mesh(new THREE.ConeGeometry(0.22, 0.9, 10), M(c,0.6), dx, 1.4, 0);
+    g.add(dress);
+  });
+  g.position.set(x, 0, z); g.rotation.y = ry;
+  wardrobe.add(g);
+}
+rack(10.5, -6, -Math.PI/2.4, [0xff9ec7,0xc9b6ff,0xfff3b0,0xbfe3ff,0xc8f7dc]);
+rack(12.5, -2.5, -Math.PI/2.2, [0xff7fb8,0xa8e6cf,0xffd9b3,0xdcd3ff,0xffb7b2]);
+rack(13, 1.5, -Math.PI/2, [0xffc2dd,0x9be0ff,0xffe28a,0xbaffd0,0xe0b3ff]);
+// mannequin trưng bày
+function mannequin(x, z, dressColor, ry=0){
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(0.04,0.3,0.12,12), M(0xdddddd,0.3,0.7), 0, 0.06, 0));
+  g.add(mesh(new THREE.CylinderGeometry(0.03,0.03,1.0,8), M(0xcccccc,0.3,0.7), 0, 0.6, 0));
+  g.add(mesh(new THREE.SphereGeometry(0.13,10,10), M(0xf5e6d8,0.6), 0, 1.55, 0));
+  g.add(mesh(new THREE.ConeGeometry(0.34, 1.0, 14), M(dressColor,0.5), 0, 1.0, 0));
+  g.add(mesh(new THREE.CylinderGeometry(0.15,0.2,0.45,10), M(dressColor,0.5), 0, 1.42, 0));
+  g.position.set(x,0,z); g.rotation.y = ry;
+  wardrobe.add(g);
+}
+mannequin(10, 4.5, 0xffc2dd, -0.6);
+mannequin(12.5, 5.5, 0xc9b6ff, -0.9);
+mannequin(14.5, 4, 0xfff3b0, -1.2);
+// kệ giày/túi
+const shelf = mesh(new THREE.BoxGeometry(3, 0.12, 0.9), M(0xffffff,0.6), 13.5, 0.8, 7.5);
+wardrobe.add(shelf);
+wardrobe.add(mesh(new THREE.BoxGeometry(3, 0.12, 0.9), M(0xffffff,0.6), 13.5, 1.6, 7.5));
+wardrobe.add(mesh(new THREE.BoxGeometry(3, 0.12, 0.9), M(0xffffff,0.6), 13.5, 2.4, 7.5));
+wardrobe.add(mesh(new THREE.BoxGeometry(0.12, 2.5, 0.9), M(0xf0d8ea,0.6), 12.1, 1.25, 7.5));
+wardrobe.add(mesh(new THREE.BoxGeometry(0.12, 2.5, 0.9), M(0xf0d8ea,0.6), 14.9, 1.25, 7.5));
+for (let i=0;i<6;i++){
+  wardrobe.add(mesh(new THREE.SphereGeometry(0.14,10,8), M(PASTELS[i%10],0.5), 12.4+(i%3)*1.0, 0.95+Math.floor(i/3)*0.8, 7.5));
+}
+scene.add(wardrobe);
+
+// ---------- Khu trang điểm (trái) ----------
+const makeupZone = new THREE.Group();
+const table = mesh(new THREE.BoxGeometry(3.4, 0.14, 1.1), M(0xffffff,0.4), -11.5, 0.95, -4);
+makeupZone.add(table);
+makeupZone.add(mesh(new THREE.BoxGeometry(0.14, 0.95, 0.9), M(0xffd6e8,0.5), -12.9, 0.48, -4));
+makeupZone.add(mesh(new THREE.BoxGeometry(0.14, 0.95, 0.9), M(0xffd6e8,0.5), -10.1, 0.48, -4));
+// gương tròn + bóng đèn
+const mirror = mesh(new THREE.CircleGeometry(0.85, 32), new THREE.MeshStandardMaterial({color:0xeaf6ff, roughness:0.05, metalness:0.9}), -11.5, 2.3, -4.55, false, false);
+makeupZone.add(mirror);
+makeupZone.add(mesh(new THREE.TorusGeometry(0.88, 0.06, 10, 40), M(0xffd700,0.3,0.8), -11.5, 2.3, -4.54));
+for (let a=0; a<Math.PI*2; a+=Math.PI/6){
+  const bx = -11.5 + Math.cos(a)*1.05, by = 2.3 + Math.sin(a)*1.05;
+  makeupZone.add(mesh(new THREE.SphereGeometry(0.07,8,8), new THREE.MeshStandardMaterial({color:0xfff2b0, emissive:0xffe27a, emissiveIntensity:2}), bx, by, -4.5, false, false));
+}
+// ghế trang điểm
+makeupZone.add(mesh(new THREE.CylinderGeometry(0.35,0.4,0.55,16), M(0xff9ec7,0.6), -11.5, 0.28, -2.6));
+makeupZone.add(mesh(new THREE.CylinderGeometry(0.05,0.05,0.35,8), M(0xcccccc,0.4,0.6), -11.5, 0.75, -2.6));
+// lọ mỹ phẩm trên bàn
+for (let i=0;i<5;i++){
+  makeupZone.add(mesh(new THREE.CylinderGeometry(0.06,0.07,0.22,8), M(PASTELS[(i*3)%10],0.4), -12.6+i*0.55, 1.13, -4.15));
+}
+scene.add(makeupZone);
+
+// ---------- Gương lớn trang trí tường ----------
+function bigMirror(x, z, ry){
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CircleGeometry(1.5, 40), new THREE.MeshStandardMaterial({color:0xdff2ff, roughness:0.04, metalness:0.95}), 0, 2.6, 0, false, false));
+  g.add(mesh(new THREE.TorusGeometry(1.55, 0.1, 10, 48), M(0xffd700,0.25,0.9), 0, 2.6, 0.01));
+  g.position.set(x,0,z); g.rotation.y = ry;
+  scene.add(g);
+}
+bigMirror(-15.8, 3, Math.PI/2);
+bigMirror(15.8, -6, -Math.PI/2);
+bigMirror(6, -13.85, 0);
+
+// ---------- Sofa + khu thư giãn ----------
+const sofa = new THREE.Group();
+sofa.add(mesh(new THREE.BoxGeometry(3.2, 0.55, 1.2), M(0xc9b6ff,0.7), 0, 0.35, 0));
+sofa.add(mesh(new THREE.BoxGeometry(3.2, 0.9, 0.28), M(0xc9b6ff,0.7), 0, 0.95, -0.46));
+sofa.add(mesh(new THREE.BoxGeometry(0.28, 0.75, 1.2), M(0xbba5f5,0.7), -1.6, 0.65, 0));
+sofa.add(mesh(new THREE.BoxGeometry(0.28, 0.75, 1.2), M(0xbba5f5,0.7), 1.6, 0.65, 0));
+sofa.add(mesh(new THREE.BoxGeometry(1.3, 0.22, 1.0), M(0xffd6e8,0.8), -0.7, 0.72, 0.05));
+sofa.add(mesh(new THREE.BoxGeometry(1.3, 0.22, 1.0), M(0xfff3b0,0.8), 0.7, 0.72, 0.05));
+sofa.position.set(-6.5, 0, 6); sofa.rotation.y = 0.5;
+scene.add(sofa);
+scene.add(mesh(new THREE.CylinderGeometry(0.7,0.7,0.4,20), M(0xffffff,0.4), -4, 0.2, 7.5));
+scene.add(mesh(new THREE.SphereGeometry(0.16,10,8), M(0xff9ec7,0.5), -4, 0.48, 7.5));
+
+// ---------- Cây trang trí ----------
+function plant(x, z){
+  const g = new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(0.3,0.24,0.5,12), M(0xffb58a,0.6), 0, 0.25, 0));
+  g.add(mesh(new THREE.ConeGeometry(0.55, 1.3, 8), M(0x7fce8f,0.7), 0, 1.2, 0));
+  g.add(mesh(new THREE.ConeGeometry(0.4, 1.0, 8), M(0x95e0a5,0.7), 0, 1.85, 0));
+  g.position.set(x,0,z); scene.add(g);
+}
+plant(-14, 10); plant(14.5, 10.5); plant(-14.5, -9); plant(14, -11);
+
+// ---------- Khu chụp ảnh (góc trước-trái) ----------
+const photoZone = new THREE.Group();
+const backdrop = mesh(new THREE.PlaneGeometry(6, 4.6), M(0xffc2dd,0.85), -8.5, 2.3, 11.9, false, true);
+photoZone.add(backdrop);
+photoZone.add(mesh(new THREE.BoxGeometry(6.3,0.2,0.2), M(0xffffff,0.5), -8.5, 4.7, 11.9));
+photoZone.add(mesh(new THREE.BoxGeometry(0.2,4.7,0.2), M(0xffffff,0.5), -11.6, 2.35, 11.9));
+photoZone.add(mesh(new THREE.BoxGeometry(0.2,4.7,0.2), M(0xffffff,0.5), -5.4, 2.35, 11.9));
+// máy ảnh tripod
+const camProp = new THREE.Group();
+camProp.add(mesh(new THREE.BoxGeometry(0.5,0.35,0.3), M(0x4a4a5a,0.4,0.6), 0, 1.5, 0));
+camProp.add(mesh(new THREE.CylinderGeometry(0.12,0.12,0.2,12), M(0x333344,0.3,0.7), 0, 1.5, 0.22)).rotation.x = Math.PI/2;
+for (let a=0;a<3;a++){
+  const leg = mesh(new THREE.CylinderGeometry(0.02,0.02,1.5,6), M(0x888899,0.4,0.6), 0, 0.75, 0);
+  leg.rotation.z = 0.35; leg.rotation.y = a*Math.PI*2/3;
+  leg.position.x = Math.sin(a*Math.PI*2/3)*0.3; leg.position.z = Math.cos(a*Math.PI*2/3)*0.3;
+  camProp.add(leg);
+}
+camProp.position.set(-4.5, 0, 9); camProp.lookAt(-8.5, 1.5, 11.9);
+photoZone.add(camProp);
+scene.add(photoZone);
+
+// ---------- Đèn chùm trang trí ----------
+for (const [cx,cz] of [[0,2.5],[-11.5,-4],[10,0]]){
+  const ch = new THREE.Group();
+  ch.add(mesh(new THREE.CylinderGeometry(0.02,0.02,2.2,6), M(0xdddddd,0.4), 0, 7.6, 0, false, false));
+  ch.add(mesh(new THREE.SphereGeometry(0.42,14,12), new THREE.MeshStandardMaterial({color:0xfff2b0, emissive:0xffe9a0, emissiveIntensity:1.4}), 0, 6.4, 0, false, false));
+  ch.position.set(cx,0,cz); scene.add(ch);
+}
+
+// ============================================================
+//  NHÂN VẬT 3D — phong cách anime/chibi thân thiện trẻ em
+// ============================================================
+const char = new THREE.Group();
+scene.add(char);
+
+// --- vật liệu thân ---
+const skinMat  = M(0xffe0cc, 0.6);
+const hairMat  = M(0x6b4a2f, 0.65);
+let dressMat   = M(0xff9ec7, 0.45);
+let topMat     = M(0xffffff, 0.5);
+let skirtMat   = M(0xff9ec7, 0.5);
+let pantsMat   = M(0x8fb8ff, 0.6);
+let shoeMat    = M(0xffffff, 0.3, 0.4);
+let accMat     = M(0xffd700, 0.25, 0.85);
+
+// --- khung xương nhóm ---
+const body   = new THREE.Group(); char.add(body);            // thân
+const hips   = new THREE.Group(); body.add(hips);
+const legL   = new THREE.Group(); hips.add(legL);
+const legR   = new THREE.Group(); hips.add(legR);
+const armL   = new THREE.Group(); body.add(armL);
+const armR   = new THREE.Group(); body.add(armR);
+const headG  = new THREE.Group(); body.add(headG);
+legL.position.set( 0.11, 0.52, 0); legR.position.set(-0.11, 0.52, 0);
+armL.position.set( 0.22, 0.86, 0); armR.position.set(-0.22, 0.86, 0);
+headG.position.set(0, 1.06, 0);
+
+// --- chân + giày (giày thay đổi theo danh mục) ---
+const legGeo = new THREE.CylinderGeometry(0.055, 0.05, 0.48, 10);
+legL.add(mesh(legGeo, skinMat, 0, -0.26, 0));
+legR.add(mesh(legGeo, skinMat, 0, -0.26, 0));
+const shoeL = new THREE.Group(); legL.add(shoeL);
+const shoeR = new THREE.Group(); legR.add(shoeR);
+shoeL.position.set(0,-0.5,0.03); shoeR.position.set(0,-0.5,0.03);
+function buildShoes(type){
+  shoeL.clear(); shoeR.clear();
+  const mk = (g)=>{ shoeL.add(mesh(g.clone(), shoeMat)); shoeR.add(mesh(g.clone(), shoeMat)); };
+  if (type==='heels'){
+    mk(new THREE.BoxGeometry(0.1,0.07,0.2));
+    shoeL.add(mesh(new THREE.CylinderGeometry(0.02,0.02,0.12,6), shoeMat, 0,-0.08,-0.06));
+    shoeR.add(mesh(new THREE.CylinderGeometry(0.02,0.02,0.12,6), shoeMat, 0,-0.08,-0.06));
+  } else if (type==='boots'){
+    mk(new THREE.BoxGeometry(0.11,0.09,0.2));
+    shoeL.add(mesh(new THREE.CylinderGeometry(0.06,0.065,0.28,10), shoeMat, 0,0.12,0));
+    shoeR.add(mesh(new THREE.CylinderGeometry(0.06,0.065,0.28,10), shoeMat, 0,0.12,0));
+  } else if (type==='ballet'){
+    mk(new THREE.SphereGeometry(0.075,10,8));
+    shoeL.children[0].scale.set(1,0.6,1.4); shoeR.children[0].scale.set(1,0.6,1.4);
+  } else { // flats
+    mk(new THREE.BoxGeometry(0.1,0.06,0.18));
+    shoeL.add(mesh(new THREE.SphereGeometry(0.055,8,8), shoeMat, 0,0.01,0.07));
+    shoeR.add(mesh(new THREE.SphereGeometry(0.055,8,8), shoeMat, 0,0.01,0.07));
+  }
+}
+
+// --- tay ---
+const armGeo = new THREE.CylinderGeometry(0.045, 0.04, 0.42, 10);
+armL.add(mesh(armGeo, skinMat, 0, -0.2, 0));
+armR.add(mesh(armGeo, skinMat, 0, -0.2, 0));
+const handL = mesh(new THREE.SphereGeometry(0.05,8,8), skinMat, 0, -0.43, 0);
+const handR = handL.clone(); armL.add(handL); armR.add(handR);
+// găng tay (phụ kiện) — ống tay che cẳng tay
+const gloveMat = M(0xfff0f5, 0.6);
+const gloveL = mesh(new THREE.CylinderGeometry(0.055,0.05,0.22,10), gloveMat, 0,-0.32,0);
+const gloveR = gloveL.clone(); gloveL.visible = gloveR.visible = false;
+armL.add(gloveL); armR.add(gloveR);
+
+// --- đầu ---
+headG.add(mesh(new THREE.SphereGeometry(0.30, 24, 20), skinMat, 0, 0.22, 0));
+headG.add(mesh(new THREE.CylinderGeometry(0.08,0.09,0.14,10), skinMat, 0, -0.03, 0));
+// tai
+headG.add(mesh(new THREE.SphereGeometry(0.055,8,8), skinMat, 0.295, 0.2, 0));
+headG.add(mesh(new THREE.SphereGeometry(0.055,8,8), skinMat, -0.295, 0.2, 0));
+// má hồng
+const cheekL = mesh(new THREE.CircleGeometry(0.05,12), new THREE.MeshBasicMaterial({color:0xff9eb5, transparent:true, opacity:0.75}), 0.17, 0.14, 0.272, false, false);
+const cheekR = cheekL.clone(); cheekR.position.x = -0.17;
+cheekL.rotation.y = 0.35; cheekR.rotation.y = -0.35;
+headG.add(cheekL, cheekR);
+// mắt (có animation chớp)
+const eyeWhiteL = mesh(new THREE.SphereGeometry(0.068,12,12), new THREE.MeshBasicMaterial({color:0xffffff}), 0.115, 0.26, 0.245, false, false);
+const eyeWhiteR = eyeWhiteL.clone(); eyeWhiteR.position.x = -0.115;
+const pupilL = mesh(new THREE.SphereGeometry(0.038,10,10), new THREE.MeshBasicMaterial({color:0x3a2b45}), 0.115, 0.255, 0.295, false, false);
+const pupilR = pupilL.clone(); pupilR.position.x = -0.115;
+const sparkL = mesh(new THREE.SphereGeometry(0.014,6,6), new THREE.MeshBasicMaterial({color:0xffffff}), 0.128, 0.275, 0.325, false, false);
+const sparkR = sparkL.clone(); sparkR.position.x = -0.102;
+// phấn mắt
+const shadowL = mesh(new THREE.SphereGeometry(0.06,10,8,0,Math.PI*2,0,Math.PI/2), new THREE.MeshBasicMaterial({color:0xffb8d9, transparent:true, opacity:0.55}), 0.115, 0.30, 0.245, false, false);
+shadowL.rotation.x = -0.5;
+const shadowR = shadowL.clone(); shadowR.position.x = -0.115;
+const browL = mesh(new THREE.BoxGeometry(0.09,0.014,0.01), new THREE.MeshBasicMaterial({color:0x6b4a2f}), 0.115, 0.36, 0.27, false, false);
+browL.rotation.z = -0.12;
+const browR = browL.clone(); browR.position.x = -0.115; browR.rotation.z = 0.12;
+headG.add(eyeWhiteL, eyeWhiteR, pupilL, pupilR, sparkL, sparkR, shadowL, shadowR, browL, browR);
+// miệng (3 kiểu biểu cảm)
+const mouthG = new THREE.Group(); mouthG.position.set(0, 0.09, 0.285); headG.add(mouthG);
+let lipColor = 0xe0607f;
+function buildMouth(type){
+  mouthG.clear();
+  if (type==='happy'){ // cường lớn
+    const m = mesh(new THREE.SphereGeometry(0.055,12,10), new THREE.MeshBasicMaterial({color:0x8a3b4a}), 0,0,0, false,false);
+    m.scale.set(1.3,0.9,0.5); mouthG.add(m);
+    const lip = mesh(new THREE.TorusGeometry(0.06,0.018,8,16,Math.PI), new THREE.MeshBasicMaterial({color:lipColor}), 0,-0.01,0.01, false,false);
+    lip.rotation.z = Math.PI; mouthG.add(lip);
+  } else if (type==='wow'){
+    mouthG.add(mesh(new THREE.SphereGeometry(0.038,10,10), new THREE.MeshBasicMaterial({color:0x8a3b4a}), 0,0,0, false,false));
+  } else { // smile nhẹ
+    const lip = mesh(new THREE.TorusGeometry(0.045,0.015,8,16,Math.PI), new THREE.MeshBasicMaterial({color:lipColor}), 0,0.01,0.01, false,false);
+    lip.rotation.z = Math.PI; mouthG.add(lip);
+  }
+}
+
+// --- TÓC ---
+const hairG = new THREE.Group(); headG.add(hairG);
+function buildHair(style, color){
+  hairG.clear();
+  hairMat.color.setHex(color);
+  const cap = mesh(new THREE.SphereGeometry(0.315, 20, 16, 0, Math.PI*2, 0, Math.PI*0.55), hairMat, 0, 0.235, -0.005);
+  cap.rotation.x = -0.28; hairG.add(cap);
+  const bang = mesh(new THREE.SphereGeometry(0.30, 16, 10, 0, Math.PI*2, 0, Math.PI*0.35), hairMat, 0, 0.30, 0.04);
+  bang.rotation.x = -0.55; hairG.add(bang);
+  const add = (g,x,y,z)=>{ const o=mesh(g,hairMat,x,y,z); hairG.add(o); return o; };
+  if (style==='long'){
+    add(new THREE.BoxGeometry(0.42,0.75,0.14), 0, -0.08, -0.24);
+    add(new THREE.SphereGeometry(0.09,8,8), 0.14, 0.36, 0.14);
+    add(new THREE.SphereGeometry(0.09,8,8), -0.14, 0.36, 0.14);
+  } else if (style==='short'){
+    add(new THREE.SphereGeometry(0.29,14,10,0,Math.PI*2,0,Math.PI*0.6), 0, 0.22, -0.04).rotation.x=-0.3;
+  } else if (style==='curly'){
+    for (let i=0;i<8;i++){
+      const a = i/8*Math.PI*1.5+Math.PI*0.75;
+      add(new THREE.SphereGeometry(0.11,10,8), Math.cos(a)*0.27, 0.30+Math.sin(a)*0.22, Math.sin(a*2)*0.05);
+    }
+    add(new THREE.SphereGeometry(0.12,10,8), 0, 0.52, -0.05);
+  } else if (style==='bun'){
+    add(new THREE.SphereGeometry(0.15,12,10), 0, 0.58, -0.08);
+    add(new THREE.TorusGeometry(0.15,0.03,8,20), M(0xffd700,0.3,0.8), 0, 0.58, -0.08);
+  } else if (style==='ponytail'){
+    const p = add(new THREE.ConeGeometry(0.13,0.6,10), 0, 0.15, -0.42);
+    p.rotation.x = 0.5;
+    add(new THREE.SphereGeometry(0.14,10,8), 0, 0.5, -0.28);
+  } else if (style==='pigtails'){
+    add(new THREE.SphereGeometry(0.13,10,8), 0.32, 0.42, -0.05);
+    add(new THREE.SphereGeometry(0.13,10,8), -0.32, 0.42, -0.05);
+    const c1 = add(new THREE.ConeGeometry(0.11,0.5,10), 0.36, 0.05, -0.08); c1.rotation.x = Math.PI;
+    const c2 = add(new THREE.ConeGeometry(0.11,0.5,10), -0.36, 0.05, -0.08); c2.rotation.x = Math.PI;
+    add(new THREE.TorusGeometry(0.06,0.02,6,14), M(0xff7fb8,0.4), 0.32, 0.45, -0.05);
+    add(new THREE.TorusGeometry(0.06,0.02,6,14), M(0xff7fb8,0.4), -0.32, 0.45, -0.05);
+  } else if (style==='braids'){
+    for (const sx of [1,-1]){
+      for (let i=0;i<4;i++){
+        add(new THREE.SphereGeometry(0.075-i*0.008,8,8), sx*(0.30+i*0.015), 0.28-i*0.17, 0.02);
+      }
+      add(new THREE.SphereGeometry(0.045,8,6), M(0xff7fb8,0.4), sx*0.345, -0.36, 0.02);
+    }
+  }
+}
+
+// ============================================================
+//  HỆ THỐNG TRANG PHỤC — váy, áo/quần, phụ kiện gắn đúng vị trí
+// ============================================================
+
+// ---------- VÁY (váy liền che thân + chân váy) ----------
+// mỗi kiểu là bộ profile Lathe khác nhau + chi tiết riêng (không chỉ đổi màu)
+const dressG = new THREE.Group(); hips.add(dressG); dressG.position.set(0, 0.03, 0);
+function latheGeo(profile, segs=24){
+  const pts = profile.map(p=>new THREE.Vector2(p[0], p[1]));
+  return new THREE.LatheGeometry(pts, segs);
+}
+let currentDress = null;
+function buildDress(type, color){
+  dressG.clear();
+  dressMat = M(color, 0.42);
+  const mk = (geo)=>{ const m = mesh(geo, dressMat); dressG.add(m); return m; };
+  const trim = M(0xffffff, 0.6);
+  if (type==='gown' || type==='wedding'){          // váy dạ hội / váy cưới
+    mk(latheGeo([[0.30,0],[0.42,0.06],[0.40,0.2],[0.3,0.38],[0.22,0.52],[0.13,0.62]], dressMat));
+    mk(new THREE.CylinderGeometry(0.13,0.17,0.3,14)).position.y = 0.74;
+    // viền bèo
+    const frill = mesh(new THREE.TorusGeometry(0.40,0.045,10,30), trim, 0, 0.16, 0);
+    frill.rotation.x = Math.PI/2; dressG.add(frill);
+    if (type==='wedding'){
+      dressMat = M(0xffffff, 0.35);
+      // voan tàu dài phía sau
+      const train = mesh(new THREE.BoxGeometry(0.5,0.03,0.9), M(0xffffff,0.5,0.1), 0, 0.05, -0.55);
+      dressG.add(train);
+      // hoa trắng cài eo
+      for (let i=0;i<5;i++){
+        const a = i/5*Math.PI*2;
+        dressG.add(mesh(new THREE.SphereGeometry(0.035,8,6), trim, Math.cos(a)*0.16, 0.6, Math.sin(a)*0.16));
+      }
+    }
+  } else if (type==='princess'){                    // váy công chúa nhiều tầng
+    mk(latheGeo([[0.36,0],[0.40,0.05],[0.34,0.16],[0.28,0.3],[0.16,0.45],[0.12,0.62]], dressMat));
+    for (let i=0;i<3;i++){
+      const r = 0.37 - i*0.09;
+      const layer = mesh(new THREE.TorusGeometry(r,0.055,10,28), M(color,0.55), 0, 0.06+i*0.14, 0);
+      layer.rotation.x = Math.PI/2; dressG.add(layer);
+    }
+    mk(new THREE.CylinderGeometry(0.12,0.15,0.26,12)).position.y = 0.72;
+    // bờ vai phồng
+    dressG.add(mesh(new THREE.SphereGeometry(0.09,10,8), dressMat, 0.2, 0.84, 0));
+    dressG.add(mesh(new THREE.SphereGeometry(0.09,10,8), dressMat, -0.2, 0.84, 0));
+  } else if (type==='tutu'){                        // váy ballet
+    mk(new THREE.CylinderGeometry(0.12,0.13,0.28,12)).position.y = 0.68;
+    const tutu = mesh(new THREE.TorusGeometry(0.3,0.09,12,28), M(color,0.6), 0, 0.5, 0);
+    tutu.rotation.x = Math.PI/2; tutu.scale.z = 1.6; dressG.add(tutu);
+    const tutu2 = mesh(new THREE.TorusGeometry(0.26,0.06,10,24), trim, 0, 0.47, 0);
+    tutu2.rotation.x = Math.PI/2; tutu2.scale.z = 1.6; dressG.add(tutu2);
+  } else if (type==='fairytale'){                   // váy cổ tích
+    mk(latheGeo([[0.34,0],[0.38,0.08],[0.30,0.22],[0.2,0.4],[0.13,0.6]], dressMat));
+    mk(new THREE.CylinderGeometry(0.13,0.16,0.28,12)).position.y = 0.72;
+    // cánh tay áo chuông
+    dressG.add(mesh(new THREE.ConeGeometry(0.09,0.22,10,1,true), dressMat, 0.24, 0.8, 0));
+    dressG.add(mesh(new THREE.ConeGeometry(0.09,0.22,10,1,true), dressMat, -0.24, 0.8, 0));
+    // đính sao nhỏ
+    for (let i=0;i<10;i++){
+      const a = Math.random()*Math.PI*2, r = 0.2+Math.random()*0.14;
+      dressG.add(mesh(new THREE.SphereGeometry(0.018,6,6), new THREE.MeshStandardMaterial({color:0xfff3b0, emissive:0xffe27a, emissiveIntensity:1.5}), Math.cos(a)*r, 0.1+Math.random()*0.3, Math.sin(a)*r, false, false));
+    }
+  } else if (type==='summer'){                      // váy mùa hè ngắn nhẹ
+    mk(latheGeo([[0.26,0.15],[0.30,0.22],[0.20,0.38],[0.13,0.58]], dressMat));
+    mk(new THREE.CylinderGeometry(0.13,0.16,0.2,12)).position.y = 0.66;
+    const hem = mesh(new THREE.TorusGeometry(0.27,0.03,8,24), trim, 0, 0.17, 0);
+    hem.rotation.x = Math.PI/2; dressG.add(hem);
+  } else if (type==='party'){                       // váy dự tiệc bóng
+    mk(latheGeo([[0.30,0],[0.34,0.08],[0.24,0.3],[0.16,0.45],[0.13,0.62]], dressMat));
+    mk(new THREE.CylinderGeometry(0.13,0.15,0.3,12)).position.y = 0.74;
+    // đai sequin
+    const belt = mesh(new THREE.TorusGeometry(0.155,0.03,8,20), new THREE.MeshStandardMaterial({color:0xffd700, roughness:0.2, metalness:0.9}), 0, 0.6, 0);
+    belt.rotation.x = Math.PI/2; dressG.add(belt);
+  } else if (type==='korean'){                      // váy Hàn Quốc dễ thương
+    mk(latheGeo([[0.30,0.1],[0.32,0.2],[0.2,0.35],[0.14,0.55]], dressMat));
+    mk(new THREE.CylinderGeometry(0.14,0.17,0.26,12)).position.y = 0.68;
+    // tạp dề trắng
+    const apron = mesh(new THREE.BoxGeometry(0.22,0.3,0.02), trim, 0, 0.35, 0.24);
+    dressG.add(apron);
+    // nơ ngực
+    const bow1 = mesh(new THREE.ConeGeometry(0.05,0.1,8), M(0xff7fb8,0.5), 0.06, 0.78, 0.15);
+    const bow2 = bow1.clone(); bow2.position.x = -0.06; bow2.rotation.y = Math.PI;
+    dressG.add(bow1, bow2);
+  } else if (type==='modern'){                      // váy hiện đại chữ A
+    mk(latheGeo([[0.26,0],[0.30,0.1],[0.22,0.3],[0.16,0.5],[0.13,0.62]], dressMat));
+    mk(new THREE.CylinderGeometry(0.13,0.15,0.3,12)).position.y = 0.74;
+    // túi hộp
+    dressG.add(mesh(new THREE.BoxGeometry(0.09,0.07,0.02), trim, 0.17, 0.32, 0.17));
+    dressG.add(mesh(new THREE.BoxGeometry(0.09,0.07,0.02), trim, -0.17, 0.32, 0.17));
+  } else if (type==='stage'){                       // váy biểu diễn lấp lánh
+    mk(latheGeo([[0.28,0],[0.34,0.07],[0.26,0.28],[0.15,0.48],[0.13,0.62]], new THREE.MeshStandardMaterial({color, roughness:0.15, metalness:0.7})));
+    mk(new THREE.CylinderGeometry(0.13,0.15,0.28,12)).position.y = 0.72;
+    for (let i=0;i<16;i++){
+      const a = Math.random()*Math.PI*2, r = 0.15+Math.random()*0.16;
+      dressG.add(mesh(new THREE.SphereGeometry(0.02,6,6), new THREE.MeshStandardMaterial({color:0xffffff, emissive:0xfff0ff, emissiveIntensity:2}), Math.cos(a)*r, 0.05+Math.random()*0.4, Math.sin(a)*r, false, false));
+    }
+  }
+}
+
+// ---------- TRANG PHỤC RỜI (áo + chân váy/quần + áo khoác) ----------
+const outfitG = new THREE.Group(); body.add(outfitG);
+let currentOutfit = null;
+function buildOutfit(type, c1, c2){
+  outfitG.clear();
+  const A = M(c1, 0.5), B = M(c2, 0.55);
+  const add = (g,x,y,z)=>{ const o = mesh(g,A,x,y,z); outfitG.add(o); return o; };
+  if (type==='set_skirt'){          // áo + chân váy
+    add(new THREE.CylinderGeometry(0.135,0.16,0.32,14), 0, 0.72, 0);
+    add(new THREE.SphereGeometry(0.07,10,8), 0.19, 0.86, 0);
+    add(new THREE.SphereGeometry(0.07,10,8), -0.19, 0.86, 0);
+    const sk = mesh(latheGeo([[0.24,0],[0.28,0.06],[0.2,0.3],[0.15,0.42]], B), B, 0, 0.16, 0);
+    outfitG.add(sk);
+  } else if (type==='set_pants'){   // áo + quần
+    add(new THREE.CylinderGeometry(0.135,0.16,0.32,14), 0, 0.72, 0);
+    add(new THREE.SphereGeometry(0.07,10,8), 0.19, 0.86, 0);
+    add(new THREE.SphereGeometry(0.07,10,8), -0.19, 0.86, 0);
+    const p1 = mesh(new THREE.CylinderGeometry(0.085,0.075,0.5,10), B, 0.085, 0.32, 0);
+    const p2 = mesh(new THREE.CylinderGeometry(0.085,0.075,0.5,10), B, -0.085, 0.32, 0);
+    outfitG.add(p1, p2);
+    const belt = mesh(new THREE.TorusGeometry(0.155,0.025,8,18), M(0xffd700,0.3,0.8), 0, 0.56, 0);
+    belt.rotation.x = Math.PI/2; outfitG.add(belt);
+  } else if (type==='sport'){       // thể thao
+    add(new THREE.CylinderGeometry(0.14,0.16,0.3,14), 0, 0.72, 0);
+    const sk2 = mesh(latheGeo([[0.22,0.1],[0.24,0.16],[0.17,0.32],[0.14,0.42]], B), B, 0, 0.16, 0);
+    outfitG.add(sk2);
+    // sọc áo
+    outfitG.add(mesh(new THREE.TorusGeometry(0.145,0.018,6,16), M(0xffffff,0.6), 0, 0.78, 0)).rotation.x = Math.PI/2;
+    outfitG.add(mesh(new THREE.TorusGeometry(0.15,0.018,6,16), M(0xffffff,0.6), 0, 0.68, 0)).rotation.x = Math.PI/2;
+  } else if (type==='winter'){      // mùa đông áo khoác ấm
+    add(new THREE.CylinderGeometry(0.135,0.16,0.3,14), 0, 0.7, 0);
+    const jacket = mesh(latheGeo([[0.2,0.28],[0.22,0.45],[0.17,0.62],[0.14,0.72]], B), B);
+    outfitG.add(jacket);
+    // lông viền cổ + tay áo
+    outfitG.add(mesh(new THREE.TorusGeometry(0.13,0.04,8,16), M(0xffffff,0.9), 0, 0.76, 0)).rotation.x = Math.PI/2;
+    outfitG.add(mesh(new THREE.CylinderGeometry(0.07,0.08,0.3,10), B, 0.23, 0.72, 0)).rotation.z = -0.15;
+    outfitG.add(mesh(new THREE.CylinderGeometry(0.07,0.08,0.3,10), B, -0.23, 0.72, 0)).rotation.z = 0.15;
+    // khăn quàng cổ (luôn có với đồ đông)
+    const sc = mesh(new THREE.TorusGeometry(0.1,0.05,8,16), M(0xff7fb8,0.8), 0, 0.94, 0);
+    sc.rotation.x = Math.PI/2; outfitG.add(sc);
+  } else if (type==='royal'){       // hoàng gia
+    add(new THREE.CylinderGeometry(0.135,0.16,0.34,14), 0, 0.7, 0);
+    const skirt = mesh(latheGeo([[0.28,0],[0.32,0.07],[0.22,0.32],[0.16,0.46]]), new THREE.MeshStandardMaterial({color:c2, roughness:0.3, metalness:0.5}), 0, 0.14, 0);
+    outfitG.add(skirt);
+    // áo choàng vai
+    const cape = mesh(latheGeo([[0.22,0.55],[0.34,0.3],[0.4,0.05]]), new THREE.MeshStandardMaterial({color:c1, roughness:0.4, metalness:0.3, side:THREE.DoubleSide}));
+    cape.position.z = -0.06; outfitG.add(cape);
+    outfitG.add(mesh(new THREE.SphereGeometry(0.03,8,6), new THREE.MeshStandardMaterial({color:0xffd700, metalness:0.9, roughness:0.2}), 0, 0.88, 0.14));
+  } else if (type==='uniform'){     // đồng phục học sinh dễ thương
+    add(new THREE.CylinderGeometry(0.135,0.16,0.3,14), 0, 0.72, 0);
+    const sk3 = mesh(latheGeo([[0.24,0.08],[0.28,0.14],[0.18,0.34],[0.15,0.42]], B), B, 0, 0.16, 0);
+    outfitG.add(sk3);
+    // cà vạt nơ
+    outfitG.add(mesh(new THREE.SphereGeometry(0.035,8,6), M(0xe05a7a,0.5), 0, 0.84, 0.145));
+    // tất dài
+    outfitG.add(mesh(new THREE.CylinderGeometry(0.06,0.06,0.2,10), M(0xffffff,0.8), 0.1, 0.22, 0));
+    outfitG.add(mesh(new THREE.CylinderGeometry(0.06,0.06,0.2,10), M(0xffffff,0.8), -0.1, 0.22, 0));
+  } else if (type==='fairyoutfit'){ // trang phục tiên
+    add(new THREE.CylinderGeometry(0.13,0.15,0.3,12), 0, 0.7, 0);
+    const skirtF = mesh(latheGeo([[0.24,0.05],[0.28,0.14],[0.16,0.36],[0.13,0.5]]), new THREE.MeshStandardMaterial({color:c2, roughness:0.5, transparent:true, opacity:0.85}), 0, 0.12, 0);
+    outfitG.add(skirtF);
+    // cánh hoa tay áo
+    outfitG.add(mesh(new THREE.SphereGeometry(0.1,10,8), M(c1,0.6), 0.21, 0.84, 0));
+    outfitG.add(mesh(new THREE.SphereGeometry(0.1,10,8), M(c1,0.6), -0.21, 0.84, 0));
+  }
+}
+
+// ---------- PHỤ KIỆN (gắn đúng vị trí cơ thể) ----------
+const acc = {}; // name -> Object3D
+function reg(name, obj, parent){ obj.visible = false; parent.add(obj); acc[name] = obj; return obj; }
+// vương miện — trên đỉnh đầu
+reg('crown', (()=>{ const g=new THREE.Group();
+  g.add(mesh(new THREE.CylinderGeometry(0.16,0.17,0.1,16,1,true), accMat, 0,0,0));
+  for(let i=0;i<5;i++){ const a=i/5*Math.PI*2-Math.PI/2;
+    g.add(mesh(new THREE.ConeGeometry(0.035,0.12,6), accMat, Math.cos(a)*0.15, 0.1, Math.sin(a)*0.15)); }
+  g.add(mesh(new THREE.SphereGeometry(0.03,8,6), new THREE.MeshStandardMaterial({color:0xff5f8f, roughness:0.2, metalness:0.3}), 0, 0.06, 0.16));
+  g.position.set(0, 0.58, 0); return g; })(), headG);
+// nơ tóc — bên trái đầu
+reg('bow', (()=>{ const g=new THREE.Group(); const bm=M(0xff5f8f,0.5);
+  const c1=mesh(new THREE.ConeGeometry(0.07,0.13,8), bm, 0.07,0,0); c1.rotation.z=-Math.PI/2;
+  const c2=mesh(new THREE.ConeGeometry(0.07,0.13,8), bm, -0.07,0,0); c2.rotation.z=Math.PI/2;
+  g.add(c1,c2,mesh(new THREE.SphereGeometry(0.035,8,6), bm, 0,0,0));
+  g.position.set(0.28, 0.45, 0.05); g.rotation.z=0.4; return g; })(), headG);
+// kẹp tóc sao
+reg('clip', (()=>{ const g=new THREE.Group();
+  g.add(mesh(new THREE.SphereGeometry(0.045,8,6), new THREE.MeshStandardMaterial({color:0xffd700, emissive:0xffe27a, emissiveIntensity:1}), 0,0,0));
+  for(let i=0;i<5;i++){ const a=i/5*Math.PI*2; g.add(mesh(new THREE.ConeGeometry(0.02,0.05,5), new THREE.MeshStandardMaterial({color:0xffd700}), Math.cos(a)*0.05, Math.sin(a)*0.05, 0)).rotation.z=a-Math.PI/2; }
+  g.position.set(-0.25, 0.42, 0.12); return g; })(), headG);
+// băng đô — vòng quanh đầu
+reg('headband', (()=>{ const g=new THREE.Group();
+  const t=mesh(new THREE.TorusGeometry(0.3,0.035,10,28,Math.PI), M(0xff7fb8,0.5));
+  t.rotation.x = -0.15; t.rotation.z = Math.PI; g.add(t);
+  g.position.set(0, 0.34, 0); return g; })(), headG);
+// hoa cài — phải đầu
+reg('flower', (()=>{ const g=new THREE.Group();
+  for(let i=0;i<6;i++){ const a=i/6*Math.PI*2;
+    g.add(mesh(new THREE.SphereGeometry(0.035,8,6), M(0xffb8d9,0.6), Math.cos(a)*0.05, Math.sin(a)*0.05, 0)); }
+  g.add(mesh(new THREE.SphereGeometry(0.03,8,6), M(0xffd700,0.4), 0,0,0.01));
+  g.position.set(0.24, 0.3, 0.16); g.rotation.y = 0.5; return g; })(), headG);
+// bông tai — 2 tai
+reg('earrings', (()=>{ const g=new THREE.Group();
+  g.add(mesh(new THREE.SphereGeometry(0.035,8,6), accMat, 0.30, 0.12, 0));
+  g.add(mesh(new THREE.SphereGeometry(0.035,8,6), accMat, -0.30, 0.12, 0));
+  g.add(mesh(new THREE.SphereGeometry(0.02,8,6), new THREE.MeshStandardMaterial({color:0xff5f8f, roughness:0.2}), 0.30, 0.07, 0));
+  g.add(mesh(new THREE.SphereGeometry(0.02,8,6), new THREE.MeshStandardMaterial({color:0xff5f8f, roughness:0.2}), -0.30, 0.07, 0));
+  return g; })(), headG);
+// vòng cổ
+reg('necklace', (()=>{ const g=new THREE.Group();
+  const t=mesh(new THREE.TorusGeometry(0.105,0.018,8,20), accMat, 0, 0.02, 0);
+  t.rotation.x = Math.PI/2 - 0.25; g.add(t);
+  g.add(mesh(new THREE.SphereGeometry(0.03,8,6), new THREE.MeshStandardMaterial({color:0x7fd8ff, roughness:0.15, metalness:0.4}), 0, -0.06, 0.09));
+  g.position.set(0, 0.98 - 1.06, 0.03); return g; })(), body);
+// vòng tay — cổ tay phải
+reg('bracelet', (()=>{ const g=new THREE.Group();
+  const t=mesh(new THREE.TorusGeometry(0.055,0.014,8,16), accMat, 0, 0, 0); t.rotation.x = Math.PI/2; g.add(t);
+  g.position.set(0, -0.38, 0); return g; })(), armR);
+// kính
+reg('glasses', (()=>{ const g=new THREE.Group(); const gm=M(0xff5f8f,0.3,0.6);
+  g.add(mesh(new THREE.TorusGeometry(0.085,0.014,8,18), gm, 0.115, 0.26, 0.30));
+  g.add(mesh(new THREE.TorusGeometry(0.085,0.014,8,18), gm, -0.115, 0.26, 0.30));
+  g.add(mesh(new THREE.BoxGeometry(0.06,0.014,0.014), gm, 0, 0.27, 0.31));
+  return g; })(), headG);
+// túi xách — tay trái
+reg('bag', (()=>{ const g=new THREE.Group(); const bm=M(0xc9a2ff,0.5);
+  g.add(mesh(new THREE.BoxGeometry(0.16,0.13,0.07), bm, 0, -0.06, 0));
+  const h=mesh(new THREE.TorusGeometry(0.07,0.014,8,16,Math.PI), accMat, 0, 0.03, 0); g.add(h);
+  g.add(mesh(new THREE.SphereGeometry(0.02,8,6), accMat, 0, -0.02, 0.04));
+  g.position.set(0, -0.5, 0.02); return g; })(), armL);
+// cánh thiên thần — sau lưng
+reg('angelwings', (()=>{ const g=new THREE.Group(); const wm=M(0xffffff,0.7);
+  const w1=mesh(new THREE.SphereGeometry(0.3,12,10), wm, 0.28, 0, -0.1); w1.scale.set(0.5,1.1,0.25); w1.rotation.z=-0.4;
+  const w2=w1.clone(); w2.position.x=-0.28; w2.rotation.z=0.4;
+  const s1=mesh(new THREE.SphereGeometry(0.2,10,8), wm, 0.42, -0.15, -0.1); s1.scale.set(0.5,0.9,0.2); s1.rotation.z=-0.7;
+  const s2=s1.clone(); s2.position.x=-0.42; s2.rotation.z=0.7;
+  g.add(w1,w2,s1,s2); g.position.set(0, 0.7, -0.18); return g; })(), body);
+// cánh tiên — sau lưng mỏng trong suốt
+reg('fairywings', (()=>{ const g=new THREE.Group();
+  const wm=new THREE.MeshStandardMaterial({color:0xbfe8ff, roughness:0.2, transparent:true, opacity:0.55, side:THREE.DoubleSide, emissive:0x9fd4ff, emissiveIntensity:0.4});
+  const mkWing=(sx)=>{ const w=mesh(new THREE.CircleGeometry(0.34,20), wm, sx*0.3, 0.15, -0.15, false, false);
+    w.scale.set(0.7,1.3,1); w.rotation.y = sx*0.5; g.add(w);
+    const w2=mesh(new THREE.CircleGeometry(0.22,18), wm, sx*0.26, -0.25, -0.15, false, false);
+    w2.scale.set(0.7,1.1,1); w2.rotation.y = sx*0.5; g.add(w2); };
+  mkWing(1); mkWing(-1);
+  g.position.set(0, 0.65, 0); return g; })(), body);
+// khăn choàng
+reg('scarf', (()=>{ const g=new THREE.Group(); const sm=M(0xff9ec7,0.8);
+  const t=mesh(new THREE.TorusGeometry(0.11,0.055,10,20), sm, 0, 0, 0); t.rotation.x=Math.PI/2; g.add(t);
+  const tail=mesh(new THREE.BoxGeometry(0.12,0.3,0.03), sm, 0.08, -0.18, 0.1); tail.rotation.z=0.15; g.add(tail);
+  g.position.set(0, -0.08, 0.02); return g; })(), headG);
+// găng tay
+function setGloves(on, color=0xfff0f5){ gloveL.visible = gloveR.visible = on; gloveMat.color.setHex(color); }
+
+// ============================================================
+//  DỮ LIỆU KHO THỜI TRANG + TRẠNG THÁI PHỐI ĐỒ
+// ============================================================
+const COLORS = [
+  {n:'Hồng', c:0xff9ec7},{n:'Đỏ hồng', c:0xff5f8f},{n:'Tím', c:0xc9b6ff},{n:'Xanh dương', c:0x8fb8ff},
+  {n:'Trờng nhạt', c:0xbfe3ff},{n:'Vàng', c:0xffe28a},{n:'Kem', c:0xfff3d6},{n:'Xanh mint', c:0xa8e6cf},
+  {n:'Xanh lá', c:0x7fce8f},{n:'Cam', c:0xffc48a},{n:'Đỏ', c:0xff7a7a},{n:'Trắng', c:0xffffff},
+  {n:'Hồng nhạt', c:0xffc2dd},{n:'Xám', c:0xcfc9d9},{n:'Nâu', c:0xc9a27a},{n:'Đen', c:0x6a5a7a},
+];
+const HAIRCOLORS = [
+  {n:'Nâu', c:0x6b4a2f},{n:'Đen', c:0x3a2e2a},{n:'Vàng', c:0xe8c86a},{n:'Hồng', c:0xff9ec7},
+  {n:'Tím', c:0xa88ee8},{n:'Xanh dương', c:0x7fb8e8},{n:'Bạch kim', c:0xf0e6d8},{n:'Đỏ', c:0xd86a5a},
+];
+
+const WARDROBE = {
+  dress: { title:'Váy', items:[
+    {id:'princess', n:'Công chúa', icon:'👸'},{id:'gown', n:'Dạ hội', icon:'💃'},{id:'wedding', n:'Cưới', icon:'💍'},
+    {id:'tutu', n:'Ballet', icon:'🩰'},{id:'fairytale', n:'Cổ tích', icon:'🧚'},{id:'summer', n:'Mùa hè', icon:'🌞'},
+    {id:'party', n:'Dự tiệc', icon:'🎉'},{id:'korean', n:'Hàn Quốc', icon:'🇰🇷'},{id:'modern', n:'Hiện đại', icon:'🌆'},
+    {id:'stage', n:'Biểu diễn', icon:'🌟'},
+  ]},
+  outfit: { title:'Trang phục', items:[
+    {id:'set_skirt', n:'Áo+Chân váy', icon:'👚'},{id:'set_pants', n:'Áo+Quần', icon:'👖'},{id:'sport', n:'Thể thao', icon:'⚽'},
+    {id:'winter', n:'Mùa đông', icon:'🧥'},{id:'royal', n:'Hoàng gia', icon:'👑'},{id:'uniform', n:'Đồng phục', icon:'🎒'},
+    {id:'fairyoutfit', n:'Tiên', icon:'✨'},
+  ]},
+  hair: { title:'Tóc', items:[
+    {id:'long', n:'Dài', icon:'💇‍♀️'},{id:'short', n:'Ngắn', icon:'✂️'},{id:'curly', n:'Xoăn', icon:'🌀'},
+    {id:'bun', n:'Búi', icon:'🍡'},{id:'ponytail', n:'Đuôi ngựa', icon:'🐴'},{id:'pigtails', n:'Hai bên', icon:'👧'},
+    {id:'braids', n:'Tết', icon:'🎀'},
+  ]},
+  accessory: { title:'Phụ kiện', items:[
+    {id:'crown', n:'Vương miện', icon:'👑'},{id:'bow', n:'Nơ', icon:'🎀'},{id:'clip', n:'Kẹp sao', icon:'⭐'},
+    {id:'headband', n:'Băng đô', icon:'🎗️'},{id:'flower', n:'Hoa cài', icon:'🌸'},{id:'earrings', n:'Bông tai', icon:'💎'},
+    {id:'necklace', n:'Vòng cổ', icon:'📿'},{id:'bracelet', n:'Vòng tay', icon:'📿'},{id:'bag', n:'Túi xách', icon:'👜'},
+    {id:'glasses', n:'Kính', icon:'👓'},{id:'gloves', n:'Găng tay', icon:'🧤'},{id:'angelwings', n:'Cánh thiên thần', icon:'😇'},
+    {id:'fairywings', n:'Cánh tiên', icon:'🦋'},{id:'scarf', n:'Khăn choàng', icon:'🧣'},
+  ]},
+  shoes: { title:'Giày', items:[
+    {id:'flats', n:'Búp bê', icon:'🥿'},{id:'heels', n:'Cao gót', icon:'👠'},{id:'boots', n:'Boots', icon:'🥾'},
+    {id:'ballet', n:'Ballet', icon:'🩰'},
+  ]},
+};
+
+// trạng thái hiện tại
+const state = {
+  dress: { type:'princess', color:0xff9ec7 },
+  outfit: null, // {type, c1, c2}
+  hair: { style:'long', color:0x6b4a2f },
+  accessories: new Set(),
+  shoes: 'flats',
+  skin: 0xffe0cc, lips: 0xe0607f, blush: 0xff9eb5, eyeshadow: 0xffb8d9, expression: 'smile',
+};
+let history = [];
+
+function snapshot(){
+  return JSON.stringify({ ...state, accessories:[...state.accessories] });
+}
+function pushHistory(){ history.push(snapshot()); if (history.length>40) history.shift(); }
+function applyState(s){
+  const d = JSON.parse(s);
+  Object.assign(state, d); state.accessories = new Set(d.accessories);
+  buildDress(state.dress.type, state.dress.color);
+  if (state.outfit) buildOutfit(state.outfit.type, state.outfit.c1, state.outfit.c2);
+  outfitG.visible = !!state.outfit;
+  dressG.visible = !state.outfit; // mặc đồ rời thì giấu váy để không bị xuyên
+  buildHair(state.hair.style, state.hair.color);
+  buildShoes(state.shoes);
+  buildMouth(state.expression);
+  for (const k in acc) acc[k].visible = state.accessories.has(k);
+  setGloves(state.accessories.has('gloves'), 0xfff0f5);
+  skinMat.color.setHex(state.skin);
+  cheekL.material.color.setHex(state.blush); cheekR.material.color.setHex(state.blush);
+  shadowL.material.color.setHex(state.eyeshadow); shadowR.material.color.setHex(state.eyeshadow);
+  lipColor = state.lips; buildMouth(state.expression);
+  refreshActiveUI();
+}
+function setDress(type, color){ pushHistory(); state.dress={type,color}; buildDress(type,color); refreshActiveUI(); }
+function setOutfit(type){ pushHistory(); state.outfit={type, c1:COLORS[Math.floor(Math.random()*COLORS.length)].c, c2:COLORS[Math.floor(Math.random()*COLORS.length)].c}; buildOutfit(type, state.outfit.c1, state.outfit.c2); outfitG.visible = true; refreshActiveUI(); }
+function removeOutfit(){ pushHistory(); state.outfit=null; outfitG.visible=false; refreshActiveUI(); }
+function setHair(style, color){ pushHistory(); state.hair={style,color}; buildHair(style,color); refreshActiveUI(); }
+function setHairColor(color){ pushHistory(); state.hair.color=color; buildHair(state.hair.style,color); refreshActiveUI(); }
+function toggleAccessory(id){ pushHistory(); state.accessories.has(id)?state.accessories.delete(id):state.accessories.add(id); acc[id].visible = state.accessories.has(id); if(id==='gloves') setGloves(acc.gloves.visible, 0xfff0f5); refreshActiveUI(); }
+function setShoes(id){ pushHistory(); state.shoes=id; buildShoes(id); refreshActiveUI(); }
+function setSkin(c){ pushHistory(); state.skin=c; skinMat.color.setHex(c); refreshActiveUI(); }
+function setLips(c){ pushHistory(); state.lips=c; lipColor=c; buildMouth(state.expression); refreshActiveUI(); }
+function setBlush(c){ pushHistory(); state.blush=c; cheekL.material.color.setHex(c); cheekR.material.color.setHex(c); refreshActiveUI(); }
+function setEyeshadow(c){ pushHistory(); state.eyeshadow=c; shadowL.material.color.setHex(c); shadowR.material.color.setHex(c); refreshActiveUI(); }
+function setExpression(e){ pushHistory(); state.expression=e; buildMouth(e); refreshActiveUI(); }
+
+// phối đồ ngẫu nhiên
+function randomOutfit(){
+  pushHistory();
+  const pick = a=>a[Math.floor(Math.random()*a.length)];
+  const useOutfit = Math.random()<0.5;
+  if (useOutfit){ const o=pick(WARDROBE.outfit.items); state.outfit={type:o.id, c1:pick(COLORS).c, c2:pick(COLORS).c}; buildOutfit(o.id, state.outfit.c1, state.outfit.c2); outfitG.visible=true; }
+  else { state.dress={type:pick(WARDROBE.dress.items).id, color:pick(COLORS).c}; buildDress(state.dress.type, state.dress.color); }
+  const h=pick(WARDROBE.hair.items); state.hair={style:h.id, color:pick(HAIRCOLORS).c}; buildHair(h.id, state.hair.color);
+  state.shoes = pick(WARDROBE.shoes.items).id; buildShoes(state.shoes);
+  state.accessories.clear();
+  const pool=[...WARDROBE.accessory.items].sort(()=>Math.random()-0.5).slice(0, 2+Math.floor(Math.random()*3));
+  pool.forEach(p=>state.accessories.add(p.id));
+  for (const k in acc) acc[k].visible = state.accessories.has(k);
+  setGloves(state.accessories.has('gloves'), 0xfff0f5);
+  refreshActiveUI(); toast('🎲 Đã phối đồ ngẫu nhiên!');
+}
+function undo(){ if (history.length===0) return toast('Không có gì để hoàn tác!'); applyState(history.pop()); toast('↩️ Đã hoàn tác'); }
+function resetOutfit(){ pushHistory(); applyState(snapshotDefault); toast('🔄 Về trang phục ban đầu'); }
+
+// ============================================================
+//  BỘ SƯU TẬP (lưu yêu thích + ảnh chụp)
+// ============================================================
+let favorites = [];
+try { favorites = JSON.parse(localStorage.getItem('bhv_favs')||'[]'); } catch(e){ favorites=[]; }
+function saveFavorite(){
+  pushHistory();
+  const thumb = capturePhoto();
+  favorites.unshift({ name:'Bộ đồ '+(favorites.length+1), state: snapshot(), thumb, date: Date.now() });
+  if (favorites.length>24) favorites.pop();
+  localStorage.setItem('bhv_favs', JSON.stringify(favorites));
+  toast('💾 Đã lưu vào bộ sưu tập!'); renderTab(currentTab);
+}
+function capturePhoto(){
+  renderer.render(scene, camera);
+  try { return renderer.domElement.toDataURL('image/jpeg', 0.6); } catch(e){ return ''; }
+}
+function applyFavorite(i){ applyState(favorites[i].state); toast('👗 Đã mặc bộ đồ này!'); }
+function deleteFavorite(i){ favorites.splice(i,1); localStorage.setItem('bhv_favs', JSON.stringify(favorites)); renderTab(currentTab); }
+
+// ============================================================
+//  GIAO DIỆN NGƯỜI DÙNG
+// ============================================================
+const TABS = [
+  {id:'dress', label:'👗 Váy'}, {id:'outfit', label:'👚 Đồ'}, {id:'hair', label:'💇 Tóc'},
+  {id:'accessory', label:'🎀 Phụ kiện'}, {id:'makeup', label:'💄 Makeup'}, {id:'runway', label:'🌟 Sàn diễn'},
+  {id:'photo', label:'📸 Chụp ảnh'}, {id:'collection', label:'💾 BST'},
+];
+let currentTab = 'dress';
+const tabsEl = document.getElementById('tabs');
+TABS.forEach(t=>{
+  const b=document.createElement('button'); b.className='tab'; b.textContent=t.label; b.dataset.id=t.id;
+  b.onclick=()=>{ currentTab=t.id; renderTab(t.id); };
+  tabsEl.appendChild(b);
+});
+const panelBody = document.getElementById('panelBody');
+const panel = document.getElementById('panel');
+const toggleBtn = document.getElementById('togglePanel');
+toggleBtn.onclick = ()=>{ panel.classList.toggle('hidden'); toggleBtn.textContent = panel.classList.contains('hidden') ? '🎨 Tủ đồ' : '✖ Đóng'; };
+
+function colorGrid(colors, getActive, onPick){
+  const g=document.createElement('div'); g.className='grid';
+  colors.forEach((c,i)=>{
+    const d=document.createElement('div'); d.className='item';
+    if (getActive()===c.c) d.classList.add('active');
+    d.innerHTML = `<div class="sw" style="background:#${c.c.toString(16).padStart(6,'0')}"></div><div class="n">${c.n}</div>`;
+    d.onclick = ()=>onPick(c.c, i);
+    g.appendChild(d);
+  });
+  return g;
+}
+function itemGrid(items, isActive, onPick){
+  const g=document.createElement('div'); g.className='grid';
+  items.forEach(it=>{
+    const d=document.createElement('div'); d.className='item'+(isActive(it.id)?' active':'');
+    d.innerHTML = `<div style="font-size:1.4rem">${it.icon}</div><div class="n">${it.n}</div>`;
+    d.onclick = ()=>onPick(it.id);
+    g.appendChild(d);
+  });
+  return g;
+}
+function sec(t){ const e=document.createElement('div'); e.className='secTitle'; e.textContent=t; return e; }
+function btnRow(btns){
+  const r=document.createElement('div'); r.className='rowBtns';
+  btns.forEach(b=>{ const e=document.createElement('button'); e.className='btn '+b.cls; e.textContent=b.t; e.onclick=b.f; r.appendChild(e); });
+  return r;
+}
+function refreshActiveUI(){ if(!document.hidden) renderTab(currentTab, true); }
+
+function renderTab(id, keepScroll){
+  const sc = keepScroll ? panelBody.scrollTop : 0;
+  panelBody.innerHTML='';
+  tabsEl.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.id===id));
+  if (id==='dress'){
+    panelBody.appendChild(sec('Kiểu váy'));
+    panelBody.appendChild(itemGrid(WARDROBE.dress.items, x=>state.dress.type===x, t=>setDress(t, state.dress.color)));
+    panelBody.appendChild(sec('Màu váy'));
+    panelBody.appendChild(colorGrid(COLORS, ()=>state.dress.color, c=>setDress(state.dress.type, c)));
+  } else if (id==='outfit'){
+    panelBody.appendChild(btnRow([{t:'👗 Bỏ đồ rời (mặc váy)', cls:'gray', f:removeOutfit}]));
+    panelBody.appendChild(sec('Bộ trang phục (mỗi bộ 2 màu riêng)'));
+    panelBody.appendChild(itemGrid(WARDROBE.outfit.items, x=>state.outfit?.type===x, setOutfit));
+  } else if (id==='hair'){
+    panelBody.appendChild(sec('Kiểu tóc'));
+    panelBody.appendChild(itemGrid(WARDROBE.hair.items, x=>state.hair.style===x, s=>setHair(s, state.hair.color)));
+    panelBody.appendChild(sec('Màu tóc'));
+    panelBody.appendChild(colorGrid(HAIRCOLORS, ()=>state.hair.color, setHairColor));
+  } else if (id==='accessory'){
+    panelBody.appendChild(sec('Phụ kiện (bật/tắt)'));
+    panelBody.appendChild(itemGrid(WARDROBE.accessory.items, x=>state.accessories.has(x), toggleAccessory));
+    panelBody.appendChild(sec('Giày'));
+    panelBody.appendChild(itemGrid(WARDROBE.shoes.items, x=>state.shoes===x, setShoes));
+  } else if (id==='makeup'){
+    panelBody.appendChild(sec('Màu da'));
+    panelBody.appendChild(colorGrid([{n:'Sáng', c:0xffe8d6},{n:'Tự nhiên', c:0xffd9bd},{n:'Tan', c:0xe8b58a},{n:'Nâu', c:0xc98e5f}], ()=>state.skin, setSkin));
+    panelBody.appendChild(sec('Son môi'));
+    panelBody.appendChild(colorGrid([{n:'Hồng', c:0xe0607f},{n:'Đỏ', c:0xd93a4e},{n:'Cam', c:0xe88a5a},{n:'Tím', c:0xc06ab0},{n:'Hồng nhạt', c:0xf0a0b8}], ()=>state.lips, setLips));
+    panelBody.appendChild(sec('Phấn má'));
+    panelBody.appendChild(colorGrid([{n:'Hồng', c:0xff9eb5},{n:'Đào', c:0xffb894},{n:'Tím nhạt', c:0xe0b0e8},{n:'Không', c:0xffe0cc}], ()=>state.blush, setBlush));
+    panelBody.appendChild(sec('Màu mắt'));
+    panelBody.appendChild(colorGrid([{n:'Hồng', c:0xffb8d9},{n:'Tím', c:0xc9a2ff},{n:'Xanh', c:0x9fd4ff},{n:'Vàng', c:0xffe28a},{n:'Không', c:0xffe0cc}], ()=>state.eyeshadow, setEyeshadow));
+    panelBody.appendChild(sec('Biểu cảm'));
+    panelBody.appendChild(itemGrid([{id:'smile',n:'Cường nhẹ',icon:'😊'},{id:'happy',n:'Vui',icon:'😄'},{id:'wow',n:'Ngạc nhiên',icon:'😮'}], x=>state.expression===x, setExpression));
+  } else if (id==='runway'){
+    panelBody.appendChild(sec('Trình diễn thờ trang'));
+    panelBody.appendChild(btnRow([
+      {t: runShow.on?'⏹ Dừng diễn':'▶ Bắt đầu diễn', cls:'pink', f:toggleRunway},
+      {t:'✨ Spotlight: '+(spot.intensity>0?'BẬT':'TẮT'), cls:'purple', f:()=>{ spot.intensity = spot.intensity>0?0:60; toast(spot.intensity?'💡 Spotlight bật':'💡 Spotlight tắt'); }},
+    ]));
+    panelBody.appendChild(sec('Kiểu trình diễn'));
+    panelBody.appendChild(itemGrid([{id:'classic',n:'Classic',icon:'🚶‍♀️'},{id:'spin',n:'Xoay ngườ',icon:'🌀'},{id:'wave',n:'Vẫy khán giả',icon:'👋'}], x=>runShow.style===x, s=>{runShow.style=s; toast('Kiểu diễn: '+s);}));
+    panelBody.appendChild(sec('Di chuyển tới khu vực'));
+    panelBody.appendChild(itemGrid([
+      {id:'runway',n:'Sàn diễn',icon:'🌟'},{id:'makeup',n:'Trang điểm',icon:'💄'},{id:'wardrobe',n:'Tủ váy',icon:'👗'},
+      {id:'photo',n:'Chụp ảnh',icon:'📸'},{id:'sofa',n:'Sofa',icon:'🛋️'},{id:'center',n:'Giữa phòng',icon:'✨'},
+    ], ()=>false, a=>goToArea(a)));
+  } else if (id==='photo'){
+    panelBody.appendChild(sec('Phông nền chụp ảnh'));
+    panelBody.appendChild(colorGrid([{n:'Hồng', c:0xffc2dd},{n:'Tím', c:0xdcd3ff},{n:'Xanh', c:0xbfe3ff},{n:'Vàng', c:0xfff3b0},{n:'Mint', c:0xc8f7dc},{n:'Trắng', c:0xffffff}], ()=>backdropColor, c=>{ backdropColor=c; backdrop.material.color.setHex(c); refreshActiveUI(); }));
+    panelBody.appendChild(sec('Tư thế chụp ảnh'));
+    panelBody.appendChild(itemGrid([{id:'stand',n:'Đứng',icon:'🧍'},{id:'princess',n:'Công chúa',icon:'👸'},{id:'runwaypose',n:'Runway',icon:'💃'},{id:'cute',n:'Dễ thương',icon:'🥰'},{id:'jump',n:'Nhảy',icon:'🐰'},{id:'sit',n:'Ngồi',icon:'🪑'}], x=>poseMode===x, p=>{ poseMode = p; }));
+    panelBody.appendChild(btnRow([
+      {t:'📷 Chụp & Lưu ảnh', cls:'blue', f:downloadPhoto},
+      {t:'💾 Lưu BST yêu thích', cls:'mint', f:saveFavorite},
+    ]));
+  } else if (id==='collection'){
+    panelBody.appendChild(btnRow([
+      {t:'💾 Lưu bộ đồ hiện tại', cls:'mint', f:saveFavorite},
+      {t:'🎲 Phối ngẫu nhiên', cls:'pink', f:randomOutfit},
+      {t:'↩️ Hoàn tác', cls:'gray', f:undo},
+      {t:'🔄 Về ban đầu', cls:'blue', f:resetOutfit},
+    ]));
+    panelBody.appendChild(sec('Bộ sưu tập của bé ('+favorites.length+')'));
+    favorites.forEach((f,i)=>{
+      const r=document.createElement('div'); r.className='favRow';
+      r.innerHTML = `${f.thumb?`<img src="${f.thumb}">`:'<div style="width:52px;height:52px;border-radius:10px;background:#eee;display:flex;align-items:center;justify-content:center">👗</div>'}<div class="t">${f.name}</div>`;
+      const wear=document.createElement('button'); wear.style.background='#ff9ec7'; wear.textContent='Mặc'; wear.onclick=()=>applyFavorite(i);
+      const del=document.createElement('button'); del.style.background='#c9b6ff'; del.textContent='Xóa'; del.onclick=()=>deleteFavorite(i);
+      r.appendChild(wear); r.appendChild(del);
+      panelBody.appendChild(r);
+    });
+    if (!favorites.length) panelBody.innerHTML += '<div style="text-align:center;color:#b8a3c8;font-size:.85rem;padding:20px">Chưa có bộ đồ nào.<br>Hãy thiết kế và bấm 💾 nhé!</div>';
+  }
+  if (keepScroll) panelBody.scrollTop = sc;
+}
+let backdropColor = 0xffc2dd;
+
+// toast
+let toastTimer;
+function toast(msg){
+  const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'), 1800);
+}
+
+// ============================================================
+//  DI CHUYỂN + ANIMATION
+// ============================================================
+const keys = { up:false, down:false, left:false, right:false };
+let moveTarget = null;
+const areas = { runway:[0,-1.2], makeup:[-11.5,-2.2], wardrobe:[10.5,1.5], photo:[-8.5,10.2], sofa:[-6,4.6], center:[0,2.5] };
+function goToArea(a){ const p=areas[a]; if(p){ moveTarget = new THREE.Vector3(p[0], 0, p[1]); toast('🚶 Đang di chuyển...'); } }
+
+document.querySelectorAll('#movePad button').forEach(b=>{
+  const k=b.dataset.k;
+  const on=e=>{e.preventDefault(); keys[k]=true;}, off=e=>{e.preventDefault(); keys[k]=false;};
+  b.addEventListener('pointerdown',on); b.addEventListener('pointerup',off); b.addEventListener('pointerleave',off);
+});
+document.querySelectorAll('#areaBtns button').forEach(b=> b.onclick=()=>goToArea(b.dataset.area));
+addEventListener('keydown',e=>{
+  if (e.key==='ArrowUp'||e.key==='w'||e.key==='W') keys.up=true;
+  if (e.key==='ArrowDown'||e.key==='s'||e.key==='S') keys.down=true;
+  if (e.key==='ArrowLeft'||e.key==='a'||e.key==='A') keys.left=true;
+  if (e.key==='ArrowRight'||e.key==='d'||e.key==='D') keys.right=true;
+});
+addEventListener('keyup',e=>{
+  if (e.key==='ArrowUp'||e.key==='w'||e.key==='W') keys.up=false;
+  if (e.key==='ArrowDown'||e.key==='s'||e.key==='S') keys.down=false;
+  if (e.key==='ArrowLeft'||e.key==='a'||e.key==='A') keys.left=false;
+  if (e.key==='ArrowRight'||e.key==='d'||e.key==='D') keys.right=false;
+});
+
+// chế độ hành động
+let animMode = 'idle';   // idle | walk | wave | spin | jump | pose
+let poseMode = 'stand';  // cho chụp ảnh
+function setMode(m){ animMode = m; document.querySelectorAll('#topbar .chip').forEach(c=>c.classList.toggle('active', false)); }
+document.getElementById('btnIdle').onclick = ()=>{ setMode('idle'); runShow.on=false; };
+document.getElementById('btnWalkAnim').onclick = ()=>{ setMode('walk'); runShow.on=false; };
+document.getElementById('btnWave').onclick = ()=>{ setMode('wave'); };
+document.getElementById('btnSpin').onclick = ()=>{ setMode('spin'); };
+document.getElementById('btnJump').onclick = ()=>{ setMode('jump'); };
+
+// chế độ sàn diễn
+const runShow = { on:false, style:'classic', phase:'walkOut', t:0 };
+function toggleRunway(){
+  runShow.on = !runShow.on;
+  if (runShow.on){
+    runShow.phase='walkOut';
+    char.position.set(0, 0.35, 1.2);
+    char.rotation.y = Math.PI;
+    spot.intensity = 60;
+    toast('🌟 Bắt đầu trình diễn!'); sparkleBurst();
+  } else { toast('⏹ Đã dừng trình diễn'); }
+  renderTab('runway', true);
+}
+let burst = null;
+function sparkleBurst(){
+  if (burst) scene.remove(burst);
+  burst = makeSparkles(char.position.x, char.position.z, 2, 2, 120, 0xffffff);
+  setTimeout(()=>{ if(burst){scene.remove(burst); burst=null;} }, 2500);
+}
+
+function lerpAngle(a, b, t){
+  let d = b - a;
+  while (d > Math.PI) d -= Math.PI*2;
+  while (d < -Math.PI) d += Math.PI*2;
+  return a + d * Math.min(1, t);
+}
+
+// ---------- vòng lặp animation ----------
+const clock = new THREE.Clock();
+let blinkT = 0, blinkOn = false;
+let spinT = 0, jumpT = 0;
+
+function animate(){
+  requestAnimationFrame(animate);
+  const dt = Math.min(clock.getDelta(), 0.05);
+  const t = clock.elapsedTime;
+
+  // --- chớp mắt ---
+  blinkT += dt;
+  if (blinkT > 2.6){ blinkT = 0; blinkOn = true; }
+  if (blinkOn){
+    const s = Math.max(0.12, 1 - Math.sin(Math.min(1, blinkT*14))*0.95);
+    eyeWhiteL.scale.y = eyeWhiteR.scale.y = pupilL.scale.y = pupilR.scale.y = s;
+    if (blinkT > 0.15) { blinkOn = false; eyeWhiteL.scale.y = eyeWhiteR.scale.y = pupilL.scale.y = pupilR.scale.y = 1; }
+  }
+
+  let walking = false;
+  const speed = 2.4;
+
+  if (runShow.on){
+    // --- trình diễn runway tự động ---
+    animMode = 'runway';
+    const endZ = -11.2;
+    if (runShow.phase === 'walkOut'){
+      char.position.z -= dt * 1.5;
+      char.rotation.y = lerpAngle(char.rotation.y, Math.PI, dt*6);
+      if (char.position.z <= endZ){ runShow.phase='turn'; runShow.t=0; sparkleBurst(); }
+    } else if (runShow.phase === 'turn'){
+      runShow.t += dt;
+      char.rotation.y += dt * (runShow.style==='spin' ? 4.5 : 2.6);
+      if (runShow.t > (runShow.style==='spin'?1.5:1.9)){ runShow.phase='pose'; runShow.t=0; }
+    } else if (runShow.phase === 'pose'){
+      runShow.t += dt;
+      if (runShow.t > 1.6){ runShow.phase='walkBack'; }
+    } else {
+      char.position.z += dt * 1.5;
+      char.rotation.y = lerpAngle(char.rotation.y, 0, dt*6);
+      if (char.position.z >= 1.2){ runShow.phase='walkOut'; sparkleBurst(); }
+    }
+    // xoay theo hướng đi
+    if (runShow.phase==='walkOut') char.rotation.y = Math.PI + Math.sin(t*6)*0.06;
+    if (runShow.phase==='walkBack') char.rotation.y = Math.sin(t*6)*0.06;
+  } else {
+    // --- di chuyển tự do ---
+    let dx=0, dz=0;
+    if (keys.up) dz-=1; if (keys.down) dz+=1;
+    if (keys.left) dx-=1; if (keys.right) dx+=1;
+    if (moveTarget){
+      const d = moveTarget.clone().sub(char.position); d.y=0;
+      if (d.length() > 0.25){ dx = d.x; dz = d.z; }
+      else { moveTarget = null; toast('✅ Đã tới nơi!'); }
+    }
+    if (dx||dz){
+      const len = Math.hypot(dx,dz);
+      const nx = char.position.x + dx/len*speed*dt;
+      const nz = char.position.z + dz/len*speed*dt;
+      // giới hạn trong phòng
+      char.position.x = Math.max(-13.5, Math.min(13.5, nx));
+      char.position.z = Math.max(-12.2, Math.min(11.2, nz));
+      const targetYaw = Math.atan2(dx, dz);
+      char.rotation.y = lerpAngle(char.rotation.y, targetYaw, dt*8);
+      walking = true;
+      if (animMode!=='spin' && animMode!=='jump') animMode='walk';
+    } else if (animMode==='walk') animMode = 'idle';
+  }
+
+  // --- tạo dáng các tư thế ---
+  const A = { // góc mục tiêu
+    lLeg:0, rLeg:0, lArm:0, rArm:0, lArmZ:0.12, rArmZ:-0.12, bodyY:0, bodyRot:0, headTilt:0,
+  };
+  if (animMode==='walk' || (runShow.on && (runShow.phase==='walkOut'||runShow.phase==='walkBack'))){
+    const w = t*9;
+    A.lLeg = Math.sin(w)*0.65; A.rLeg = -Math.sin(w)*0.65;
+    A.lArm = -Math.sin(w)*0.5; A.rArm = Math.sin(w)*0.5;
+    A.bodyY = Math.abs(Math.sin(w))*0.04;
+  } else if (animMode==='idle'){
+    A.lArm = 0.05+Math.sin(t*1.4)*0.04; A.rArm = 0.05+Math.sin(t*1.4+1)*0.04;
+    A.headTilt = Math.sin(t*0.8)*0.06;
+    A.bodyY = Math.sin(t*2)*0.008;
+  } else if (animMode==='wave' || (runShow.on && runShow.phase==='pose' && runShow.style==='wave')){
+    A.rArmZ = -2.4 + Math.sin(t*7)*0.25; A.rArm = 0; A.lArm = 0.1;
+    A.headTilt = Math.sin(t*2)*0.08;
+  } else if (animMode==='spin'){
+    spinT += dt; char.rotation.y += dt*5;
+    A.lArmZ = 1.4; A.rArmZ = -1.4; A.lArm = A.rArm = -0.6;
+    if (spinT > 1.2){ spinT=0; setMode('idle'); }
+  } else if (animMode==='jump'){
+    jumpT += dt*3;
+    A.bodyY = Math.abs(Math.sin(jumpT*Math.PI))*0.35;
+    A.lArmZ = 1.8; A.rArmZ = -1.8; A.lArm = A.rArm = -0.9;
+    if (jumpT > 3){ jumpT=0; setMode('idle'); }
+  }
+  // tư thế tạo dáng (khi đứng yên hoặc chụp ảnh)
+  if (!walking && !runShow.on && poseMode!=='stand' && (animMode==='idle'||animMode==='walk')){
+    if (poseMode==='princess'){ A.lArmZ = 0.9; A.rArmZ = -0.9; A.lArm = A.rArm = -0.5; A.headTilt = -0.1; }
+    if (poseMode==='runwaypose'){ A.rArmZ = -2.2; A.rArm = 0; A.lArm = 0.15; A.headTilt = 0.12; }
+    if (poseMode==='cute'){ A.lArm = -2.4; A.rArm = -2.4; A.lArmZ = 0.5; A.rArmZ = -0.5; }
+    if (poseMode==='sit'){ A.lLeg = A.rLeg = -1.4; A.bodyY = -0.25; }
+  }
+  if (poseMode==='jump' && !walking){ A.bodyY = Math.abs(Math.sin(t*4))*0.25; A.lArmZ = 1.8; A.rArmZ = -1.8; }
+  if (runShow.on && runShow.phase==='pose' && runShow.style==='classic'){ A.rArmZ = -2.2; A.lArm = 0.15; A.headTilt = 0.1; }
+
+  // áp dụng góc mượt
+  const k = 1 - Math.pow(0.0001, dt);
+  legL.rotation.x += (A.lLeg - legL.rotation.x)*k;
+  legR.rotation.x += (A.rLeg - legR.rotation.x)*k;
+  armL.rotation.x += (A.lArm - armL.rotation.x)*k;
+  armR.rotation.x += (A.rArm - armR.rotation.x)*k;
+  armL.rotation.z += (A.lArmZ - armL.rotation.z)*k;
+  armR.rotation.z += (A.rArmZ - armR.rotation.z)*k;
+  headG.rotation.z += (A.headTilt - headG.rotation.z)*k;
+  body.position.y += (A.bodyY - body.position.y)*k;
+
+  // nhịp thở
+  body.scale.y = 1 + Math.sin(t*2.2)*0.006;
+
+  // camera theo nhân vật nhẹ + controls
+  const follow = char.position;
+  controls.target.lerp(new THREE.Vector3(follow.x, follow.y+1.0, follow.z), 1-Math.pow(0.01, dt));
+  controls.update();
+
+  // spotlight đuổi theo ngườ mẫu
+  spotTarget.position.set(char.position.x, 0.5, char.position.z);
+  if (runShow.on) spotTarget.position.set(char.position.x, 0.5, char.position.z);
+
+  // kim tuyến bay
+  [spark1, spark2, burst].forEach(p=>{
+    if (!p) return;
+    const pos = p.geometry.attributes.position;
+    for (let i=0;i<pos.count;i++){
+      let y = pos.getY(i) + dt*0.5;
+      if (y > 4) y = 0;
+      pos.setY(i, y);
+    }
+    pos.needsUpdate = true;
+    p.rotation.y += dt*0.15;
+  });
+  // fairy wings đập nhẹ
+  if (acc.fairywings.visible) acc.fairywings.rotation.y = Math.sin(t*6)*0.15;
+
+  renderer.render(scene, camera);
+}
+
+// ---------- chụp & tải ảnh ----------
+function downloadPhoto(){
+  renderer.render(scene, camera);
+  const a = document.createElement('a');
+  a.download = 'fashion-design-'+Date.now()+'.png';
+  a.href = renderer.domElement.toDataURL('image/png');
+  a.click();
+  toast('📷 Đã lưu ảnh!');
+}
+
+// ---------- resize ----------
+addEventListener('resize', ()=>{
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+// ---------- khởi tạo ----------
+const snapshotDefault = snapshot();
+applyState(snapshotDefault);
+renderTab('dress');
+char.position.set(0, 0, 2.5);
+animate();
+setTimeout(()=>{
+  const l=document.getElementById('loading');
+  l.style.opacity='0'; setTimeout(()=>l.remove(), 650);
+}, 900);
+toast('🎀 Chào mừng bé đến Fashion Designer 3D!');
+</script>
+</body>
+</html>
