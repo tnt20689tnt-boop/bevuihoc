@@ -168,7 +168,7 @@ function mesh(geo, mat, x=0,y=0,z=0, cast=true, recv=true){ const o=new THREE.Me
 const floor = mesh(new THREE.CircleGeometry(30, 64), new THREE.MeshStandardMaterial({ color:0xfdeaf3, roughness:0.18, metalness:0.35 }), 0,0,0, false, true);
 floor.rotation.x = -Math.PI/2;
 scene.add(floor);
-// thảm tròi trung tâm
+// thảm tròn trung tâm
 const rug = mesh(new THREE.CircleGeometry(4.2, 48), M(0xffd6e8, 0.9), 0, 0.012, 2.5, false, true);
 rug.rotation.x = -Math.PI/2; scene.add(rug);
 const rugRing = mesh(new THREE.RingGeometry(4.2, 4.55, 48), M(0xffffff, 0.9), 0, 0.014, 2.5, false, true);
@@ -211,7 +211,7 @@ runway.add(mesh(new THREE.BoxGeometry(0.25,3.6,0.25), M(0xc9b6ff,0.4,0.5), 2.6, 
 scene.add(runway);
 // sàn catwalk mở rộng cuối runway
 scene.add(mesh(new THREE.CylinderGeometry(2.8,2.8,0.35,32), M(0xffffff,0.15,0.4), 0, 0.175, -12));
-// spotlight chiếu ngườ mẫu
+// spotlight chiếu người mẫu
 const spot = new THREE.SpotLight(0xfff0fa, 60, 30, Math.PI/7, 0.45, 1.6);
 spot.position.set(0, 9, -4); spot.castShadow = true;
 const spotTarget = new THREE.Object3D(); scene.add(spotTarget);
@@ -984,15 +984,15 @@ function renderTab(id, keepScroll){
     panelBody.appendChild(sec('Màu mắt'));
     panelBody.appendChild(colorGrid([{n:'Hồng', c:0xffb8d9},{n:'Tím', c:0xc9a2ff},{n:'Xanh', c:0x9fd4ff},{n:'Vàng', c:0xffe28a},{n:'Không', c:0xffe0cc}], ()=>state.eyeshadow, setEyeshadow));
     panelBody.appendChild(sec('Biểu cảm'));
-    panelBody.appendChild(itemGrid([{id:'smile',n:'Cường nhẹ',icon:'😊'},{id:'happy',n:'Vui',icon:'😄'},{id:'wow',n:'Ngạc nhiên',icon:'😮'}], x=>state.expression===x, setExpression));
+    panelBody.appendChild(itemGrid([{id:'smile',n:'Cười nhẹ',icon:'😊'},{id:'happy',n:'Vui',icon:'😄'},{id:'wow',n:'Ngạc nhiên',icon:'😮'}], x=>state.expression===x, setExpression));
   } else if (id==='runway'){
-    panelBody.appendChild(sec('Trình diễn thờ trang'));
+    panelBody.appendChild(sec('Trình diễn thời trang'));
     panelBody.appendChild(btnRow([
       {t: runShow.on?'⏹ Dừng diễn':'▶ Bắt đầu diễn', cls:'pink', f:toggleRunway},
       {t:'✨ Spotlight: '+(spot.intensity>0?'BẬT':'TẮT'), cls:'purple', f:()=>{ spot.intensity = spot.intensity>0?0:60; toast(spot.intensity?'💡 Spotlight bật':'💡 Spotlight tắt'); }},
     ]));
     panelBody.appendChild(sec('Kiểu trình diễn'));
-    panelBody.appendChild(itemGrid([{id:'classic',n:'Classic',icon:'🚶‍♀️'},{id:'spin',n:'Xoay ngườ',icon:'🌀'},{id:'wave',n:'Vẫy khán giả',icon:'👋'}], x=>runShow.style===x, s=>{runShow.style=s; toast('Kiểu diễn: '+s);}));
+    panelBody.appendChild(itemGrid([{id:'classic',n:'Classic',icon:'🚶‍♀️'},{id:'spin',n:'Xoay người',icon:'🌀'},{id:'wave',n:'Vẫy khán giả',icon:'👋'}], x=>runShow.style===x, s=>{runShow.style=s; toast('Kiểu diễn: '+s);}));
     panelBody.appendChild(sec('Di chuyển tới khu vực'));
     panelBody.appendChild(itemGrid([
       {id:'runway',n:'Sàn diễn',icon:'🌟'},{id:'makeup',n:'Trang điểm',icon:'💄'},{id:'wardrobe',n:'Tủ váy',icon:'👗'},
