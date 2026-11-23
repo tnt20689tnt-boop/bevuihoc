@@ -256,7 +256,6 @@ export interface FileRouteTypes {
     | '/_authenticated/ho-so'
     | '/_authenticated/nhan-vat'
     | '/_authenticated/quan-tri'
-    | '/_authenticated/salon'
     | '/_authenticated/san-bong'
     | '/_authenticated/sanh-vinh-danh'
     | '/_authenticated/the-gioi'
