@@ -368,7 +368,7 @@ const char = new THREE.Group();
 scene.add(char);
 
 // --- vật liệu thân ---
-const skinMat  = M(0xffe0cc, 0.6);
+const skinMat  = M(0xffe6df, 0.52);
 const hairMat  = M(0x6b4a2f, 0.65);
 let dressMat   = M(0xff9ec7, 0.45);
 let topMat     = M(0xffffff, 0.5);
@@ -430,23 +430,25 @@ const gloveR = gloveL.clone(); gloveL.visible = gloveR.visible = false;
 armL.add(gloveL); armR.add(gloveR);
 
 // --- đầu ---
-headG.add(mesh(new THREE.SphereGeometry(0.30, 24, 20), skinMat, 0, 0.22, 0));
+headG.add(mesh(new THREE.SphereGeometry(0.36, 40, 32), skinMat, 0, 0.22, 0));
 headG.add(mesh(new THREE.CylinderGeometry(0.08,0.09,0.14,10), skinMat, 0, -0.03, 0));
 // tai
-headG.add(mesh(new THREE.SphereGeometry(0.055,8,8), skinMat, 0.295, 0.2, 0));
-headG.add(mesh(new THREE.SphereGeometry(0.055,8,8), skinMat, -0.295, 0.2, 0));
+headG.add(mesh(new THREE.SphereGeometry(0.065,16,12), skinMat, 0.35, 0.2, 0));
+headG.add(mesh(new THREE.SphereGeometry(0.065,16,12), skinMat, -0.35, 0.2, 0));
 // má hồng
-const cheekL = mesh(new THREE.CircleGeometry(0.05,12), new THREE.MeshBasicMaterial({color:0xff9eb5, transparent:true, opacity:0.75}), 0.17, 0.14, 0.272, false, false);
+const cheekL = mesh(new THREE.CircleGeometry(0.065,18), new THREE.MeshBasicMaterial({color:0xff9eb5, transparent:true, opacity:0.58}), 0.21, 0.12, 0.32, false, false);
 const cheekR = cheekL.clone(); cheekR.position.x = -0.17;
-cheekL.rotation.y = 0.35; cheekR.rotation.y = -0.35;
+cheekL.rotation.y = 0.35; cheekR.rotation.y = -0.35; cheekL.scale.set(1.25,0.8,1); cheekR.scale.copy(cheekL.scale);
 headG.add(cheekL, cheekR);
 // mắt (có animation chớp)
-const eyeWhiteL = mesh(new THREE.SphereGeometry(0.068,12,12), new THREE.MeshBasicMaterial({color:0xffffff}), 0.115, 0.26, 0.245, false, false);
-const eyeWhiteR = eyeWhiteL.clone(); eyeWhiteR.position.x = -0.115;
-const pupilL = mesh(new THREE.SphereGeometry(0.038,10,10), new THREE.MeshBasicMaterial({color:0x3a2b45}), 0.115, 0.255, 0.295, false, false);
-const pupilR = pupilL.clone(); pupilR.position.x = -0.115;
-const sparkL = mesh(new THREE.SphereGeometry(0.014,6,6), new THREE.MeshBasicMaterial({color:0xffffff}), 0.128, 0.275, 0.325, false, false);
-const sparkR = sparkL.clone(); sparkR.position.x = -0.102;
+const eyeWhiteL = mesh(new THREE.SphereGeometry(0.09,20,16), new THREE.MeshBasicMaterial({color:0xffffff}), 0.13, 0.26, 0.285, false, false);
+const eyeWhiteR = eyeWhiteL.clone(); eyeWhiteR.position.x = -0.13;
+const irisL = mesh(new THREE.SphereGeometry(0.068,18,14), new THREE.MeshStandardMaterial({color:0x9b70c9, roughness:0.18, metalness:0.05, emissive:0x4b2674, emissiveIntensity:0.16}), 0.13, 0.255, 0.355, false, false);
+const irisR = irisL.clone(); irisR.position.x = -0.13;
+const pupilL = mesh(new THREE.SphereGeometry(0.045,14,12), new THREE.MeshBasicMaterial({color:0x21152f}), 0.13, 0.255, 0.405, false, false);
+const pupilR = pupilL.clone(); pupilR.position.x = -0.13;
+const sparkL = mesh(new THREE.SphereGeometry(0.022,10,8), new THREE.MeshBasicMaterial({color:0xffffff}), 0.112, 0.282, 0.45, false, false);
+const sparkR = sparkL.clone(); sparkR.position.x = -0.148;
 // phấn mắt
 const shadowL = mesh(new THREE.SphereGeometry(0.06,10,8,0,Math.PI*2,0,Math.PI/2), new THREE.MeshBasicMaterial({color:0xffb8d9, transparent:true, opacity:0.55}), 0.115, 0.30, 0.245, false, false);
 shadowL.rotation.x = -0.5;
@@ -454,7 +456,7 @@ const shadowR = shadowL.clone(); shadowR.position.x = -0.115;
 const browL = mesh(new THREE.BoxGeometry(0.09,0.014,0.01), new THREE.MeshBasicMaterial({color:0x6b4a2f}), 0.115, 0.36, 0.27, false, false);
 browL.rotation.z = -0.12;
 const browR = browL.clone(); browR.position.x = -0.115; browR.rotation.z = 0.12;
-headG.add(eyeWhiteL, eyeWhiteR, pupilL, pupilR, sparkL, sparkR, shadowL, shadowR, browL, browR);
+headG.add(eyeWhiteL, eyeWhiteR, irisL, irisR, pupilL, pupilR, sparkL, sparkR, shadowL, shadowR, browL, browR);
 // miệng (3 kiểu biểu cảm)
 const mouthG = new THREE.Group(); mouthG.position.set(0, 0.09, 0.285); headG.add(mouthG);
 let lipColor = 0xe0607f;
@@ -477,10 +479,11 @@ function buildMouth(type){
 const hairG = new THREE.Group(); headG.add(hairG);
 function buildHair(style, color){
   hairG.clear();
+  hairG.scale.set(1.12, 1.10, 1.08);
   hairMat.color.setHex(color);
-  const cap = mesh(new THREE.SphereGeometry(0.315, 20, 16, 0, Math.PI*2, 0, Math.PI*0.55), hairMat, 0, 0.235, -0.005);
+  const cap = mesh(new THREE.SphereGeometry(0.38, 32, 24, 0, Math.PI*2, 0, Math.PI*0.55), hairMat, 0, 0.235, -0.005);
   cap.rotation.x = -0.28; hairG.add(cap);
-  const bang = mesh(new THREE.SphereGeometry(0.30, 16, 10, 0, Math.PI*2, 0, Math.PI*0.35), hairMat, 0, 0.30, 0.04);
+  const bang = mesh(new THREE.SphereGeometry(0.35, 24, 16, 0, Math.PI*2, 0, Math.PI*0.35), hairMat, 0, 0.30, 0.04);
   bang.rotation.x = -0.55; hairG.add(bang);
   const add = (g,x,y,z)=>{ const o=mesh(g,hairMat,x,y,z); hairG.add(o); return o; };
   if (style==='long'){
