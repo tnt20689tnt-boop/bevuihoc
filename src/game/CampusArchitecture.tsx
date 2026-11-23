@@ -16,7 +16,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
       const halfZ = Math.abs(Math.sin(yaw)) * halfWidth + Math.abs(Math.cos(yaw)) * halfDepth;
       return { name: ROOMS[portal.to].short, minX: cx - halfX, maxX: cx + halfX, minZ: cz - halfZ, maxZ: cz + halfZ };
     });
-    boxes.push({ name: "Đài phun nước", minX: -23.15, maxX: -16.85, minZ: -7.15, maxZ: -0.85 });
+    boxes.push({ name: "Đài phun nước", minX: -3.15, maxX: 3.15, minZ: -3.15, maxZ: 3.15 });
     for (let i = 0; i < boxes.length; i++) {
       for (let j = i + 1; j < boxes.length; j++) {
         const a = boxes[i];
@@ -26,7 +26,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         }
       }
     }
-    const entranceCorridor = boxes.filter((box) => box.minX < 6 && box.maxX > -6 && box.maxZ > 0 && box.minZ < 26.5);
+    const entranceCorridor = boxes.filter((box) => box.name !== "Đài phun nước" && box.minX < 6 && box.maxX > -6 && box.maxZ > 0 && box.minZ < 26.5);
     if (entranceCorridor.length) console.warn("[Campus AABB] Công trình chắn trục cổng - sân:", entranceCorridor.map((box) => box.name));
   }, [portals]);
   return (
@@ -56,7 +56,7 @@ export function CampusArchitecture({ portals }: { portals: Portal[] }) {
         );
       })}
       <CampusGreenery portals={portals} />
-      <CentralLandmark position={[-20, 0, -4]} />
+      <CentralLandmark position={[0, 0, 0]} />
       <SchoolBoundary />
       <EntranceGate />
     </group>
