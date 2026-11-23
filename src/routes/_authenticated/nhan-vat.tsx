@@ -5,13 +5,13 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { profileQueryKey, useMyProfile, type Profile } from "@/hooks/use-player";
 import { AvatarBadge } from "@/components/AvatarBadge";
-import { HAIR_COLORS, HAIR_STYLES, SKIN_TONES, validateName, type Avatar, type Gender } from "@/lib/avatar";
+import { ACCESSORIES, CLOTH_COLORS, EYES, HAIR_COLORS, HAIR_STYLES, MOUTHS, OUTFITS, SKIN_TONES, validateName, type Avatar, type Gender } from "@/lib/avatar";
 
 export const Route = createFileRoute("/_authenticated/nhan-vat")({
   head: () => ({
     meta: [
-      { title: "Chỉnh sửa hồ sơ – Bé Học Vui" },
-      { name: "description", content: "Bé chỉnh sửa tên, lớp, màu da và kiểu tóc nhân vật." },
+      { title: "Tùy chỉnh nhân vật – Bé Học Vui" },
+      { name: "description", content: "Bé tùy chỉnh tên, lớp, diện mạo, trang phục và phụ kiện nhân vật." },
     ],
   }),
   component: CharacterEditor,
@@ -37,18 +37,6 @@ function ColorChoices({ colors, value, onChange, label }: {
         />
       ))}
     </div>
-  );
-}
-
-function LockedSection({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <section aria-disabled="true" className="relative overflow-hidden rounded-2xl border border-slate-200 bg-slate-100/80 p-4 opacity-55 grayscale">
-      <div className="pointer-events-none select-none">
-        <h3 className="mb-2 font-black text-slate-600">{title}</h3>
-        {children}
-      </div>
-      <div className="absolute right-3 top-3 rounded-full bg-slate-300 px-3 py-1 text-xs font-black text-slate-600">🔒 Chưa mở</div>
-    </section>
   );
 }
 
@@ -134,7 +122,7 @@ function CharacterEditor() {
           <div className="text-5xl">🏫</div>
           <p className="mt-2 text-xs font-black uppercase tracking-[.22em] text-emerald-700">Bé Học Vui · Hồ sơ học sinh</p>
           <h1 className="mt-2 text-3xl font-black sm:text-4xl">Chỉnh sửa hồ sơ của bé</h1>
-          <p className="mt-2 text-slate-600">Bé có thể thay đổi tên, lớp và một số đặc điểm nhân vật.</p>
+          <p className="mt-2 text-slate-600">Bé có thể tự do thay đổi diện mạo, trang phục và phụ kiện của nhân vật.</p>
         </header>
 
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
@@ -169,15 +157,47 @@ function CharacterEditor() {
               <ColorChoices colors={HAIR_COLORS} value={avatar.hairColor} onChange={(hairColor) => patchAvatar({ hairColor })} label="Màu tóc" />
             </section>
 
-            <LockedSection title="Giới tính">
-              <div className="flex gap-3"><span>👦 Bé trai</span><span>👧 Bé gái</span></div>
-            </LockedSection>
-            <LockedSection title="Trang phục và phụ kiện">
-              <div className="flex flex-wrap gap-2"><span>Áo thun</span><span>Váy</span><span>Mũ</span><span>Kính</span></div>
-            </LockedSection>
-            <LockedSection title="Các đặc điểm khác của khuôn mặt">
-              <div className="flex flex-wrap gap-2"><span>Mắt</span><span>Nụ cười</span><span>Phụ kiện</span></div>
-            </LockedSection>
+            <section className="rounded-2xl border-2 border-sky-100 bg-sky-50/60 p-4">
+              <h2 className="mb-3 font-black">5. Trang phục</h2>
+              <div className="flex flex-wrap gap-2">
+                {OUTFITS[gender].map((item) => (
+                  <button key={item.id} type="button" aria-pressed={avatar.outfit === item.id} onClick={() => patchAvatar({ outfit: item.id })} className={`rounded-xl border-2 px-3 py-2 text-sm font-extrabold ${avatar.outfit === item.id ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-600"}`}>{item.name}</button>
+                ))}
+              </div>
+              <h3 className="mb-2 mt-4 text-sm font-black text-slate-700">Màu áo</h3>
+              <ColorChoices colors={CLOTH_COLORS} value={avatar.topColor} onChange={(topColor) => patchAvatar({ topColor })} label="Màu áo" />
+              <h3 className="mb-2 mt-4 text-sm font-black text-slate-700">Màu quần / váy</h3>
+              <ColorChoices colors={CLOTH_COLORS} value={avatar.bottomColor} onChange={(bottomColor) => patchAvatar({ bottomColor })} label="Màu quần váy" />
+              <h3 className="mb-2 mt-4 text-sm font-black text-slate-700">Màu giày</h3>
+              <ColorChoices colors={CLOTH_COLORS} value={avatar.shoeColor} onChange={(shoeColor) => patchAvatar({ shoeColor })} label="Màu giày" />
+            </section>
+
+            <section className="rounded-2xl border-2 border-sky-100 bg-sky-50/60 p-4">
+              <h2 className="mb-3 font-black">6. Phụ kiện</h2>
+              <div className="flex flex-wrap gap-2">
+                {ACCESSORIES[gender].map((item) => (
+                  <button key={item.id} type="button" aria-pressed={avatar.accessory === item.id} onClick={() => patchAvatar({ accessory: item.id })} className={`rounded-xl border-2 px-3 py-2 text-sm font-extrabold ${avatar.accessory === item.id ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-600"}`}>{item.name}</button>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-2xl border-2 border-sky-100 bg-sky-50/60 p-4">
+              <h2 className="mb-3 font-black">7. Đôi mắt</h2>
+              <div className="flex flex-wrap gap-2">
+                {EYES.map((item) => (
+                  <button key={item.id} type="button" aria-pressed={avatar.eyes === item.id} onClick={() => patchAvatar({ eyes: item.id })} className={`rounded-xl border-2 px-3 py-2 text-sm font-extrabold ${avatar.eyes === item.id ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-600"}`}>{item.name}</button>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-2xl border-2 border-sky-100 bg-sky-50/60 p-4">
+              <h2 className="mb-3 font-black">8. Nụ cười</h2>
+              <div className="flex flex-wrap gap-2">
+                {MOUTHS.map((item) => (
+                  <button key={item.id} type="button" aria-pressed={avatar.mouth === item.id} onClick={() => patchAvatar({ mouth: item.id })} className={`rounded-xl border-2 px-3 py-2 text-sm font-extrabold ${avatar.mouth === item.id ? "border-emerald-500 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-white text-slate-600"}`}>{item.name}</button>
+                ))}
+              </div>
+            </section>
 
             {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">{error}</p>}
             <button type="button" disabled={saving} onClick={() => void saveProfile()} className="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-lg font-black text-white shadow-[0_5px_0_#16866e] disabled:opacity-60">{saving ? "Đang lưu…" : "Lưu thay đổi 🌟"}</button>
@@ -191,7 +211,7 @@ function CharacterEditor() {
             </div>
             <h2 className="mt-5 text-2xl font-black">{name.trim() || "Tên của bé"}</h2>
             <p className="mt-1 font-bold text-slate-500">{gender === "boy" ? "Bé trai" : "Bé gái"} · Lớp {grade}</p>
-            <div className="mt-5 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-900">⭐ Chỉ những mục sáng màu mới có thể chỉnh sửa.</div>
+            <div className="mt-5 rounded-2xl bg-amber-50 p-3 text-sm font-semibold text-amber-900">✨ Mọi thay đổi sẽ được xem trước và lưu vào hồ sơ của bé.</div>
           </aside>
         </div>
       </div>
