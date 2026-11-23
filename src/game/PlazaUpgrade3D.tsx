@@ -160,11 +160,11 @@ export function PlazaUpgrade3D() {
   return (
     <group>
       <CampusArchitecture portals={ROOMS.plaza.portals} />
-      <group position={[-20, 0, -4]}>
+      <group position={[0, 0, 0]}>
         <FountainStructure />
         <FountainSpray position={[0, 0, 0]} />
       </group>
-      <FountainRingLights center={[-20, 0.02, -4]} radius={3.35} count={8} />
+      <FountainRingLights center={[0, 0.02, 0]} radius={3.35} count={8} />
       <TreeFairyLights center={[-20, 2.8, -12]} radius={1.25} count={20} />
       <TreeFairyLights center={[18, 2.8, -12]} radius={1.25} count={20} />
       <RotatingSeat position={[-19, 0, -9]} speed={0.65} />
