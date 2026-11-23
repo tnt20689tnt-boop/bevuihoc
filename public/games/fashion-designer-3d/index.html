@@ -3,128 +3,116 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💖 Fashion Stylist 3D 💖</title>
+<title>✨ Fashion Studio - No Ads ✨</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#fce4ec;height:100vh;overflow:hidden;display:flex;color:#4a2c3a}
-.character-area{flex:1;min-width:0;position:relative;display:flex;justify-content:center;align-items:center;background:#ffeef2;transition:background .5s;overflow:hidden}
-.stage{position:relative;width:400px;height:600px;max-width:100%;display:flex;justify-content:center;align-items:flex-end;padding-bottom:20px;z-index:2}
-.ui-area{width:420px;max-width:48vw;background:#fff;border-left:4px solid #f48fb1;display:flex;flex-direction:column;box-shadow:-5px 0 25px #00000014;z-index:10}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#ffeef2;height:100vh;overflow:hidden;display:flex;color:#4a2c3a}
+.character-area{flex:1;min-width:0;position:relative;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#fce4ec,#f8bbd0);transition:background .5s;overflow:hidden}
+.stage{position:relative;width:350px;height:600px;max-width:100%;display:flex;justify-content:center;align-items:flex-end;padding-bottom:20px}
+.layer{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:100%;height:100%;object-fit:contain;pointer-events:none;transition:opacity .1s}
+.z-bg{z-index:1}.z-hair-back{z-index:2}.z-body{z-index:3}.z-shoes{z-index:4}.z-dress{z-index:5}.z-hair-front{z-index:6}.z-acc{z-index:7}
+.ui-area{width:400px;max-width:48vw;background:#fff;border-left:4px solid #f48fb1;display:flex;flex-direction:column;box-shadow:-5px 0 25px #00000014;z-index:10}
 .ui-header{padding:20px;background:#f48fb1;color:#fff;text-align:center;font-size:22px;font-weight:800;letter-spacing:1px;text-shadow:0 2px 4px #0002}
 .tabs{display:flex;border-bottom:2px solid #fce4ec;background:#fff9fb;overflow-x:auto}
-.tab-btn{flex:1;min-width:55px;padding:12px 5px;border:0;background:none;cursor:pointer;font-weight:bold;color:#b08090;transition:.2s;font-size:12px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:4px}
-.tab-btn:hover{background:#fce4ec;color:#f48fb1}
-.tab-btn.active{color:#e91e63;border-bottom:3px solid #e91e63;background:#fff}
-.tab-icon{font-size:20px}
+.tab-btn{flex:1;min-width:58px;padding:15px 5px;border:0;background:none;cursor:pointer;font-weight:bold;color:#b08090;transition:.2s;font-size:13px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:5px}
+.tab-btn:hover{background:#fce4ec;color:#f48fb1}.tab-btn.active{color:#e91e63;border-bottom:3px solid #e91e63;background:#fff}.tab-icon{font-size:22px}
 .items-container{flex:1;min-height:0;padding:20px;overflow-y:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;align-content:start}
 .items-container::-webkit-scrollbar{width:8px}.items-container::-webkit-scrollbar-thumb{background:#f48fb1;border-radius:4px}
-.item-btn{aspect-ratio:1;border:2px solid #eee;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:24px;transition:.2s;position:relative;box-shadow:0 2px 5px #00000005;overflow:hidden}
-.item-btn:hover{border-color:#f48fb1;transform:translateY(-3px);box-shadow:0 4px 10px #f48fb14d}
-.item-btn.active{border-color:#e91e63;background:#fce4ec;box-shadow:0 0 0 2px #e91e63 inset}
-.item-btn span.label{font-size:10px;margin-top:4px;color:#b08090;font-weight:bold}
-.color-btn{border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px #0000001a;cursor:pointer;transition:.2s;width:100%;aspect-ratio:1}
-.color-btn:hover{transform:scale(1.1)}.color-btn.active{border-color:#e91e63;box-shadow:0 0 0 3px #e91e63}
+.item-btn{aspect-ratio:1;border:2px solid #eee;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;transition:.2s;position:relative;box-shadow:0 2px 5px #00000005;overflow:hidden}
+.item-btn:hover{border-color:#f48fb1;transform:translateY(-3px);box-shadow:0 4px 10px #f48fb14d}.item-btn.active{border-color:#e91e63;background:#fce4ec;box-shadow:0 0 0 2px #e91e63 inset}
+.item-btn img{width:80%;height:80%;object-fit:contain}
 .action-area{padding:15px;background:#fff9fb;border-top:2px solid #fce4ec;display:flex;gap:10px}
 .action-btn{flex:1;padding:15px;border:0;border-radius:12px;font-weight:bold;font-size:15px;cursor:pointer;transition:.2s;color:#fff;text-shadow:0 1px 2px #0003}
-.action-btn.photo{background:linear-gradient(45deg,#f06292,#f48fb1)}.action-btn.random{background:linear-gradient(45deg,#ba68c8,#ce93d8)}
-.action-btn:hover{filter:brightness(1.05);transform:translateY(-2px);box-shadow:0 5px 15px #0000001a}.action-btn:active{transform:translateY(0)}
-.character-wrapper{width:300px;height:500px;max-height:85vh;transition:transform .3s ease;filter:drop-shadow(0 15px 25px #00000026)}
-.character-wrapper.idle{animation:float 4s ease-in-out infinite}
-@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
-svg{width:100%;height:100%;overflow:visible}
-@media(max-width:700px){body{flex-direction:column}.character-area{flex:1;min-height:0}.stage{height:100%;width:100%;align-items:center;padding:8px}.character-wrapper{height:min(48vh,420px);width:auto;max-width:80vw}.ui-area{width:100%;max-width:none;height:52vh;border-left:0;border-top:3px solid #f48fb1}.ui-header{padding:9px;font-size:18px}.tab-btn{padding:7px 3px}.tab-icon{font-size:17px}.items-container{padding:10px;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.action-area{padding:8px}.action-btn{padding:10px;font-size:13px}}
+.action-btn.random{background:linear-gradient(45deg,#ba68c8,#ce93d8)}.action-btn:hover{filter:brightness(1.05);transform:translateY(-2px)}
+@media(max-width:700px){body{flex-direction:column}.character-area{flex:1;min-height:0}.stage{height:100%;width:100%;padding:8px;align-items:center}.layer{height:100%;width:auto;max-width:100%;max-height:100%}.ui-area{width:100%;max-width:none;height:48vh;border-left:0;border-top:4px solid #f48fb1}.ui-header{padding:9px;font-size:18px}.tab-btn{padding:7px 3px;font-size:11px}.tab-icon{font-size:18px}.items-container{padding:10px;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}.action-area{padding:8px}.action-btn{padding:10px;font-size:13px}}
 </style>
 </head>
 <body>
 <div class="character-area" id="character-area">
- <div class="stage"><div class="character-wrapper idle" id="character-wrapper">
-  <svg viewBox="0 0 300 520">
-   <defs>
-    <linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#ffe6df"/><stop offset="50%" stop-color="#fff5f0"/><stop offset="100%" stop-color="#ffd5c2"/></linearGradient>
-    <filter id="skinShadow"><feDropShadow dx="2" dy="2" stdDeviation="2" flood-color="#000" flood-opacity=".15"/></filter>
-   </defs>
-   <path id="hair-back" d="" fill="#4a2c3a" filter="url(#skinShadow)"/>
-   <path d="M130 300 L130 460 Q130 470 140 470 L145 470 Q155 470 155 460 L155 300Z" fill="url(#skinGrad)"/>
-   <path d="M145 300 L145 460 Q145 470 155 470 L160 470 Q170 470 170 460 L170 300Z" fill="url(#skinGrad)"/>
-   <path id="shoe-left" d="" fill="#2b1b17" filter="url(#skinShadow)"/><path id="shoe-right" d="" fill="#2b1b17" filter="url(#skinShadow)"/>
-   <path d="M110 190 Q90 250 95 320 Q105 330 115 320 Q115 260 130 210Z" fill="url(#skinGrad)" filter="url(#skinShadow)"/>
-   <path d="M190 190 Q210 250 205 320 Q195 330 185 320 Q185 260 170 210Z" fill="url(#skinGrad)" filter="url(#skinShadow)"/>
-   <path d="M125 180 Q150 170 175 180 L165 300 Q150 310 135 300Z" fill="url(#skinGrad)"/>
-   <path id="dress-skirt" d="" fill="#ff6b9d" filter="url(#skinShadow)"/><path id="dress-top" d="" fill="#ff6b9d" filter="url(#skinShadow)"/>
-   <rect x="140" y="150" width="20" height="30" fill="url(#skinGrad)"/>
-   <ellipse cx="150" cy="100" rx="45" ry="55" fill="url(#skinGrad)" filter="url(#skinShadow)"/>
-   <path d="M120 85 Q130 80 140 85 M160 85 Q170 80 180 85" stroke="#4a2c3a" stroke-width="3" fill="none" stroke-linecap="round"/>
-   <ellipse cx="125" cy="105" rx="8" ry="12" fill="#2b1b17"/><ellipse cx="175" cy="105" rx="8" ry="12" fill="#2b1b17"/>
-   <circle cx="123" cy="101" r="3" fill="#fff"/><circle cx="173" cy="101" r="3" fill="#fff"/><circle cx="128" cy="108" r="1.5" fill="#fff" opacity=".6"/><circle cx="178" cy="108" r="1.5" fill="#fff" opacity=".6"/>
-   <ellipse cx="110" cy="120" rx="8" ry="5" fill="#ff9eb5" opacity=".6" filter="blur(1px)"/><ellipse cx="190" cy="120" rx="8" ry="5" fill="#ff9eb5" opacity=".6" filter="blur(1px)"/>
-   <path d="M145 125 Q150 132 155 125" stroke="#e91e63" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-   <path id="hair-front" d="" fill="#4a2c3a"/><g id="acc-layer"></g>
-  </svg>
- </div></div>
+ <div class="stage">
+  <img id="img-hair-back" class="layer z-hair-back" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,100 Q70,250 50,400 Q150,420 250,400 Q230,250 200,100 Z' fill='%23333'/></svg>" alt="Tóc sau">
+  <img id="img-body" class="layer z-body" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><ellipse cx='150' cy='120' rx='45' ry='55' fill='%23ffd5c2'/><path d='M130,175 L170,175 L160,280 L140,280 Z' fill='%23ffd5c2'/><path d='M135,280 L135,460 Q135,470 145,470 L145,470 Q155,470 155,460 L155,280 Z' fill='%23ffd5c2'/><path d='M145,280 L145,460 Q145,470 155,470 L155,470 Q165,470 165,460 L165,280 Z' fill='%23ffd5c2'/><circle cx='125' cy='120' r='6' fill='%23333'/><circle cx='175' cy='120' r='6' fill='%23333'/></svg>" alt="Cơ thể">
+  <img id="img-shoes" class="layer z-shoes" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M125,460 L125,480 L155,480 L155,460 Z' fill='%23e91e63'/><path d='M145,460 L145,480 L175,480 L175,460 Z' fill='%23e91e63'/></svg>" alt="Giày">
+  <img id="img-dress" class="layer z-dress" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M125,180 L175,180 L185,300 L115,300 Z' fill='%23ff6b9d'/><path d='M115,300 L185,300 L220,420 Q150,450 80,420 Z' fill='%23ff6b9d'/></svg>" alt="Váy">
+  <img id="img-hair-front" class="layer z-hair-front" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M105,120 Q105,50 150,50 Q195,50 195,120 Q195,140 150,140 Q105,140 105,120 Z' fill='%23333'/></svg>" alt="Tóc trước">
+  <img id="img-acc" class="layer z-acc" src="" style="display:none" alt="Phụ kiện">
+ </div>
 </div>
 <div class="ui-area">
- <div class="ui-header">💖 Fashion Stylist 💖</div>
+ <div class="ui-header">✨ Fashion Studio ✨</div>
  <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('dress',this)"><span class="tab-icon">👗</span>Váy</button>
-  <button class="tab-btn" onclick="switchTab('hair',this)"><span class="tab-icon">💇</span>Tóc</button>
+  <button class="tab-btn active" onclick="switchTab('hair',this)"><span class="tab-icon">💇</span>Tóc</button>
+  <button class="tab-btn" onclick="switchTab('dress',this)"><span class="tab-icon">👗</span>Váy</button>
   <button class="tab-btn" onclick="switchTab('shoes',this)"><span class="tab-icon">👠</span>Giày</button>
+  <button class="tab-btn" onclick="switchTab('acc',this)"><span class="tab-icon">🎀</span>Kính</button>
   <button class="tab-btn" onclick="switchTab('bg',this)"><span class="tab-icon">🖼️</span>Nền</button>
-  <button class="tab-btn" onclick="switchTab('color',this)"><span class="tab-icon">🎨</span>Màu</button>
-  <button class="tab-btn" onclick="switchTab('acc',this)"><span class="tab-icon">🎀</span>Phụ kiện</button>
  </div>
  <div class="items-container" id="items-container"></div>
- <div class="action-area"><button class="action-btn random" onclick="randomize()">🎲 Ngẫu Nhiên</button><button class="action-btn photo" onclick="takePhoto()">📸 Chụp Ảnh</button></div>
+ <div class="action-area"><button class="action-btn random" onclick="randomize()">🎲 Ngẫu Nhiên</button></div>
 </div>
 <script>
-const COLORS=['#ff6b9d','#ff4757','#4facfe','#43e97b','#f8b500','#a18cd1','#ffffff','#2b1b17','#d4af37','#e6e6fa'];
-const DRESSES=[
-{id:'d1',name:'Dạ hội',top:'M 130 180 L 170 180 L 170 220 L 130 220 Z',skirt:'M 130 220 L 170 220 L 200 350 Q 150 380 100 350 Z'},
-{id:'d2',name:'Xòe A',top:'M 135 180 L 165 180 L 165 220 L 135 220 Z',skirt:'M 130 220 L 170 220 L 190 370 Q 150 390 110 370 Z'},
-{id:'d3',name:'Ngắn',top:'M 130 180 L 170 180 L 170 230 L 130 230 Z',skirt:'M 130 230 L 170 230 L 180 300 Q 150 320 120 300 Z'},
-{id:'d4',name:'Đuôi cá',top:'M 130 180 L 170 180 L 170 220 L 130 220 Z',skirt:'M 130 220 L 170 220 L 160 320 L 180 420 Q 150 440 120 420 L 140 320 Z'}];
-const HAIRS=[
-{id:'h1',name:'Xoăn',back:'M 95 100 Q 80 200 70 300 Q 110 330 150 330 Q 190 330 230 300 Q 220 200 205 100 Z',front:'M 150 45 Q 105 45 100 95 Q 100 120 115 140 Q 130 140 150 140 Q 170 140 185 140 Q 200 120 200 95 Q 195 45 150 45 Z'},
-{id:'h2',name:'Twin',back:'M 105 130 Q 80 220 70 300 Q 100 320 120 310 L 130 200 L 170 200 L 180 310 Q 200 320 230 300 Q 220 220 195 130 Z',front:'M 150 45 Q 110 45 105 90 Q 105 110 115 130 Q 130 130 150 130 Q 170 130 185 130 Q 195 110 195 90 Q 190 45 150 45 Z'},
-{id:'h3',name:'Bob',back:'M 110 110 Q 100 160 110 200 Q 150 210 190 200 Q 200 160 190 110 Z',front:'M 150 50 Q 105 50 100 95 Q 100 115 115 135 Q 130 135 150 135 Q 170 135 185 135 Q 200 115 200 95 Q 195 50 150 50 Z'},
-{id:'h4',name:'Búi',back:'M 115 110 Q 105 150 115 180 Q 150 190 185 180 Q 195 150 185 110 Z',front:'M 150 30 Q 110 30 105 75 Q 105 95 115 115 Q 130 115 150 115 Q 170 115 185 115 Q 195 95 195 75 Q 190 30 150 30 Z'}];
-const SHOES=[
-{id:'s1',name:'Cao gót',left:'M 130 460 L 130 470 Q 130 480 140 480 L 145 480 Q 155 480 155 470 L 155 460 Z',right:'M 145 460 L 155 460 L 155 470 Q 155 480 165 480 L 170 480 L 170 470 L 170 460 Z'},
-{id:'s2',name:'Sneaker',left:'M 130 460 L 130 475 Q 130 485 140 485 L 145 485 Q 155 485 155 475 L 155 460 Z',right:'M 145 460 L 155 460 L 155 475 Q 155 485 165 485 L 170 485 L 170 475 L 170 460 Z'}];
-const BACKGROUNDS=[
-{id:'b1',name:'Studio',color:'linear-gradient(135deg,#ff9a9e,#fecfef)'},
-{id:'b2',name:'Sự kiện',color:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
-{id:'b3',name:'Dạo phố',color:'linear-gradient(135deg,#84fab0,#8fd3f4)'},
-{id:'b4',name:'Biển',color:'linear-gradient(135deg,#4facfe,#00f2fe)'}];
-const ACCS=[
-{id:'a1',name:'Kính',icon:'🕶️',x:120,y:105,size:25},
-{id:'a2',name:'Mũ',icon:'👒',x:130,y:30,size:40},
-{id:'a3',name:'Hoa',icon:'🌸',x:180,y:50,size:25},
-{id:'a4',name:'Túi',icon:'👜',x:210,y:250,size:35}];
-let state={dress:0,hair:0,shoes:0,bg:0,color:0,acc:-1,tab:'dress'};
-const elHairBack=document.getElementById('hair-back'),elHairFront=document.getElementById('hair-front'),elDressTop=document.getElementById('dress-top'),elDressSkirt=document.getElementById('dress-skirt'),elShoeL=document.getElementById('shoe-left'),elShoeR=document.getElementById('shoe-right'),elAccLayer=document.getElementById('acc-layer'),elCharArea=document.getElementById('character-area'),container=document.getElementById('items-container');
+const DB={
+hair:[
+{id:'h1',back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,100 Q70,250 50,400 Q150,420 250,400 Q230,250 200,100 Z' fill='%234a2c3a'/></svg>",front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M105,120 Q105,50 150,50 Q195,50 195,120 Q195,140 150,140 Q105,140 105,120 Z' fill='%234a2c3a'/></svg>"},
+{id:'h2',back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,120 Q80,250 60,350 Q100,370 120,350 L130,200 L170,200 L180,350 Q200,370 240,350 Q220,250 190,120 Z' fill='%23f8b500'/></svg>",front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,110 Q110,60 150,60 Q190,60 190,110 Q190,130 150,130 Q110,130 110,110 Z' fill='%23f8b500'/></svg>"},
+{id:'h3',back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,120 Q100,200 110,250 Q150,260 190,250 Q200,200 200,120 Z' fill='%23ff6b9d'/></svg>",front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,110 Q110,50 150,50 Q190,50 190,110 Q190,130 150,130 Q110,130 110,110 Z' fill='%23ff6b9d'/></svg>"}
+],
+dress:[
+{id:'d1',img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,280 L110,280 Z' fill='%23e91e63'/><path d='M110,280 L190,280 L230,420 Q150,450 70,420 Z' fill='%23e91e63'/></svg>"},
+{id:'d2',img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,280 L110,280 Z' fill='%234facfe'/><path d='M110,280 L190,280 L210,350 L90,350 Z' fill='%234facfe'/></svg>"},
+{id:'d3',img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M125,180 L175,180 L185,280 L115,280 Z' fill='%23f8b500'/><path d='M115,280 L185,280 L200,450 Q150,460 100,450 Z' fill='%23f8b500'/></svg>"}
+],
+shoes:[
+{id:'s1',img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M125,460 L125,480 L155,480 L155,460 Z' fill='%23333'/><path d='M145,460 L145,480 L175,480 L175,460 Z' fill='%23333'/></svg>"},
+{id:'s2',img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,460 L120,485 L155,485 L155,460 Z' fill='%23fff'/><path d='M145,460 L145,485 L180,485 L180,460 Z' fill='%23fff'/></svg>"}
+],
+acc:[
+{id:'a1',img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><circle cx='130' cy='115' r='10' fill='none' stroke='%23333' stroke-width='3'/><circle cx='170' cy='115' r='10' fill='none' stroke='%23333' stroke-width='3'/><line x1='140' y1='115' x2='160' y2='115' stroke='%23333' stroke-width='3'/></svg>"},
+{id:'a2',img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,70 L180,70 L190,120 L110,120 Z' fill='%23ff6b9d'/><path d='M130,70 L130,40 L170,40 L170,70 Z' fill='%23ff6b9d'/></svg>"}
+],
+bg:[
+{id:'b1',color:'linear-gradient(135deg,#fce4ec,#f8bbd0)'},
+{id:'b2',color:'linear-gradient(135deg,#e3f2fd,#90caf9)'},
+{id:'b3',color:'linear-gradient(135deg,#e8f5e9,#a5d6a7)'},
+{id:'b4',color:'linear-gradient(135deg,#f3e5f5,#ce93d8)'}
+]};
+let state={hair:0,dress:0,shoes:0,acc:-1,bg:0,tab:'hair'};
+const container=document.getElementById('items-container'),elCharArea=document.getElementById('character-area');
 function updateCharacter(){
-const c=COLORS[state.color],dress=DRESSES[state.dress],hair=HAIRS[state.hair],shoes=SHOES[state.shoes];
-elDressTop.setAttribute('d',dress.top);elDressTop.setAttribute('fill',c);elDressSkirt.setAttribute('d',dress.skirt);elDressSkirt.setAttribute('fill',c);
-elHairBack.setAttribute('d',hair.back);elHairBack.setAttribute('fill','#4a2c3a');elHairFront.setAttribute('d',hair.front);elHairFront.setAttribute('fill','#4a2c3a');
-elShoeL.setAttribute('d',shoes.left);elShoeL.setAttribute('fill',c);elShoeR.setAttribute('d',shoes.right);elShoeR.setAttribute('fill',c);
-elCharArea.style.background=BACKGROUNDS[state.bg].color;elAccLayer.innerHTML='';
-if(state.acc>=0){const a=ACCS[state.acc],node=document.createElementNS('http://www.w3.org/2000/svg','text');node.setAttribute('x',a.x);node.setAttribute('y',a.y);node.setAttribute('font-size',a.size);node.textContent=a.icon;elAccLayer.appendChild(node)}
+document.getElementById('img-hair-back').src=DB.hair[state.hair].back;
+document.getElementById('img-hair-front').src=DB.hair[state.hair].front;
+document.getElementById('img-dress').src=DB.dress[state.dress].img;
+document.getElementById('img-shoes').src=DB.shoes[state.shoes].img;
+const accImg=document.getElementById('img-acc');
+if(state.acc>=0){accImg.src=DB.acc[state.acc].img;accImg.style.display='block'}else{accImg.style.display='none'}
+elCharArea.style.background=DB.bg[state.bg].color;
 }
 function switchTab(tabId,btn){state.tab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderItems()}
 function renderItems(){
 container.innerHTML='';
-if(state.tab==='dress')DRESSES.forEach((d,i)=>addItem('👗',d.name,state.dress===i,()=>{state.dress=i;refresh()}));
-else if(state.tab==='hair')HAIRS.forEach((h,i)=>addItem('💇',h.name,state.hair===i,()=>{state.hair=i;refresh()}));
-else if(state.tab==='shoes')SHOES.forEach((s,i)=>addItem('👠',s.name,state.shoes===i,()=>{state.shoes=i;refresh()}));
-else if(state.tab==='bg')BACKGROUNDS.forEach((b,i)=>{const d=makeItem(state.bg===i);d.style.background=b.color;d.style.color='#fff';d.innerHTML='<span class="label" style="color:#fff;font-size:12px">'+b.name+'</span>';d.onclick=()=>{state.bg=i;refresh()};container.appendChild(d)});
-else if(state.tab==='color')COLORS.forEach((c,i)=>{const d=document.createElement('div');d.className='color-btn'+(state.color===i?' active':'');d.style.background=c;d.onclick=()=>{state.color=i;refresh()};container.appendChild(d)});
-else if(state.tab==='acc'){addItem('❌','Bỏ',state.acc===-1,()=>{state.acc=-1;refresh()});ACCS.forEach((a,i)=>addItem(a.icon,a.name,state.acc===i,()=>{state.acc=i;refresh()}))}
+const tab=state.tab;
+if(tab==='bg'){
+DB.bg.forEach((item,i)=>{const div=document.createElement('div');div.className='item-btn'+(state.bg===i?' active':'');div.style.background=item.color;div.onclick=()=>{state.bg=i;updateCharacter();renderItems()};container.appendChild(div)});
+return;
 }
-function makeItem(active){const d=document.createElement('div');d.className='item-btn'+(active?' active':'');return d}
-function addItem(icon,label,active,fn){const d=makeItem(active);d.innerHTML=icon+'<span class="label">'+label+'</span>';d.onclick=fn;container.appendChild(d)}
-function refresh(){updateCharacter();renderItems()}
-function randomize(){state.dress=Math.floor(Math.random()*DRESSES.length);state.hair=Math.floor(Math.random()*HAIRS.length);state.shoes=Math.floor(Math.random()*SHOES.length);state.bg=Math.floor(Math.random()*BACKGROUNDS.length);state.color=Math.floor(Math.random()*COLORS.length);state.acc=Math.random()>.4?Math.floor(Math.random()*ACCS.length):-1;refresh()}
-function takePhoto(){alert('📸 Đã chụp ảnh Influencer! (Bản demo)');const w=document.getElementById('character-wrapper');w.style.transform='scale(1.1)';setTimeout(()=>{w.style.transform='scale(1)'},200)}
+const items=DB[tab];
+if(tab==='acc'){
+const noneDiv=document.createElement('div');noneDiv.className='item-btn'+(state.acc===-1?' active':'');noneDiv.innerHTML='<span style="font-size:20px">❌</span>';noneDiv.onclick=()=>{state.acc=-1;updateCharacter();renderItems()};container.appendChild(noneDiv);
+}
+items.forEach((item,i)=>{
+const div=document.createElement('div');div.className='item-btn'+(state[tab]===i?' active':'');
+if(tab==='hair'){div.innerHTML='<img src="'+item.front+'" style="object-fit:cover;border-radius:8px">'}else{div.innerHTML='<img src="'+item.img+'">'}
+div.onclick=()=>{state[tab]=i;updateCharacter();renderItems()};container.appendChild(div);
+});
+}
+function randomize(){
+state.hair=Math.floor(Math.random()*DB.hair.length);
+state.dress=Math.floor(Math.random()*DB.dress.length);
+state.shoes=Math.floor(Math.random()*DB.shoes.length);
+state.bg=Math.floor(Math.random()*DB.bg.length);
+state.acc=Math.random()>.5?Math.floor(Math.random()*DB.acc.length):-1;
+updateCharacter();renderItems();
+}
 renderItems();updateCharacter();
 </script>
 </body>
