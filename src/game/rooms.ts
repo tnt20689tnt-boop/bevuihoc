@@ -4,15 +4,25 @@ import engImg from "@/assets/room-english.jpg";
 import salonImg from "@/assets/room-salon.jpg";
 import footballImg from "@/assets/room-football.jpg";
 
-export type RoomId = "plaza" | "math" | "vietnamese" | "english" | "girls" | "boys" | "arena" | "library";
-export const ROOM_IDS: RoomId[] = ["plaza", "math", "vietnamese", "english", "girls", "boys", "arena", "library"];
+export type RoomId =
+  "plaza" | "math" | "vietnamese" | "english" | "girls" | "boys" | "arena" | "library";
+export const ROOM_IDS: RoomId[] = [
+  "plaza",
+  "math",
+  "vietnamese",
+  "english",
+  "girls",
+  "boys",
+  "arena",
+  "library",
+];
 
 export type Activity = {
   x: number;
   z: number;
   label: string;
   icon: string;
-  to: "/hoc/$subject" | "/san-bong" | "/thi-dau" | "/bang-xep-hang" | "/sanh-vinh-danh";
+  to: "/hoc/$subject" | "/salon" | "/san-bong" | "/thi-dau" | "/bang-xep-hang" | "/sanh-vinh-danh";
   params?: { subject: string };
 };
 
@@ -105,7 +115,10 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ],
     obstacles: [
       { x: 0, z: 0, r: 3.1 },
-      ...PLAZA_PORTALS.map((portal) => { const [x, z] = portalBuildingPosition(portal); return { x, z, r: portal.to === "arena" ? 2.15 : 3.35 }; }),
+      ...PLAZA_PORTALS.map((portal) => {
+        const [x, z] = portalBuildingPosition(portal);
+        return { x, z, r: portal.to === "arena" ? 2.15 : 3.35 };
+      }),
     ],
   },
   math: {
@@ -198,8 +211,7 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     blurb: "Trang điểm, làm tóc và thay trang phục cho cô bé anime.",
     radius: 14,
     portals: [EXIT],
-    activities: [
-    ],
+    activities: [{ x: -2.1, z: -5, label: "Vào Salon thời trang 3D", icon: "👗", to: "/salon" }],
     obstacles: [{ x: 0, z: -10, r: 2.4 }],
   },
 
