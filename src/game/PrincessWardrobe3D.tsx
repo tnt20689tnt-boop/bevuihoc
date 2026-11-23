@@ -101,72 +101,106 @@ const shoes: Option[] = [
 
 const OPTIONS: Record<Zone, Option[]> = { clothes, hair, glasses, clips, headwear, shoes };
 
-function SuppliedModel() {
+function SuppliedModel({ runway }: { runway: boolean }) {
   const { scene } = useGLTF("/female_custom_poses.glb");
-  const model = useMemo(() => scene.clone(), [scene]);
+  const model = useMemo(() => {
+    const cloned = scene.clone();
+    cloned.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.castShadow = true;
+        object.receiveShadow = true;
+      }
+    });
+    return cloned;
+  }, [scene]);
   return (
     <primitive
       object={model}
-      position={[2.35, 0.05, -0.9]}
+      position={[0, 0.12, runway ? -0.15 : -0.9]}
       rotation={[0, Math.PI, 0]}
-      scale={1.65}
+      scale={runway ? 1.85 : 1.65}
     />
   );
 }
 
-function Showroom({ avatar, anim }: { avatar: Avatar; anim: React.MutableRefObject<AnimState> }) {
-  const sparkles = useMemo(
-    () => new Float32Array(Array.from({ length: 180 }, (_, i) => (((i * 47) % 160) - 80) / 10)),
-    [],
-  );
-  const points = useRef<THREE.Points>(null);
-  useFrame(({ clock }) => {
-    if (points.current) points.current.rotation.y = clock.elapsedTime * 0.04;
-  });
+function SalonDecor({ runway }: { runway: boolean }) {
+  const bulbPositions = Array.from({ length: 12 }, (_, i) => [-5.4 + i * 0.98, 3.65, -2.7] as [number, number, number]);
   return (
-    <Canvas shadows camera={{ position: [0, 3.4, 8.8], fov: 40 }}>
-      <color attach="background" args={["#f4e7ff"]} />
-      <ambientLight intensity={1.8} color="#fff2fb" />
-      <directionalLight
-        castShadow
-        position={[4, 8, 5]}
-        intensity={2.5}
-        color="#fff2cc"
-        shadow-mapSize={[1024, 1024]}
-      />
-      <pointLight position={[-4, 3, 2]} intensity={12} distance={11} color="#e5a9ff" />
-      <points ref={points}>
-        <bufferGeometry>
-          <bufferAttribute attach="attributes-position" args={[sparkles, 3]} />
-        </bufferGeometry>
-        <pointsMaterial color="#fff6ae" size={0.08} transparent opacity={0.85} />
-      </points>
-      <mesh rotation-x={-Math.PI / 2} receiveShadow>
-        <circleGeometry args={[6.5, 48]} />
-        <meshStandardMaterial color="#f9eaf6" roughness={0.8} />
-      </mesh>
-      <mesh position={[0, 2.5, -3]} receiveShadow>
-        <boxGeometry args={[13, 5, 0.25]} />
+    <group>
+      {/* Mirror wall and gold trim */}
+      <mesh position={[0, 2.15, -3.15]}>
+        <boxGeometry args={[12.8, 4.3, 0.16]} />
         <meshStandardMaterial color="#fff8ff" />
       </mesh>
-      <mesh position={[0, 0.15, -1.15]}>
-        <cylinderGeometry args={[2.4, 2.4, 0.2, 48]} />
-        <meshStandardMaterial color="#e8b8ee" emissive="#f4c8ff" emissiveIntensity={0.12} />
+      <mesh position={[0, 2.15, -3.04]}>
+        <boxGeometry args={[8.4, 3.25, 0.08]} />
+        <meshStandardMaterial color="#e5b9f2" metalness={0.35} roughness={0.2} />
       </mesh>
-      <mesh position={[0, 1.65, -2.83]}>
-        <boxGeometry args={[3.3, 2.5, 0.05]} />
-        <meshStandardMaterial color="#d0a7e7" metalness={0.4} roughness={0.18} />
+      <mesh position={[0, 2.15, -2.98]}>
+        <boxGeometry args={[7.95, 2.85, 0.035]} />
+        <meshStandardMaterial color="#d8f3ff" metalness={0.55} roughness={0.12} />
       </mesh>
+      {bulbPositions.map((p, i) => (
+        <group key={i} position={p}>
+          <mesh><sphereGeometry args={[0.12, 12, 10]} /><meshStandardMaterial color="#fff8d5" emissive="#ffd8f2" emissiveIntensity={1.4} /></mesh>
+          <pointLight color={i % 2 ? "#ffd4f3" : "#d9c8ff"} intensity={0.65} distance={2.2} />
+        </group>
+      ))}
+      {/* Clothing rails */}
+      {[-5.3, 5.3].map((x, side) => (
+        <group key={side} position={[x, 0, -0.3]}>
+          <mesh position={[0, 1.7, 0]}><boxGeometry args={[2.25, 0.08, 0.08]} /><meshStandardMaterial color="#d9a64d" metalness={0.65} roughness={0.25} /></mesh>
+          {[-0.9, 0.9].map((dx) => <mesh key={dx} position={[dx, 0.85, 0]}><cylinderGeometry args={[0.055, 0.055, 1.7, 10]} /><meshStandardMaterial color="#d9a64d" metalness={0.55} /></mesh>)}
+          {Array.from({ length: 5 }, (_, i) => (
+            <mesh key={i} position={[-0.75 + i * 0.38, 1.15, 0.1]} rotation={[0, 0, Math.PI]}>
+              <coneGeometry args={[0.24, 0.48, 5]} />
+              <meshStandardMaterial color={["#ff8fc8", "#b99aff", "#83d9ff", "#ffcf73", "#8be0c4"][i]} />
+            </mesh>
+          ))}
+          <mesh position={[0, 0.1, 0]}><boxGeometry args={[2.2, 0.18, 0.65]} /><meshStandardMaterial color="#f4d9f1" /></mesh>
+        </group>
+      ))}
+      {/* Runway floor */}
+      <mesh position={[0, 0.025, 2.2]} rotation={[-Math.PI / 2, 0, 0]}>
+        <planeGeometry args={[4.2, 7.2]} />
+        <meshStandardMaterial color={runway ? "#f9d7f3" : "#f0e0f3"} metalness={0.22} roughness={0.28} />
+      </mesh>
+      {[-1.95, 1.95].map((x) => (
+        <mesh key={x} position={[x, 0.04, 2.2]} rotation={[-Math.PI / 2, 0, 0]}>
+          <planeGeometry args={[0.12, 7.2]} />
+          <meshBasicMaterial color="#ffe58b" />
+        </mesh>
+      ))}
+      <mesh position={[0, 0.18, -0.9]}><cylinderGeometry args={[2.5, 2.5, 0.28, 48]} /><meshStandardMaterial color="#d8a9ec" metalness={0.25} roughness={0.35} /></mesh>
+      <mesh position={[0, 0.34, -0.9]}><cylinderGeometry args={[2.25, 2.25, 0.08, 48]} /><meshStandardMaterial color="#fff0fb" emissive="#f6c9ff" emissiveIntensity={0.15} /></mesh>
+      {[-4, -2, 0, 2, 4].map((x) => (
+        <spotLight key={x} position={[x, 5.4, 3.2]} angle={0.55} penumbra={0.8} intensity={runway ? 32 : 16} color={x % 2 ? "#ffc6f2" : "#c8d5ff"} target-position={[x * 0.35, 0, 0]} />
+      ))}
+    </group>
+  );
+}
+
+function Showroom({ avatar, anim, runway }: { avatar: Avatar; anim: React.MutableRefObject<AnimState>; runway: boolean }) {
+  const sparkles = useMemo(() => new Float32Array(Array.from({ length: 360 }, (_, i) => (((i * 47) % 160) - 80) / 10)), []);
+  const points = useRef<THREE.Points>(null);
+  useFrame(({ clock }) => { if (points.current) points.current.rotation.y = clock.elapsedTime * 0.04; });
+  return (
+    <Canvas shadows camera={{ position: runway ? [0, 4.2, 10.5] : [0, 3.4, 8.8], fov: runway ? 35 : 40 }}>
+      <color attach="background" args={["#f4e7ff"]} />
+      <fog attach="fog" args={["#f4e7ff", 14, 32]} />
+      <ambientLight intensity={1.65} color="#fff2fb" />
+      <directionalLight castShadow position={[4, 8, 5]} intensity={2.3} color="#fff2cc" shadow-mapSize={[1024, 1024]} />
+      <pointLight position={[-4, 3, 2]} intensity={15} distance={13} color="#e5a9ff" />
+      <pointLight position={[4, 4, -2]} intensity={10} distance={12} color="#a8d9ff" />
+      <points ref={points}>
+        <bufferGeometry><bufferAttribute attach="attributes-position" args={[sparkles, 3]} /></bufferGeometry>
+        <pointsMaterial color="#fff6ae" size={0.08} transparent opacity={0.9} />
+      </points>
+      <mesh rotation-x={-Math.PI / 2} receiveShadow><circleGeometry args={[8, 64]} /><meshStandardMaterial color="#f9eaf6" roughness={0.8} /></mesh>
+      <SalonDecor runway={runway} />
       <Character3D avatar={avatar} state={anim} castShadow />
-      <SuppliedModel />
-      <OrbitControls
-        enablePan={false}
-        minDistance={6}
-        maxDistance={12}
-        minPolarAngle={Math.PI / 4}
-        maxPolarAngle={Math.PI / 2.05}
-        target={[0.8, 1.1, -0.9]}
-      />
+      <SuppliedModel runway={runway} />
+      <OrbitControls enablePan={false} minDistance={6} maxDistance={13} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 2.05} target={runway ? [0, 1.25, 0.3] : [0.8, 1.1, -0.9]} />
     </Canvas>
   );
 }
@@ -218,7 +252,7 @@ export function PrincessWardrobe3D({ profile }: { profile: Profile }) {
     headwear: "tiara",
     shoes: "pink-heels",
   });
-  const [saving, setSaving] = useState(false);
+  const [saving, setSaving] = useState(false);\n  const [runway, setRunway] = useState(false);
   const anim = useRef<AnimState>(makeAnimState());
   const activeOptions = OPTIONS[zone];
 
@@ -289,9 +323,9 @@ export function PrincessWardrobe3D({ profile }: { profile: Profile }) {
         </header>
         <div className="grid min-h-0 flex-1 lg:grid-cols-[minmax(0,1fr)_440px]">
           <section className="relative min-h-[430px] overflow-hidden">
-            <Showroom avatar={avatar} anim={anim} />
+            <Showroom avatar={avatar} anim={anim} runway={runway} />
             <div className="pointer-events-none absolute left-1/2 top-5 -translate-x-1/2 rounded-full bg-white/75 px-4 py-2 text-xs font-black text-fuchsia-800 shadow">
-              Bục giữa: avatar tùy chỉnh · bục phải: model GLB của bé
+              Model 3D trên bục trung tâm · tủ đồ và gương studio
             </div>
           </section>
           <aside className="flex max-h-[58dvh] flex-col overflow-y-auto border-t border-white/80 bg-white/65 p-3 lg:max-h-none lg:border-l lg:border-t-0 lg:p-5">
@@ -319,7 +353,7 @@ export function PrincessWardrobe3D({ profile }: { profile: Profile }) {
                 </button>
               ))}
             </div>
-            <div className="my-4 flex items-center justify-between">
+            <button type="button" onClick={() => { const outfit = clothes[Math.floor(Math.random() * clothes.length)]; const hairstyle = hair[Math.floor(Math.random() * hair.length)]; setSelected((v) => ({ ...v, clothes: outfit.id, hair: hairstyle.id })); setAvatar((v) => ({ ...v, outfit: outfit.mapped, topColor: outfit.color, bottomColor: outfit.color, hair: hairstyle.mapped, hairColor: hairstyle.color })); sfx.pop(); }} className="mb-3 w-full rounded-2xl bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-4 py-3 text-sm font-black text-white shadow-lg">🎲 Phối đồ ngẫu nhiên</button>\n            <div className="my-4 flex items-center justify-between">
               <h2 className="text-lg font-black text-fuchsia-900">
                 {ZONES.find((item) => item.id === zone)?.icon}{" "}
                 {ZONES.find((item) => item.id === zone)?.label}
@@ -343,7 +377,7 @@ export function PrincessWardrobe3D({ profile }: { profile: Profile }) {
                 ✨ Bộ sưu tập của bé đang lấp lánh ✨
               </p>
               <p className="mt-1 text-[11px] font-bold text-slate-500">
-                Model GLB được đặt ở bục riêng để bé ngắm các pose 3D.
+                Chạm chọn trang phục, đổi kiểu tóc rồi bật Sàn diễn để ngắm người mẫu trong ánh đèn.
               </p>
             </div>
           </aside>
