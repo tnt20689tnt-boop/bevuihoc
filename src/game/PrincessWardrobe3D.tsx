@@ -4,7 +4,7 @@ import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 import type { Profile } from "@/hooks/use-player";
 import { supabase } from "@/integrations/supabase/client";
-import { CLOTH_COLORS, defaultAvatar, type Avatar } from "@/lib/avatar";
+import { defaultAvatar, type Avatar } from "@/lib/avatar";
 import { Character3D, makeAnimState, type AnimState } from "./Character3D";
 import { sfx } from "@/lib/sound";
 import { toast } from "sonner";
@@ -174,7 +174,7 @@ function SalonDecor({ runway }: { runway: boolean }) {
       <mesh position={[0, 0.18, -0.9]}><cylinderGeometry args={[2.5, 2.5, 0.28, 48]} /><meshStandardMaterial color="#d8a9ec" metalness={0.25} roughness={0.35} /></mesh>
       <mesh position={[0, 0.34, -0.9]}><cylinderGeometry args={[2.25, 2.25, 0.08, 48]} /><meshStandardMaterial color="#fff0fb" emissive="#f6c9ff" emissiveIntensity={0.15} /></mesh>
       {[-4, -2, 0, 2, 4].map((x) => (
-        <spotLight key={x} position={[x, 5.4, 3.2]} angle={0.55} penumbra={0.8} intensity={runway ? 32 : 16} color={x % 2 ? "#ffc6f2" : "#c8d5ff"} target-position={[x * 0.35, 0, 0]} />
+        <spotLight key={x} position={[x, 5.4, 3.2]} angle={0.55} penumbra={0.8} intensity={runway ? 32 : 16} color={x % 2 ? "#ffc6f2" : "#c8d5ff"} />
       ))}
     </group>
   );
@@ -353,7 +353,8 @@ export function PrincessWardrobe3D({ profile }: { profile: Profile }) {
                 </button>
               ))}
             </div>
-            <button type="button" onClick={() => { const outfit = clothes[Math.floor(Math.random() * clothes.length)]; const hairstyle = hair[Math.floor(Math.random() * hair.length)]; setSelected((v) => ({ ...v, clothes: outfit.id, hair: hairstyle.id })); setAvatar((v) => ({ ...v, outfit: outfit.mapped, topColor: outfit.color, bottomColor: outfit.color, hair: hairstyle.mapped, hairColor: hairstyle.color })); sfx.pop(); }} className="mb-3 w-full rounded-2xl bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-4 py-3 text-sm font-black text-white shadow-lg">🎲 Phối đồ ngẫu nhiên</button>\n            <div className="my-4 flex items-center justify-between">
+            <button type="button" onClick={() => { const outfit = clothes[Math.floor(Math.random() * clothes.length)]; const hairstyle = hair[Math.floor(Math.random() * hair.length)]; setSelected((v) => ({ ...v, clothes: outfit.id, hair: hairstyle.id })); setAvatar((v) => ({ ...v, outfit: outfit.mapped, topColor: outfit.color, bottomColor: outfit.color, hair: hairstyle.mapped, hairColor: hairstyle.color })); sfx.pop(); }} className="mb-3 w-full rounded-2xl bg-gradient-to-r from-violet-500 via-fuchsia-500 to-pink-500 px-4 py-3 text-sm font-black text-white shadow-lg">🎲 Phối đồ ngẫu nhiên</button>
+            <div className="my-4 flex items-center justify-between">
               <h2 className="text-lg font-black text-fuchsia-900">
                 {ZONES.find((item) => item.id === zone)?.icon}{" "}
                 {ZONES.find((item) => item.id === zone)?.label}
