@@ -9,44 +9,45 @@
 body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#fce4ec;height:100vh;height:100dvh;overflow:hidden;display:flex;color:#4a2c3a}
 .character-area{flex:1;min-width:0;position:relative;display:flex;justify-content:center;align-items:center;background:#ffeef2;transition:background .5s ease;overflow:hidden}
 .stage{position:relative;width:400px;height:600px;max-width:100%;display:flex;justify-content:center;align-items:flex-end;padding-bottom:30px;z-index:2}
-.ui-area{width:420px;flex-shrink:0;background:#fff;border-left:4px solid #f48fb1;display:flex;flex-direction:column;box-shadow:-5px 0 25px rgba(0,0,0,.08);z-index:10;min-height:0}
+.ui-area{width:420px;max-width:48vw;min-width:300px;background:#fff;border-left:4px solid #f48fb1;display:flex;flex-direction:column;box-shadow:-5px 0 25px rgba(0,0,0,.08);z-index:10;min-height:0}
 .ui-header{padding:20px;background:#f48fb1;color:#fff;text-align:center;font-size:22px;font-weight:800;letter-spacing:1px;text-shadow:0 2px 4px rgba(0,0,0,.1)}
-.tabs{display:flex;border-bottom:2px solid #fce4ec;background:#fff9fb;overflow-x:auto}
-.tab-btn{flex:1;min-width:58px;padding:12px 4px;border:0;background:none;cursor:pointer;font-weight:bold;color:#b08090;transition:.2s;font-size:12px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tabs{display:flex;border-bottom:2px solid #fce4ec;background:#fff9fb;overflow-x:auto;flex-shrink:0}
+.tab-btn{flex:1;min-width:52px;padding:15px 5px;border:0;background:none;cursor:pointer;font-weight:bold;color:#b08090;transition:.2s;font-size:12px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:4px}
 .tab-btn:hover{background:#fce4ec;color:#f48fb1}
 .tab-btn.active{color:#e91e63;border-bottom:3px solid #e91e63;background:#fff}
 .tab-icon{font-size:20px}
 .items-container{flex:1;min-height:0;padding:20px;overflow-y:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;align-content:start}
 .items-container::-webkit-scrollbar{width:8px}
 .items-container::-webkit-scrollbar-thumb{background:#f48fb1;border-radius:4px}
-.item-btn{aspect-ratio:1;border:2px solid #eee;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:24px;transition:.2s;position:relative;box-shadow:0 2px 5px rgba(0,0,0,.02);overflow:hidden}
+.item-btn{aspect-ratio:1;border:2px solid #eee;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:24px;transition:.2s;position:relative;box-shadow:0 2px 5px rgba(0,0,0,.02);overflow:hidden;min-width:0}
 .item-btn:hover{border-color:#f48fb1;transform:translateY(-3px);box-shadow:0 4px 10px rgba(244,143,177,.3)}
 .item-btn.active{border-color:#e91e63;background:#fce4ec;box-shadow:0 0 0 2px #e91e63 inset}
 .item-btn span.label{font-size:10px;margin-top:4px;color:#b08090;font-weight:bold}
 .color-btn{border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer;transition:.2s;width:100%;aspect-ratio:1}
 .color-btn:hover{transform:scale(1.1)}
 .color-btn.active{border-color:#e91e63;box-shadow:0 0 0 3px #e91e63}
-.action-area{padding:15px;background:#fff9fb;border-top:2px solid #fce4ec;display:flex;gap:10px}
+.action-area{padding:15px;background:#fff9fb;border-top:2px solid #fce4ec;display:flex;gap:10px;flex-shrink:0}
 .action-btn{flex:1;padding:15px 8px;border:0;border-radius:12px;font-weight:bold;font-size:15px;cursor:pointer;transition:.2s;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.2)}
 .action-btn.photo{background:linear-gradient(45deg,#f06292,#f48fb1)}
 .action-btn.random{background:linear-gradient(45deg,#ba68c8,#ce93d8)}
 .action-btn:hover{filter:brightness(1.05);transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,.1)}
 .action-btn:active{transform:translateY(0)}
-.character-wrapper{width:300px;height:550px;max-width:100%;max-height:100%;transition:transform .3s ease;filter:drop-shadow(0 10px 20px rgba(0,0,0,.1))}
+.character-wrapper{width:350px;height:550px;max-width:100%;max-height:100%;transition:transform .3s ease;filter:drop-shadow(0 10px 20px rgba(0,0,0,.1))}
 .character-wrapper.idle{animation:float 3s ease-in-out infinite}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 svg{width:100%;height:100%;overflow:visible}
-@media(max-width:760px){
+@media(max-width:700px){
  body{flex-direction:column}
  .character-area{flex:1;min-height:0}
  .stage{height:100%;width:100%;padding:8px}
- .character-wrapper{height:min(100%,460px);width:auto;aspect-ratio:300/550}
- .ui-area{width:100%;height:48%;max-height:430px;border-left:0;border-top:4px solid #f48fb1}
+ .character-wrapper{height:min(100%,48vh);width:auto;max-width:90%}
+ .ui-area{width:100%;max-width:none;min-width:0;height:52vh;border-left:0;border-top:4px solid #f48fb1}
  .ui-header{padding:9px;font-size:18px}
- .tab-btn{padding:8px 3px}
- .items-container{padding:10px;gap:9px;grid-template-columns:repeat(5,minmax(0,1fr))}
+ .tab-btn{padding:8px 3px;font-size:11px}
+ .tab-icon{font-size:18px}
+ .items-container{padding:10px;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
  .action-area{padding:8px}
- .action-btn{padding:10px 5px;font-size:13px}
+ .action-btn{padding:11px 6px;font-size:13px}
 }
 </style>
 </head>
@@ -55,27 +56,28 @@ svg{width:100%;height:100%;overflow:visible}
  <div class="stage">
   <div class="character-wrapper idle" id="character-wrapper">
    <svg viewBox="0 0 300 550" role="img" aria-label="Nhân vật thời trang Barbee">
-    <defs><linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffe6df"/><stop offset="100%" stop-color="#f5c8c0"/></linearGradient></defs>
+    <defs><linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#fff0eb"/><stop offset="100%" stop-color="#ffd5c2"/></linearGradient></defs>
     <path id="hair-back" d="" fill="#4a2c3a"/>
-    <path d="M110 350 L110 480 Q110 490 120 490 L130 490 Q140 490 140 480 L140 350 Z" fill="url(#skinGrad)"/>
-    <path d="M160 350 L160 480 Q160 490 170 490 L180 490 Q190 490 190 480 L190 350 Z" fill="url(#skinGrad)"/>
+    <path d="M125 300 L125 430 Q125 440 135 440 L145 440 Q155 440 155 430 L155 300 Z" fill="url(#skinGrad)"/>
+    <path d="M155 300 L155 430 Q155 440 165 440 L175 440 Q185 440 185 430 L185 300 Z" fill="url(#skinGrad)"/>
+    <path d="M115 210 Q90 250 95 330 Q105 340 115 330 Q120 260 135 230 Z" fill="url(#skinGrad)"/>
+    <path d="M185 210 Q210 250 205 330 Q195 340 185 330 Q180 260 165 230 Z" fill="url(#skinGrad)"/>
+    <path d="M125 190 Q150 180 175 190 L170 310 Q150 320 130 310 Z" fill="url(#skinGrad)"/>
     <path id="shoe-left" d="" fill="#e91e63"/>
     <path id="shoe-right" d="" fill="#e91e63"/>
-    <path d="M120 200 L180 200 L175 360 Q150 380 125 360 Z" fill="url(#skinGrad)"/>
-    <path d="M120 210 Q90 260 90 350 Q100 360 110 350 Q115 280 135 230 Z" fill="url(#skinGrad)"/>
-    <path d="M180 210 Q210 260 210 350 Q200 360 190 350 Q185 280 165 230 Z" fill="url(#skinGrad)"/>
     <path id="dress-skirt" d="" fill="#ff6b9d"/>
     <path id="dress-top" d="" fill="#ff6b9d"/>
-    <rect x="140" y="170" width="20" height="30" fill="url(#skinGrad)"/>
-    <ellipse cx="150" cy="120" rx="55" ry="65" fill="url(#skinGrad)"/>
-    <ellipse cx="125" cy="125" rx="10" ry="14" fill="#4a2c3a"/>
-    <ellipse cx="175" cy="125" rx="10" ry="14" fill="#4a2c3a"/>
-    <circle cx="122" cy="120" r="4" fill="#fff"/><circle cx="172" cy="120" r="4" fill="#fff"/>
-    <circle cx="128" cy="130" r="2" fill="#fff" opacity=".6"/><circle cx="178" cy="130" r="2" fill="#fff" opacity=".6"/>
-    <path d="M115 105 Q125 100 135 105 M165 105 Q175 100 185 105" stroke="#4a2c3a" stroke-width="3" fill="none" stroke-linecap="round"/>
-    <ellipse cx="110" cy="140" rx="10" ry="6" fill="#ff9eb5" opacity=".6" filter="blur(2px)"/>
-    <ellipse cx="190" cy="140" rx="10" ry="6" fill="#ff9eb5" opacity=".6" filter="blur(2px)"/>
-    <path d="M145 150 Q150 158 155 150" stroke="#e91e63" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <rect x="140" y="160" width="20" height="30" fill="url(#skinGrad)"/>
+    <ellipse cx="150" cy="110" rx="50" ry="60" fill="url(#skinGrad)"/>
+    <ellipse cx="125" cy="115" rx="10" ry="14" fill="#2b1b17"/>
+    <ellipse cx="175" cy="115" rx="10" ry="14" fill="#2b1b17"/>
+    <circle cx="122" cy="110" r="4" fill="#fff"/><circle cx="172" cy="110" r="4" fill="#fff"/>
+    <circle cx="128" cy="120" r="2" fill="#fff" opacity=".6"/><circle cx="178" cy="120" r="2" fill="#fff" opacity=".6"/>
+    <path d="M115 95 Q125 90 135 95" stroke="#2b1b17" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M165 95 Q175 90 185 95" stroke="#2b1b17" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="110" cy="130" rx="10" ry="6" fill="#ff9eb5" opacity=".6" filter="blur(1px)"/>
+    <ellipse cx="190" cy="130" rx="10" ry="6" fill="#ff9eb5" opacity=".6" filter="blur(1px)"/>
+    <path d="M145 140 Q150 148 155 140" stroke="#e91e63" stroke-width="3" fill="none" stroke-linecap="round"/>
     <path id="hair-front" d="" fill="#4a2c3a"/>
     <g id="acc-layer"></g>
    </svg>
@@ -101,22 +103,22 @@ svg{width:100%;height:100%;overflow:visible}
 <script>
 const COLORS=['#ff6b9d','#ffb6c1','#ff4757','#4facfe','#00f2fe','#43e97b','#f8b500','#a18cd1','#fbc2eb','#ffffff','#2b1b17','#e6e6fa'];
 const DRESSES=[
-{id:'d1',name:'Công chúa',top:'M130 210 L170 210 L170 240 L130 240 Z',skirt:'M130 240 L170 240 L200 380 Q150 420 100 380 Z'},
-{id:'d2',name:'Xòe A',top:'M135 210 L165 210 L165 240 L135 240 Z',skirt:'M130 240 L170 240 L190 400 Q150 430 110 400 Z'},
-{id:'d3',name:'Ngắn',top:'M130 210 L170 210 L170 250 L130 250 Z',skirt:'M130 250 L170 250 L180 330 Q150 350 120 330 Z'},
-{id:'d4',name:'Đuôi cá',top:'M130 210 L170 210 L170 240 L130 240 Z',skirt:'M130 240 L170 240 L160 350 L180 450 Q150 470 120 450 L140 350 Z'},
-{id:'d5',name:'Yếm',top:'M140 200 L160 200 L160 230 L140 230 Z',skirt:'M130 230 L170 230 L180 370 Q150 390 120 370 Z'}
+{id:'d1',name:'Dạ hội',top:'M 130 190 L 170 190 L 170 220 L 130 220 Z',skirt:'M 130 220 L 170 220 L 200 350 Q 150 380 100 350 Z'},
+{id:'d2',name:'Xòe A',top:'M 135 190 L 165 190 L 165 220 L 135 220 Z',skirt:'M 130 220 L 170 220 L 190 370 Q 150 390 110 370 Z'},
+{id:'d3',name:'Ngắn',top:'M 130 190 L 170 190 L 170 230 L 130 230 Z',skirt:'M 130 230 L 170 230 L 180 300 Q 150 320 120 300 Z'},
+{id:'d4',name:'Đuôi cá',top:'M 130 190 L 170 190 L 170 220 L 130 220 Z',skirt:'M 130 220 L 170 220 L 160 320 L 180 420 Q 150 440 120 420 L 140 320 Z'},
+{id:'d5',name:'Yếm',top:'M 140 180 L 160 180 L 160 210 L 140 210 Z',skirt:'M 130 210 L 170 210 L 180 340 Q 150 360 120 340 Z'}
 ];
 const HAIRS=[
-{id:'h1',name:'Xoăn dài',back:'M90 120 Q80 250 60 350 Q100 380 150 380 Q200 380 240 350 Q220 250 210 120 Z',front:'M150 50 Q100 50 95 100 Q95 120 100 140 Q120 140 150 140 Q180 140 200 140 Q205 120 205 100 Q200 50 150 50 Z'},
-{id:'h2',name:'Twin-tail',back:'M100 150 Q70 250 50 350 Q90 370 120 360 L130 250 L170 250 L180 360 Q210 370 250 350 Q230 250 200 150 Z',front:'M150 45 Q110 45 100 90 Q100 110 110 130 Q130 130 150 130 Q170 130 190 130 Q200 110 200 90 Q190 45 150 45 Z'},
-{id:'h3',name:'Ngắn',back:'M100 120 Q95 180 105 220 Q150 230 195 220 Q205 180 200 120 Z',front:'M150 50 Q105 50 100 100 Q100 120 110 140 Q130 140 150 140 Q170 140 190 140 Q200 120 200 100 Q195 50 150 50 Z'},
-{id:'h4',name:'Búi',back:'M110 120 Q100 180 110 200 Q150 210 190 200 Q200 180 190 120 Z',front:'M150 30 Q110 30 105 80 Q105 100 110 120 Q130 120 150 120 Q170 120 190 120 Q195 100 195 80 Q190 30 150 30 Z'}
+{id:'h1',name:'Xoăn',back:'M 95 110 Q 80 200 70 300 Q 110 330 150 330 Q 190 330 230 300 Q 220 200 205 110 Z',front:'M 150 45 Q 105 45 100 95 Q 100 120 115 140 Q 130 140 150 140 Q 170 140 185 140 Q 200 120 200 95 Q 195 45 150 45 Z'},
+{id:'h2',name:'Twin',back:'M 105 130 Q 80 220 70 300 Q 100 320 120 310 L 130 200 L 170 200 L 180 310 Q 200 320 230 300 Q 220 220 195 130 Z',front:'M 150 45 Q 110 45 105 90 Q 105 110 115 130 Q 130 130 150 130 Q 170 130 185 130 Q 195 110 195 90 Q 190 45 150 45 Z'},
+{id:'h3',name:'Ngắn',back:'M 110 110 Q 100 160 110 200 Q 150 210 190 200 Q 200 160 190 110 Z',front:'M 150 50 Q 105 50 100 95 Q 100 115 115 135 Q 130 135 150 135 Q 170 135 185 135 Q 200 115 200 95 Q 195 50 150 50 Z'},
+{id:'h4',name:'Búi',back:'M 115 110 Q 105 150 115 180 Q 150 190 185 180 Q 195 150 185 110 Z',front:'M 150 30 Q 110 30 105 75 Q 105 95 115 115 Q 130 115 150 115 Q 170 115 185 115 Q 195 95 195 75 Q 190 30 150 30 Z'}
 ];
 const SHOES=[
-{id:'s1',name:'Cao gót',left:'M105 480 L105 490 Q105 500 115 500 L135 500 Q145 500 145 490 L135 480 Z',right:'M155 480 L165 480 L165 490 Q165 500 175 500 L195 500 Q195 500 195 490 L195 480 Z'},
-{id:'s2',name:'Sneaker',left:'M105 480 L105 495 Q105 505 120 505 L140 505 Q150 505 150 495 L145 480 Z',right:'M155 480 L160 495 Q160 505 170 505 L190 505 Q200 505 200 495 L200 480 Z'},
-{id:'s3',name:'Bốt',left:'M105 450 L105 495 Q105 505 120 505 L140 505 Q150 505 150 495 L145 450 Z',right:'M155 450 L160 495 Q160 505 170 505 L190 505 Q200 505 200 495 L200 450 Z'}
+{id:'s1',name:'Cao gót',left:'M 125 430 L 125 440 Q 125 450 135 450 L 150 450 Q 155 450 155 440 L 145 430 Z',right:'M 155 430 L 165 430 L 165 440 Q 165 450 175 450 L 185 450 Q 185 450 185 440 L 185 430 Z'},
+{id:'s2',name:'Sneaker',left:'M 125 430 L 125 445 Q 125 455 135 455 L 150 455 Q 155 455 155 445 L 145 430 Z',right:'M 155 430 L 165 430 L 165 445 Q 165 455 175 455 L 185 455 Q 185 455 185 445 L 185 430 Z'},
+{id:'s3',name:'Bốt',left:'M 125 410 L 125 445 Q 125 455 135 455 L 150 455 Q 155 455 155 445 L 145 410 Z',right:'M 155 410 L 165 410 L 165 445 Q 165 455 175 455 L 185 455 Q 185 455 185 445 L 185 410 Z'}
 ];
 const BACKGROUNDS=[
 {id:'b1',name:'Studio',color:'linear-gradient(135deg,#ff9a9e,#fecfef)'},
@@ -125,35 +127,70 @@ const BACKGROUNDS=[
 {id:'b4',name:'Biển',color:'linear-gradient(135deg,#4facfe,#00f2fe)'}
 ];
 const ACCS=[
-{id:'a1',name:'Kính',icon:'🕶️',x:120,y:115,size:35},
-{id:'a2',name:'Mũ',icon:'🧢',x:150,y:30,size:45},
-{id:'a3',name:'Hoa',icon:'🌸',x:200,y:60,size:30},
-{id:'a4',name:'Túi',icon:'👜',x:220,y:280,size:35}
+{id:'a1',name:'Kính',icon:'🕶️',x:120,y:105,size:35},
+{id:'a2',name:'Mũ',icon:'🧢',x:140,y:20,size:45},
+{id:'a3',name:'Hoa',icon:'🌸',x:195,y:50,size:30},
+{id:'a4',name:'Túi',icon:'👜',x:230,y:250,size:35}
 ];
 let state={dress:0,hair:0,shoes:0,bg:0,color:0,acc:-1,tab:'dress'};
-const elHairBack=document.getElementById('hair-back'),elHairFront=document.getElementById('hair-front'),elDressTop=document.getElementById('dress-top'),elDressSkirt=document.getElementById('dress-skirt'),elShoeL=document.getElementById('shoe-left'),elShoeR=document.getElementById('shoe-right'),elAccLayer=document.getElementById('acc-layer'),elCharArea=document.getElementById('character-area'),container=document.getElementById('items-container');
+const elHairBack=document.getElementById('hair-back');
+const elHairFront=document.getElementById('hair-front');
+const elDressTop=document.getElementById('dress-top');
+const elDressSkirt=document.getElementById('dress-skirt');
+const elShoeL=document.getElementById('shoe-left');
+const elShoeR=document.getElementById('shoe-right');
+const elAccLayer=document.getElementById('acc-layer');
+const elCharArea=document.getElementById('character-area');
+const container=document.getElementById('items-container');
 function updateCharacter(){
-const c=COLORS[state.color],dress=DRESSES[state.dress],hair=HAIRS[state.hair],shoes=SHOES[state.shoes];
-elDressTop.setAttribute('d',dress.top);elDressTop.setAttribute('fill',c);elDressSkirt.setAttribute('d',dress.skirt);elDressSkirt.setAttribute('fill',c);
-elHairBack.setAttribute('d',hair.back);elHairBack.setAttribute('fill','#4a2c3a');elHairFront.setAttribute('d',hair.front);elHairFront.setAttribute('fill','#4a2c3a');
-elShoeL.setAttribute('d',shoes.left);elShoeL.setAttribute('fill','#e91e63');elShoeR.setAttribute('d',shoes.right);elShoeR.setAttribute('fill','#e91e63');
-elCharArea.style.background=BACKGROUNDS[state.bg].color;
-elAccLayer.replaceChildren();
-if(state.acc>=0){const a=ACCS[state.acc],node=document.createElementNS('http://www.w3.org/2000/svg','text');node.setAttribute('x',a.x);node.setAttribute('y',a.y);node.setAttribute('font-size',a.size);node.setAttribute('text-anchor','middle');node.textContent=a.icon;elAccLayer.appendChild(node);}
+ const c=COLORS[state.color],dress=DRESSES[state.dress],hair=HAIRS[state.hair],shoes=SHOES[state.shoes];
+ elDressTop.setAttribute('d',dress.top);elDressTop.setAttribute('fill',c);
+ elDressSkirt.setAttribute('d',dress.skirt);elDressSkirt.setAttribute('fill',c);
+ elHairBack.setAttribute('d',hair.back);elHairBack.setAttribute('fill',c);
+ elHairFront.setAttribute('d',hair.front);elHairFront.setAttribute('fill',c);
+ elShoeL.setAttribute('d',shoes.left);elShoeL.setAttribute('fill',c);
+ elShoeR.setAttribute('d',shoes.right);elShoeR.setAttribute('fill',c);
+ elCharArea.style.background=BACKGROUNDS[state.bg].color;
+ elAccLayer.replaceChildren();
+ if(state.acc>=0){
+  const acc=ACCS[state.acc],node=document.createElementNS('http://www.w3.org/2000/svg','text');
+  node.setAttribute('x',acc.x);node.setAttribute('y',acc.y);node.setAttribute('font-size',acc.size);node.textContent=acc.icon;elAccLayer.appendChild(node);
+ }
 }
-function switchTab(tabId,btn){state.tab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderItems();}
+function switchTab(tabId,btn){
+ state.tab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderItems();
+}
 function renderItems(){
-container.replaceChildren();
-const addItem=(icon,label,active,onClick,background)=>{const d=document.createElement('button');d.type='button';d.className='item-btn'+(active?' active':'');d.innerHTML=icon+'<span class="label"></span>';d.querySelector('.label').textContent=label; if(background)d.style.background=background;d.onclick=onClick;container.appendChild(d);};
-if(state.tab==='dress')DRESSES.forEach((d,i)=>addItem('👗',d.name,state.dress===i,()=>{state.dress=i;updateCharacter();renderItems();}));
-else if(state.tab==='hair')HAIRS.forEach((h,i)=>addItem('💇',h.name,state.hair===i,()=>{state.hair=i;updateCharacter();renderItems();}));
-else if(state.tab==='shoes')SHOES.forEach((s,i)=>addItem('👠',s.name,state.shoes===i,()=>{state.shoes=i;updateCharacter();renderItems();}));
-else if(state.tab==='bg')BACKGROUNDS.forEach((b,i)=>addItem('🖼️',b.name,state.bg===i,()=>{state.bg=i;updateCharacter();renderItems();},b.color));
-else if(state.tab==='color')COLORS.forEach((c,i)=>{const d=document.createElement('button');d.type='button';d.className='color-btn'+(state.color===i?' active':'');d.style.background=c;d.setAttribute('aria-label','Màu '+(i+1));d.onclick=()=>{state.color=i;updateCharacter();renderItems();};container.appendChild(d);});
-else if(state.tab==='acc'){addItem('❌','Bỏ',state.acc===-1,()=>{state.acc=-1;updateCharacter();renderItems();});ACCS.forEach((a,i)=>addItem(a.icon,a.name,state.acc===i,()=>{state.acc=i;updateCharacter();renderItems();}));}
+ container.replaceChildren();
+ if(state.tab==='dress')DRESSES.forEach((d,i)=>addItem('👗',d.name,state.dress===i,()=>{state.dress=i;updateCharacter();renderItems();}));
+ else if(state.tab==='hair')HAIRS.forEach((h,i)=>addItem('💇',h.name,state.hair===i,()=>{state.hair=i;updateCharacter();renderItems();}));
+ else if(state.tab==='shoes')SHOES.forEach((s,i)=>addItem('👠',s.name,state.shoes===i,()=>{state.shoes=i;updateCharacter();renderItems();}));
+ else if(state.tab==='bg')BACKGROUNDS.forEach((b,i)=>{const d=addItem('',b.name,state.bg===i,()=>{state.bg=i;updateCharacter();renderItems();});d.style.background=b.color;d.style.color='#fff';d.querySelector('.label').style.cssText='color:#fff;font-size:12px';});
+ else if(state.tab==='color')COLORS.forEach((c,i)=>{const d=document.createElement('button');d.className='color-btn'+(state.color===i?' active':'');d.style.background=c;d.setAttribute('aria-label','Chọn màu '+c);d.onclick=()=>{state.color=i;updateCharacter();renderItems();};container.appendChild(d);});
+ else if(state.tab==='acc'){
+  addItem('❌','Bỏ',state.acc===-1,()=>{state.acc=-1;updateCharacter();renderItems();});
+  ACCS.forEach((a,i)=>addItem(a.icon,a.name,state.acc===i,()=>{state.acc=i;updateCharacter();renderItems();}));
+ }
 }
-function randomize(){state.dress=Math.floor(Math.random()*DRESSES.length);state.hair=Math.floor(Math.random()*HAIRS.length);state.shoes=Math.floor(Math.random()*SHOES.length);state.bg=Math.floor(Math.random()*BACKGROUNDS.length);state.color=Math.floor(Math.random()*COLORS.length);state.acc=Math.random()>.4?Math.floor(Math.random()*ACCS.length):-1;updateCharacter();renderItems();}
-function takePhoto(){const wrapper=document.getElementById('character-wrapper');wrapper.style.transform='scale(1.08)';setTimeout(()=>{wrapper.style.transform='scale(1)';},220);alert('📸 Hãy dùng chức năng chụp màn hình của thiết bị để lưu tạo hình Influencer nhé!');}
+function addItem(icon,label,active,action){
+ const d=document.createElement('button');d.type='button';d.className='item-btn'+(active?' active':'');
+ if(icon){const iconNode=document.createElement('span');iconNode.textContent=icon;d.appendChild(iconNode);}
+ const name=document.createElement('span');name.className='label';name.textContent=label;d.appendChild(name);d.onclick=action;container.appendChild(d);return d;
+}
+function randomize(){
+ state.dress=Math.floor(Math.random()*DRESSES.length);
+ state.hair=Math.floor(Math.random()*HAIRS.length);
+ state.shoes=Math.floor(Math.random()*SHOES.length);
+ state.bg=Math.floor(Math.random()*BACKGROUNDS.length);
+ state.color=Math.floor(Math.random()*COLORS.length);
+ state.acc=Math.random()>.4?Math.floor(Math.random()*ACCS.length):-1;
+ updateCharacter();renderItems();
+}
+function takePhoto(){
+ const wrapper=document.getElementById('character-wrapper');wrapper.style.transform='scale(1.08)';
+ setTimeout(()=>{wrapper.style.transform='scale(1)';},220);
+ alert('📸 Hãy dùng chức năng chụp màn hình của thiết bị để lưu tạo hình Influencer nhé!');
+}
 renderItems();updateCharacter();
 </script>
 </body>
