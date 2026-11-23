@@ -3,62 +3,87 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>💖 Barbee Fashion - Chơi Ngay 💖</title>
+<title>Đang mở Barbee Fashion...</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;height:100vh;display:flex;flex-direction:column;overflow:hidden;color:#fff}
-.toolbar{background:linear-gradient(90deg,#ff6b9d,#c44569);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 4px 15px #0006;z-index:100;gap:12px}
-.title{font-size:18px;font-weight:800;letter-spacing:1px;display:flex;align-items:center;gap:10px}
-.status-badge{font-size:11px;background:#43e97b;color:#003a24;padding:4px 10px;border-radius:12px;font-weight:bold}
-.controls{display:flex;gap:10px;flex-wrap:wrap}
-.btn{background:#ffffff26;border:1px solid #ffffff4d;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-weight:bold;font-size:14px;text-decoration:none}
-.btn:hover{background:#ffffff4d}
-.game-container{flex:1;position:relative;background:#000;overflow:hidden}
-iframe{width:100%;height:100%;border:0;display:block}
-.overlay{position:absolute;inset:0;background:#1a1a2e;display:flex;flex-direction:column;justify-content:center;align-items:center;z-index:200;text-align:center;padding:20px;transition:opacity .5s}
-.overlay.hidden{opacity:0;pointer-events:none}
-.overlay h2{color:#ff6b9d;margin-bottom:15px;font-size:24px}
-.overlay p{color:#aaa;margin-bottom:20px;max-width:420px;line-height:1.5}
-.btn-play{background:linear-gradient(45deg,#f06292,#f48fb1);color:white;text-decoration:none;padding:15px 40px;border-radius:30px;font-size:20px;font-weight:bold}
-.spinner{width:50px;height:50px;border:5px solid #ff6b9d4d;border-top-color:#ff6b9d;border-radius:50%;animation:spin 1s linear infinite;margin-bottom:20px}
-@keyframes spin{to{transform:rotate(360deg)}}
-@media(max-width:600px){.toolbar{padding:9px;align-items:flex-start;flex-direction:column}.title{font-size:15px}.btn{padding:7px 10px;font-size:12px}}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #ff9a9e, #fecfef);
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #4a2c3a;
+        overflow: hidden;
+    }
+    .card {
+        background: rgba(255, 255, 255, 0.95);
+        padding: 40px 50px;
+        border-radius: 30px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        text-align: center;
+        backdrop-filter: blur(10px);
+        animation: popIn 0.5s ease-out;
+    }
+    @keyframes popIn {
+        0% { transform: scale(0.9); opacity: 0; }
+        100% { transform: scale(1); opacity: 1; }
+    }
+    h1 {
+        font-size: 24px;
+        margin-bottom: 10px;
+        color: #e91e63;
+        font-weight: 800;
+    }
+    p {
+        font-size: 15px;
+        color: #777;
+        margin-bottom: 25px;
+    }
+    .spinner {
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(240, 98, 146, 0.2);
+        border-top-color: #f06292;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 0 auto 20px auto;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn {
+        background: linear-gradient(45deg, #f06292, #f48fb1);
+        color: #fff;
+        text-decoration: none;
+        padding: 15px 35px;
+        border-radius: 25px;
+        font-weight: bold;
+        font-size: 16px;
+        display: inline-block;
+        transition: 0.3s;
+        box-shadow: 0 5px 15px rgba(240, 98, 146, 0.4);
+    }
+    .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(240, 98, 146, 0.6);
+    }
 </style>
 </head>
 <body>
-<div class="toolbar">
-  <div class="title">💖 Barbee Fashion <span class="status-badge" id="ad-status">KHIÊN GIAO DIỆN: BẬT</span></div>
-  <div class="controls">
-    <button class="btn" onclick="toggleShield()" id="btn-toggle">Tắt khiên</button>
-    <button class="btn" onclick="reloadGame()">🔄 Tải lại</button>
-    <a href="https://plix.gg/vi/games/barbee-fashion-influencer" target="_blank" rel="noopener noreferrer" class="btn">↗️ Mở tab mới</a>
-  </div>
-</div>
-<div class="game-container">
-  <div class="overlay" id="overlay"><div class="spinner"></div><h2>Đang tải game...</h2><p>Nếu quá lâu, hãy bấm nút "Mở tab mới" ở trên.</p></div>
-  <iframe id="game-iframe" src="https://plix.gg/vi/games/barbee-fashion-influencer" allow="fullscreen" allowfullscreen title="Barbee Fashion"></iframe>
-</div>
-<script>
-const iframe=document.getElementById('game-iframe');
-const overlay=document.getElementById('overlay');
-const statusBadge=document.getElementById('ad-status');
-const toggleButton=document.getElementById('btn-toggle');
-let shieldActive=true;
-// Trang Plix là tên miền bên ngoài: chính sách same-origin không cho phép
-// trang này đọc nội dung hoặc chặn quảng cáo bên trong iframe.
-iframe.addEventListener('load',()=>overlay.classList.add('hidden'));
-function toggleShield(){
-  shieldActive=!shieldActive;
-  statusBadge.textContent=shieldActive?'KHIÊN GIAO DIỆN: BẬT':'KHIÊN GIAO DIỆN: TẮT';
-  statusBadge.style.background=shieldActive?'#43e97b':'#ff4757';
-  statusBadge.style.color=shieldActive?'#003a24':'#fff';
-  toggleButton.textContent=shieldActive?'Tắt khiên':'Bật khiên';
-}
-function reloadGame(){
-  overlay.classList.remove('hidden');
-  overlay.innerHTML='<div class="spinner"></div><h2>Đang tải lại...</h2>';
-  iframe.src='https://plix.gg/vi/games/barbee-fashion-influencer';
-}
-</script>
+    <div class="card">
+        <h1>✨ Đang mở Barbee Fashion ✨</h1>
+        <p>Hệ thống đang tự động chuyển hướng bạn đến game...</p>
+        <div class="spinner"></div>
+        <!-- Nút dự phòng nếu trình duyệt chặn tự động chuyển -->
+        <a href="https://plix.gg/vi/games/barbee-fashion-influencer" class="btn">
+            🎮 Click vào đây nếu không tự chuyển
+        </a>
+    </div>
+    <script>
+        // Chuyển trang sau một giây.
+        // Việc điều hướng trong iframe vẫn có thể bị website đích từ chối.
+        setTimeout(function() {
+            window.location.href = "https://plix.gg/vi/games/barbee-fashion-influencer";
+        }, 1000);
+    </script>
 </body>
 </html>
