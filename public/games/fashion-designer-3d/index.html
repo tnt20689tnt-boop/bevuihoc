@@ -3,264 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ Fashion Stylist 2D ✨</title>
+<title>💖 Barbee Fashion Influencer 💖</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #ffeef2; height: 100vh; overflow: hidden; display: flex; color: #5a3d4a; }
-  .character-area { flex: 1; position: relative; display: flex; justify-content: center; align-items: center; background: linear-gradient(135deg, #ffeef2, #f8e1e7); }
-  .stage { position: relative; width: 380px; height: 600px; display: flex; justify-content: center; align-items: flex-end; padding-bottom: 50px; }
-  .ui-area { width: 420px; background: #fff; border-left: 4px solid #ffb6c1; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.05); z-index: 10; }
-  .ui-header { padding: 20px; background: #ffb6c1; color: #fff; text-align: center; font-size: 22px; font-weight: 800; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-  .tabs { display: flex; border-bottom: 2px solid #ffe4e1; background: #fff8f9; overflow-x: auto; }
-  .tab-btn { flex: 1; padding: 15px 10px; border: none; background: none; cursor: pointer; font-weight: bold; color: #a08090; transition: 0.2s; font-size: 14px; white-space: nowrap; }
-  .tab-btn:hover { background: #ffe4e1; color: #ff6b9d; }
-  .tab-btn.active { color: #ff6b9d; border-bottom: 3px solid #ff6b9d; background: #fff; }
-  .items-container { flex: 1; padding: 20px; overflow-y: auto; display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; align-content: start; }
-  .items-container::-webkit-scrollbar { width: 8px; }
-  .items-container::-webkit-scrollbar-thumb { background: #ffb6c1; border-radius: 4px; }
-  .item-btn { aspect-ratio: 1; border: 2px solid #eee; border-radius: 12px; background: #fff; cursor: pointer; display: flex; justify-content: center; align-items: center; font-size: 24px; transition: 0.2s; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
-  .item-btn:hover { border-color: #ffb6c1; transform: translateY(-3px); box-shadow: 0 4px 10px rgba(255,182,193,0.3); }
-  .item-btn.active { border-color: #ff6b9d; background: #fff0f5; box-shadow: 0 0 0 2px #ff6b9d inset; }
-  .color-btn { border-radius: 50%; border: 3px solid #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.1); cursor: pointer; transition: 0.2s; width: 100%; aspect-ratio: 1; }
-  .color-btn:hover { transform: scale(1.1); }
-  .color-btn.active { border-color: #ff6b9d; box-shadow: 0 0 0 3px #ff6b9d; }
-  .action-area { padding: 15px; background: #fff8f9; border-top: 2px solid #ffe4e1; display: flex; gap: 10px; }
-  .action-btn { flex: 1; padding: 15px; border: none; border-radius: 12px; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.2s; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.2); }
-  .action-btn.photo { background: linear-gradient(45deg, #ff9a9e, #fecfef); color: #d63031; }
-  .action-btn.random { background: linear-gradient(45deg, #a18cd1, #fbc2eb); }
-  .action-btn:hover { filter: brightness(1.05); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-  .action-btn:active { transform: translateY(0); }
-  .character-wrapper { position: relative; width: 250px; height: 500px; transition: transform 0.3s ease; }
-  .character-wrapper.idle { animation: float 3s ease-in-out infinite; }
-  @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-  .head { position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: 120px; height: 130px; background: #ffe6df; border-radius: 50% 50% 45% 45%; z-index: 5; box-shadow: inset -10px -10px 20px rgba(0,0,0,0.05); }
-  .face { position: absolute; width: 100%; height: 100%; }
-  .eye { position: absolute; top: 65px; width: 22px; height: 30px; background: #2b1b17; border-radius: 50%; overflow: hidden; }
-  .eye.left { left: 25px; } .eye.right { right: 25px; }
-  .eye::before { content: ''; position: absolute; top: 5px; left: 5px; width: 8px; height: 8px; background: #fff; border-radius: 50%; }
-  .eye::after { content: ''; position: absolute; bottom: 5px; right: 3px; width: 4px; height: 4px; background: #fff; border-radius: 50%; opacity: 0.7; }
-  .blush { position: absolute; top: 85px; width: 20px; height: 10px; background: #ff9eb5; border-radius: 50%; opacity: 0.6; }
-  .blush.left { left: 12px; } .blush.right { right: 12px; }
-  .mouth { position: absolute; top: 95px; left: 50%; transform: translateX(-50%); width: 12px; height: 6px; background: #e74c3c; border-radius: 0 0 10px 10px; }
-  .hair { position: absolute; width: 100%; height: 100%; z-index: 4; pointer-events: none; }
-  .hair-back { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); width: 160px; height: 350px; border-radius: 50px 50px 20px 20px; z-index: 2; transition: 0.3s; }
-  .body { position: absolute; top: 160px; left: 50%; transform: translateX(-50%); width: 70px; height: 100px; background: #ffe6df; z-index: 4; }
-  .arm { position: absolute; top: 165px; width: 20px; height: 120px; background: #ffe6df; border-radius: 20px; z-index: 3; }
-  .arm.left { left: 50px; transform: rotate(10deg); } .arm.right { right: 50px; transform: rotate(-10deg); }
-  .leg { position: absolute; top: 250px; width: 24px; height: 150px; background: #ffe6df; border-radius: 20px; z-index: 3; }
-  .leg.left { left: 80px; } .leg.right { right: 80px; }
-  .shoe { position: absolute; top: 390px; width: 30px; height: 15px; border-radius: 10px 10px 5px 5px; z-index: 4; transition: 0.3s; }
-  .shoe.left { left: 75px; } .shoe.right { right: 75px; }
-  .dress-layer { position: absolute; top: 155px; left: 50%; transform: translateX(-50%); width: 90px; height: 180px; z-index: 4; transition: 0.3s; display: flex; justify-content: center; }
-  .dress-top { width: 60px; height: 50px; border-radius: 15px 15px 0 0; }
-  .dress-skirt { width: 100px; height: 130px; border-radius: 10px 10px 50% 50%; margin-top: -5px; }
-  .acc-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 6; pointer-events: none; }
-
-  /* Tương thích màn hình nhỏ */
-  @media (max-width: 760px) {
-    body { height: 100dvh; flex-direction: column; }
-    .character-area { min-height: 0; flex: 1; }
-    .stage { height: 100%; min-height: 360px; transform: scale(.78); }
-    .ui-area { width: 100%; height: 48%; min-height: 260px; border-left: 0; border-top: 3px solid #ffb6c1; }
-    .ui-header { padding: 9px; font-size: 17px; }
-    .tab-btn { padding: 10px 7px; font-size: 12px; }
-    .items-container { padding: 10px; grid-template-columns: repeat(5, 1fr); gap: 9px; }
-    .action-area { padding: 8px; }
-    .action-btn { padding: 10px; font-size: 13px; }
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;background:#fce4ec;height:100vh;height:100dvh;overflow:hidden;display:flex;color:#4a2c3a}
+.character-area{flex:1;min-width:0;position:relative;display:flex;justify-content:center;align-items:center;background:#ffeef2;transition:background .5s ease;overflow:hidden}
+.stage{position:relative;width:400px;height:600px;max-width:100%;display:flex;justify-content:center;align-items:flex-end;padding-bottom:30px;z-index:2}
+.ui-area{width:420px;flex-shrink:0;background:#fff;border-left:4px solid #f48fb1;display:flex;flex-direction:column;box-shadow:-5px 0 25px rgba(0,0,0,.08);z-index:10;min-height:0}
+.ui-header{padding:20px;background:#f48fb1;color:#fff;text-align:center;font-size:22px;font-weight:800;letter-spacing:1px;text-shadow:0 2px 4px rgba(0,0,0,.1)}
+.tabs{display:flex;border-bottom:2px solid #fce4ec;background:#fff9fb;overflow-x:auto}
+.tab-btn{flex:1;min-width:58px;padding:12px 4px;border:0;background:none;cursor:pointer;font-weight:bold;color:#b08090;transition:.2s;font-size:12px;white-space:nowrap;display:flex;flex-direction:column;align-items:center;gap:4px}
+.tab-btn:hover{background:#fce4ec;color:#f48fb1}
+.tab-btn.active{color:#e91e63;border-bottom:3px solid #e91e63;background:#fff}
+.tab-icon{font-size:20px}
+.items-container{flex:1;min-height:0;padding:20px;overflow-y:auto;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:15px;align-content:start}
+.items-container::-webkit-scrollbar{width:8px}
+.items-container::-webkit-scrollbar-thumb{background:#f48fb1;border-radius:4px}
+.item-btn{aspect-ratio:1;border:2px solid #eee;border-radius:12px;background:#fff;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;font-size:24px;transition:.2s;position:relative;box-shadow:0 2px 5px rgba(0,0,0,.02);overflow:hidden}
+.item-btn:hover{border-color:#f48fb1;transform:translateY(-3px);box-shadow:0 4px 10px rgba(244,143,177,.3)}
+.item-btn.active{border-color:#e91e63;background:#fce4ec;box-shadow:0 0 0 2px #e91e63 inset}
+.item-btn span.label{font-size:10px;margin-top:4px;color:#b08090;font-weight:bold}
+.color-btn{border-radius:50%;border:3px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.1);cursor:pointer;transition:.2s;width:100%;aspect-ratio:1}
+.color-btn:hover{transform:scale(1.1)}
+.color-btn.active{border-color:#e91e63;box-shadow:0 0 0 3px #e91e63}
+.action-area{padding:15px;background:#fff9fb;border-top:2px solid #fce4ec;display:flex;gap:10px}
+.action-btn{flex:1;padding:15px 8px;border:0;border-radius:12px;font-weight:bold;font-size:15px;cursor:pointer;transition:.2s;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.2)}
+.action-btn.photo{background:linear-gradient(45deg,#f06292,#f48fb1)}
+.action-btn.random{background:linear-gradient(45deg,#ba68c8,#ce93d8)}
+.action-btn:hover{filter:brightness(1.05);transform:translateY(-2px);box-shadow:0 5px 15px rgba(0,0,0,.1)}
+.action-btn:active{transform:translateY(0)}
+.character-wrapper{width:300px;height:550px;max-width:100%;max-height:100%;transition:transform .3s ease;filter:drop-shadow(0 10px 20px rgba(0,0,0,.1))}
+.character-wrapper.idle{animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+svg{width:100%;height:100%;overflow:visible}
+@media(max-width:760px){
+ body{flex-direction:column}
+ .character-area{flex:1;min-height:0}
+ .stage{height:100%;width:100%;padding:8px}
+ .character-wrapper{height:min(100%,460px);width:auto;aspect-ratio:300/550}
+ .ui-area{width:100%;height:48%;max-height:430px;border-left:0;border-top:4px solid #f48fb1}
+ .ui-header{padding:9px;font-size:18px}
+ .tab-btn{padding:8px 3px}
+ .items-container{padding:10px;gap:9px;grid-template-columns:repeat(5,minmax(0,1fr))}
+ .action-area{padding:8px}
+ .action-btn{padding:10px 5px;font-size:13px}
+}
 </style>
 </head>
 <body>
-<div class="character-area">
-  <div class="stage">
-    <div class="character-wrapper idle" id="character-wrapper">
-      <div class="hair-back" id="hair-back"></div>
-      <div class="arm left"></div>
-      <div class="arm right"></div>
-      <div class="leg left"></div>
-      <div class="leg right"></div>
-      <div class="shoe left" id="shoe-left"></div>
-      <div class="shoe right" id="shoe-right"></div>
-      <div class="dress-layer" id="dress-layer">
-        <div class="dress-top" id="dress-top"></div>
-        <div class="dress-skirt" id="dress-skirt"></div>
-      </div>
-      <div class="body"></div>
-      <div class="head">
-        <div class="face">
-          <div class="eye left"></div>
-          <div class="eye right"></div>
-          <div class="blush left"></div>
-          <div class="blush right"></div>
-          <div class="mouth"></div>
-        </div>
-      </div>
-      <div class="hair" id="hair-front"></div>
-      <div class="acc-layer" id="acc-layer"></div>
-    </div>
+<div class="character-area" id="character-area">
+ <div class="stage">
+  <div class="character-wrapper idle" id="character-wrapper">
+   <svg viewBox="0 0 300 550" role="img" aria-label="Nhân vật thời trang Barbee">
+    <defs><linearGradient id="skinGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#ffe6df"/><stop offset="100%" stop-color="#f5c8c0"/></linearGradient></defs>
+    <path id="hair-back" d="" fill="#4a2c3a"/>
+    <path d="M110 350 L110 480 Q110 490 120 490 L130 490 Q140 490 140 480 L140 350 Z" fill="url(#skinGrad)"/>
+    <path d="M160 350 L160 480 Q160 490 170 490 L180 490 Q190 490 190 480 L190 350 Z" fill="url(#skinGrad)"/>
+    <path id="shoe-left" d="" fill="#e91e63"/>
+    <path id="shoe-right" d="" fill="#e91e63"/>
+    <path d="M120 200 L180 200 L175 360 Q150 380 125 360 Z" fill="url(#skinGrad)"/>
+    <path d="M120 210 Q90 260 90 350 Q100 360 110 350 Q115 280 135 230 Z" fill="url(#skinGrad)"/>
+    <path d="M180 210 Q210 260 210 350 Q200 360 190 350 Q185 280 165 230 Z" fill="url(#skinGrad)"/>
+    <path id="dress-skirt" d="" fill="#ff6b9d"/>
+    <path id="dress-top" d="" fill="#ff6b9d"/>
+    <rect x="140" y="170" width="20" height="30" fill="url(#skinGrad)"/>
+    <ellipse cx="150" cy="120" rx="55" ry="65" fill="url(#skinGrad)"/>
+    <ellipse cx="125" cy="125" rx="10" ry="14" fill="#4a2c3a"/>
+    <ellipse cx="175" cy="125" rx="10" ry="14" fill="#4a2c3a"/>
+    <circle cx="122" cy="120" r="4" fill="#fff"/><circle cx="172" cy="120" r="4" fill="#fff"/>
+    <circle cx="128" cy="130" r="2" fill="#fff" opacity=".6"/><circle cx="178" cy="130" r="2" fill="#fff" opacity=".6"/>
+    <path d="M115 105 Q125 100 135 105 M165 105 Q175 100 185 105" stroke="#4a2c3a" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="110" cy="140" rx="10" ry="6" fill="#ff9eb5" opacity=".6" filter="blur(2px)"/>
+    <ellipse cx="190" cy="140" rx="10" ry="6" fill="#ff9eb5" opacity=".6" filter="blur(2px)"/>
+    <path d="M145 150 Q150 158 155 150" stroke="#e91e63" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path id="hair-front" d="" fill="#4a2c3a"/>
+    <g id="acc-layer"></g>
+   </svg>
   </div>
+ </div>
 </div>
 <div class="ui-area">
-  <div class="ui-header">✨ Thời Trang Duyên Dáng ✨</div>
-  <div class="tabs">
-    <button class="tab-btn active" onclick="switchTab('dress', this)">👗 Váy</button>
-    <button class="tab-btn" onclick="switchTab('hair', this)">💇 Tóc</button>
-    <button class="tab-btn" onclick="switchTab('shoes', this)">👠 Giày</button>
-    <button class="tab-btn" onclick="switchTab('color', this)">🎨 Màu</button>
-    <button class="tab-btn" onclick="switchTab('acc', this)">🎀 Phụ kiện</button>
-  </div>
-  <div class="items-container" id="items-container"></div>
-  <div class="action-area">
-    <button class="action-btn random" onclick="randomize()">🎲 Ngẫu Nhiên</button>
-    <button class="action-btn photo" onclick="takePhoto()">📸 Chụp Ảnh</button>
-  </div>
+ <div class="ui-header">💖 Barbee Influencer 💖</div>
+ <div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('dress',this)"><span class="tab-icon">👗</span>Váy</button>
+  <button class="tab-btn" onclick="switchTab('hair',this)"><span class="tab-icon">💇</span>Tóc</button>
+  <button class="tab-btn" onclick="switchTab('shoes',this)"><span class="tab-icon">👠</span>Giày</button>
+  <button class="tab-btn" onclick="switchTab('bg',this)"><span class="tab-icon">🖼️</span>Nền</button>
+  <button class="tab-btn" onclick="switchTab('color',this)"><span class="tab-icon">🎨</span>Màu</button>
+  <button class="tab-btn" onclick="switchTab('acc',this)"><span class="tab-icon">🎀</span>Phụ kiện</button>
+ </div>
+ <div class="items-container" id="items-container"></div>
+ <div class="action-area">
+  <button class="action-btn random" onclick="randomize()">🎲 Ngẫu Nhiên</button>
+  <button class="action-btn photo" onclick="takePhoto()">📸 Chụp Ảnh</button>
+ </div>
 </div>
 <script>
-  const COLORS = ['#ff6b9d', '#ffb6c1', '#ff4757', '#4facfe', '#00f2fe', '#43e97b', '#38f9d7', '#f8b500', '#a18cd1', '#fbc2eb', '#ffffff', '#2b1b17'];
-  const DRESSES = [
-    { id: 'd1', name: 'Công chúa', top: '50%', skirt: '100%', skirtShape: '50% 50% 40% 40% / 20% 20% 80% 80%' },
-    { id: 'd2', name: 'Xòe A', top: '60%', skirt: '120%', skirtShape: '50% 50% 10% 10%' },
-    { id: 'd3', name: 'Xếp ly', top: '40%', skirt: '90%', skirtShape: '20% 20% 60% 60%' },
-    { id: 'd4', name: 'Dạ hội', top: '50%', skirt: '130%', skirtShape: '40% 40% 20% 20%' }
-  ];
-  const HAIRS = [
-    { id: 'h1', name: 'Dài', back: '50% 50% 20px 20px', front: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' },
-    { id: 'h2', name: 'Twin', back: '30% 30% 50% 50%', front: 'circle(50% at 50% 30%)' },
-    { id: 'h3', name: 'Ngắn', back: '20px', front: 'rect(0, 0, 100%, 50%)' },
-    { id: 'h4', name: 'Búi', back: '50%', front: 'ellipse(50% 40% at 50% 50%)' }
-  ];
-  const SHOES = [
-    { id: 's1', name: 'Búp bê', shape: '10px 10px 5px 5px' },
-    { id: 's2', name: 'Cao gót', shape: '5px 5px 15px 15px' },
-    { id: 's3', name: 'Bốt', shape: '10px 10px 0 0' },
-    { id: 's4', name: 'Sneaker', shape: '15px 15px 5px 5px' }
-  ];
-  const ACCS = [
-    { id: 'a1', name: 'Nơ', icon: '🎀', pos: 'top: 20px; left: 60px;' },
-    { id: 'a2', name: 'Vương miện', icon: '👑', pos: 'top: 5px; left: 90px;' },
-    { id: 'a3', name: 'Kính', icon: '👓', pos: 'top: 75px; left: 45px;' },
-    { id: 'a4', name: 'Hoa', icon: '🌸', pos: 'top: 30px; right: 30px;' }
-  ];
-  let state = { dress: 0, hair: 0, shoes: 0, color: 0, acc: -1, tab: 'dress' };
-  const elDressTop = document.getElementById('dress-top');
-  const elDressSkirt = document.getElementById('dress-skirt');
-  const elHairBack = document.getElementById('hair-back');
-  const elHairFront = document.getElementById('hair-front');
-  const elShoeL = document.getElementById('shoe-left');
-  const elShoeR = document.getElementById('shoe-right');
-  const elAccLayer = document.getElementById('acc-layer');
-  const container = document.getElementById('items-container');
-
-  function updateCharacter() {
-    const c = COLORS[state.color];
-    const dress = DRESSES[state.dress];
-    elDressTop.style.background = c;
-    elDressTop.style.width = dress.top;
-    elDressSkirt.style.background = c;
-    elDressSkirt.style.width = dress.skirt;
-    elDressSkirt.style.borderRadius = dress.skirtShape;
-    const hair = HAIRS[state.hair];
-    elHairBack.style.background = c;
-    elHairBack.style.borderRadius = hair.back;
-    elHairFront.style.background = c;
-    elHairFront.style.clipPath = hair.front;
-    elShoeL.style.background = c;
-    elShoeL.style.borderRadius = SHOES[state.shoes].shape;
-    elShoeR.style.background = c;
-    elShoeR.style.borderRadius = SHOES[state.shoes].shape;
-    elAccLayer.innerHTML = '';
-    if (state.acc >= 0) {
-      const acc = ACCS[state.acc];
-      const el = document.createElement('div');
-      el.style.cssText = `position:absolute; font-size:30px; ${acc.pos}`;
-      el.textContent = acc.icon;
-      elAccLayer.appendChild(el);
-    }
-  }
-
-  function switchTab(tabId, btn) {
-    state.tab = tabId;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    renderItems();
-  }
-
-  function renderItems() {
-    container.innerHTML = '';
-    if (state.tab === 'dress') {
-      DRESSES.forEach((d, i) => {
-        const div = document.createElement('div');
-        div.className = `item-btn ${state.dress === i ? 'active' : ''}`;
-        div.innerHTML = '👗';
-        div.title = d.name;
-        div.onclick = () => { state.dress = i; updateCharacter(); renderItems(); };
-        container.appendChild(div);
-      });
-    } else if (state.tab === 'hair') {
-      HAIRS.forEach((h, i) => {
-        const div = document.createElement('div');
-        div.className = `item-btn ${state.hair === i ? 'active' : ''}`;
-        div.innerHTML = '💇';
-        div.title = h.name;
-        div.onclick = () => { state.hair = i; updateCharacter(); renderItems(); };
-        container.appendChild(div);
-      });
-    } else if (state.tab === 'shoes') {
-      SHOES.forEach((s, i) => {
-        const div = document.createElement('div');
-        div.className = `item-btn ${state.shoes === i ? 'active' : ''}`;
-        div.innerHTML = '👠';
-        div.title = s.name;
-        div.onclick = () => { state.shoes = i; updateCharacter(); renderItems(); };
-        container.appendChild(div);
-      });
-    } else if (state.tab === 'color') {
-      COLORS.forEach((c, i) => {
-        const div = document.createElement('div');
-        div.className = `color-btn ${state.color === i ? 'active' : ''}`;
-        div.style.background = c;
-        div.onclick = () => { state.color = i; updateCharacter(); renderItems(); };
-        container.appendChild(div);
-      });
-    } else if (state.tab === 'acc') {
-      const noneDiv = document.createElement('div');
-      noneDiv.className = `item-btn ${state.acc === -1 ? 'active' : ''}`;
-      noneDiv.innerHTML = '❌';
-      noneDiv.title = 'Không có phụ kiện';
-      noneDiv.onclick = () => { state.acc = -1; updateCharacter(); renderItems(); };
-      container.appendChild(noneDiv);
-      ACCS.forEach((a, i) => {
-        const div = document.createElement('div');
-        div.className = `item-btn ${state.acc === i ? 'active' : ''}`;
-        div.innerHTML = a.icon;
-        div.title = a.name;
-        div.onclick = () => { state.acc = i; updateCharacter(); renderItems(); };
-        container.appendChild(div);
-      });
-    }
-  }
-
-  function randomize() {
-    state.dress = Math.floor(Math.random() * DRESSES.length);
-    state.hair = Math.floor(Math.random() * HAIRS.length);
-    state.shoes = Math.floor(Math.random() * SHOES.length);
-    state.color = Math.floor(Math.random() * COLORS.length);
-    state.acc = Math.random() > 0.5 ? Math.floor(Math.random() * ACCS.length) : -1;
-    updateCharacter();
-    renderItems();
-  }
-
-  function takePhoto() {
-    const wrapper = document.getElementById('character-wrapper');
-    wrapper.style.transform = 'scale(1.1)';
-    setTimeout(() => {
-      wrapper.style.transform = '';
-      alert('✨ Tạo dáng xinh quá! Muốn lưu ảnh, hãy dùng chức năng chụp màn hình của thiết bị nhé.');
-    }, 200);
-  }
-
-  renderItems();
-  updateCharacter();
+const COLORS=['#ff6b9d','#ffb6c1','#ff4757','#4facfe','#00f2fe','#43e97b','#f8b500','#a18cd1','#fbc2eb','#ffffff','#2b1b17','#e6e6fa'];
+const DRESSES=[
+{id:'d1',name:'Công chúa',top:'M130 210 L170 210 L170 240 L130 240 Z',skirt:'M130 240 L170 240 L200 380 Q150 420 100 380 Z'},
+{id:'d2',name:'Xòe A',top:'M135 210 L165 210 L165 240 L135 240 Z',skirt:'M130 240 L170 240 L190 400 Q150 430 110 400 Z'},
+{id:'d3',name:'Ngắn',top:'M130 210 L170 210 L170 250 L130 250 Z',skirt:'M130 250 L170 250 L180 330 Q150 350 120 330 Z'},
+{id:'d4',name:'Đuôi cá',top:'M130 210 L170 210 L170 240 L130 240 Z',skirt:'M130 240 L170 240 L160 350 L180 450 Q150 470 120 450 L140 350 Z'},
+{id:'d5',name:'Yếm',top:'M140 200 L160 200 L160 230 L140 230 Z',skirt:'M130 230 L170 230 L180 370 Q150 390 120 370 Z'}
+];
+const HAIRS=[
+{id:'h1',name:'Xoăn dài',back:'M90 120 Q80 250 60 350 Q100 380 150 380 Q200 380 240 350 Q220 250 210 120 Z',front:'M150 50 Q100 50 95 100 Q95 120 100 140 Q120 140 150 140 Q180 140 200 140 Q205 120 205 100 Q200 50 150 50 Z'},
+{id:'h2',name:'Twin-tail',back:'M100 150 Q70 250 50 350 Q90 370 120 360 L130 250 L170 250 L180 360 Q210 370 250 350 Q230 250 200 150 Z',front:'M150 45 Q110 45 100 90 Q100 110 110 130 Q130 130 150 130 Q170 130 190 130 Q200 110 200 90 Q190 45 150 45 Z'},
+{id:'h3',name:'Ngắn',back:'M100 120 Q95 180 105 220 Q150 230 195 220 Q205 180 200 120 Z',front:'M150 50 Q105 50 100 100 Q100 120 110 140 Q130 140 150 140 Q170 140 190 140 Q200 120 200 100 Q195 50 150 50 Z'},
+{id:'h4',name:'Búi',back:'M110 120 Q100 180 110 200 Q150 210 190 200 Q200 180 190 120 Z',front:'M150 30 Q110 30 105 80 Q105 100 110 120 Q130 120 150 120 Q170 120 190 120 Q195 100 195 80 Q190 30 150 30 Z'}
+];
+const SHOES=[
+{id:'s1',name:'Cao gót',left:'M105 480 L105 490 Q105 500 115 500 L135 500 Q145 500 145 490 L135 480 Z',right:'M155 480 L165 480 L165 490 Q165 500 175 500 L195 500 Q195 500 195 490 L195 480 Z'},
+{id:'s2',name:'Sneaker',left:'M105 480 L105 495 Q105 505 120 505 L140 505 Q150 505 150 495 L145 480 Z',right:'M155 480 L160 495 Q160 505 170 505 L190 505 Q200 505 200 495 L200 480 Z'},
+{id:'s3',name:'Bốt',left:'M105 450 L105 495 Q105 505 120 505 L140 505 Q150 505 150 495 L145 450 Z',right:'M155 450 L160 495 Q160 505 170 505 L190 505 Q200 505 200 495 L200 450 Z'}
+];
+const BACKGROUNDS=[
+{id:'b1',name:'Studio',color:'linear-gradient(135deg,#ff9a9e,#fecfef)'},
+{id:'b2',name:'Sự kiện',color:'linear-gradient(135deg,#a18cd1,#fbc2eb)'},
+{id:'b3',name:'Dạo phố',color:'linear-gradient(135deg,#84fab0,#8fd3f4)'},
+{id:'b4',name:'Biển',color:'linear-gradient(135deg,#4facfe,#00f2fe)'}
+];
+const ACCS=[
+{id:'a1',name:'Kính',icon:'🕶️',x:120,y:115,size:35},
+{id:'a2',name:'Mũ',icon:'🧢',x:150,y:30,size:45},
+{id:'a3',name:'Hoa',icon:'🌸',x:200,y:60,size:30},
+{id:'a4',name:'Túi',icon:'👜',x:220,y:280,size:35}
+];
+let state={dress:0,hair:0,shoes:0,bg:0,color:0,acc:-1,tab:'dress'};
+const elHairBack=document.getElementById('hair-back'),elHairFront=document.getElementById('hair-front'),elDressTop=document.getElementById('dress-top'),elDressSkirt=document.getElementById('dress-skirt'),elShoeL=document.getElementById('shoe-left'),elShoeR=document.getElementById('shoe-right'),elAccLayer=document.getElementById('acc-layer'),elCharArea=document.getElementById('character-area'),container=document.getElementById('items-container');
+function updateCharacter(){
+const c=COLORS[state.color],dress=DRESSES[state.dress],hair=HAIRS[state.hair],shoes=SHOES[state.shoes];
+elDressTop.setAttribute('d',dress.top);elDressTop.setAttribute('fill',c);elDressSkirt.setAttribute('d',dress.skirt);elDressSkirt.setAttribute('fill',c);
+elHairBack.setAttribute('d',hair.back);elHairBack.setAttribute('fill','#4a2c3a');elHairFront.setAttribute('d',hair.front);elHairFront.setAttribute('fill','#4a2c3a');
+elShoeL.setAttribute('d',shoes.left);elShoeL.setAttribute('fill','#e91e63');elShoeR.setAttribute('d',shoes.right);elShoeR.setAttribute('fill','#e91e63');
+elCharArea.style.background=BACKGROUNDS[state.bg].color;
+elAccLayer.replaceChildren();
+if(state.acc>=0){const a=ACCS[state.acc],node=document.createElementNS('http://www.w3.org/2000/svg','text');node.setAttribute('x',a.x);node.setAttribute('y',a.y);node.setAttribute('font-size',a.size);node.setAttribute('text-anchor','middle');node.textContent=a.icon;elAccLayer.appendChild(node);}
+}
+function switchTab(tabId,btn){state.tab=tabId;document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderItems();}
+function renderItems(){
+container.replaceChildren();
+const addItem=(icon,label,active,onClick,background)=>{const d=document.createElement('button');d.type='button';d.className='item-btn'+(active?' active':'');d.innerHTML=icon+'<span class="label"></span>';d.querySelector('.label').textContent=label; if(background)d.style.background=background;d.onclick=onClick;container.appendChild(d);};
+if(state.tab==='dress')DRESSES.forEach((d,i)=>addItem('👗',d.name,state.dress===i,()=>{state.dress=i;updateCharacter();renderItems();}));
+else if(state.tab==='hair')HAIRS.forEach((h,i)=>addItem('💇',h.name,state.hair===i,()=>{state.hair=i;updateCharacter();renderItems();}));
+else if(state.tab==='shoes')SHOES.forEach((s,i)=>addItem('👠',s.name,state.shoes===i,()=>{state.shoes=i;updateCharacter();renderItems();}));
+else if(state.tab==='bg')BACKGROUNDS.forEach((b,i)=>addItem('🖼️',b.name,state.bg===i,()=>{state.bg=i;updateCharacter();renderItems();},b.color));
+else if(state.tab==='color')COLORS.forEach((c,i)=>{const d=document.createElement('button');d.type='button';d.className='color-btn'+(state.color===i?' active':'');d.style.background=c;d.setAttribute('aria-label','Màu '+(i+1));d.onclick=()=>{state.color=i;updateCharacter();renderItems();};container.appendChild(d);});
+else if(state.tab==='acc'){addItem('❌','Bỏ',state.acc===-1,()=>{state.acc=-1;updateCharacter();renderItems();});ACCS.forEach((a,i)=>addItem(a.icon,a.name,state.acc===i,()=>{state.acc=i;updateCharacter();renderItems();}));}
+}
+function randomize(){state.dress=Math.floor(Math.random()*DRESSES.length);state.hair=Math.floor(Math.random()*HAIRS.length);state.shoes=Math.floor(Math.random()*SHOES.length);state.bg=Math.floor(Math.random()*BACKGROUNDS.length);state.color=Math.floor(Math.random()*COLORS.length);state.acc=Math.random()>.4?Math.floor(Math.random()*ACCS.length):-1;updateCharacter();renderItems();}
+function takePhoto(){const wrapper=document.getElementById('character-wrapper');wrapper.style.transform='scale(1.08)';setTimeout(()=>{wrapper.style.transform='scale(1)';},220);alert('📸 Hãy dùng chức năng chụp màn hình của thiết bị để lưu tạo hình Influencer nhé!');}
+renderItems();updateCharacter();
 </script>
 </body>
 </html>
