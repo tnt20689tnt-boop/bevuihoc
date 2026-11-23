@@ -196,9 +196,9 @@ function Showroom({ avatar, anim, runway }: { avatar: Avatar; anim: React.Mutabl
         <bufferGeometry><bufferAttribute attach="attributes-position" args={[sparkles, 3]} /></bufferGeometry>
         <pointsMaterial color="#fff6ae" size={0.08} transparent opacity={0.9} />
       </points>
-      <mesh rotation-x={-Math.PI / 2} receiveShadow><circleGeometry args={[8, 64]} /><meshStandardMaterial color="#f9eaf6" roughness={0.8} /></mesh>
+      <mesh rotation-x={-Math.PI / 2} receiveShadow><circleGeometry args={[14, 96]} /><meshStandardMaterial color="#f9eaf6" roughness={0.8} /></mesh>
       <SalonDecor runway={runway} />
-      <Character3D avatar={avatar} state={anim} castShadow />
+      <group ref={walker}><Character3D avatar={avatar} state={anim} castShadow /></group>
       <SuppliedModel runway={runway} />
       <OrbitControls enablePan={false} minDistance={6} maxDistance={13} minPolarAngle={Math.PI / 4} maxPolarAngle={Math.PI / 2.05} target={runway ? [0, 1.25, 0.3] : [0.8, 1.1, -0.9]} />
     </Canvas>
