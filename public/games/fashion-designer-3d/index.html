@@ -3,153 +3,234 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>✨ Anime Fashion Studio ✨</title>
+<title>✨ Fashion Studio Pro ✨</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #f0e6f5; height: 100vh; display: flex; overflow: hidden; }
-.character-stage { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; background: radial-gradient(circle, #fff, #e6d3f0); overflow: hidden; }
-.avatar-container { position: relative; width: 350px; height: 600px; }
-.layer { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s; pointer-events: none; }
-.z-bg { z-index: 1; } .z-back-hair { z-index: 2; } .z-body { z-index: 3; } .z-eyes { z-index: 4; } .z-clothes { z-index: 5; } .z-front-hair { z-index: 6; } .z-acc { z-index: 7; }
-.ui-panel { width: 400px; background: #fff; border-left: 3px solid #d1b3e6; display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.05); z-index: 10; }
-.ui-header { padding: 20px; background: #d1b3e6; color: #fff; text-align: center; font-size: 20px; font-weight: bold; letter-spacing: 1px; }
-.tabs { display: flex; background: #f9f5fc; border-bottom: 2px solid #eadcf5; overflow-x: auto; }
-.tab-btn { flex: 1; padding: 12px 5px; border: none; background: none; cursor: pointer; font-weight: bold; color: #9c7bb5; display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 11px; transition: 0.2s; }
-.tab-btn.active { color: #6a1b9a; border-bottom: 3px solid #6a1b9a; background: #fff; }
-.tab-icon { font-size: 20px; }
-.items-grid { flex: 1; padding: 15px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; overflow-y: auto; align-content: start; }
-.items-grid::-webkit-scrollbar { width: 6px; } .items-grid::-webkit-scrollbar-thumb { background: #d1b3e6; border-radius: 4px; }
-.item-btn { aspect-ratio: 1; background: #fff; border: 2px solid #eee; border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; padding: 5px; }
-.item-btn:hover { border-color: #d1b3e6; transform: scale(1.05); }
-.item-btn.active { border-color: #6a1b9a; box-shadow: 0 0 8px rgba(106, 27, 154, 0.4); background: #f9f5fc; }
-.item-btn img { width: 100%; height: 100%; object-fit: contain; }
-.action-bar { padding: 15px; background: #f9f5fc; border-top: 2px solid #eadcf5; display: flex; gap: 10px; }
-.btn { flex: 1; padding: 12px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; color: #fff; transition: 0.2s; font-size: 14px; }
-.btn-random { background: #9c7bb5; } .btn-download { background: #6a1b9a; }
-.btn:hover { filter: brightness(1.1); transform: translateY(-2px); }
-@media (max-width: 700px) {
- body { flex-direction: column; height: 100dvh; }
- .character-stage { min-height: 0; flex: 1; }
- .avatar-container { height: min(52vh, 500px); width: min(100%, 300px); }
- .ui-panel { width: 100%; height: 48vh; min-height: 300px; border-left: 0; border-top: 3px solid #d1b3e6; }
- .ui-header { padding: 10px; }
- .items-grid { padding: 10px; }
-}
+    /* CSS được thiết kế lại để tạo cảm giác "cao cấp" hơn */
+    @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Quicksand', sans-serif; background: #f0e6f5; height: 100vh; display: flex; overflow: hidden; }
+    
+    /* --- SÂN KHẤU --- */
+    .stage-area { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%"><defs><pattern id="dots" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse"><circle fill="%23d1b3e6" cx="2" cy="2" r="2"></circle></pattern></defs><rect x="0" y="0" width="100%" height="100%" fill="%23fdfbfe"></rect><rect x="0" y="0" width="100%" height="100%" fill="url(%23dots)" opacity="0.4"></rect></svg>'); overflow: hidden; }
+    
+    .character-wrapper { position: relative; width: 360px; height: 620px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.15)); }
+    
+    /* Các lớp ảnh được xếp chồng khít lên nhau */
+    .layer { position: absolute; bottom: 0; left: 0; width: 100%; height: 100%; object-fit: contain; pointer-events: none; }
+    
+    .z-back-hair { z-index: 1; }
+    .z-body { z-index: 2; }
+    .z-clothes { z-index: 3; }
+    .z-front-hair { z-index: 4; }
+    .z-accessory { z-index: 5; }
+    .z-bg-prop { z-index: 0; }
+
+    /* --- BẢNG ĐIỀU KHIỂN --- */
+    .ui-panel { width: 400px; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border-left: 2px solid #e0cceb; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(209, 179, 230, 0.2); z-index: 10; }
+    .ui-header { padding: 25px; background: linear-gradient(135deg, #d1b3e6, #b39ddb); color: #fff; text-align: center; font-size: 24px; font-weight: 700; letter-spacing: 1px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    
+    /* Tabs được thiết kế lại với icon đẹp hơn */
+    .tabs { display: flex; background: #f9f5fc; border-bottom: 2px solid #e0cceb; }
+    .tab-btn { flex: 1; padding: 15px 5px; border: none; background: none; cursor: pointer; font-weight: 600; color: #9c7bb5; display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 13px; transition: all 0.3s ease; }
+    .tab-btn.active { color: #6a1b9a; border-bottom: 4px solid #6a1b9a; background: #fff; }
+    .tab-icon { font-size: 24px; }
+
+    /* Grid đồ được thiết kế lại với hiệu ứng hover 3D */
+    .items-grid { flex: 1; padding: 20px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; overflow-y: auto; align-content: start; }
+    .items-grid::-webkit-scrollbar { width: 6px; }
+    .items-grid::-webkit-scrollbar-thumb { background: #d1b3e6; border-radius: 4px; }
+
+    .item-btn { aspect-ratio: 1; background: #fff; border: 2px solid #f0f0f0; border-radius: 15px; cursor: pointer; transition: all 0.2s ease; display: flex; justify-content: center; align-items: center; padding: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.03); position: relative; overflow: hidden; }
+    .item-btn:hover { border-color: #d1b3e6; transform: translateY(-4px) scale(1.02); box-shadow: 0 8px 15px rgba(209, 179, 230, 0.3); }
+    .item-btn.active { border-color: #6a1b9a; box-shadow: 0 0 0 3px rgba(106, 27, 154, 0.2); background: #f9f5fc; }
+    .item-btn img { width: 100%; height: 100%; object-fit: contain; }
+
+    /* Nút bấm cuối trang */
+    .action-bar { padding: 20px; background: #f9f5fc; border-top: 2px solid #e0cceb; display: flex; gap: 15px; }
+    .btn { flex: 1; padding: 16px; border: none; border-radius: 15px; font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 16px; cursor: pointer; color: #fff; transition: all 0.3s ease; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+    .btn-random { background: linear-gradient(135deg, #b39ddb, #9575cd); }
+    .btn-download { background: linear-gradient(135deg, #f06292, #e91e63); }
+    .btn:hover { filter: brightness(1.1); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+    .btn:active { transform: translateY(0); }
 </style>
 </head>
 <body>
-<div class="character-stage">
- <div class="avatar-container" id="avatar-container">
-  <img id="img-bg" class="layer z-bg" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><circle cx='150' cy='250' r='140' fill='%23fce4ec'/></svg>">
-  <img id="img-back-hair" class="layer z-back-hair" src="">
-  <img id="img-body" class="layer z-body" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><ellipse cx='150' cy='110' rx='45' ry='55' fill='%23ffe0d5'/><path d='M 110 160 Q 150 150 190 160 L 180 300 Q 150 320 120 300 Z' fill='%23ffe0d5'/><path d='M 120 300 L 120 450 Q 120 460 130 460 L 140 460 Q 150 460 150 450 L 150 300 Z' fill='%23ffe0d5'/><path d='M 150 300 L 150 450 Q 150 460 160 460 L 170 460 Q 180 460 180 450 L 180 300 Z' fill='%23ffe0d5'/><path d='M 110 170 Q 80 220 90 300 Q 100 310 110 300 Q 110 240 130 200 Z' fill='%23ffe0d5'/><path d='M 190 170 Q 220 220 210 300 Q 200 310 190 300 Q 190 240 170 200 Z' fill='%23ffe0d5'/></svg>">
-  <img id="img-clothes" class="layer z-clothes" src="">
-  <img id="img-front-hair" class="layer z-front-hair" src="">
-  <img id="img-acc" class="layer z-acc" src="" style="display:none;">
-  <img class="layer z-eyes" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><ellipse cx='130' cy='110' rx='8' ry='12' fill='%23333'/><ellipse cx='170' cy='110' rx='8' ry='12' fill='%23333'/><circle cx='128' cy='106' r='3' fill='%23fff'/><circle cx='168' cy='106' r='3' fill='%23fff'/><path d='M 145 130 Q 150 138 155 130' stroke='%23e91e63' stroke-width='2' fill='none' stroke-linecap='round'/><ellipse cx='110' cy='125' rx='6' ry='4' fill='%23ff9eb5' opacity='0.5'/><ellipse cx='190' cy='125' rx='6' ry='4' fill='%23ff9eb5' opacity='0.5'/></svg>">
- </div>
-</div>
-<div class="ui-panel">
- <div class="ui-header">Anime Fashion</div>
- <div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('hair', this)"><span class="tab-icon">💇</span>Tóc</button>
-  <button class="tab-btn" onclick="switchTab('dress', this)"><span class="tab-icon">👗</span>Váy</button>
-  <button class="tab-btn" onclick="switchTab('acc', this)"><span class="tab-icon">🎀</span>Phụ kiện</button>
-  <button class="tab-btn" onclick="switchTab('bg', this)"><span class="tab-icon">🖼️</span>Nền</button>
- </div>
- <div class="items-grid" id="items-container"></div>
- <div class="action-bar">
-  <button class="btn btn-random" onclick="randomize()">🎲 Ngẫu Nhiên</button>
-  <button class="btn btn-download" onclick="takePhoto()">📸 Chụp Ảnh</button>
- </div>
-</div>
+
+    <div class="stage-area">
+        <div class="character-wrapper" id="avatar-wrapper">
+            <!-- Ảnh nền / Cảnh vật (Có sẵn) -->
+            <img id="img-bg" class="layer z-bg-prop" src="" alt="Background">
+            
+            <!-- Các lớp nhân vật -->
+            <img id="img-back-hair" class="layer z-back-hair" src="" alt="Back Hair">
+            <img id="img-body" class="layer z-body" src="" alt="Body Base">
+            <img id="img-clothes" class="layer z-clothes" src="" alt="Clothes">
+            <img id="img-front-hair" class="layer z-front-hair" src="" alt="Front Hair">
+            <img id="img-accessory" class="layer z-accessory" src="" style="display: none;" alt="Accessory">
+        </div>
+    </div>
+
+    <div class="ui-panel">
+        <div class="ui-header">✨ Fashion Studio Pro ✨</div>
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('hair', this)"><span class="tab-icon">💇</span> Tóc</button>
+            <button class="tab-btn" onclick="switchTab('dress', this)"><span class="tab-icon">👗</span> Váy</button>
+            <button class="tab-btn" onclick="switchTab('acc', this)"><span class="tab-icon">👑</span> Phụ kiện</button>
+            <button class="tab-btn" onclick="switchTab('bg', this)"><span class="tab-icon">🖼️</span> Nền</button>
+        </div>
+        <div class="items-grid" id="items-container"></div>
+        <div class="action-bar">
+            <button class="btn btn-random" onclick="randomize()">🎲 Ngẫu Nhiên</button>
+            <button class="btn btn-download" onclick="takePhoto()">📸 Lưu Ảnh</button>
+        </div>
+    </div>
+
 <script>
-const DB = {
- hair: [
-  { id:'h1', name:'Dài', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M90,100 Q70,250 60,350 Q150,380 240,350 Q230,250 210,100 Z' fill='%234a2c3a'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M105,110 Q105,40 150,40 Q195,40 195,110 Q195,130 150,130 Q105,130 105,110 Z' fill='%234a2c3a'/><path d='M95,100 Q85,140 100,180 L110,150 Z' fill='%234a2c3a'/></svg>" },
-  { id:'h2', name:'Twin', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,120 Q60,250 50,350 Q100,380 120,350 L130,200 L170,200 L180,350 Q200,380 250,350 Q240,250 200,120 Z' fill='%23f8b500'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,100 Q110,50 150,50 Q190,50 190,100 Q190,120 150,120 Q110,120 110,100 Z' fill='%23f8b500'/></svg>" },
-  { id:'h3', name:'Búi', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,110 Q100,160 110,200 Q150,210 190,200 Q200,160 190,110 Z' fill='%23ff6b9d'/><circle cx='150' cy='50' r='25' fill='%23ff6b9d'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M115,110 Q115,60 150,60 Q185,60 185,110 Q185,130 150,130 Q115,130 115,110 Z' fill='%23ff6b9d'/></svg>" },
-  { id:'h4', name:'Bob', back:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,110 Q90,180 110,230 Q150,250 190,230 Q210,180 200,110 Z' fill='%234facfe'/></svg>", front:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M100,110 Q100,50 150,50 Q200,50 200,110 Q200,130 150,130 Q100,130 100,110 Z' fill='%234facfe'/></svg>" }
- ],
- dress: [
-  { id:'d1', name:'Dạ hội', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,280 L110,280 Z' fill='%23e91e63'/><path d='M110,280 L190,280 L230,400 Q150,430 70,400 Z' fill='%23e91e63'/></svg>" },
-  { id:'d2', name:'Xòe A', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,260 L110,260 Z' fill='%234facfe'/><path d='M110,260 L190,260 L210,350 L90,350 Z' fill='%234facfe'/></svg>" },
-  { id:'d3', name:'Yếm', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M125,180 L175,180 L185,260 L115,260 Z' fill='%23f8b500'/><path d='M115,260 L185,260 L200,380 Q150,400 100,380 Z' fill='%23f8b500'/></svg>" },
-  { id:'d4', name:'Công chúa', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,180 L180,180 L190,270 L110,270 Z' fill='%23a18cd1'/><path d='M110,270 L190,270 L240,420 Q150,450 60,420 Z' fill='%23a18cd1'/></svg>" }
- ],
- acc: [
-  { id:'a1', name:'Kính', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><circle cx='130' cy='110' r='12' fill='none' stroke='%23333' stroke-width='3'/><circle cx='170' cy='110' r='12' fill='none' stroke='%23333' stroke-width='3'/><line x1='142' y1='110' x2='158' y2='110' stroke='%23333' stroke-width='3'/></svg>" },
-  { id:'a2', name:'Mũ', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M110,60 L190,60 L200,110 L100,110 Z' fill='%23ff6b9d'/><path d='M120,60 L120,30 L180,30 L180,60 Z' fill='%23ff6b9d'/></svg>" },
-  { id:'a3', name:'Vương miện', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><path d='M120,60 L130,30 L150,50 L170,30 L180,60 Z' fill='%23ffd700'/><circle cx='150' cy='45' r='5' fill='%23ff0000'/></svg>" }
- ],
- bg: [
-  { id:'b1', name:'Studio', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23fce4ec'/></svg>" },
-  { id:'b2', name:'Sự kiện', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23e8eaf6'/></svg>" },
-  { id:'b3', name:'Dạo phố', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23e0f7fa'/></svg>" },
-  { id:'b4', name:'Biển', img:"data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 500'><rect width='300' height='500' fill='%23bbdefb'/></svg>" }
- ]
-};
-let state = { hair:0, dress:0, acc:-1, bg:0, tab:'hair' };
-const container = document.getElementById('items-container');
-function updateAvatar() {
- document.getElementById('img-back-hair').src = DB.hair[state.hair].back;
- document.getElementById('img-front-hair').src = DB.hair[state.hair].front;
- document.getElementById('img-clothes').src = DB.dress[state.dress].img;
- const accImg = document.getElementById('img-acc');
- if (state.acc >= 0) { accImg.src = DB.acc[state.acc].img; accImg.style.display = 'block'; }
- else { accImg.style.display = 'none'; }
- document.getElementById('img-bg').src = DB.bg[state.bg].img;
-}
-function switchTab(tab, btn) {
- state.tab = tab;
- document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
- btn.classList.add('active');
- renderItems();
-}
-function renderItems() {
- container.innerHTML = '';
- if (state.tab === 'bg') {
-  DB.bg.forEach((item, i) => {
-   const div = document.createElement('div');
-   div.className = 'item-btn' + (state.bg === i ? ' active' : '');
-   div.innerHTML = '<img src="' + item.img + '">';
-   div.onclick = () => { state.bg = i; updateAvatar(); renderItems(); };
-   container.appendChild(div);
-  });
-  return;
- }
- const items = DB[state.tab];
- if (state.tab === 'acc') {
-  const noneDiv = document.createElement('div');
-  noneDiv.className = 'item-btn' + (state.acc === -1 ? ' active' : '');
-  noneDiv.innerHTML = '<span style="font-size:20px">❌</span>';
-  noneDiv.onclick = () => { state.acc = -1; updateAvatar(); renderItems(); };
-  container.appendChild(noneDiv);
- }
- items.forEach((item, i) => {
-  const div = document.createElement('div');
-  div.className = 'item-btn' + (state[state.tab] === i ? ' active' : '');
-  if (state.tab === 'hair') div.innerHTML = '<img src="' + item.front + '" style="transform:scale(1.5)">';
-  else div.innerHTML = '<img src="' + item.img + '">';
-  div.onclick = () => { state[state.tab] = i; updateAvatar(); renderItems(); };
-  container.appendChild(div);
- });
-}
-function randomize() {
- state.hair = Math.floor(Math.random() * DB.hair.length);
- state.dress = Math.floor(Math.random() * DB.dress.length);
- state.bg = Math.floor(Math.random() * DB.bg.length);
- state.acc = Math.random() > 0.5 ? Math.floor(Math.random() * DB.acc.length) : -1;
- updateAvatar(); renderItems();
-}
-function takePhoto() {
- alert('📸 Đã chụp ảnh!');
- const avatar = document.getElementById('avatar-container');
- avatar.style.transform = 'scale(1.1)';
- setTimeout(() => avatar.style.transform = 'scale(1)', 200);
-}
-renderItems();
-updateAvatar();
+    // =========================================================================
+    // THƯ VIỆN ASSET CHUYÊN NGHIỆP
+    // Hình ảnh được vẽ bằng SVG chất lượng cực cao (mô phỏng Anime)
+    // =========================================================================
+
+    // 1. Cơ thể cơ bản (Khuôn mặt bầu bĩnh, mắt to, má hồng)
+    const ASSET_BODY = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><defs><linearGradient id='skin' x1='0%' y1='0%' x2='100%' y2='0%'><stop offset='0%' stop-color='%23ffe6df'/><stop offset='100%' stop-color='%23ffccbc'/></linearGradient></defs><ellipse cx='150' cy='120' rx='50' ry='60' fill='url(%23skin)'/><path d='M 115 175 L 185 175 L 175 330 L 125 330 Z' fill='url(%23skin)'/><path d='M 125 330 L 125 480 Q 125 490 135 490 L 145 490 Q 155 490 155 480 L 155 330 Z' fill='url(%23skin)'/><path d='M 145 330 L 145 480 Q 145 490 155 490 L 165 490 Q 175 490 175 480 L 175 330 Z' fill='url(%23skin)'/><path d='M 115 185 Q 85 240 95 330 Q 105 340 115 330 Q 115 260 135 210 Z' fill='url(%23skin)'/><path d='M 185 185 Q 215 240 205 330 Q 195 340 185 330 Q 185 260 165 210 Z' fill='url(%23skin)'/><ellipse cx='125' cy='120' rx='10' ry='15' fill='%23333'/><ellipse cx='175' cy='120' rx='10' ry='15' fill='%23333'/><circle cx='122' cy='114' r='4' fill='%23fff'/><circle cx='172' cy='114' r='4' fill='%23fff'/><circle cx='128' cy='124' r='2' fill='%23fff' opacity='0.6'/><circle cx='178' cy='124' r='2' fill='%23fff' opacity='0.6'/><path d='M 145 145 Q 150 155 155 145' stroke='%23e91e63' stroke-width='3' fill='none' stroke-linecap='round'/><ellipse cx='105' cy='140' rx='8' ry='5' fill='%23ff9eb5' opacity='0.5'/><ellipse cx='195' cy='140' rx='8' ry='5' fill='%23ff9eb5' opacity='0.5'/></svg>";
+
+    // 2. Kho ảnh chuyên nghiệp
+    const ASSETS = {
+        hair: [
+            { 
+                id: 'h1', name: 'Tóc Tím Xoăn', 
+                back: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 90 100 Q 60 250 60 420 Q 80 450 100 420 Q 110 300 100 100 Z' fill='%23a18cd1'/><path d='M 210 100 Q 240 250 240 420 Q 220 450 200 420 Q 190 300 200 100 Z' fill='%23a18cd1'/></svg>", 
+                front: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 100 120 Q 100 40 150 40 Q 200 40 200 120 Q 200 160 150 160 Q 100 160 100 120 Z' fill='%23a18cd1'/><path d='M 90 100 Q 70 180 80 240 L 100 200 Z' fill='%23a18cd1'/><path d='M 210 100 Q 230 180 220 240 L 200 200 Z' fill='%23a18cd1'/></svg>" 
+            },
+            { 
+                id: 'h2', name: 'Tóc Vàng Twin', 
+                back: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 110 130 Q 70 250 60 350 Q 100 380 120 350 L 130 200 L 170 200 L 180 350 Q 200 380 240 350 Q 230 250 190 130 Z' fill='%23f8b500'/></svg>", 
+                front: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 110 110 Q 110 50 150 50 Q 190 50 190 110 Q 190 130 150 130 Q 110 130 110 110 Z' fill='%23f8b500'/><circle cx='105' cy='120' r='10' fill='%23ff6b9d'/><circle cx='195' cy='120' r='10' fill='%23ff6b9d'/></svg>" 
+            },
+            { 
+                id: 'h3', name: 'Tóc Xanh Bob', 
+                back: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 100 120 Q 90 180 100 250 Q 150 270 200 250 Q 210 180 200 120 Z' fill='%234facfe'/></svg>", 
+                front: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 100 120 Q 100 40 150 40 Q 200 40 200 120 Q 200 150 150 150 Q 100 150 100 120 Z' fill='%234facfe'/></svg>" 
+            }
+        ],
+        dress: [
+            { 
+                id: 'd1', name: 'Đầm Hồng Công Chúa', 
+                img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 120 180 L 180 180 L 190 300 L 110 300 Z' fill='%23ff6b9d'/><path d='M 110 300 L 190 300 L 240 460 Q 150 500 60 460 Z' fill='%23ff6b9d'/><path d='M 110 300 L 190 300 L 240 460 Q 150 500 60 460 Z' fill='none' stroke='%23fff' stroke-width='4' stroke-dasharray='6,6'/></svg>" 
+            },
+            { 
+                id: 'd2', name: 'Đầm Xanh Dạ Hội', 
+                img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 120 180 L 180 180 L 190 280 L 110 280 Z' fill='%234facfe'/><path d='M 110 280 L 190 280 L 220 380 Q 150 410 80 380 Z' fill='%234facfe'/><circle cx='150' cy='230' r='5' fill='%23fff'/></svg>" 
+            },
+            { 
+                id: 'd3', name: 'Đầm Vàng Dạ Tiệc', 
+                img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 125 180 L 175 180 L 185 280 L 115 280 Z' fill='%23f8b500'/><path d='M 115 280 L 185 280 L 200 400 Q 150 420 100 400 Z' fill='%23f8b500'/></svg>" 
+            }
+        ],
+        acc: [
+            { 
+                id: 'a1', name: 'Kính Trí Thức', 
+                img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><circle cx='125' cy='120' r='14' fill='none' stroke='%23333' stroke-width='4'/><circle cx='175' cy='120' r='14' fill='none' stroke='%23333' stroke-width='4'/><line x1='139' y1='120' x2='161' y2='120' stroke='%23333' stroke-width='4'/></svg>" 
+            },
+            { 
+                id: 'a2', name: 'Vương Miện Nữ Hoàng', 
+                img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><path d='M 110 70 L 120 30 L 140 50 L 150 20 L 160 50 L 180 30 L 190 70 Z' fill='%23ffd700'/><circle cx='150' cy='40' r='4' fill='%23ff0000'/></svg>" 
+            }
+        ],
+        bg: [
+            { id: 'b1', name: 'Studio Hồng', img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><rect width='300' height='550' fill='%23fce4ec'/></svg>" },
+            { id: 'b2', name: 'Sân Khấu Xanh', img: "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 550'><rect width='300' height='550' fill='%23e3f2fd'/></svg>" }
+        ]
+    };
+
+    // --- LOGIC GAME ---
+    let state = {
+        hair: 0, dress: 0, acc: -1, bg: 0, tab: 'hair'
+    };
+
+    const container = document.getElementById('items-container');
+    
+    function updateCharacter() {
+        document.getElementById('img-bg').src = ASSETS.bg[state.bg].img;
+        document.getElementById('img-body').src = ASSET_BODY;
+        document.getElementById('img-back-hair').src = ASSETS.hair[state.hair].back;
+        document.getElementById('img-front-hair').src = ASSETS.hair[state.hair].front;
+        document.getElementById('img-clothes').src = ASSETS.dress[state.dress].img;
+        
+        const accImg = document.getElementById('img-accessory');
+        if (state.acc >= 0) {
+            accImg.src = ASSETS.acc[state.acc].img;
+            accImg.style.display = 'block';
+        } else {
+            accImg.style.display = 'none';
+        }
+    }
+
+    function switchTab(tab, btn) {
+        state.tab = tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderItems();
+    }
+
+    function renderItems() {
+        container.innerHTML = '';
+        
+        if (state.tab === 'bg') {
+            ASSETS.bg.forEach((item, i) => {
+                const div = document.createElement('div');
+                div.className = `item-btn ${state.bg === i ? 'active' : ''}`;
+                div.innerHTML = `<img src="${item.img}">`;
+                div.onclick = () => { state.bg = i; updateCharacter(); renderItems(); };
+                container.appendChild(div);
+            });
+            return;
+        }
+
+        const items = ASSETS[state.tab];
+        
+        if (state.tab === 'acc') {
+            const noneDiv = document.createElement('div');
+            noneDiv.className = `item-btn ${state.acc === -1 ? 'active' : ''}`;
+            noneDiv.innerHTML = '<span style="font-size:24px; color:#999;">❌</span>';
+            noneDiv.onclick = () => { state.acc = -1; updateCharacter(); renderItems(); };
+            container.appendChild(noneDiv);
+        }
+
+        items.forEach((item, i) => {
+            const div = document.createElement('div');
+            div.className = `item-btn ${state[state.tab] === i ? 'active' : ''}`;
+            
+            if (state.tab === 'hair') {
+                div.innerHTML = `<img src="${item.front}" style="transform: scale(1.2);">`;
+            } else {
+                div.innerHTML = `<img src="${item.img}">`;
+            }
+            div.onclick = () => { state[state.tab] = i; updateCharacter(); renderItems(); };
+            container.appendChild(div);
+        });
+    }
+
+    function randomize() {
+        state.hair = Math.floor(Math.random() * ASSETS.hair.length);
+        state.dress = Math.floor(Math.random() * ASSETS.dress.length);
+        state.bg = Math.floor(Math.random() * ASSETS.bg.length);
+        state.acc = Math.random() > 0.5 ? Math.floor(Math.random() * ASSETS.acc.length) : -1;
+        updateCharacter();
+        renderItems();
+    }
+
+    function takePhoto() {
+        alert("📸 Đã chụp ảnh!");
+        const container = document.getElementById('avatar-wrapper');
+        container.style.transform = 'scale(1.1)';
+        setTimeout(() => container.style.transform = 'scale(1)', 200);
+    }
+
+    // Khởi tạo
+    renderItems();
+    updateCharacter();
 </script>
 </body>
 </html>
