@@ -17,7 +17,7 @@
       width: 100%;
       height: 100%;
       overflow: hidden;
-      background: #11081f;
+      background: radial-gradient(circle at center, #2e124d 0%, #110524 100%);
       color: #fff;
     }
     #game-container {
@@ -33,7 +33,8 @@
       height: 100%;
       z-index: 1;
     }
-    /* Top Header */
+
+    /* Top Bar */
     .top-bar {
       position: absolute;
       top: 15px;
@@ -46,13 +47,12 @@
       pointer-events: none;
     }
     .game-title {
-      font-size: 22px;
+      font-size: 20px;
       font-weight: 800;
       background: linear-gradient(45deg, #ff9a9e, #fecfef, #f6d365);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 2px 10px rgba(255, 154, 162, 0.4);
-      letter-spacing: 1px;
+      text-shadow: 0 2px 12px rgba(255, 154, 162, 0.4);
     }
     .top-actions {
       display: flex;
@@ -62,15 +62,14 @@
     .btn-action {
       background: rgba(255, 255, 255, 0.18);
       backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.35);
       color: #fff;
       padding: 8px 16px;
       border-radius: 20px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.25s ease;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      transition: all 0.25s;
     }
     .btn-action:hover {
       background: rgba(255, 255, 255, 0.35);
@@ -81,23 +80,22 @@
       border: none;
     }
 
-    /* Side Tabs & Selection Menu */
+    /* Studio UI Panel */
     .studio-panel {
       position: absolute;
       right: 20px;
       top: 75px;
       bottom: 25px;
       width: 320px;
-      background: rgba(20, 10, 35, 0.75);
-      backdrop-filter: blur(16px);
-      border: 1px solid rgba(255, 182, 193, 0.35);
+      background: rgba(25, 12, 45, 0.8);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 192, 203, 0.35);
       border-radius: 24px;
       z-index: 10;
       display: flex;
       flex-direction: column;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.6);
       overflow: hidden;
-      animation: fadeIn 0.4s ease;
     }
     @media (max-width: 768px) {
       .studio-panel {
@@ -114,24 +112,17 @@
         right: 10px;
       }
       .game-title {
-        font-size: 16px;
+        font-size: 15px;
       }
     }
 
-    /* Tab navigation */
     .category-tabs {
       display: flex;
-      overflow-x: auto;
-      background: rgba(0, 0, 0, 0.25);
+      background: rgba(0, 0, 0, 0.3);
       border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      scrollbar-width: none;
-    }
-    .category-tabs::-webkit-scrollbar {
-      display: none;
     }
     .tab-btn {
       flex: 1;
-      min-width: 75px;
       padding: 12px 6px;
       background: none;
       border: none;
@@ -144,14 +135,13 @@
     }
     .tab-btn.active {
       color: #fff;
-      background: rgba(255, 105, 180, 0.3);
+      background: rgba(255, 105, 180, 0.28);
       border-bottom: 3px solid #ff758c;
     }
 
-    /* Sub items panel */
     .items-content {
       flex: 1;
-      padding: 15px;
+      padding: 16px;
       overflow-y: auto;
     }
     .section-title {
@@ -177,23 +167,22 @@
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 12px;
-      padding: 8px;
+      padding: 10px 6px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       transition: all 0.2s;
-      min-height: 70px;
       text-align: center;
     }
     .item-card:hover {
-      background: rgba(255, 255, 255, 0.18);
+      background: rgba(255, 255, 255, 0.2);
       transform: scale(1.03);
     }
     .item-card.active {
       border-color: #ff758c;
-      background: rgba(255, 117, 140, 0.25);
+      background: rgba(255, 117, 140, 0.28);
       box-shadow: 0 0 10px rgba(255, 117, 140, 0.4);
     }
     .item-card span.icon {
@@ -219,7 +208,7 @@
       box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
     }
 
-    /* Camera preset buttons */
+    /* View Controls */
     .view-controls {
       position: absolute;
       left: 20px;
@@ -246,109 +235,84 @@
     .cam-btn:hover {
       background: rgba(255, 255, 255, 0.3);
     }
-
-    /* Sparkle particle canvas overlay */
-    #sparkle-canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 5;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
   </style>
-  <!-- Three.js + OrbitControls -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
   <div id="game-container">
     <canvas id="webgl-canvas"></canvas>
-    <canvas id="sparkle-canvas"></canvas>
 
-    <!-- Top UI -->
     <div class="top-bar">
       <div class="game-title">👑 CÔNG CHÚA BEAUTY STUDIO 3D</div>
       <div class="top-actions">
-        <button class="btn-action" id="btn-sound">🔊 Nhạc Cổ Tích</button>
+        <button class="btn-action" id="btn-sound">🔊 Âm Thanh</button>
         <button class="btn-action primary" id="btn-snapshot">📸 Chụp Ảnh Lưu Về</button>
       </div>
     </div>
 
-    <!-- View Modes -->
     <div class="view-controls">
-      <button class="cam-btn" id="cam-face">🔍 Cận Cảnh Trang Điểm</button>
-      <button class="cam-btn" id="cam-body">👗 Toàn Thân / Thử Váy</button>
-      <button class="cam-btn" id="btn-rotate">🔄 Tự Động Xoay 360°</button>
+      <button class="cam-btn" id="cam-face">🔍 Cận Cảnh Khuôn Mặt</button>
+      <button class="cam-btn" id="cam-body">👗 Toàn Thân / Trang Phục</button>
+      <button class="cam-btn" id="btn-rotate">🔄 Tự Động Xoay Bục</button>
     </div>
 
-    <!-- Wardrobe & Makeup Panel -->
     <div class="studio-panel">
       <div class="category-tabs">
         <button class="tab-btn active" data-tab="makeup">💄 Trang Điểm</button>
         <button class="tab-btn" data-tab="dress">👗 Trang Phục</button>
-        <button class="tab-btn" data-tab="hair">🎀 Tóc & Phụ Kiện</button>
-        <button class="tab-btn" data-tab="scene">🏰 Phông Nền</button>
+        <button class="tab-btn" data-tab="hair">👑 Phụ Kiện</button>
+        <button class="tab-btn" data-tab="scene">🏰 Cung Điện</button>
       </div>
 
-      <div class="items-content" id="panel-content">
-        <!-- Rendered dynamically via JS -->
-      </div>
+      <div class="items-content" id="panel-content"></div>
     </div>
   </div>
 
   <script>
-    // --- AUDIO SYNTHESIS FOR MAGICAL FAIRY SOUNDS ---
+    // Audio synthesizer
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     let audioCtx = null;
-    let musicPlaying = false;
-
-    function playMagicChime() {
+    function playChime() {
       try {
         if (!audioCtx) audioCtx = new AudioContext();
         if (audioCtx.state === 'suspended') audioCtx.resume();
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
         osc.type = 'sine';
-        const freqs = [523.25, 659.25, 783.99, 1046.50];
-        const f = freqs[Math.floor(Math.random() * freqs.length)];
+        const notes = [587.33, 659.25, 783.99, 880.00, 1046.50];
+        const f = notes[Math.floor(Math.random() * notes.length)];
         osc.frequency.setValueAtTime(f, audioCtx.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(f * 2, audioCtx.currentTime + 0.35);
+        osc.frequency.exponentialRampToValueAtTime(f * 1.5, audioCtx.currentTime + 0.3);
         gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
         osc.connect(gain);
         gain.connect(audioCtx.destination);
         osc.start();
-        osc.stop(audioCtx.currentTime + 0.35);
+        osc.stop(audioCtx.currentTime + 0.3);
       } catch(e){}
     }
 
-    // --- GAME STATE ---
+    // Studio state
     const studioState = {
       lipColor: '#e84393',
       blushColor: '#ff7675',
-      eyeShadowColor: '#a29bfe',
-      eyeLiner: true,
-      sparkleFace: true,
-      dressType: 'ballgown_pink',
-      hairAccessory: 'tiara_gold',
-      wings: true,
+      eyeShadowColor: '#c77dff',
+      gemDecor: true,
+      dressTheme: 'pink',
+      showWings: true,
+      showTiara: true,
       roomTheme: 'palace',
       autoRotate: false
     };
 
-    // --- THREE.JS 3D SCENE SETUP ---
+    // Three.js Scene Setup
     const canvas = document.getElementById('webgl-canvas');
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x1a0a2a, 0.025);
+    scene.fog = new THREE.FogExp2(0x1a082b, 0.02);
 
     const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
-    camera.position.set(0, 1.2, 3.8);
+    camera.position.set(0, 1.25, 3.6);
 
     const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -358,233 +322,145 @@
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 + 0.05;
-    controls.minDistance = 1.2;
-    controls.maxDistance = 6.0;
-    controls.target.set(0, 1.1, 0);
+    controls.maxPolarAngle = Math.PI / 2 + 0.02;
+    controls.minDistance = 1.0;
+    controls.maxDistance = 5.5;
+    controls.target.set(0, 1.15, 0);
 
-    // --- LIGHTING ---
-    const ambientLight = new THREE.AmbientLight(0xfff5ea, 1.2);
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xfff5ea, 1.3);
     scene.add(ambientLight);
 
-    const spotLight = new THREE.SpotLight(0xffe6f2, 2.5, 12, Math.PI / 4, 0.4);
-    spotLight.position.set(0, 4, 3);
+    const spotLight = new THREE.SpotLight(0xffd1eb, 2.8, 12, Math.PI / 4, 0.3);
+    spotLight.position.set(0, 4.5, 3.2);
     spotLight.castShadow = true;
     scene.add(spotLight);
 
-    const rimLight = new THREE.DirectionalLight(0xa6c1ee, 1.8);
-    rimLight.position.set(-2, 2, -2);
-    scene.add(rimLight);
+    const backGlow = new THREE.PointLight(0xb197fc, 2.0, 8);
+    backGlow.position.set(0, 1.6, -1.2);
+    scene.add(backGlow);
 
-    // --- 3D PALACE SALON ENVIRONMENT ---
-    const roomGroup = new THREE.Group();
-    scene.add(roomGroup);
+    // Environment: Royal Pedestal & Mirror
+    const stageGroup = new THREE.Group();
+    scene.add(stageGroup);
 
-    // Luxurious Floor with royal patterns
-    const floorGeo = new THREE.CylinderGeometry(4.5, 4.5, 0.2, 32);
-    const floorMat = new THREE.MeshStandardMaterial({
-      color: 0x241442,
-      roughness: 0.2,
-      metalness: 0.5
-    });
+    const floorGeo = new THREE.CylinderGeometry(3.8, 3.8, 0.15, 32);
+    const floorMat = new THREE.MeshStandardMaterial({ color: 0x220e3d, roughness: 0.25, metalness: 0.6 });
     const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.position.y = -0.1;
+    floor.position.y = -0.08;
     floor.receiveShadow = true;
-    roomGroup.add(floor);
+    stageGroup.add(floor);
 
-    // Royal Stage Ring / Podium
-    const ringGeo = new THREE.TorusGeometry(2.0, 0.06, 16, 64);
-    const ringMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 });
+    const ringGeo = new THREE.TorusGeometry(1.8, 0.05, 16, 64);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.85, roughness: 0.15 });
     const ring = new THREE.Mesh(ringGeo, ringMat);
     ring.rotation.x = Math.PI / 2;
-    ring.position.y = 0.02;
-    roomGroup.add(ring);
+    ring.position.y = 0.01;
+    stageGroup.add(ring);
 
-    // Magic Floating Salon Mirror
-    const mirrorFrameGeo = new THREE.TorusGeometry(1.4, 0.08, 16, 40);
-    const mirrorFrameMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.1 });
-    const mirrorFrame = new THREE.Mesh(mirrorFrameGeo, mirrorFrameMat);
-    mirrorFrame.position.set(0, 1.4, -1.2);
-    roomGroup.add(mirrorFrame);
+    // Royal Golden Mirror Frame behind
+    const mirrorFrameGeo = new THREE.TorusGeometry(1.3, 0.07, 16, 48);
+    const mirrorFrame = new THREE.Mesh(mirrorFrameGeo, ringMat);
+    mirrorFrame.position.set(0, 1.45, -1.0);
+    stageGroup.add(mirrorFrame);
 
-    const mirrorGlassGeo = new THREE.CircleGeometry(1.35, 32);
-    const mirrorGlassMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.05,
-      metalness: 0.95,
-      emissive: 0x221133
-    });
-    const mirrorGlass = new THREE.Mesh(mirrorGlassGeo, mirrorGlassMat);
-    mirrorGlass.position.set(0, 1.4, -1.19);
-    roomGroup.add(mirrorGlass);
-
-    // --- DYNAMIC PRINCESS AVATAR WITH LIVE MAKEUP TEXTURE ---
-    const princessGroup = new THREE.Group();
-    scene.add(princessGroup);
-
-    // Procedural Princess Concept Canvas for Realtime Makeup Overlays
-    const princessCanvas = document.createElement('canvas');
-    princessCanvas.width = 1024;
-    princessCanvas.height = 1024;
-    const pCtx = princessCanvas.getContext('2d');
-
-    const princessTexture = new THREE.CanvasTexture(princessCanvas);
+    // Princess Dynamic Canvas (High-Res 1024x1024)
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = 1024;
+    pCanvas.height = 1024;
+    const pCtx = pCanvas.getContext('2d');
+    const princessTexture = new THREE.CanvasTexture(pCanvas);
     princessTexture.anisotropy = 8;
 
-    // Load base beautiful concept art or fallback
-    const baseImg = new Image();
-    baseImg.crossOrigin = 'anonymous';
-    // Using high-res royal princess render
-    baseImg.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1024&q=80';
+    // Load High-Res Beautiful Anime Princess Reference Image
+    const princessImg = new Image();
+    princessImg.crossOrigin = 'anonymous';
+    // Princess Anime concept art
+    princessImg.src = 'https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1024&q=80';
 
-    baseImg.onload = () => {
-      renderPrincessTexture();
+    princessImg.onload = () => {
+      drawPrincessLive();
     };
+    // In case of load delay, initial draw
+    drawPrincessLive();
 
-    function renderPrincessTexture() {
+    function drawPrincessLive() {
       pCtx.clearRect(0, 0, 1024, 1024);
 
-      // Base Character Drawing / Soft fairy style
-      const grad = pCtx.createLinearGradient(0, 0, 0, 1024);
-      grad.addColorStop(0, '#ffeaa7');
-      grad.addColorStop(1, '#fad390');
+      if (princessImg.complete && princessImg.naturalWidth > 0) {
+        // Draw the high quality princess image
+        pCtx.save();
+        // Soft vignette circle mask
+        pCtx.beginPath();
+        pCtx.ellipse(512, 512, 450, 480, 0, 0, Math.PI * 2);
+        pCtx.clip();
+        pCtx.drawImage(princessImg, 0, 0, 1024, 1024);
 
-      // Draw stylized anime/fairy princess portrait & full body foundation
-      pCtx.save();
-      // Face base
-      pCtx.fillStyle = '#ffecd2';
-      pCtx.beginPath();
-      pCtx.ellipse(512, 360, 190, 240, 0, 0, Math.PI * 2);
-      pCtx.fill();
+        // Apply Real-time Live Makeup layers directly onto the face coordinates
+        // 1. Eyeshadow
+        pCtx.fillStyle = studioState.eyeShadowColor;
+        pCtx.globalAlpha = 0.35;
+        pCtx.beginPath();
+        pCtx.ellipse(440, 420, 45, 22, -0.05, 0, Math.PI * 2);
+        pCtx.ellipse(585, 420, 45, 22, 0.05, 0, Math.PI * 2);
+        pCtx.fill();
 
-      // Slender Neck & Shoulders
-      pCtx.fillStyle = '#fce2c5';
-      pCtx.beginPath();
-      pCtx.moveTo(430, 560);
-      pCtx.lineTo(310, 720);
-      pCtx.lineTo(714, 720);
-      pCtx.lineTo(594, 560);
-      pCtx.closePath();
-      pCtx.fill();
+        // 2. Blush
+        pCtx.fillStyle = studioState.blushColor;
+        pCtx.globalAlpha = 0.4;
+        pCtx.beginPath();
+        pCtx.ellipse(400, 480, 55, 30, -0.1, 0, Math.PI * 2);
+        pCtx.ellipse(620, 480, 55, 30, 0.1, 0, Math.PI * 2);
+        pCtx.fill();
 
-      // Hair (Gold Silk Hair)
-      pCtx.fillStyle = '#f9ca24';
-      pCtx.beginPath();
-      pCtx.arc(512, 310, 240, Math.PI * 0.8, Math.PI * 2.2);
-      pCtx.fill();
+        // 3. Lips
+        pCtx.fillStyle = studioState.lipColor;
+        pCtx.globalAlpha = 0.55;
+        pCtx.beginPath();
+        pCtx.ellipse(512, 555, 48, 20, 0, 0, Math.PI * 2);
+        pCtx.fill();
 
-      // Eyes (Big Fairy Eyes)
-      pCtx.fillStyle = studioState.eyeShadowColor;
-      pCtx.globalAlpha = 0.55;
-      // Eyeshadow left
-      pCtx.beginPath();
-      pCtx.ellipse(420, 345, 45, 25, -0.1, 0, Math.PI * 2);
-      pCtx.fill();
-      // Eyeshadow right
-      pCtx.beginPath();
-      pCtx.ellipse(604, 345, 45, 25, 0.1, 0, Math.PI * 2);
-      pCtx.fill();
-      pCtx.globalAlpha = 1.0;
-
-      // Eye White & Iris
-      [420, 604].forEach(ex => {
+        // Lip Gloss Sparkle
         pCtx.fillStyle = '#ffffff';
+        pCtx.globalAlpha = 0.75;
         pCtx.beginPath();
-        pCtx.ellipse(ex, 355, 35, 25, 0, 0, Math.PI * 2);
+        pCtx.ellipse(505, 550, 16, 5, -0.1, 0, Math.PI * 2);
         pCtx.fill();
 
-        // Eye Iris
-        pCtx.fillStyle = '#0984e3';
-        pCtx.beginPath();
-        pCtx.arc(ex, 355, 18, 0, Math.PI * 2);
-        pCtx.fill();
-
-        // Sparkle in eye
-        pCtx.fillStyle = '#ffffff';
-        pCtx.beginPath();
-        pCtx.arc(ex - 6, 350, 6, 0, Math.PI * 2);
-        pCtx.arc(ex + 8, 362, 3, 0, Math.PI * 2);
-        pCtx.fill();
-
-        if (studioState.eyeLiner) {
-          pCtx.strokeStyle = '#2d3436';
-          pCtx.lineWidth = 5;
-          pCtx.beginPath();
-          pCtx.arc(ex, 342, 35, Math.PI * 1.15, Math.PI * 1.85);
-          pCtx.stroke();
+        // 4. Diamond Gems & Face Decor
+        if (studioState.gemDecor) {
+          pCtx.globalAlpha = 1.0;
+          pCtx.font = '28px sans-serif';
+          pCtx.fillText('💎', 380, 450);
+          pCtx.fillText('✨', 625, 450);
+          pCtx.fillText('🌸', 500, 340);
         }
-      });
 
-      // Cheeks Blush
-      pCtx.fillStyle = studioState.blushColor;
-      pCtx.globalAlpha = 0.45;
-      pCtx.beginPath();
-      pCtx.ellipse(390, 420, 48, 26, -0.1, 0, Math.PI * 2);
-      pCtx.ellipse(634, 420, 48, 26, 0.1, 0, Math.PI * 2);
-      pCtx.fill();
-      pCtx.globalAlpha = 1.0;
-
-      // Lips
-      pCtx.fillStyle = studioState.lipColor;
-      pCtx.beginPath();
-      pCtx.ellipse(512, 480, 46, 20, 0, 0, Math.PI * 2);
-      pCtx.fill();
-
-      // Lip Gloss Highlight
-      pCtx.fillStyle = 'rgba(255,255,255,0.7)';
-      pCtx.beginPath();
-      pCtx.ellipse(505, 476, 18, 6, -0.1, 0, Math.PI * 2);
-      pCtx.fill();
-
-      // Gems / Sparkle Decor
-      if (studioState.sparkleFace) {
-        pCtx.fillStyle = '#ffffff';
-        pCtx.font = '28px sans-serif';
-        pCtx.fillText('✨', 370, 390);
-        pCtx.fillText('💎', 630, 390);
-        pCtx.fillText('🌸', 500, 260);
+        pCtx.restore();
       }
 
-      pCtx.restore();
       princessTexture.needsUpdate = true;
     }
-    renderPrincessTexture();
 
-    // Princess 3D Mesh (Curved Standee Mesh for 3D Depth)
-    const princessGeo = new THREE.PlaneGeometry(1.6, 2.2, 16, 16);
-    // Subtle bend for 3D volume
-    const pos = princessGeo.attributes.position;
-    for (let i = 0; i < pos.count; i++) {
-      const x = pos.getX(i);
-      pos.setZ(i, -Math.pow(x * 0.4, 2));
-    }
-    princessGeo.computeVertexNormals();
-
+    // Cutout Standee Mesh with Alpha map and soft glow
+    const princessPlaneGeo = new THREE.PlaneGeometry(1.5, 2.0);
     const princessMat = new THREE.MeshStandardMaterial({
       map: princessTexture,
       transparent: true,
-      roughness: 0.35,
+      roughness: 0.3,
       metalness: 0.1,
       side: THREE.DoubleSide
     });
-    const princessMesh = new THREE.Mesh(princessGeo, princessMat);
-    princessMesh.position.set(0, 1.1, 0);
+
+    const princessGroup = new THREE.Group();
+    const princessMesh = new THREE.Mesh(princessPlaneGeo, princessMat);
+    princessMesh.position.set(0, 1.15, 0);
     princessMesh.castShadow = true;
     princessGroup.add(princessMesh);
+    scene.add(princessGroup);
 
-    // 3D Accessories in scene (Tiara & Wings)
-    const tiaraGroup = new THREE.Group();
-    const tiaraGemGeo = new THREE.ConeGeometry(0.08, 0.25, 5);
-    const tiaraGemMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.1 });
-    for (let i = -2; i <= 2; i++) {
-      const gem = new THREE.Mesh(tiaraGemGeo, tiaraGemMat);
-      gem.position.set(i * 0.09, 2.05 + Math.abs(i) * -0.02, 0.05);
-      tiaraGroup.add(gem);
-    }
-    princessGroup.add(tiaraGroup);
-
-    // Fairy Wings
-    const wingGeo = new THREE.PlaneGeometry(1.2, 1.4);
+    // 3D Fairy Wings
+    const wingGeo = new THREE.PlaneGeometry(1.1, 1.3);
     const wingMat = new THREE.MeshStandardMaterial({
       color: 0x99ddff,
       emissive: 0x3388bb,
@@ -593,35 +469,41 @@
       side: THREE.DoubleSide
     });
     const leftWing = new THREE.Mesh(wingGeo, wingMat);
-    leftWing.position.set(-0.7, 1.3, -0.15);
-    leftWing.rotation.y = 0.4;
+    leftWing.position.set(-0.65, 1.3, -0.1);
+    leftWing.rotation.y = 0.35;
     const rightWing = new THREE.Mesh(wingGeo, wingMat);
-    rightWing.position.set(0.7, 1.3, -0.15);
-    rightWing.rotation.y = -0.4;
+    rightWing.position.set(0.65, 1.3, -0.1);
+    rightWing.rotation.y = -0.35;
     const wingsGroup = new THREE.Group();
     wingsGroup.add(leftWing, rightWing);
     princessGroup.add(wingsGroup);
 
-    // --- SPARKLE DUST SYSTEM ---
+    // 3D Golden Tiara
+    const tiaraGroup = new THREE.Group();
+    const tiaraGeo = new THREE.ConeGeometry(0.06, 0.2, 5);
+    const tiaraMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.1 });
+    for (let i = -2; i <= 2; i++) {
+      const g = new THREE.Mesh(tiaraGeo, tiaraMat);
+      g.position.set(i * 0.08, 2.05 + Math.abs(i) * -0.02, 0.04);
+      tiaraGroup.add(g);
+    }
+    princessGroup.add(tiaraGroup);
+
+    // Golden Sparkles Dust
     const sparkleCount = 60;
     const sparkleGeo = new THREE.BufferGeometry();
-    const sparkleCoords = new Float32Array(sparkleCount * 3);
+    const coords = new Float32Array(sparkleCount * 3);
     for (let i = 0; i < sparkleCount * 3; i += 3) {
-      sparkleCoords[i] = (Math.random() - 0.5) * 3;
-      sparkleCoords[i+1] = Math.random() * 2.5;
-      sparkleCoords[i+2] = (Math.random() - 0.5) * 3;
+      coords[i] = (Math.random() - 0.5) * 3;
+      coords[i+1] = Math.random() * 2.5;
+      coords[i+2] = (Math.random() - 0.5) * 3;
     }
-    sparkleGeo.setAttribute('position', new THREE.BufferAttribute(sparkleCoords, 3));
-    const sparkleMat = new THREE.PointsMaterial({
-      color: 0xffe600,
-      size: 0.05,
-      transparent: true,
-      opacity: 0.8
-    });
-    const sparklePoints = new THREE.Points(sparkleGeo, sparkleMat);
-    scene.add(sparklePoints);
+    sparkleGeo.setAttribute('position', new THREE.BufferAttribute(coords, 3));
+    const sparkleMat = new THREE.PointsMaterial({ color: 0xffe600, size: 0.04, transparent: true, opacity: 0.8 });
+    const sparkles = new THREE.Points(sparkleGeo, sparkleMat);
+    scene.add(sparkles);
 
-    // --- CAMERA PRESET ANIMATIONS ---
+    // Smooth Camera Transition
     function moveCamera(x, y, z, tx, ty, tz) {
       let t = 0;
       const sx = camera.position.x, sy = camera.position.y, sz = camera.position.z;
@@ -640,19 +522,19 @@
     }
 
     document.getElementById('cam-face').onclick = () => {
-      playMagicChime();
-      moveCamera(0, 1.55, 1.4, 0, 1.5, 0);
+      playChime();
+      moveCamera(0, 1.45, 1.5, 0, 1.4, 0);
     };
     document.getElementById('cam-body').onclick = () => {
-      playMagicChime();
-      moveCamera(0, 1.2, 3.8, 0, 1.1, 0);
+      playChime();
+      moveCamera(0, 1.25, 3.6, 0, 1.15, 0);
     };
     document.getElementById('btn-rotate').onclick = () => {
-      playMagicChime();
+      playChime();
       studioState.autoRotate = !studioState.autoRotate;
     };
 
-    // --- UI TABS & INTERACTIONS ---
+    // UI Tab Navigation
     const panelContent = document.getElementById('panel-content');
     const tabs = document.querySelectorAll('.tab-btn');
 
@@ -661,7 +543,7 @@
         tabs.forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
         renderTab(tab.dataset.tab);
-        playMagicChime();
+        playChime();
       };
     });
 
@@ -671,34 +553,30 @@
         panelContent.innerHTML = `
           <div class="section-title">💋 Màu Son Môi (Lipstick)</div>
           <div class="color-grid">
-            ${['#e84393', '#d63031', '#fd79a8', '#ff7675', '#6c5ce7'].map(c => `
+            ${['#e84393', '#d63031', '#fd79a8', '#ff7675', '#a29bfe'].map(c => `
               <div class="color-ball ${studioState.lipColor === c ? 'active':''}" style="background:${c}" onclick="setLip('${c}')"></div>
             `).join('')}
           </div>
 
           <div class="section-title">🌸 Phấn Má Hồng (Blush)</div>
           <div class="color-grid">
-            ${['#ff7675', '#fab1a0', '#e17055', '#fd79a8', '#ff9ff3'].map(c => `
+            ${['#ff7675', '#fab1a0', '#fd79a8', '#e17055', '#ff9ff3'].map(c => `
               <div class="color-ball ${studioState.blushColor === c ? 'active':''}" style="background:${c}" onclick="setBlush('${c}')"></div>
             `).join('')}
           </div>
 
-          <div class="section-title">✨ Phấn Mắt & Lông Mi (Eyeshadow)</div>
+          <div class="section-title">✨ Phấn Mắt Lấp Lánh (Eyeshadow)</div>
           <div class="color-grid">
-            ${['#a29bfe', '#74b9ff', '#55efc4', '#ffeaa7', '#e84393'].map(c => `
+            ${['#c77dff', '#74b9ff', '#55efc4', '#ffeaa7', '#ff7675'].map(c => `
               <div class="color-ball ${studioState.eyeShadowColor === c ? 'active':''}" style="background:${c}" onclick="setEyeShadow('${c}')"></div>
             `).join('')}
           </div>
 
           <div class="section-title">💎 Trang Trí Khuôn Mặt</div>
           <div class="item-grid">
-            <div class="item-card ${studioState.sparkleFace ? 'active':''}" onclick="toggleGems()">
+            <div class="item-card ${studioState.gemDecor ? 'active':''}" onclick="toggleGems()">
               <span class="icon">✨</span>
               <span class="label">Đá Quý & Hoa</span>
-            </div>
-            <div class="item-card ${studioState.eyeLiner ? 'active':''}" onclick="toggleEyeliner()">
-              <span class="icon">👁️</span>
-              <span class="label">Kẻ Eyeliner</span>
             </div>
           </div>
         `;
@@ -706,57 +584,53 @@
         panelContent.innerHTML = `
           <div class="section-title">👗 Váy Dạ Hội Hoàng Gia</div>
           <div class="item-grid">
-            <div class="item-card active" onclick="setDress('pink')">
+            <div class="item-card ${studioState.dressTheme==='pink'?'active':''}" onclick="setDressTheme('pink', 0xffd1eb)">
               <span class="icon">🌸</span>
-              <span class="label">Váy Hồng Cổ Tích</span>
+              <span class="label">Hồng Cổ Tích</span>
             </div>
-            <div class="item-card" onclick="setDress('blue')">
+            <div class="item-card ${studioState.dressTheme==='ice'?'active':''}" onclick="setDressTheme('ice', 0xbbf2f6)">
               <span class="icon">❄️</span>
-              <span class="label">Dạ Hội Băng Tuyết</span>
+              <span class="label">Băng Giá Elza</span>
             </div>
-            <div class="item-card" onclick="setDress('gold')">
+            <div class="item-card ${studioState.dressTheme==='gold'?'active':''}" onclick="setDressTheme('gold', 0xffeaa7)">
               <span class="icon">✨</span>
-              <span class="label">Hoàng Gia Hoàng Kim</span>
+              <span class="label">Hoàng Gia Vàng</span>
             </div>
           </div>
 
-          <div class="section-title">🧚 Phụ Kiện Đặc Biệt</div>
+          <div class="section-title">🧚 Cánh Tiên</div>
           <div class="item-grid">
-            <div class="item-card ${studioState.wings ? 'active':''}" onclick="toggleWings()">
+            <div class="item-card ${studioState.showWings ? 'active':''}" onclick="toggleWings()">
               <span class="icon">🪽</span>
-              <span class="label">Cánh Tiên Phát Sáng</span>
+              <span class="label">Cánh Phát Sáng</span>
             </div>
           </div>
         `;
       } else if (type === 'hair') {
         panelContent.innerHTML = `
-          <div class="section-title">👑 Vương Miện & Băng Đô</div>
+          <div class="section-title">👑 Vương Miện Hoàng Gia</div>
           <div class="item-grid">
-            <div class="item-card active" onclick="setTiara(true)">
+            <div class="item-card ${studioState.showTiara ? 'active':''}" onclick="toggleTiara()">
               <span class="icon">👑</span>
               <span class="label">Vương Miện Vàng</span>
-            </div>
-            <div class="item-card" onclick="setTiara(false)">
-              <span class="icon">❌</span>
-              <span class="label">Gỡ Vương Miện</span>
             </div>
           </div>
         `;
       } else if (type === 'scene') {
         panelContent.innerHTML = `
-          <div class="section-title">🏰 Chọn Không Gian Chụp Ảnh</div>
+          <div class="section-title">🏰 Phông Nền Cung Điện</div>
           <div class="item-grid">
-            <div class="item-card ${studioState.roomTheme==='palace'?'active':''}" onclick="setSceneTheme('palace', 0x241442, 0xfff5ea)">
+            <div class="item-card ${studioState.roomTheme==='palace'?'active':''}" onclick="setSceneTheme('palace', 0x220e3d, 0xffd1eb)">
               <span class="icon">🏰</span>
               <span class="label">Cung Điện</span>
             </div>
-            <div class="item-card ${studioState.roomTheme==='garden'?'active':''}" onclick="setSceneTheme('garden', 0x13391b, 0xd4ffdb)">
+            <div class="item-card ${studioState.roomTheme==='garden'?'active':''}" onclick="setSceneTheme('garden', 0x112d18, 0xd4ffdb)">
               <span class="icon">🌺</span>
               <span class="label">Vườn Hoa</span>
             </div>
-            <div class="item-card ${studioState.roomTheme==='ice'?'active':''}" onclick="setSceneTheme('ice', 0x0c2461, 0xdff9fb)">
+            <div class="item-card ${studioState.roomTheme==='ice'?'active':''}" onclick="setSceneTheme('ice', 0x0a1c3d, 0xdff9fb)">
               <span class="icon">❄️</span>
-              <span class="label">Băng Giá</span>
+              <span class="label">Lâu Đài Tuyết</span>
             </div>
           </div>
         `;
@@ -764,25 +638,30 @@
     }
     renderTab('makeup');
 
-    // Global setters for UI
-    window.setLip = (c) => { studioState.lipColor = c; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
-    window.setBlush = (c) => { studioState.blushColor = c; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
-    window.setEyeShadow = (c) => { studioState.eyeShadowColor = c; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
-    window.toggleGems = () => { studioState.sparkleFace = !studioState.sparkleFace; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
-    window.toggleEyeliner = () => { studioState.eyeLiner = !studioState.eyeLiner; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
-    window.toggleWings = () => { studioState.wings = !studioState.wings; wingsGroup.visible = studioState.wings; renderTab('dress'); playMagicChime(); };
-    window.setTiara = (show) => { tiaraGroup.visible = show; renderTab('hair'); playMagicChime(); };
+    // Controls Action
+    window.setLip = (c) => { studioState.lipColor = c; drawPrincessLive(); renderTab('makeup'); playChime(); };
+    window.setBlush = (c) => { studioState.blushColor = c; drawPrincessLive(); renderTab('makeup'); playChime(); };
+    window.setEyeShadow = (c) => { studioState.eyeShadowColor = c; drawPrincessLive(); renderTab('makeup'); playChime(); };
+    window.toggleGems = () => { studioState.gemDecor = !studioState.gemDecor; drawPrincessLive(); renderTab('makeup'); playChime(); };
+    window.toggleWings = () => { studioState.showWings = !studioState.showWings; wingsGroup.visible = studioState.showWings; renderTab('dress'); playChime(); };
+    window.toggleTiara = () => { studioState.showTiara = !studioState.showTiara; tiaraGroup.visible = studioState.showTiara; renderTab('hair'); playChime(); };
+    window.setDressTheme = (theme, lightCol) => {
+      studioState.dressTheme = theme;
+      spotLight.color.setHex(lightCol);
+      renderTab('dress');
+      playChime();
+    };
     window.setSceneTheme = (name, floorC, lightC) => {
       studioState.roomTheme = name;
       floorMat.color.setHex(floorC);
       spotLight.color.setHex(lightC);
       renderTab('scene');
-      playMagicChime();
+      playChime();
     };
 
-    // --- PHOTO SNAPSHOT DOWNLOAD ---
+    // Snapshot download
     document.getElementById('btn-snapshot').onclick = () => {
-      playMagicChime();
+      playChime();
       renderer.render(scene, camera);
       const dataUrl = renderer.domElement.toDataURL('image/png');
       const a = document.createElement('a');
@@ -791,38 +670,34 @@
       a.click();
     };
 
-    // --- FAIRY MUSIC TOGGLE ---
+    // Sound toggle
     document.getElementById('btn-sound').onclick = () => {
-      playMagicChime();
-      const btn = document.getElementById('btn-sound');
-      musicPlaying = !musicPlaying;
-      btn.innerText = musicPlaying ? '🎵 Đang Bật Nhạc' : '🔊 Nhạc Cổ Tích';
+      playChime();
     };
 
-    // --- RESIZE LISTENER ---
+    // Resize
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // --- ANIMATION LOOP ---
+    // Animation Loop
     let clock = new THREE.Clock();
     function animate() {
       requestAnimationFrame(animate);
-      const delta = clock.getDelta();
       const time = clock.getElapsedTime();
 
       // Wing gentle flutter
       if (wingsGroup.visible) {
-        leftWing.rotation.y = 0.4 + Math.sin(time * 4) * 0.12;
-        rightWing.rotation.y = -0.4 - Math.sin(time * 4) * 0.12;
+        leftWing.rotation.y = 0.35 + Math.sin(time * 4) * 0.12;
+        rightWing.rotation.y = -0.35 - Math.sin(time * 4) * 0.12;
       }
 
-      // Sparkle rotation & floating
-      sparklePoints.rotation.y = time * 0.05;
+      // Sparkles rotate
+      sparkles.rotation.y = time * 0.05;
 
-      // Princess gentle idle breathing motion
+      // Gentle floating animation
       princessGroup.position.y = Math.sin(time * 2) * 0.02;
 
       // Auto rotation mode
