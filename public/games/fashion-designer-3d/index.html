@@ -174,30 +174,6 @@
     background:rgba(255,255,255,.04);margin-bottom:4px}
   .pl .dot{width:7px;height:7px}
 
-
-  /* Mobile touch controls */
-  #mobileControls{display:none;position:absolute;inset:0;z-index:26;pointer-events:none;touch-action:none}
-  #joystickBase{position:absolute;left:16px;bottom:92px;width:120px;height:120px;border-radius:50%;background:rgba(35,18,58,.55);border:2px solid #ffffff80;box-shadow:0 5px 22px #0006;pointer-events:auto;touch-action:none}
-  #joystickKnob{position:absolute;left:50%;top:50%;width:52px;height:52px;border-radius:50%;transform:translate(-50%,-50%);background:linear-gradient(145deg,#ff9ecb,#8755ff);border:2px solid white;box-shadow:0 3px 12px #0008;pointer-events:none}
-  #runButton{position:absolute;right:20px;bottom:105px;width:70px;height:70px;border-radius:50%;border:2px solid white;background:linear-gradient(145deg,#ffc857,#ff7b35);color:#321500;font-size:13px;font-weight:900;box-shadow:0 5px 18px #0008;pointer-events:auto;touch-action:none}
-  #cameraHint{position:absolute;right:12px;bottom:184px;padding:6px 10px;border-radius:14px;color:white;background:#190a2a99;font-size:10px;pointer-events:none}
-  @media(max-width:820px),(pointer:coarse){
-    #mobileControls{display:block}
-    #fullscreenBtn{font-size:0;width:34px;height:32px;padding:0}
-    #fullscreenBtn:after{content:'⛶';font-size:19px}
-    #topbar{gap:5px;padding:0 6px;height:46px}
-    #topbar .logo{font-size:11px;letter-spacing:0}
-    #netPill{padding:4px 7px;font-size:10px}
-    #toolbar{height:66px;justify-content:flex-start;padding-bottom:env(safe-area-inset-bottom,0px)}
-    .tool{min-width:48px;padding:4px 6px}
-    .tool .ic{font-size:17px}.tool .lb{font-size:8px}
-    .side{top:50px;bottom:76px;max-height:calc(100dvh - 126px)}
-    #joystickBase{bottom:calc(78px + env(safe-area-inset-bottom,0px))}
-    #runButton{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
-    #cameraHint{bottom:calc(174px + env(safe-area-inset-bottom,0px))}
-  }
-  @media(max-width:420px){#topbar .logo{max-width:105px;overflow:hidden;text-overflow:ellipsis}#joystickBase{width:108px;height:108px;left:12px}#joystickKnob{width:48px;height:48px}#runButton{width:64px;height:64px;right:14px}}
-
   /* ---------- MOBILE ---------- */
   #toggleLeft,#toggleRight{display:none}
   @media (max-width:820px){
@@ -282,7 +258,6 @@
     <div class="tool" data-act="help"><span class="ic">❓</span><span class="lb">Trợ giúp</span></div>
   </div>
 
-  <div id="mobileControls" aria-label="Điều khiển cảm ứng"><div id="joystickBase"><div id="joystickKnob"></div></div><button id="runButton" type="button">🏃 CHẠY</button><div id="cameraHint">Vuốt bên phải để xoay camera</div></div>
   <div id="toasts"></div>
 
   <!-- MODAL -->
@@ -326,7 +301,7 @@ const STATE = {
   contest:{active:false, theme:null, endsAt:0, locked:false, myScore:null, results:[]},
   photoMode:false,
   playerName:localStorage.getItem('pw_name')||'Bạn',
-  moveKeys:{}, touchMove:{x:0,y:0}, touchRun:false, walking:false, lastMoveSent:0,
+  moveKeys:{}, walking:false, lastMoveSent:0,
   history:[], future:[]
 };
 
@@ -467,24 +442,12 @@ function installPlayerControls(){
 }
 function updatePlayerMovement(){
   const root=STATE.avatar,cam=STATE.camera,engine=STATE.engine;if(!root||!cam||!engine)return;
-  const k=STATE.moveKeys||{},touch=STATE.touchMove||{x:0,y:0};let f=(k.w||k.arrowup?1:0)-(k.s||k.arrowdown?1:0)-touch.y;let side=(k.d||k.arrowright?1:0)-(k.a||k.arrowleft?1:0)+touch.x;
+  const k=STATE.moveKeys||{};let f=(k.w||k.arrowup?1:0)-(k.s||k.arrowdown?1:0);let side=(k.d||k.arrowright?1:0)-(k.a||k.arrowleft?1:0);
   if($('modal').classList.contains('show')){STATE.walking=false;return;}const moving=f!==0||side!==0;STATE.walking=moving;if(!moving)return;
   const len=Math.hypot(f,side)||1;f/=len;side/=len;const a=cam.alpha,fx=-Math.cos(a),fz=-Math.sin(a),rx=-Math.sin(a),rz=Math.cos(a);const dx=rx*side+fx*f,dz=rz*side+fz*f;
-  const speed=(k.shift||STATE.touchRun?3.8:2.25)*(engine.getDeltaTime()/1000);root.position.x=BABYLON.Scalar.Clamp(root.position.x+dx*speed,-3.35,3.35);root.position.z=BABYLON.Scalar.Clamp(root.position.z+dz*speed,-2.65,2.65);root.rotation.y=Math.atan2(dx,dz);
+  const speed=(k.shift?3.8:2.25)*(engine.getDeltaTime()/1000);root.position.x=BABYLON.Scalar.Clamp(root.position.x+dx*speed,-3.35,3.35);root.position.z=BABYLON.Scalar.Clamp(root.position.z+dz*speed,-2.65,2.65);root.rotation.y=Math.atan2(dx,dz);
   const target=new BABYLON.Vector3(root.position.x,1.05,root.position.z);cam.target=BABYLON.Vector3.Lerp(cam.target,target,Math.min(1,engine.getDeltaTime()/100));
   const mp=STATE.multiplayer,now=performance.now();if(mp.ws&&mp.connected&&mp.ws.readyState===WebSocket.OPEN&&now-STATE.lastMoveSent>80){STATE.lastMoveSent=now;try{mp.ws.send(JSON.stringify({type:'move',pos:{x:root.position.x,y:root.position.y,z:root.position.z},rot:root.rotation.y,anim:'walk'}));}catch(e){}}
-}
-function setupTouchControls(){
-  const base=$('joystickBase'),knob=$('joystickKnob'),run=$('runButton');if(!base||!knob||!run)return;
-  let pointer=null,cx=0,cy=0;
-  const reset=()=>{STATE.touchMove={x:0,y:0};pointer=null;knob.style.transform='translate(-50%,-50%)';};
-  const move=e=>{if(pointer!==e.pointerId)return;const max=base.clientWidth*.34,dx=e.clientX-cx,dy=e.clientY-cy,d=Math.hypot(dx,dy),scale=d>max?max/d:1,x=dx*scale,y=dy*scale;knob.style.transform='translate(calc(-50% + '+x+'px),calc(-50% + '+y+'px))';STATE.touchMove={x:x/max,y:y/max};};
-  base.addEventListener('pointerdown',e=>{e.preventDefault();pointer=e.pointerId;base.setPointerCapture(e.pointerId);const r=base.getBoundingClientRect();cx=r.left+r.width/2;cy=r.top+r.height/2;move(e);});
-  base.addEventListener('pointermove',move);base.addEventListener('pointerup',e=>{if(pointer===e.pointerId)reset();});base.addEventListener('pointercancel',reset);base.addEventListener('lostpointercapture',reset);
-  const stop=()=>{STATE.touchRun=false;run.style.filter='';};
-  run.addEventListener('pointerdown',e=>{e.preventDefault();STATE.touchRun=true;run.setPointerCapture(e.pointerId);run.style.filter='brightness(1.2)';});
-  run.addEventListener('pointerup',stop);run.addEventListener('pointercancel',stop);run.addEventListener('lostpointercapture',stop);
-  document.addEventListener('visibilitychange',()=>{if(document.hidden){reset();stop();}});
 }
 function setupFullscreen(){
   const btn=$('fullscreenBtn');if(!btn)return;const refresh=()=>{btn.textContent=document.fullscreenElement?'⛶ Thu nhỏ':'⛶ Toàn màn hình';};
@@ -1736,7 +1699,7 @@ function openRightPanel(){ $('rightPanel').classList.remove('hidden'); }
 function openHelp(){
   openModal(`
     <h2>❓ Hướng dẫn & Giới hạn</h2>
-    <p><b>Di chuyển:</b> Trên điện thoại: kéo joystick bên trái để di chuyển, giữ nút CHẠY để chạy nhanh và vuốt bên phải để xoay camera. Trên máy tính: dùng W/A/S/D hoặc phím mũi tên, giữ Shift để chạy. Tên người chơi hiển thị phía trên đầu nhân vật.</p>
+    <p><b>Di chuyển:</b> Dùng W/A/S/D hoặc phím mũi tên để đi theo hướng camera; giữ Shift để chạy. Kéo chuột để xoay góc nhìn. Tên người chơi hiển thị phía trên đầu nhân vật.</p>
     <p><b>Toàn màn hình:</b> Nhấn nút ⛶ trên thanh phía trên để mở rộng game.</p>
     <p><b>Làm đẹp:</b> Chọn tab 💄 Trang điểm hoặc 👗 Tủ đồ để thay đổi nhân vật 3D.</p>
     <p><b>Thi đấu:</b> Chọn 🏆 Thi đấu → chọn chủ đề → 5 phút chuẩn bị → tự động khóa và chấm điểm minh bạch theo 6 tiêu chí.</p>
@@ -1783,7 +1746,7 @@ function init(){
   }
   try{
     loadLocal();
-    installPlayerControls(); setupFullscreen(); setupTouchControls();
+    installPlayerControls(); setupFullscreen();
     setLoad(35,'Đang dựng phòng Beauty Studio…');
     bootBabylon();
     setLoad(70,'Đang tạo nhân vật công chúa…');
