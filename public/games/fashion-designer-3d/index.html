@@ -445,7 +445,7 @@ function updatePlayerMovement(){
   const k=STATE.moveKeys||{};let f=(k.w||k.arrowup?1:0)-(k.s||k.arrowdown?1:0);let side=(k.d||k.arrowright?1:0)-(k.a||k.arrowleft?1:0);
   if($('modal').classList.contains('show')){STATE.walking=false;return;}const moving=f!==0||side!==0;STATE.walking=moving;if(!moving)return;
   const len=Math.hypot(f,side)||1;f/=len;side/=len;const a=cam.alpha,fx=-Math.cos(a),fz=-Math.sin(a),rx=-Math.sin(a),rz=Math.cos(a);const dx=rx*side+fx*f,dz=rz*side+fz*f;
-  const speed=(k.shift?3.8:2.25)*(engine.getDeltaTime()/1000);root.position.x=BABYLON.Scalar.Clamp(root.position.x+dx*speed,-3.35,3.35);root.position.z=BABYLON.Scalar.Clamp(root.position.z+dz*speed,-2.65,2.65);root.rotation.y=Math.atan2(dx,dz);
+  const speed=(k.shift?5.2:3.2)*(engine.getDeltaTime()/1000);root.position.x=BABYLON.Scalar.Clamp(root.position.x+dx*speed,-3.35,3.35);root.position.z=BABYLON.Scalar.Clamp(root.position.z+dz*speed,-2.65,2.65);root.rotation.y=Math.atan2(dx,dz);
   const target=new BABYLON.Vector3(root.position.x,1.05,root.position.z);cam.target=BABYLON.Vector3.Lerp(cam.target,target,Math.min(1,engine.getDeltaTime()/100));
   const mp=STATE.multiplayer,now=performance.now();if(mp.ws&&mp.connected&&mp.ws.readyState===WebSocket.OPEN&&now-STATE.lastMoveSent>80){STATE.lastMoveSent=now;try{mp.ws.send(JSON.stringify({type:'move',pos:{x:root.position.x,y:root.position.y,z:root.position.z},rot:root.rotation.y,anim:'walk'}));}catch(e){}}
 }
