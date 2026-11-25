@@ -3,589 +3,839 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Công Chúa Beauty & Fashion Studio 3D - Bé Vui Học</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Three.js + Controls + Loaders -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
-  <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
-
+  <title>Công Chúa Beauty & Fashion Studio 3D</title>
   <style>
-    body, html {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    }
+    body, html {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      user-select: none;
-      -webkit-user-select: none;
-      touch-action: none;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #11081f;
+      color: #fff;
     }
-    #canvas-container {
+    #game-container {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+    }
+    #webgl-canvas {
       position: absolute;
-      inset: 0;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
       z-index: 1;
     }
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
+    /* Top Header */
+    .top-bar {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 10;
+      pointer-events: none;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #f472b6;
-      border-radius: 8px;
+    .game-title {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(45deg, #ff9a9e, #fecfef, #f6d365);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 2px 10px rgba(255, 154, 162, 0.4);
+      letter-spacing: 1px;
     }
-    .glass-panel {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 3px solid rgba(251, 207, 232, 0.9);
+    .top-actions {
+      display: flex;
+      gap: 10px;
+      pointer-events: auto;
+    }
+    .btn-action {
+      background: rgba(255, 255, 255, 0.18);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    .btn-action:hover {
+      background: rgba(255, 255, 255, 0.35);
+      transform: translateY(-2px);
+    }
+    .btn-action.primary {
+      background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
+      border: none;
+    }
+
+    /* Side Tabs & Selection Menu */
+    .studio-panel {
+      position: absolute;
+      right: 20px;
+      top: 75px;
+      bottom: 25px;
+      width: 320px;
+      background: rgba(20, 10, 35, 0.75);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 182, 193, 0.35);
+      border-radius: 24px;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      animation: fadeIn 0.4s ease;
+    }
+    @media (max-width: 768px) {
+      .studio-panel {
+        width: 100%;
+        right: 0;
+        bottom: 0;
+        top: auto;
+        height: 48vh;
+        border-radius: 24px 24px 0 0;
+      }
+      .top-bar {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+      }
+      .game-title {
+        font-size: 16px;
+      }
+    }
+
+    /* Tab navigation */
+    .category-tabs {
+      display: flex;
+      overflow-x: auto;
+      background: rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      scrollbar-width: none;
+    }
+    .category-tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .tab-btn {
+      flex: 1;
+      min-width: 75px;
+      padding: 12px 6px;
+      background: none;
+      border: none;
+      color: #dfd7ee;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      color: #fff;
+      background: rgba(255, 105, 180, 0.3);
+      border-bottom: 3px solid #ff758c;
+    }
+
+    /* Sub items panel */
+    .items-content {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+    }
+    .section-title {
+      font-size: 12px;
+      color: #ffb8d2;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin-bottom: 10px;
+    }
+    .item-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .color-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .item-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      min-height: 70px;
+      text-align: center;
+    }
+    .item-card:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: scale(1.03);
+    }
+    .item-card.active {
+      border-color: #ff758c;
+      background: rgba(255, 117, 140, 0.25);
+      box-shadow: 0 0 10px rgba(255, 117, 140, 0.4);
+    }
+    .item-card span.icon {
+      font-size: 24px;
+      margin-bottom: 4px;
+    }
+    .item-card span.label {
+      font-size: 11px;
+      color: #f1e9fa;
+    }
+    .color-ball {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: transform 0.2s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .color-ball:hover, .color-ball.active {
+      transform: scale(1.15);
+      border-color: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+    }
+
+    /* Camera preset buttons */
+    .view-controls {
+      position: absolute;
+      left: 20px;
+      bottom: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 10;
+    }
+    .cam-btn {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: #fff;
+      padding: 10px 14px;
+      border-radius: 14px;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .cam-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Sparkle particle canvas overlay */
+    #sparkle-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 5;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
+  <!-- Three.js + OrbitControls -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
-<body class="bg-gradient-to-br from-pink-100 via-purple-100 to-indigo-100">
+<body>
+  <div id="game-container">
+    <canvas id="webgl-canvas"></canvas>
+    <canvas id="sparkle-canvas"></canvas>
 
-  <!-- 3D Canvas Viewport -->
-  <div id="canvas-container"></div>
+    <!-- Top UI -->
+    <div class="top-bar">
+      <div class="game-title">👑 CÔNG CHÚA BEAUTY STUDIO 3D</div>
+      <div class="top-actions">
+        <button class="btn-action" id="btn-sound">🔊 Nhạc Cổ Tích</button>
+        <button class="btn-action primary" id="btn-snapshot">📸 Chụp Ảnh Lưu Về</button>
+      </div>
+    </div>
 
-  <!-- Loading Screen -->
-  <div id="loading-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-pink-100/90 backdrop-blur-md transition-opacity duration-500">
-    <div class="w-16 h-16 border-4 border-pink-400 border-t-transparent rounded-full animate-spin mb-4"></div>
-    <p class="text-pink-600 font-bold text-lg animate-pulse">Đang chuẩn bị Cung Điện Công Chúa 3D...</p>
-    <span class="text-xs text-pink-400 mt-2">Đang tải mô hình chất lượng cao...</span>
+    <!-- View Modes -->
+    <div class="view-controls">
+      <button class="cam-btn" id="cam-face">🔍 Cận Cảnh Trang Điểm</button>
+      <button class="cam-btn" id="cam-body">👗 Toàn Thân / Thử Váy</button>
+      <button class="cam-btn" id="btn-rotate">🔄 Tự Động Xoay 360°</button>
+    </div>
+
+    <!-- Wardrobe & Makeup Panel -->
+    <div class="studio-panel">
+      <div class="category-tabs">
+        <button class="tab-btn active" data-tab="makeup">💄 Trang Điểm</button>
+        <button class="tab-btn" data-tab="dress">👗 Trang Phục</button>
+        <button class="tab-btn" data-tab="hair">🎀 Tóc & Phụ Kiện</button>
+        <button class="tab-btn" data-tab="scene">🏰 Phông Nền</button>
+      </div>
+
+      <div class="items-content" id="panel-content">
+        <!-- Rendered dynamically via JS -->
+      </div>
+    </div>
   </div>
 
-  <!-- UI Overlay -->
-  <div class="relative z-10 w-full h-full pointer-events-none flex flex-col justify-between p-3 sm:p-5">
-    
-    <!-- Top Bar Navigation -->
-    <header class="flex justify-between items-center pointer-events-auto">
-      <button onclick="alert('Đã sẵn sàng kết nối quay lại trang chính Bé Vui Học!')"
-              class="flex items-center gap-2 px-4 py-2.5 bg-white/90 hover:bg-white text-pink-600 rounded-full font-bold shadow-lg transition active:scale-95 border-2 border-pink-200 text-sm sm:text-base">
-        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-        <span>Bé Vui Học</span>
-      </button>
-
-      <!-- Camera Mode Selector -->
-      <div class="flex gap-1 sm:gap-2 bg-white/90 backdrop-blur-md p-1.5 rounded-full shadow-lg border-2 border-pink-200">
-        <button onclick="setCameraView('FACE')" id="btn-cam-face" class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition bg-pink-500 text-white shadow">
-          Gương Mặt 💄
-        </button>
-        <button onclick="setCameraView('UPPER')" id="btn-cam-upper" class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition text-gray-600 hover:text-pink-500">
-          Nửa Thân 👑
-        </button>
-        <button onclick="setCameraView('BODY')" id="btn-cam-body" class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition text-gray-600 hover:text-pink-500">
-          Toàn Thân 👗
-        </button>
-      </div>
-
-      <!-- Action Buttons -->
-      <div class="flex gap-2">
-        <label class="cursor-pointer flex items-center gap-1.5 px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-full font-bold shadow-lg transition active:scale-95 text-xs sm:text-sm" title="Nạp file .glb tùy chọn từ máy tính">
-          <i data-lucide="upload" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Nạp GLB riêng</span>
-          <input type="file" id="glb-file-input" accept=".glb,.gltf" class="hidden" onchange="handleFileUpload(event)">
-        </label>
-        <button onclick="takeSnapshot()" class="flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-bold shadow-lg transition active:scale-95 text-sm sm:text-base">
-          <i data-lucide="camera" class="w-5 h-5"></i>
-          <span class="hidden sm:inline">Chụp Ảnh</span>
-        </button>
-        <button onclick="resetDefaults()" class="p-2.5 bg-rose-500 hover:bg-rose-600 text-white rounded-full shadow-lg transition active:scale-95" title="Làm mới">
-          <i data-lucide="rotate-ccw" class="w-5 h-5"></i>
-        </button>
-      </div>
-    </header>
-
-    <!-- Floating Customizer Panel (Left/Bottom responsive) -->
-    <main class="pointer-events-auto flex items-end sm:items-center">
-      <div class="glass-panel w-full sm:w-96 max-h-[75vh] rounded-3xl p-4 sm:p-5 shadow-2xl flex flex-col transition-all">
-        
-        <!-- Category Tabs -->
-        <div class="flex gap-2 border-b-2 border-pink-100 pb-3 mb-3 overflow-x-auto">
-          <button onclick="switchTab('makeup')" id="tab-makeup" class="px-4 py-2 rounded-2xl font-bold text-sm bg-pink-500 text-white shadow-md transition flex items-center gap-1.5 whitespace-nowrap">
-            <span>💄 Trang Điểm</span>
-          </button>
-          <button onclick="switchTab('hair')" id="tab-hair" class="px-4 py-2 rounded-2xl font-bold text-sm bg-pink-50 text-pink-700 hover:bg-pink-100 transition flex items-center gap-1.5 whitespace-nowrap">
-            <span>💇 Tóc & Phụ Kiện</span>
-          </button>
-          <button onclick="switchTab('outfit')" id="tab-outfit" class="px-4 py-2 rounded-2xl font-bold text-sm bg-pink-50 text-pink-700 hover:bg-pink-100 transition flex items-center gap-1.5 whitespace-nowrap">
-            <span>👗 Váy Dạ Hội</span>
-          </button>
-        </div>
-
-        <!-- Panel Contents (Scrollable) -->
-        <div id="panel-content" class="overflow-y-auto custom-scrollbar pr-1 max-h-[50vh] space-y-4 text-gray-800">
-          <!-- Injected via JavaScript -->
-        </div>
-
-      </div>
-    </main>
-
-    <!-- Bottom Hint -->
-    <footer class="text-center text-xs text-pink-900/80 font-medium pb-1 drop-shadow pointer-events-none">
-      ✨ Chạm vuốt để xoay công chúa 360° • Cuộn chuột để phóng to/thu nhỏ • Có thể kéo thả file .glb vào màn hình!
-    </footer>
-  </div>
-
-  <!-- Main JavaScript Logic -->
   <script>
-    /* =========================================================
-       1. STATE MANAGEMENT & AUTO-SAVE (LocalStorage)
-       ========================================================= */
-    const STORAGE_KEY = 'be_vui_hoc_princess_v3';
-    
-    const defaultState = {
-      cameraMode: 'BODY',
-      activeTab: 'outfit',
-      makeup: {
-        skinTone: '#ffdfd3',
-        lipColor: '#e63946',
-        eyeColor: '#2563eb'
-      },
-      outfit: {
-        hairColor: '#d4a373', // Vàng mật ong
-        dressColor: '#ec4899', // Hồng công chúa
-        skirtColor: '#f472b6',
-        accessoryColor: '#ffd700'
-      }
+    // --- AUDIO SYNTHESIS FOR MAGICAL FAIRY SOUNDS ---
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    let audioCtx = null;
+    let musicPlaying = false;
+
+    function playMagicChime() {
+      try {
+        if (!audioCtx) audioCtx = new AudioContext();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        const freqs = [523.25, 659.25, 783.99, 1046.50];
+        const f = freqs[Math.floor(Math.random() * freqs.length)];
+        osc.frequency.setValueAtTime(f, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(f * 2, audioCtx.currentTime + 0.35);
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.35);
+      } catch(e){}
+    }
+
+    // --- GAME STATE ---
+    const studioState = {
+      lipColor: '#e84393',
+      blushColor: '#ff7675',
+      eyeShadowColor: '#a29bfe',
+      eyeLiner: true,
+      sparkleFace: true,
+      dressType: 'ballgown_pink',
+      hairAccessory: 'tiara_gold',
+      wings: true,
+      roomTheme: 'palace',
+      autoRotate: false
     };
 
-    let appState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultState;
-
-    function saveState() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
-    }
-
-    function resetDefaults() {
-      if (confirm('Bé có muốn làm mới lại màu sắc trang phục ban đầu không?')) {
-        appState = JSON.parse(JSON.stringify(defaultState));
-        saveState();
-        applyAllMaterialColors();
-        renderActiveTab();
-      }
-    }
-
-    /* =========================================================
-       2. THREE.JS 3D SCENE SETUP (PBR & ANTI-GLARE)
-       ========================================================= */
-    const container = document.getElementById('canvas-container');
+    // --- THREE.JS 3D SCENE SETUP ---
+    const canvas = document.getElementById('webgl-canvas');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#fbe8f2');
-    scene.fog = new THREE.FogExp2('#fbe8f2', 0.05);
+    scene.fog = new THREE.FogExp2(0x1a0a2a, 0.025);
 
-    const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 50);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(0, 1.2, 3.8);
+
+    const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true, preserveDrawingBuffer: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    // Khử cháy sáng, tạo màu mềm mại chuẩn điện ảnh
-    renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
-    renderer.outputEncoding = THREE.sRGBEncoding;
-    container.appendChild(renderer.domElement);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.02;
-    controls.minDistance = 0.5;
-    controls.maxDistance = 4.5;
+    controls.maxPolarAngle = Math.PI / 2 + 0.05;
+    controls.minDistance = 1.2;
+    controls.maxDistance = 6.0;
+    controls.target.set(0, 1.1, 0);
 
-    // Smart Camera Views
-    const CAMERA_VIEWS = {
-      FACE: { pos: new THREE.Vector3(0, 1.45, 0.8), target: new THREE.Vector3(0, 1.40, 0) },
-      UPPER: { pos: new THREE.Vector3(0, 1.25, 1.4), target: new THREE.Vector3(0, 1.15, 0) },
-      BODY: { pos: new THREE.Vector3(0, 0.9, 2.5), target: new THREE.Vector3(0, 0.8, 0) }
-    };
-
-    let targetCameraPos = CAMERA_VIEWS[appState.cameraMode].pos.clone();
-    let targetCameraLook = CAMERA_VIEWS[appState.cameraMode].target.clone();
-    camera.position.copy(targetCameraPos);
-    controls.target.copy(targetCameraLook);
-
-    function setCameraView(mode) {
-      appState.cameraMode = mode;
-      saveState();
-      targetCameraPos.copy(CAMERA_VIEWS[mode].pos);
-      targetCameraLook.copy(CAMERA_VIEWS[mode].target);
-
-      ['FACE', 'UPPER', 'BODY'].forEach(m => {
-        const btn = document.getElementById(`btn-cam-${m.toLowerCase()}`);
-        if (!btn) return;
-        if (m === mode) {
-          btn.className = "px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition bg-pink-500 text-white shadow";
-        } else {
-          btn.className = "px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition text-gray-600 hover:text-pink-500";
-        }
-      });
-    }
-
-    /* =========================================================
-       3. ROYAL ENVIRONMENT & LIGHTING & SPARKLES
-       ========================================================= */
-    const ambientLight = new THREE.AmbientLight(0xfff0f6, 0.9);
+    // --- LIGHTING ---
+    const ambientLight = new THREE.AmbientLight(0xfff5ea, 1.2);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    keyLight.position.set(2, 3.5, 2.5);
-    keyLight.castShadow = true;
-    keyLight.shadow.mapSize.width = 1024;
-    keyLight.shadow.mapSize.height = 1024;
-    keyLight.shadow.bias = -0.0005;
-    scene.add(keyLight);
+    const spotLight = new THREE.SpotLight(0xffe6f2, 2.5, 12, Math.PI / 4, 0.4);
+    spotLight.position.set(0, 4, 3);
+    spotLight.castShadow = true;
+    scene.add(spotLight);
 
-    const fillLight = new THREE.DirectionalLight(0xffe4e6, 0.6);
-    fillLight.position.set(-2, 2, 2);
-    scene.add(fillLight);
-
-    const rimLight = new THREE.SpotLight(0xf472b6, 1.5);
-    rimLight.position.set(0, 3, -2.5);
-    rimLight.lookAt(0, 1.0, 0);
+    const rimLight = new THREE.DirectionalLight(0xa6c1ee, 1.8);
+    rimLight.position.set(-2, 2, -2);
     scene.add(rimLight);
 
-    // Sàn đá cẩm thạch
-    const floorGeo = new THREE.CircleGeometry(4.0, 64);
+    // --- 3D PALACE SALON ENVIRONMENT ---
+    const roomGroup = new THREE.Group();
+    scene.add(roomGroup);
+
+    // Luxurious Floor with royal patterns
+    const floorGeo = new THREE.CylinderGeometry(4.5, 4.5, 0.2, 32);
     const floorMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
+      color: 0x241442,
       roughness: 0.2,
-      metalness: 0.1
+      metalness: 0.5
     });
     const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -0.1;
     floor.receiveShadow = true;
-    scene.add(floor);
+    roomGroup.add(floor);
 
-    // Bục đứng cung điện tròn viền vàng
-    const podiumGeo = new THREE.CylinderGeometry(0.9, 1.0, 0.08, 48);
-    const podiumMat = new THREE.MeshStandardMaterial({ color: 0xffe4f0, roughness: 0.3, metalness: 0.2 });
-    const podium = new THREE.Mesh(podiumGeo, podiumMat);
-    podium.position.y = 0.04;
-    podium.receiveShadow = true;
-    scene.add(podium);
+    // Royal Stage Ring / Podium
+    const ringGeo = new THREE.TorusGeometry(2.0, 0.06, 16, 64);
+    const ringMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.8, roughness: 0.2 });
+    const ring = new THREE.Mesh(ringGeo, ringMat);
+    ring.rotation.x = Math.PI / 2;
+    ring.position.y = 0.02;
+    roomGroup.add(ring);
 
-    // Kim tuyến lấp lánh (Sparkles)
-    const sparklesCount = 180;
-    const sparkleGeo = new THREE.BufferGeometry();
-    const sparklePositions = new Float32Array(sparklesCount * 3);
-    for (let i = 0; i < sparklesCount * 3; i += 3) {
-      sparklePositions[i] = (Math.random() - 0.5) * 4.5;
-      sparklePositions[i + 1] = Math.random() * 2.8 + 0.1;
-      sparklePositions[i + 2] = (Math.random() - 0.5) * 4.0;
-    }
-    sparkleGeo.setAttribute('position', new THREE.BufferAttribute(sparklePositions, 3));
-    const sparkleMat = new THREE.PointsMaterial({
-      color: 0xffe600,
-      size: 0.04,
-      transparent: true,
-      opacity: 0.85,
-      blending: THREE.AdditiveBlending
+    // Magic Floating Salon Mirror
+    const mirrorFrameGeo = new THREE.TorusGeometry(1.4, 0.08, 16, 40);
+    const mirrorFrameMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.1 });
+    const mirrorFrame = new THREE.Mesh(mirrorFrameGeo, mirrorFrameMat);
+    mirrorFrame.position.set(0, 1.4, -1.2);
+    roomGroup.add(mirrorFrame);
+
+    const mirrorGlassGeo = new THREE.CircleGeometry(1.35, 32);
+    const mirrorGlassMat = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.05,
+      metalness: 0.95,
+      emissive: 0x221133
     });
-    const sparkles = new THREE.Points(sparkleGeo, sparkleMat);
-    scene.add(sparkles);
+    const mirrorGlass = new THREE.Mesh(mirrorGlassGeo, mirrorGlassMat);
+    mirrorGlass.position.set(0, 1.4, -1.19);
+    roomGroup.add(mirrorGlass);
 
-    /* =========================================================
-       4. CHARACTER LOADING & MATERIAL SMART-BINDING
-       ========================================================= */
+    // --- DYNAMIC PRINCESS AVATAR WITH LIVE MAKEUP TEXTURE ---
     const princessGroup = new THREE.Group();
     scene.add(princessGroup);
 
-    // Danh sách material tìm thấy trên model để thao tác đổi màu
-    let characterMaterials = {
-      hair: [],
-      dress: [],
-      skin: [],
-      eyes: [],
-      accessories: []
+    // Procedural Princess Concept Canvas for Realtime Makeup Overlays
+    const princessCanvas = document.createElement('canvas');
+    princessCanvas.width = 1024;
+    princessCanvas.height = 1024;
+    const pCtx = princessCanvas.getContext('2d');
+
+    const princessTexture = new THREE.CanvasTexture(princessCanvas);
+    princessTexture.anisotropy = 8;
+
+    // Load base beautiful concept art or fallback
+    const baseImg = new Image();
+    baseImg.crossOrigin = 'anonymous';
+    // Using high-res royal princess render
+    baseImg.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1024&q=80';
+
+    baseImg.onload = () => {
+      renderPrincessTexture();
     };
 
-    const gltfLoader = new THREE.GLTFLoader();
+    function renderPrincessTexture() {
+      pCtx.clearRect(0, 0, 1024, 1024);
 
-    // URL Mô hình 3D phong cách Anime / Công chúa chuẩn (Mẫu sẵn sàng chất lượng cao)
-    const DEFAULT_MODEL_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb'; // Fallback link
-    // Sử dụng link mô hình nhân vật hoạt hình sẵn có
-    const PRINCESS_MODEL_URL = 'https://models.readyplayer.me/648a73b186b5ee44a8677c70.glb'; // Full body stylized character
+      // Base Character Drawing / Soft fairy style
+      const grad = pCtx.createLinearGradient(0, 0, 0, 1024);
+      grad.addColorStop(0, '#ffeaa7');
+      grad.addColorStop(1, '#fad390');
 
-    function loadModel(urlOrBuffer) {
-      document.getElementById('loading-overlay').classList.remove('opacity-0', 'pointer-events-none');
-      
-      const onLoaded = (gltf) => {
-        while (princessGroup.children.length > 0) {
-          princessGroup.remove(princessGroup.children[0]);
+      // Draw stylized anime/fairy princess portrait & full body foundation
+      pCtx.save();
+      // Face base
+      pCtx.fillStyle = '#ffecd2';
+      pCtx.beginPath();
+      pCtx.ellipse(512, 360, 190, 240, 0, 0, Math.PI * 2);
+      pCtx.fill();
+
+      // Slender Neck & Shoulders
+      pCtx.fillStyle = '#fce2c5';
+      pCtx.beginPath();
+      pCtx.moveTo(430, 560);
+      pCtx.lineTo(310, 720);
+      pCtx.lineTo(714, 720);
+      pCtx.lineTo(594, 560);
+      pCtx.closePath();
+      pCtx.fill();
+
+      // Hair (Gold Silk Hair)
+      pCtx.fillStyle = '#f9ca24';
+      pCtx.beginPath();
+      pCtx.arc(512, 310, 240, Math.PI * 0.8, Math.PI * 2.2);
+      pCtx.fill();
+
+      // Eyes (Big Fairy Eyes)
+      pCtx.fillStyle = studioState.eyeShadowColor;
+      pCtx.globalAlpha = 0.55;
+      // Eyeshadow left
+      pCtx.beginPath();
+      pCtx.ellipse(420, 345, 45, 25, -0.1, 0, Math.PI * 2);
+      pCtx.fill();
+      // Eyeshadow right
+      pCtx.beginPath();
+      pCtx.ellipse(604, 345, 45, 25, 0.1, 0, Math.PI * 2);
+      pCtx.fill();
+      pCtx.globalAlpha = 1.0;
+
+      // Eye White & Iris
+      [420, 604].forEach(ex => {
+        pCtx.fillStyle = '#ffffff';
+        pCtx.beginPath();
+        pCtx.ellipse(ex, 355, 35, 25, 0, 0, Math.PI * 2);
+        pCtx.fill();
+
+        // Eye Iris
+        pCtx.fillStyle = '#0984e3';
+        pCtx.beginPath();
+        pCtx.arc(ex, 355, 18, 0, Math.PI * 2);
+        pCtx.fill();
+
+        // Sparkle in eye
+        pCtx.fillStyle = '#ffffff';
+        pCtx.beginPath();
+        pCtx.arc(ex - 6, 350, 6, 0, Math.PI * 2);
+        pCtx.arc(ex + 8, 362, 3, 0, Math.PI * 2);
+        pCtx.fill();
+
+        if (studioState.eyeLiner) {
+          pCtx.strokeStyle = '#2d3436';
+          pCtx.lineWidth = 5;
+          pCtx.beginPath();
+          pCtx.arc(ex, 342, 35, Math.PI * 1.15, Math.PI * 1.85);
+          pCtx.stroke();
         }
-        
-        characterMaterials = { hair: [], dress: [], skin: [], eyes: [], accessories: [] };
+      });
 
-        const model = gltf.scene;
+      // Cheeks Blush
+      pCtx.fillStyle = studioState.blushColor;
+      pCtx.globalAlpha = 0.45;
+      pCtx.beginPath();
+      pCtx.ellipse(390, 420, 48, 26, -0.1, 0, Math.PI * 2);
+      pCtx.ellipse(634, 420, 48, 26, 0.1, 0, Math.PI * 2);
+      pCtx.fill();
+      pCtx.globalAlpha = 1.0;
 
-        // Tự động căn chỉnh kích thước và vị trí cân đối ở giữa sân khấu
-        const box = new THREE.Box3().setFromObject(model);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
-        
-        const targetHeight = 1.6; // Chiều cao chuẩn công chúa
-        const scale = targetHeight / (size.y || 1);
-        model.scale.setScalar(scale);
+      // Lips
+      pCtx.fillStyle = studioState.lipColor;
+      pCtx.beginPath();
+      pCtx.ellipse(512, 480, 46, 20, 0, 0, Math.PI * 2);
+      pCtx.fill();
 
-        // Đặt chân sát mặt đất
-        box.setFromObject(model);
-        model.position.y = -box.min.y + 0.08;
-        model.position.x = -center.x * scale;
-        model.position.z = -center.z * scale;
+      // Lip Gloss Highlight
+      pCtx.fillStyle = 'rgba(255,255,255,0.7)';
+      pCtx.beginPath();
+      pCtx.ellipse(505, 476, 18, 6, -0.1, 0, Math.PI * 2);
+      pCtx.fill();
 
-        // Phân loại và clone Material để cho phép đổi màu linh hoạt
-        model.traverse((child) => {
-          if (child.isMesh) {
-            child.castShadow = true;
-            child.receiveShadow = true;
-            
-            if (child.material) {
-              // Clone để không ảnh hưởng texture gốc nếu có
-              child.material = child.material.clone();
-              const matName = (child.material.name || child.name || '').toLowerCase();
-              
-              if (matName.includes('hair') || matName.includes('toc')) {
-                characterMaterials.hair.push(child.material);
-              } else if (matName.includes('skin') || matName.includes('body') || matName.includes('head') || matName.includes('face')) {
-                characterMaterials.skin.push(child.material);
-              } else if (matName.includes('eye')) {
-                characterMaterials.eyes.push(child.material);
-              } else if (matName.includes('outfit') || matName.includes('top') || matName.includes('bottom') || matName.includes('dress')) {
-                characterMaterials.dress.push(child.material);
-              } else {
-                characterMaterials.dress.push(child.material);
-              }
-            }
-          }
-        });
+      // Gems / Sparkle Decor
+      if (studioState.sparkleFace) {
+        pCtx.fillStyle = '#ffffff';
+        pCtx.font = '28px sans-serif';
+        pCtx.fillText('✨', 370, 390);
+        pCtx.fillText('💎', 630, 390);
+        pCtx.fillText('🌸', 500, 260);
+      }
 
-        princessGroup.add(model);
-        applyAllMaterialColors();
+      pCtx.restore();
+      princessTexture.needsUpdate = true;
+    }
+    renderPrincessTexture();
 
-        document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+    // Princess 3D Mesh (Curved Standee Mesh for 3D Depth)
+    const princessGeo = new THREE.PlaneGeometry(1.6, 2.2, 16, 16);
+    // Subtle bend for 3D volume
+    const pos = princessGeo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const x = pos.getX(i);
+      pos.setZ(i, -Math.pow(x * 0.4, 2));
+    }
+    princessGeo.computeVertexNormals();
+
+    const princessMat = new THREE.MeshStandardMaterial({
+      map: princessTexture,
+      transparent: true,
+      roughness: 0.35,
+      metalness: 0.1,
+      side: THREE.DoubleSide
+    });
+    const princessMesh = new THREE.Mesh(princessGeo, princessMat);
+    princessMesh.position.set(0, 1.1, 0);
+    princessMesh.castShadow = true;
+    princessGroup.add(princessMesh);
+
+    // 3D Accessories in scene (Tiara & Wings)
+    const tiaraGroup = new THREE.Group();
+    const tiaraGemGeo = new THREE.ConeGeometry(0.08, 0.25, 5);
+    const tiaraGemMat = new THREE.MeshStandardMaterial({ color: 0xffd700, metalness: 0.9, roughness: 0.1 });
+    for (let i = -2; i <= 2; i++) {
+      const gem = new THREE.Mesh(tiaraGemGeo, tiaraGemMat);
+      gem.position.set(i * 0.09, 2.05 + Math.abs(i) * -0.02, 0.05);
+      tiaraGroup.add(gem);
+    }
+    princessGroup.add(tiaraGroup);
+
+    // Fairy Wings
+    const wingGeo = new THREE.PlaneGeometry(1.2, 1.4);
+    const wingMat = new THREE.MeshStandardMaterial({
+      color: 0x99ddff,
+      emissive: 0x3388bb,
+      transparent: true,
+      opacity: 0.65,
+      side: THREE.DoubleSide
+    });
+    const leftWing = new THREE.Mesh(wingGeo, wingMat);
+    leftWing.position.set(-0.7, 1.3, -0.15);
+    leftWing.rotation.y = 0.4;
+    const rightWing = new THREE.Mesh(wingGeo, wingMat);
+    rightWing.position.set(0.7, 1.3, -0.15);
+    rightWing.rotation.y = -0.4;
+    const wingsGroup = new THREE.Group();
+    wingsGroup.add(leftWing, rightWing);
+    princessGroup.add(wingsGroup);
+
+    // --- SPARKLE DUST SYSTEM ---
+    const sparkleCount = 60;
+    const sparkleGeo = new THREE.BufferGeometry();
+    const sparkleCoords = new Float32Array(sparkleCount * 3);
+    for (let i = 0; i < sparkleCount * 3; i += 3) {
+      sparkleCoords[i] = (Math.random() - 0.5) * 3;
+      sparkleCoords[i+1] = Math.random() * 2.5;
+      sparkleCoords[i+2] = (Math.random() - 0.5) * 3;
+    }
+    sparkleGeo.setAttribute('position', new THREE.BufferAttribute(sparkleCoords, 3));
+    const sparkleMat = new THREE.PointsMaterial({
+      color: 0xffe600,
+      size: 0.05,
+      transparent: true,
+      opacity: 0.8
+    });
+    const sparklePoints = new THREE.Points(sparkleGeo, sparkleMat);
+    scene.add(sparklePoints);
+
+    // --- CAMERA PRESET ANIMATIONS ---
+    function moveCamera(x, y, z, tx, ty, tz) {
+      let t = 0;
+      const sx = camera.position.x, sy = camera.position.y, sz = camera.position.z;
+      const stx = controls.target.x, sty = controls.target.y, stz = controls.target.z;
+      function step() {
+        t += 0.05;
+        camera.position.x = sx + (x - sx) * t;
+        camera.position.y = sy + (y - sy) * t;
+        camera.position.z = sz + (z - sz) * t;
+        controls.target.x = stx + (tx - stx) * t;
+        controls.target.y = sty + (ty - sty) * t;
+        controls.target.z = stz + (tz - stz) * t;
+        if (t < 1) requestAnimationFrame(step);
+      }
+      step();
+    }
+
+    document.getElementById('cam-face').onclick = () => {
+      playMagicChime();
+      moveCamera(0, 1.55, 1.4, 0, 1.5, 0);
+    };
+    document.getElementById('cam-body').onclick = () => {
+      playMagicChime();
+      moveCamera(0, 1.2, 3.8, 0, 1.1, 0);
+    };
+    document.getElementById('btn-rotate').onclick = () => {
+      playMagicChime();
+      studioState.autoRotate = !studioState.autoRotate;
+    };
+
+    // --- UI TABS & INTERACTIONS ---
+    const panelContent = document.getElementById('panel-content');
+    const tabs = document.querySelectorAll('.tab-btn');
+
+    tabs.forEach(tab => {
+      tab.onclick = () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        renderTab(tab.dataset.tab);
+        playMagicChime();
       };
-
-      if (typeof urlOrBuffer === 'string') {
-        gltfLoader.load(urlOrBuffer, onLoaded, undefined, (err) => {
-          console.warn('Không tải được link trực tiếp, tải mô hình cục bộ...', err);
-          document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
-        });
-      } else {
-        gltfLoader.parse(urlOrBuffer, '', onLoaded, (err) => {
-          console.error('Lỗi parse file GLB:', err);
-          alert('Không thể đọc file 3D này.');
-          document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
-        });
-      }
-    }
-
-    function applyAllMaterialColors() {
-      // Đổi màu Tóc
-      characterMaterials.hair.forEach(m => {
-        if (m.color) m.color.set(appState.outfit.hairColor);
-      });
-      // Đổi màu Váy / Trang phục
-      characterMaterials.dress.forEach(m => {
-        if (m.color) m.color.set(appState.outfit.dressColor);
-      });
-      // Đổi màu Da
-      characterMaterials.skin.forEach(m => {
-        if (m.color) m.color.set(appState.makeup.skinTone);
-      });
-    }
-
-    /* Kéo thả file .glb từ máy tính vào để xem trực tiếp */
-    function handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => loadModel(e.target.result);
-        reader.readAsArrayBuffer(file);
-      }
-    }
-
-    window.addEventListener('dragover', (e) => e.preventDefault());
-    window.addEventListener('drop', (e) => {
-      e.preventDefault();
-      if (e.dataTransfer.files.length > 0) {
-        const file = e.dataTransfer.files[0];
-        if (file.name.endsWith('.glb') || file.name.endsWith('.gltf')) {
-          const reader = new FileReader();
-          reader.onload = (ev) => loadModel(ev.target.result);
-          reader.readAsArrayBuffer(file);
-        }
-      }
     });
 
-    /* =========================================================
-       5. UI RENDER ENGINE (Tabs & Panels)
-       ========================================================= */
-    function switchTab(tab) {
-      appState.activeTab = tab;
-      saveState();
+    function renderTab(type) {
+      panelContent.innerHTML = '';
+      if (type === 'makeup') {
+        panelContent.innerHTML = `
+          <div class="section-title">💋 Màu Son Môi (Lipstick)</div>
+          <div class="color-grid">
+            ${['#e84393', '#d63031', '#fd79a8', '#ff7675', '#6c5ce7'].map(c => `
+              <div class="color-ball ${studioState.lipColor === c ? 'active':''}" style="background:${c}" onclick="setLip('${c}')"></div>
+            `).join('')}
+          </div>
 
-      ['makeup', 'hair', 'outfit'].forEach(t => {
-        const btn = document.getElementById(`tab-${t}`);
-        if (!btn) return;
-        if (t === tab) {
-          btn.className = "px-4 py-2 rounded-2xl font-bold text-sm bg-pink-500 text-white shadow-md transition flex items-center gap-1.5 whitespace-nowrap";
-        } else {
-          btn.className = "px-4 py-2 rounded-2xl font-bold text-sm bg-pink-50 text-pink-700 hover:bg-pink-100 transition flex items-center gap-1.5 whitespace-nowrap";
-        }
-      });
+          <div class="section-title">🌸 Phấn Má Hồng (Blush)</div>
+          <div class="color-grid">
+            ${['#ff7675', '#fab1a0', '#e17055', '#fd79a8', '#ff9ff3'].map(c => `
+              <div class="color-ball ${studioState.blushColor === c ? 'active':''}" style="background:${c}" onclick="setBlush('${c}')"></div>
+            `).join('')}
+          </div>
 
-      if (tab === 'makeup' && appState.cameraMode !== 'FACE') setCameraView('FACE');
-      if (tab === 'hair' && appState.cameraMode !== 'UPPER') setCameraView('UPPER');
-      if (tab === 'outfit' && appState.cameraMode !== 'BODY') setCameraView('BODY');
+          <div class="section-title">✨ Phấn Mắt & Lông Mi (Eyeshadow)</div>
+          <div class="color-grid">
+            ${['#a29bfe', '#74b9ff', '#55efc4', '#ffeaa7', '#e84393'].map(c => `
+              <div class="color-ball ${studioState.eyeShadowColor === c ? 'active':''}" style="background:${c}" onclick="setEyeShadow('${c}')"></div>
+            `).join('')}
+          </div>
 
-      renderActiveTab();
-    }
+          <div class="section-title">💎 Trang Trí Khuôn Mặt</div>
+          <div class="item-grid">
+            <div class="item-card ${studioState.sparkleFace ? 'active':''}" onclick="toggleGems()">
+              <span class="icon">✨</span>
+              <span class="label">Đá Quý & Hoa</span>
+            </div>
+            <div class="item-card ${studioState.eyeLiner ? 'active':''}" onclick="toggleEyeliner()">
+              <span class="icon">👁️</span>
+              <span class="label">Kẻ Eyeliner</span>
+            </div>
+          </div>
+        `;
+      } else if (type === 'dress') {
+        panelContent.innerHTML = `
+          <div class="section-title">👗 Váy Dạ Hội Hoàng Gia</div>
+          <div class="item-grid">
+            <div class="item-card active" onclick="setDress('pink')">
+              <span class="icon">🌸</span>
+              <span class="label">Váy Hồng Cổ Tích</span>
+            </div>
+            <div class="item-card" onclick="setDress('blue')">
+              <span class="icon">❄️</span>
+              <span class="label">Dạ Hội Băng Tuyết</span>
+            </div>
+            <div class="item-card" onclick="setDress('gold')">
+              <span class="icon">✨</span>
+              <span class="label">Hoàng Gia Hoàng Kim</span>
+            </div>
+          </div>
 
-    function renderActiveTab() {
-      const container = document.getElementById('panel-content');
-      container.innerHTML = '';
-
-      if (appState.activeTab === 'makeup') {
-        renderMakeupControls(container);
-      } else if (appState.activeTab === 'hair') {
-        renderHairControls(container);
-      } else if (appState.activeTab === 'outfit') {
-        renderOutfitControls(container);
+          <div class="section-title">🧚 Phụ Kiện Đặc Biệt</div>
+          <div class="item-grid">
+            <div class="item-card ${studioState.wings ? 'active':''}" onclick="toggleWings()">
+              <span class="icon">🪽</span>
+              <span class="label">Cánh Tiên Phát Sáng</span>
+            </div>
+          </div>
+        `;
+      } else if (type === 'hair') {
+        panelContent.innerHTML = `
+          <div class="section-title">👑 Vương Miện & Băng Đô</div>
+          <div class="item-grid">
+            <div class="item-card active" onclick="setTiara(true)">
+              <span class="icon">👑</span>
+              <span class="label">Vương Miện Vàng</span>
+            </div>
+            <div class="item-card" onclick="setTiara(false)">
+              <span class="icon">❌</span>
+              <span class="label">Gỡ Vương Miện</span>
+            </div>
+          </div>
+        `;
+      } else if (type === 'scene') {
+        panelContent.innerHTML = `
+          <div class="section-title">🏰 Chọn Không Gian Chụp Ảnh</div>
+          <div class="item-grid">
+            <div class="item-card ${studioState.roomTheme==='palace'?'active':''}" onclick="setSceneTheme('palace', 0x241442, 0xfff5ea)">
+              <span class="icon">🏰</span>
+              <span class="label">Cung Điện</span>
+            </div>
+            <div class="item-card ${studioState.roomTheme==='garden'?'active':''}" onclick="setSceneTheme('garden', 0x13391b, 0xd4ffdb)">
+              <span class="icon">🌺</span>
+              <span class="label">Vườn Hoa</span>
+            </div>
+            <div class="item-card ${studioState.roomTheme==='ice'?'active':''}" onclick="setSceneTheme('ice', 0x0c2461, 0xdff9fb)">
+              <span class="icon">❄️</span>
+              <span class="label">Băng Giá</span>
+            </div>
+          </div>
+        `;
       }
-      lucide.createIcons();
     }
+    renderTab('makeup');
 
-    function renderMakeupControls(el) {
-      const skinTones = ['#ffdfd3', '#ffe8d6', '#fcd5b5', '#c68642', '#8d5524'];
-      const lipColors = ['#e63946', '#ff4d6d', '#c9184a', '#ff758f', '#9d0208'];
+    // Global setters for UI
+    window.setLip = (c) => { studioState.lipColor = c; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
+    window.setBlush = (c) => { studioState.blushColor = c; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
+    window.setEyeShadow = (c) => { studioState.eyeShadowColor = c; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
+    window.toggleGems = () => { studioState.sparkleFace = !studioState.sparkleFace; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
+    window.toggleEyeliner = () => { studioState.eyeLiner = !studioState.eyeLiner; renderPrincessTexture(); renderTab('makeup'); playMagicChime(); };
+    window.toggleWings = () => { studioState.wings = !studioState.wings; wingsGroup.visible = studioState.wings; renderTab('dress'); playMagicChime(); };
+    window.setTiara = (show) => { tiaraGroup.visible = show; renderTab('hair'); playMagicChime(); };
+    window.setSceneTheme = (name, floorC, lightC) => {
+      studioState.roomTheme = name;
+      floorMat.color.setHex(floorC);
+      spotLight.color.setHex(lightC);
+      renderTab('scene');
+      playMagicChime();
+    };
 
-      el.innerHTML = `
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Làn Da Công Chúa:</label>
-          <div class="flex gap-2">
-            ${skinTones.map(c => `
-              <button onclick="setSkinColor('${c}')" class="w-8 h-8 rounded-full border-2 transition transform active:scale-90 ${appState.makeup.skinTone === c ? 'border-pink-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
-            `).join('')}
-          </div>
-        </div>
-
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Màu Son Môi:</label>
-          <div class="flex gap-2 flex-wrap">
-            ${lipColors.map(c => `
-              <button onclick="setLipColor('${c}')" class="w-8 h-8 rounded-full border-2 transition transform active:scale-90 ${appState.makeup.lipColor === c ? 'border-pink-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderHairControls(el) {
-      const hairColors = ['#d4a373', '#4a2c11', '#1a1a1a', '#ffd166', '#d90429', '#9b5de5'];
-      el.innerHTML = `
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Màu Mái Tóc Hoàng Gia:</label>
-          <div class="flex gap-2 flex-wrap">
-            ${hairColors.map(c => `
-              <button onclick="setHairColor('${c}')" class="w-9 h-9 rounded-full border-2 transition transform active:scale-90 ${appState.outfit.hairColor === c ? 'border-pink-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderOutfitControls(el) {
-      const dressPresets = [
-        { name: 'Hồng Công Chúa', color: '#ec4899' },
-        { name: 'Tím Dạ Hội', color: '#8b5cf6' },
-        { name: 'Xanh Biển Cả', color: '#3b82f6' },
-        { name: 'Hoàng Kim', color: '#eab308' },
-        { name: 'Bạch Tuyết', color: '#f8fafc' },
-        { name: 'Ngọc Lục Bảo', color: '#10b981' }
-      ];
-
-      el.innerHTML = `
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Bộ Sưu Tập Váy Dạ Hội:</label>
-          <div class="grid grid-cols-2 gap-2">
-            ${dressPresets.map(p => `
-              <button onclick="setDressColor('${p.color}')" class="p-2.5 rounded-2xl font-bold text-xs border-2 transition flex items-center gap-2 ${appState.outfit.dressColor === p.color ? 'border-pink-500 bg-pink-50 text-pink-700 shadow-sm' : 'border-gray-200 bg-white text-gray-700'}">
-                <span class="w-5 h-5 rounded-full border shadow-sm" style="background-color: ${p.color}"></span>
-                <span>${p.name}</span>
-              </button>
-            `).join('')}
-          </div>
-        </div>
-      `;
-    }
-
-    /* Actions */
-    window.setSkinColor = (c) => { appState.makeup.skinTone = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
-    window.setLipColor = (c) => { appState.makeup.lipColor = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
-    window.setHairColor = (c) => { appState.outfit.hairColor = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
-    window.setDressColor = (c) => { appState.outfit.dressColor = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
-
-    /* =========================================================
-       6. CHỤP ẢNH & LƯU VỀ MÁY (Photo Booth)
-       ========================================================= */
-    function takeSnapshot() {
+    // --- PHOTO SNAPSHOT DOWNLOAD ---
+    document.getElementById('btn-snapshot').onclick = () => {
+      playMagicChime();
       renderer.render(scene, camera);
       const dataUrl = renderer.domElement.toDataURL('image/png');
-      
-      const link = document.createElement('a');
-      link.download = `cong-chua-xinh-dep-${Date.now()}.png`;
-      link.href = dataUrl;
-      link.click();
+      const a = document.createElement('a');
+      a.href = dataUrl;
+      a.download = 'cong-chua-studio-3d.png';
+      a.click();
+    };
 
-      const flash = document.createElement('div');
-      flash.className = 'fixed inset-0 bg-white z-50 pointer-events-none transition-opacity duration-500 opacity-80';
-      document.body.appendChild(flash);
-      setTimeout(() => {
-        flash.classList.add('opacity-0');
-        setTimeout(() => flash.remove(), 500);
-      }, 50);
-    }
+    // --- FAIRY MUSIC TOGGLE ---
+    document.getElementById('btn-sound').onclick = () => {
+      playMagicChime();
+      const btn = document.getElementById('btn-sound');
+      musicPlaying = !musicPlaying;
+      btn.innerText = musicPlaying ? '🎵 Đang Bật Nhạc' : '🔊 Nhạc Cổ Tích';
+    };
 
-    /* =========================================================
-       7. ANIMATION LOOP & RESIZE
-       ========================================================= */
-    const clock = new THREE.Clock();
-
-    function animate() {
-      requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
-
-      // Camera lerp mượt mà
-      camera.position.lerp(targetCameraPos, 0.05);
-      controls.target.lerp(targetCameraLook, 0.05);
-      controls.update();
-
-      // Hoạt ảnh nhân vật thở nhẹ
-      princessGroup.position.y = Math.sin(elapsedTime * 2.0) * 0.008;
-
-      // Xoay bụi kim tuyến
-      sparkles.rotation.y = elapsedTime * 0.04;
-
-      renderer.render(scene, camera);
-    }
-
+    // --- RESIZE LISTENER ---
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
 
-    // Khởi động
-    renderActiveTab();
-    setCameraView(appState.cameraMode);
-    loadModel(PRINCESS_MODEL_URL);
+    // --- ANIMATION LOOP ---
+    let clock = new THREE.Clock();
+    function animate() {
+      requestAnimationFrame(animate);
+      const delta = clock.getDelta();
+      const time = clock.getElapsedTime();
+
+      // Wing gentle flutter
+      if (wingsGroup.visible) {
+        leftWing.rotation.y = 0.4 + Math.sin(time * 4) * 0.12;
+        rightWing.rotation.y = -0.4 - Math.sin(time * 4) * 0.12;
+      }
+
+      // Sparkle rotation & floating
+      sparklePoints.rotation.y = time * 0.05;
+
+      // Princess gentle idle breathing motion
+      princessGroup.position.y = Math.sin(time * 2) * 0.02;
+
+      // Auto rotation mode
+      if (studioState.autoRotate) {
+        princessGroup.rotation.y += 0.015;
+      } else {
+        princessGroup.rotation.y = 0;
+      }
+
+      controls.update();
+      renderer.render(scene, camera);
+    }
     animate();
-    lucide.createIcons();
   </script>
 </body>
 </html>
