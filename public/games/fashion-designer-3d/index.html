@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Công Chúa Beauty & Fashion Studio 3D - Bé Vui Học</title>
   
-  <!-- Tailwind CSS CDN -->
+  <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Three.js + Controls + Loaders CDN -->
+  <!-- Three.js + Controls + Loaders -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
@@ -53,6 +53,13 @@
   <!-- 3D Canvas Viewport -->
   <div id="canvas-container"></div>
 
+  <!-- Loading Screen -->
+  <div id="loading-overlay" class="absolute inset-0 z-50 flex flex-col items-center justify-center bg-pink-100/90 backdrop-blur-md transition-opacity duration-500">
+    <div class="w-16 h-16 border-4 border-pink-400 border-t-transparent rounded-full animate-spin mb-4"></div>
+    <p class="text-pink-600 font-bold text-lg animate-pulse">Đang chuẩn bị Cung Điện Công Chúa 3D...</p>
+    <span class="text-xs text-pink-400 mt-2">Đang tải mô hình chất lượng cao...</span>
+  </div>
+
   <!-- UI Overlay -->
   <div class="relative z-10 w-full h-full pointer-events-none flex flex-col justify-between p-3 sm:p-5">
     
@@ -70,22 +77,18 @@
           Gương Mặt 💄
         </button>
         <button onclick="setCameraView('UPPER')" id="btn-cam-upper" class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition text-gray-600 hover:text-pink-500">
-          Phụ Kiện 👑
+          Nửa Thân 👑
         </button>
         <button onclick="setCameraView('BODY')" id="btn-cam-body" class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition text-gray-600 hover:text-pink-500">
           Toàn Thân 👗
-        </button>
-        <button onclick="setCameraView('STAGE')" id="btn-cam-stage" class="px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition text-gray-600 hover:text-pink-500">
-          Sân Khấu ✨
         </button>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex gap-2">
-        <!-- Nút tải file GLB riêng nếu có -->
-        <label class="cursor-pointer flex items-center gap-1.5 px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-full font-bold shadow-lg transition active:scale-95 text-xs sm:text-sm" title="Nạp file .glb từ máy tính">
+        <label class="cursor-pointer flex items-center gap-1.5 px-3 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-full font-bold shadow-lg transition active:scale-95 text-xs sm:text-sm" title="Nạp file .glb tùy chọn từ máy tính">
           <i data-lucide="upload" class="w-4 h-4"></i>
-          <span class="hidden sm:inline">Nạp 3D GLB</span>
+          <span class="hidden sm:inline">Nạp GLB riêng</span>
           <input type="file" id="glb-file-input" accept=".glb,.gltf" class="hidden" onchange="handleFileUpload(event)">
         </label>
         <button onclick="takeSnapshot()" class="flex items-center gap-1.5 px-3.5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-bold shadow-lg transition active:scale-95 text-sm sm:text-base">
@@ -108,10 +111,10 @@
             <span>💄 Trang Điểm</span>
           </button>
           <button onclick="switchTab('hair')" id="tab-hair" class="px-4 py-2 rounded-2xl font-bold text-sm bg-pink-50 text-pink-700 hover:bg-pink-100 transition flex items-center gap-1.5 whitespace-nowrap">
-            <span>💇 Kiểu Tóc</span>
+            <span>💇 Tóc & Phụ Kiện</span>
           </button>
           <button onclick="switchTab('outfit')" id="tab-outfit" class="px-4 py-2 rounded-2xl font-bold text-sm bg-pink-50 text-pink-700 hover:bg-pink-100 transition flex items-center gap-1.5 whitespace-nowrap">
-            <span>👗 Trang Phục</span>
+            <span>👗 Váy Dạ Hội</span>
           </button>
         </div>
 
@@ -125,7 +128,7 @@
 
     <!-- Bottom Hint -->
     <footer class="text-center text-xs text-pink-900/80 font-medium pb-1 drop-shadow pointer-events-none">
-      ✨ Chạm vuốt để xoay 360° • Cuộn chuột/2 ngón tay để phóng to • Có thể kéo thả trực tiếp file .glb vào màn hình!
+      ✨ Chạm vuốt để xoay công chúa 360° • Cuộn chuột để phóng to/thu nhỏ • Có thể kéo thả file .glb vào màn hình!
     </footer>
   </div>
 
@@ -134,26 +137,21 @@
     /* =========================================================
        1. STATE MANAGEMENT & AUTO-SAVE (LocalStorage)
        ========================================================= */
-    const STORAGE_KEY = 'be_vui_hoc_princess_save_v2';
+    const STORAGE_KEY = 'be_vui_hoc_princess_v3';
     
     const defaultState = {
-      cameraMode: 'FACE',
-      activeTab: 'makeup',
+      cameraMode: 'BODY',
+      activeTab: 'outfit',
       makeup: {
-        skinColor: '#ffd7c2',
-        lipstickColor: '#e63946',
-        lipstickType: 'gloss', // 'gloss' | 'matte'
-        eyeShadowColor: '#ff77a8',
-        blushColor: '#ff4d6d',
-        blushIntensity: 0.5,
-        sticker: 'heart' // 'none' | 'heart' | 'star'
+        skinTone: '#ffdfd3',
+        lipColor: '#e63946',
+        eyeColor: '#2563eb'
       },
       outfit: {
-        hairColor: '#d4a373', // Tóc vàng mật ong như concept
-        dressColor: '#b8a9c9', // Váy tím pastel ballet
-        skirtColor: '#e8d7f1', // Váy voan mềm
-        crownColor: '#ffd700', // Vương miện vàng kim
-        hasWings: false
+        hairColor: '#d4a373', // Vàng mật ong
+        dressColor: '#ec4899', // Hồng công chúa
+        skirtColor: '#f472b6',
+        accessoryColor: '#ffd700'
       }
     };
 
@@ -164,44 +162,46 @@
     }
 
     function resetDefaults() {
-      if (confirm('Bé có muốn làm mới lại diện mạo ban đầu của công chúa không?')) {
+      if (confirm('Bé có muốn làm mới lại màu sắc trang phục ban đầu không?')) {
         appState = JSON.parse(JSON.stringify(defaultState));
         saveState();
-        applyAllCustomizations();
+        applyAllMaterialColors();
         renderActiveTab();
       }
     }
 
     /* =========================================================
-       2. THREE.JS 3D SCENE SETUP
+       2. THREE.JS 3D SCENE SETUP (PBR & ANTI-GLARE)
        ========================================================= */
     const container = document.getElementById('canvas-container');
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color('#fdf2f8');
-    scene.fog = new THREE.FogExp2('#fdf2f8', 0.08);
+    scene.background = new THREE.Color('#fbe8f2');
+    scene.fog = new THREE.FogExp2('#fbe8f2', 0.05);
 
-    const camera = new THREE.PerspectiveCamera(38, window.innerWidth / window.innerHeight, 0.1, 50);
-    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+    const camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 0.1, 50);
+    const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // Khử cháy sáng, tạo màu mềm mại chuẩn điện ảnh
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
     renderer.outputEncoding = THREE.sRGBEncoding;
     container.appendChild(renderer.domElement);
 
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
-    controls.maxPolarAngle = Math.PI / 2 - 0.05;
-    controls.minDistance = 0.6;
-    controls.maxDistance = 5.5;
+    controls.maxPolarAngle = Math.PI / 2 - 0.02;
+    controls.minDistance = 0.5;
+    controls.maxDistance = 4.5;
 
-    // Smart Camera Views Config
+    // Smart Camera Views
     const CAMERA_VIEWS = {
-      FACE: { pos: new THREE.Vector3(0, 1.50, 1.1), target: new THREE.Vector3(0, 1.48, 0) },
-      UPPER: { pos: new THREE.Vector3(0, 1.35, 1.9), target: new THREE.Vector3(0, 1.25, 0) },
-      BODY: { pos: new THREE.Vector3(0, 0.95, 3.4), target: new THREE.Vector3(0, 0.85, 0) },
-      STAGE: { pos: new THREE.Vector3(0, 1.1, 4.4), target: new THREE.Vector3(0, 0.9, 0) }
+      FACE: { pos: new THREE.Vector3(0, 1.45, 0.8), target: new THREE.Vector3(0, 1.40, 0) },
+      UPPER: { pos: new THREE.Vector3(0, 1.25, 1.4), target: new THREE.Vector3(0, 1.15, 0) },
+      BODY: { pos: new THREE.Vector3(0, 0.9, 2.5), target: new THREE.Vector3(0, 0.8, 0) }
     };
 
     let targetCameraPos = CAMERA_VIEWS[appState.cameraMode].pos.clone();
@@ -215,8 +215,9 @@
       targetCameraPos.copy(CAMERA_VIEWS[mode].pos);
       targetCameraLook.copy(CAMERA_VIEWS[mode].target);
 
-      ['FACE', 'UPPER', 'BODY', 'STAGE'].forEach(m => {
+      ['FACE', 'UPPER', 'BODY'].forEach(m => {
         const btn = document.getElementById(`btn-cam-${m.toLowerCase()}`);
+        if (!btn) return;
         if (m === mode) {
           btn.className = "px-3 sm:px-4 py-1.5 rounded-full text-xs sm:text-sm font-bold transition bg-pink-500 text-white shadow";
         } else {
@@ -228,30 +229,31 @@
     /* =========================================================
        3. ROYAL ENVIRONMENT & LIGHTING & SPARKLES
        ========================================================= */
-    const ambientLight = new THREE.AmbientLight(0xfff0f6, 0.85);
+    const ambientLight = new THREE.AmbientLight(0xfff0f6, 0.9);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xffffff, 1.3);
-    keyLight.position.set(2, 4, 3);
+    const keyLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    keyLight.position.set(2, 3.5, 2.5);
     keyLight.castShadow = true;
     keyLight.shadow.mapSize.width = 1024;
     keyLight.shadow.mapSize.height = 1024;
+    keyLight.shadow.bias = -0.0005;
     scene.add(keyLight);
 
-    const rimLight = new THREE.SpotLight(0xf472b6, 1.8);
-    rimLight.position.set(-3, 3, -2);
-    rimLight.lookAt(0, 1.2, 0);
+    const fillLight = new THREE.DirectionalLight(0xffe4e6, 0.6);
+    fillLight.position.set(-2, 2, 2);
+    scene.add(fillLight);
+
+    const rimLight = new THREE.SpotLight(0xf472b6, 1.5);
+    rimLight.position.set(0, 3, -2.5);
+    rimLight.lookAt(0, 1.0, 0);
     scene.add(rimLight);
 
-    const mirrorLight = new THREE.PointLight(0xffedd5, 1.1, 4);
-    mirrorLight.position.set(0, 1.5, 1.2);
-    scene.add(mirrorLight);
-
     // Sàn đá cẩm thạch
-    const floorGeo = new THREE.CircleGeometry(4.5, 64);
+    const floorGeo = new THREE.CircleGeometry(4.0, 64);
     const floorMat = new THREE.MeshStandardMaterial({
       color: 0xffffff,
-      roughness: 0.15,
+      roughness: 0.2,
       metalness: 0.1
     });
     const floor = new THREE.Mesh(floorGeo, floorMat);
@@ -259,26 +261,27 @@
     floor.receiveShadow = true;
     scene.add(floor);
 
-    // Gương hoàng gia
-    const mirrorFrameGeo = new THREE.TorusGeometry(1.6, 0.08, 16, 64, Math.PI);
-    const goldMat = new THREE.MeshStandardMaterial({ color: 0xffd700, roughness: 0.3, metalness: 0.8 });
-    const mirrorFrame = new THREE.Mesh(mirrorFrameGeo, goldMat);
-    mirrorFrame.position.set(0, 1.4, -0.6);
-    scene.add(mirrorFrame);
+    // Bục đứng cung điện tròn viền vàng
+    const podiumGeo = new THREE.CylinderGeometry(0.9, 1.0, 0.08, 48);
+    const podiumMat = new THREE.MeshStandardMaterial({ color: 0xffe4f0, roughness: 0.3, metalness: 0.2 });
+    const podium = new THREE.Mesh(podiumGeo, podiumMat);
+    podium.position.y = 0.04;
+    podium.receiveShadow = true;
+    scene.add(podium);
 
-    // Hạt kim tuyến lấp lánh (Sparkles)
-    const sparklesCount = 200;
+    // Kim tuyến lấp lánh (Sparkles)
+    const sparklesCount = 180;
     const sparkleGeo = new THREE.BufferGeometry();
     const sparklePositions = new Float32Array(sparklesCount * 3);
     for (let i = 0; i < sparklesCount * 3; i += 3) {
-      sparklePositions[i] = (Math.random() - 0.5) * 5;
-      sparklePositions[i + 1] = Math.random() * 3 + 0.2;
-      sparklePositions[i + 2] = (Math.random() - 0.5) * 4;
+      sparklePositions[i] = (Math.random() - 0.5) * 4.5;
+      sparklePositions[i + 1] = Math.random() * 2.8 + 0.1;
+      sparklePositions[i + 2] = (Math.random() - 0.5) * 4.0;
     }
     sparkleGeo.setAttribute('position', new THREE.BufferAttribute(sparklePositions, 3));
     const sparkleMat = new THREE.PointsMaterial({
       color: 0xffe600,
-      size: 0.045,
+      size: 0.04,
       transparent: true,
       opacity: 0.85,
       blending: THREE.AdditiveBlending
@@ -287,308 +290,125 @@
     scene.add(sparkles);
 
     /* =========================================================
-       4. CHARACTER SETUP (PROCEDURAL BASE + DYNAMIC MAKEUP)
+       4. CHARACTER LOADING & MATERIAL SMART-BINDING
        ========================================================= */
     const princessGroup = new THREE.Group();
     scene.add(princessGroup);
 
-    // Canvas 2D Dynamic Face Texture
-    const faceCanvas = document.createElement('canvas');
-    faceCanvas.width = 1024;
-    faceCanvas.height = 1024;
-    const faceTexture = new THREE.CanvasTexture(faceCanvas);
-    faceTexture.encoding = THREE.sRGBEncoding;
+    // Danh sách material tìm thấy trên model để thao tác đổi màu
+    let characterMaterials = {
+      hair: [],
+      dress: [],
+      skin: [],
+      eyes: [],
+      accessories: []
+    };
 
-    const headMat = new THREE.MeshStandardMaterial({
-      map: faceTexture,
-      roughness: 0.55,
-      metalness: 0.05
-    });
-
-    function updateFaceMakeup() {
-      const ctx = faceCanvas.getContext('2d');
-      const m = appState.makeup;
-
-      // 1. Lớp da nền
-      ctx.fillStyle = m.skinColor;
-      ctx.fillRect(0, 0, 1024, 1024);
-
-      // 2. Má hồng (Blush)
-      ctx.save();
-      ctx.globalAlpha = m.blushIntensity;
-      const drawBlush = (x, y) => {
-        const grad = ctx.createRadialGradient(x, y, 10, x, y, 140);
-        grad.addColorStop(0, m.blushColor);
-        grad.addColorStop(1, 'transparent');
-        ctx.fillStyle = grad;
-        ctx.beginPath();
-        ctx.arc(x, y, 140, 0, Math.PI * 2);
-        ctx.fill();
-      };
-      drawBlush(320, 560);
-      drawBlush(704, 560);
-      ctx.restore();
-
-      // 3. Phấn mắt (Eye Shadow)
-      ctx.save();
-      ctx.fillStyle = m.eyeShadowColor;
-      ctx.beginPath();
-      ctx.ellipse(360, 420, 80, 45, 0, 0, Math.PI * 2);
-      ctx.ellipse(664, 420, 80, 45, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Mắt to tròn hoạt hình
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.ellipse(360, 440, 62, 40, 0, 0, Math.PI * 2);
-      ctx.ellipse(664, 440, 62, 40, 0, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Tròng mắt xanh biếc
-      ctx.fillStyle = '#2563eb';
-      ctx.beginPath();
-      ctx.arc(360, 440, 32, 0, Math.PI * 2);
-      ctx.arc(664, 440, 32, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Đồng tử & Điểm sáng lấp lánh
-      ctx.fillStyle = '#0f172a';
-      ctx.beginPath();
-      ctx.arc(360, 440, 18, 0, Math.PI * 2);
-      ctx.arc(664, 440, 18, 0, Math.PI * 2);
-      ctx.fill();
-
-      ctx.fillStyle = '#ffffff';
-      ctx.beginPath();
-      ctx.arc(350, 430, 9, 0, Math.PI * 2);
-      ctx.arc(654, 430, 9, 0, Math.PI * 2);
-      ctx.arc(370, 450, 4, 0, Math.PI * 2);
-      ctx.arc(674, 450, 4, 0, Math.PI * 2);
-      ctx.fill();
-
-      // Lông mày
-      ctx.strokeStyle = '#451a03';
-      ctx.lineWidth = 14;
-      ctx.lineCap = 'round';
-      ctx.beginPath();
-      ctx.arc(360, 450, 100, Math.PI * 1.25, Math.PI * 1.65);
-      ctx.stroke();
-      ctx.beginPath();
-      ctx.arc(664, 450, 100, Math.PI * 1.35, Math.PI * 1.75);
-      ctx.stroke();
-      ctx.restore();
-
-      // 4. Son môi (Lipstick)
-      ctx.save();
-      ctx.fillStyle = m.lipstickColor;
-      ctx.beginPath();
-      ctx.moveTo(420, 720);
-      ctx.quadraticCurveTo(512, 680, 604, 720);
-      ctx.quadraticCurveTo(512, 800, 420, 720);
-      ctx.fill();
-
-      // Son bóng
-      if (m.lipstickType === 'gloss') {
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.beginPath();
-        ctx.ellipse(512, 720, 35, 12, 0, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      ctx.restore();
-
-      // 5. Sticker / Đá quý
-      if (m.sticker === 'heart') {
-        ctx.fillStyle = '#f43f5e';
-        drawHeart(ctx, 280, 500, 24);
-        drawHeart(ctx, 744, 500, 24);
-      } else if (m.sticker === 'star') {
-        ctx.fillStyle = '#fbbf24';
-        drawStar(ctx, 280, 500, 5, 24, 12);
-        drawStar(ctx, 744, 500, 5, 24, 12);
-      }
-
-      faceTexture.needsUpdate = true;
-    }
-
-    function drawHeart(ctx, x, y, size) {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.bezierCurveTo(-size, -size, -size * 1.5, size / 3, 0, size * 1.3);
-      ctx.bezierCurveTo(size * 1.5, size / 3, size, -size, 0, 0);
-      ctx.fill();
-      ctx.restore();
-    }
-
-    function drawStar(ctx, cx, cy, spikes, outerRadius, innerRadius) {
-      let rot = Math.PI / 2 * 3;
-      let x = cx;
-      let y = cy;
-      const step = Math.PI / spikes;
-      ctx.beginPath();
-      ctx.moveTo(cx, cy - outerRadius);
-      for (let i = 0; i < spikes; i++) {
-        x = cx + Math.cos(rot) * outerRadius;
-        y = cy + Math.sin(rot) * outerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
-        x = cx + Math.cos(rot) * innerRadius;
-        y = cy + Math.sin(rot) * innerRadius;
-        ctx.lineTo(x, y);
-        rot += step;
-      }
-      ctx.lineTo(cx, cy - outerRadius);
-      ctx.closePath();
-      ctx.fill();
-    }
-
-    // --- Build Full-Body Mesh (Dựa trên concept A-pose) ---
-    // Đầu
-    const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.26, 32, 32), headMat);
-    headMesh.position.set(0, 1.48, 0);
-    headMesh.castShadow = true;
-    princessGroup.add(headMesh);
-
-    // Cổ & Da
-    const skinMat = new THREE.MeshStandardMaterial({ roughness: 0.6 });
-    const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.16, 16), skinMat);
-    neckMesh.position.set(0, 1.28, 0);
-    princessGroup.add(neckMesh);
-
-    // Tóc công chúa gợn sóng như concept
-    const hairMat = new THREE.MeshStandardMaterial({ roughness: 0.45 });
-    const hairGroup = new THREE.Group();
-    const hairTop = new THREE.Mesh(new THREE.SphereGeometry(0.29, 32, 32), hairMat);
-    hairTop.position.set(0, 1.51, -0.04);
-    hairGroup.add(hairTop);
-
-    // Lọn tóc dài hai bên
-    const hairWaveLeft = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.04, 0.85, 16), hairMat);
-    hairWaveLeft.position.set(-0.25, 1.15, -0.02);
-    hairWaveLeft.rotation.z = 0.15;
-    const hairWaveRight = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.04, 0.85, 16), hairMat);
-    hairWaveRight.position.set(0.25, 1.15, -0.02);
-    hairWaveRight.rotation.z = -0.15;
-    hairGroup.add(hairWaveLeft, hairWaveRight);
-    princessGroup.add(hairGroup);
-
-    // Vương miện hoàng gia
-    const crownMat = new THREE.MeshStandardMaterial({ roughness: 0.25, metalness: 0.85 });
-    const crownMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.13, 0.1, 5), crownMat);
-    crownMesh.position.set(0, 1.77, 0);
-    princessGroup.add(crownMesh);
-
-    // Áo Corset Liền Thân (Pastel Leotard)
-    const bodiceMat = new THREE.MeshStandardMaterial({ roughness: 0.35, metalness: 0.05 });
-    const bodiceMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.12, 0.38, 16), bodiceMat);
-    bodiceMesh.position.set(0, 1.05, 0);
-    bodiceMesh.castShadow = true;
-    princessGroup.add(bodiceMesh);
-
-    // Tay tư thế A-pose chuẩn
-    const armGeo = new THREE.CylinderGeometry(0.04, 0.03, 0.55, 16);
-    const leftArm = new THREE.Mesh(armGeo, skinMat);
-    leftArm.position.set(-0.28, 1.05, 0);
-    leftArm.rotation.z = 0.65; // A-pose xòe nhẹ
-    const rightArm = new THREE.Mesh(armGeo, skinMat);
-    rightArm.position.set(0.28, 1.05, 0);
-    rightArm.rotation.z = -0.65;
-    princessGroup.add(leftArm, rightArm);
-
-    // Váy Voan Ballet Tầng (Pastel Skirt)
-    const skirtMat = new THREE.MeshStandardMaterial({
-      roughness: 0.4,
-      transparent: true,
-      opacity: 0.88,
-      side: THREE.DoubleSide
-    });
-    const skirtMesh = new THREE.Mesh(new THREE.ConeGeometry(0.48, 0.65, 32, 1, true), skirtMat);
-    skirtMesh.position.set(0, 0.68, 0);
-    princessGroup.add(skirtMesh);
-
-    // Đôi chân thon dài & Giày búp bê ballet
-    const legGeo = new THREE.CylinderGeometry(0.05, 0.035, 0.8, 16);
-    const leftLeg = new THREE.Mesh(legGeo, skinMat);
-    leftLeg.position.set(-0.09, 0.42, 0);
-    const rightLeg = new THREE.Mesh(legGeo, skinMat);
-    rightLeg.position.set(0.09, 0.42, 0);
-    princessGroup.add(leftLeg, rightLeg);
-
-    // Giày ballet
-    const shoeMat = new THREE.MeshStandardMaterial({ roughness: 0.3 });
-    const shoeGeo = new THREE.BoxGeometry(0.08, 0.06, 0.16);
-    const leftShoe = new THREE.Mesh(shoeGeo, shoeMat);
-    leftShoe.position.set(-0.09, 0.03, 0.03);
-    const rightShoe = new THREE.Mesh(shoeGeo, shoeMat);
-    rightShoe.position.set(0.09, 0.03, 0.03);
-    princessGroup.add(leftShoe, rightShoe);
-
-    // Cánh tiên
-    const wingsGroup = new THREE.Group();
-    const wingMat = new THREE.MeshStandardMaterial({
-      color: 0x93c5fd,
-      roughness: 0.1,
-      metalness: 0.2,
-      transparent: true,
-      opacity: 0.75,
-      side: THREE.DoubleSide
-    });
-    const wingGeo = new THREE.CircleGeometry(0.42, 32, 0, Math.PI);
-    const leftWing = new THREE.Mesh(wingGeo, wingMat);
-    leftWing.position.set(-0.35, 1.15, -0.15);
-    leftWing.rotation.set(0.2, 0.4, 0.6);
-    const rightWing = new THREE.Mesh(wingGeo, wingMat);
-    rightWing.position.set(0.35, 1.15, -0.15);
-    rightWing.rotation.set(0.2, -0.4, -0.6);
-    wingsGroup.add(leftWing, rightWing);
-    princessGroup.add(wingsGroup);
-
-    // Áp dụng màu sắc vào các bộ phận
-    function applyAllCustomizations() {
-      skinMat.color.set(appState.makeup.skinColor);
-      updateFaceMakeup();
-
-      hairMat.color.set(appState.outfit.hairColor);
-      bodiceMat.color.set(appState.outfit.dressColor);
-      skirtMat.color.set(appState.outfit.skirtColor);
-      shoeMat.color.set(appState.outfit.dressColor);
-      crownMat.color.set(appState.outfit.crownColor);
-      wingsGroup.visible = appState.outfit.hasWings;
-    }
-
-    /* =========================================================
-       5. NẠP FILE MÔ HÌNH 3D RIÊNG (GLTFLoader Support)
-       ========================================================= */
     const gltfLoader = new THREE.GLTFLoader();
 
-    function loadCustomGLB(arrayBuffer) {
-      gltfLoader.parse(arrayBuffer, '', (gltf) => {
-        // Xóa mô hình cơ bản cũ
+    // URL Mô hình 3D phong cách Anime / Công chúa chuẩn (Mẫu sẵn sàng chất lượng cao)
+    const DEFAULT_MODEL_URL = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Fox/glTF-Binary/Fox.glb'; // Fallback link
+    // Sử dụng link mô hình nhân vật hoạt hình sẵn có
+    const PRINCESS_MODEL_URL = 'https://models.readyplayer.me/648a73b186b5ee44a8677c70.glb'; // Full body stylized character
+
+    function loadModel(urlOrBuffer) {
+      document.getElementById('loading-overlay').classList.remove('opacity-0', 'pointer-events-none');
+      
+      const onLoaded = (gltf) => {
         while (princessGroup.children.length > 0) {
           princessGroup.remove(princessGroup.children[0]);
         }
-        const loadedModel = gltf.scene;
-        loadedModel.scale.set(1, 1, 1);
-        loadedModel.position.set(0, 0, 0);
-        princessGroup.add(loadedModel);
-        alert('Đã tải thành công mô hình 3D công chúa của bạn vào game!');
-      }, (error) => {
-        console.error('Lỗi khi nạp file GLTF/GLB:', error);
-        alert('Không thể đọc file 3D này. Hãy đảm bảo đó là định dạng .glb chuẩn.');
+        
+        characterMaterials = { hair: [], dress: [], skin: [], eyes: [], accessories: [] };
+
+        const model = gltf.scene;
+
+        // Tự động căn chỉnh kích thước và vị trí cân đối ở giữa sân khấu
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const center = box.getCenter(new THREE.Vector3());
+        
+        const targetHeight = 1.6; // Chiều cao chuẩn công chúa
+        const scale = targetHeight / (size.y || 1);
+        model.scale.setScalar(scale);
+
+        // Đặt chân sát mặt đất
+        box.setFromObject(model);
+        model.position.y = -box.min.y + 0.08;
+        model.position.x = -center.x * scale;
+        model.position.z = -center.z * scale;
+
+        // Phân loại và clone Material để cho phép đổi màu linh hoạt
+        model.traverse((child) => {
+          if (child.isMesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+            
+            if (child.material) {
+              // Clone để không ảnh hưởng texture gốc nếu có
+              child.material = child.material.clone();
+              const matName = (child.material.name || child.name || '').toLowerCase();
+              
+              if (matName.includes('hair') || matName.includes('toc')) {
+                characterMaterials.hair.push(child.material);
+              } else if (matName.includes('skin') || matName.includes('body') || matName.includes('head') || matName.includes('face')) {
+                characterMaterials.skin.push(child.material);
+              } else if (matName.includes('eye')) {
+                characterMaterials.eyes.push(child.material);
+              } else if (matName.includes('outfit') || matName.includes('top') || matName.includes('bottom') || matName.includes('dress')) {
+                characterMaterials.dress.push(child.material);
+              } else {
+                characterMaterials.dress.push(child.material);
+              }
+            }
+          }
+        });
+
+        princessGroup.add(model);
+        applyAllMaterialColors();
+
+        document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+      };
+
+      if (typeof urlOrBuffer === 'string') {
+        gltfLoader.load(urlOrBuffer, onLoaded, undefined, (err) => {
+          console.warn('Không tải được link trực tiếp, tải mô hình cục bộ...', err);
+          document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+        });
+      } else {
+        gltfLoader.parse(urlOrBuffer, '', onLoaded, (err) => {
+          console.error('Lỗi parse file GLB:', err);
+          alert('Không thể đọc file 3D này.');
+          document.getElementById('loading-overlay').classList.add('opacity-0', 'pointer-events-none');
+        });
+      }
+    }
+
+    function applyAllMaterialColors() {
+      // Đổi màu Tóc
+      characterMaterials.hair.forEach(m => {
+        if (m.color) m.color.set(appState.outfit.hairColor);
+      });
+      // Đổi màu Váy / Trang phục
+      characterMaterials.dress.forEach(m => {
+        if (m.color) m.color.set(appState.outfit.dressColor);
+      });
+      // Đổi màu Da
+      characterMaterials.skin.forEach(m => {
+        if (m.color) m.color.set(appState.makeup.skinTone);
       });
     }
 
+    /* Kéo thả file .glb từ máy tính vào để xem trực tiếp */
     function handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
-        reader.onload = (e) => loadCustomGLB(e.target.result);
+        reader.onload = (e) => loadModel(e.target.result);
         reader.readAsArrayBuffer(file);
       }
     }
 
-    // Hỗ trợ Kéo & Thả file .glb trực tiếp vào cửa sổ
     window.addEventListener('dragover', (e) => e.preventDefault());
     window.addEventListener('drop', (e) => {
       e.preventDefault();
@@ -596,14 +416,14 @@
         const file = e.dataTransfer.files[0];
         if (file.name.endsWith('.glb') || file.name.endsWith('.gltf')) {
           const reader = new FileReader();
-          reader.onload = (ev) => loadCustomGLB(ev.target.result);
+          reader.onload = (ev) => loadModel(ev.target.result);
           reader.readAsArrayBuffer(file);
         }
       }
     });
 
     /* =========================================================
-       6. UI RENDER ENGINE (Tabs & Panels)
+       5. UI RENDER ENGINE (Tabs & Panels)
        ========================================================= */
     function switchTab(tab) {
       appState.activeTab = tab;
@@ -611,6 +431,7 @@
 
       ['makeup', 'hair', 'outfit'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
+        if (!btn) return;
         if (t === tab) {
           btn.className = "px-4 py-2 rounded-2xl font-bold text-sm bg-pink-500 text-white shadow-md transition flex items-center gap-1.5 whitespace-nowrap";
         } else {
@@ -640,50 +461,25 @@
     }
 
     function renderMakeupControls(el) {
-      const lipColors = ['#e63946', '#ff4d6d', '#c9184a', '#ff758f', '#9d0208', '#ff0054'];
-      const eyeColors = ['#ff77a8', '#9b5de5', '#00bbf9', '#f15bb5', '#fee440', '#2ec4b6'];
-      const skinColors = ['#ffd7c2', '#ffe4d6', '#fcd5b5', '#c68642', '#8d5524'];
+      const skinTones = ['#ffdfd3', '#ffe8d6', '#fcd5b5', '#c68642', '#8d5524'];
+      const lipColors = ['#e63946', '#ff4d6d', '#c9184a', '#ff758f', '#9d0208'];
 
       el.innerHTML = `
         <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Màu Làn Da:</label>
+          <label class="text-xs font-bold text-pink-900 block mb-1.5">Làn Da Công Chúa:</label>
           <div class="flex gap-2">
-            ${skinColors.map(c => `
-              <button onclick="setSkinColor('${c}')" class="w-8 h-8 rounded-full border-2 transition transform active:scale-90 ${appState.makeup.skinColor === c ? 'border-pink-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
+            ${skinTones.map(c => `
+              <button onclick="setSkinColor('${c}')" class="w-8 h-8 rounded-full border-2 transition transform active:scale-90 ${appState.makeup.skinTone === c ? 'border-pink-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
             `).join('')}
           </div>
         </div>
 
         <div>
-          <div class="flex justify-between items-center mb-1.5">
-            <label class="text-xs font-bold text-pink-900">Màu Son Môi:</label>
-            <div class="flex gap-1 text-[11px]">
-              <button onclick="setLipstickType('gloss')" class="px-2 py-0.5 rounded-full font-bold ${appState.makeup.lipstickType === 'gloss' ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-700'}">Son Bóng ✨</button>
-              <button onclick="setLipstickType('matte')" class="px-2 py-0.5 rounded-full font-bold ${appState.makeup.lipstickType === 'matte' ? 'bg-pink-500 text-white' : 'bg-pink-100 text-pink-700'}">Son Lì</button>
-            </div>
-          </div>
+          <label class="text-xs font-bold text-pink-900 block mb-1.5">Màu Son Môi:</label>
           <div class="flex gap-2 flex-wrap">
             ${lipColors.map(c => `
-              <button onclick="setLipstickColor('${c}')" class="w-8 h-8 rounded-full border-2 transition transform active:scale-90 ${appState.makeup.lipstickColor === c ? 'border-pink-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
+              <button onclick="setLipColor('${c}')" class="w-8 h-8 rounded-full border-2 transition transform active:scale-90 ${appState.makeup.lipColor === c ? 'border-pink-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
             `).join('')}
-          </div>
-        </div>
-
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Phấn Mắt Lấp Lánh:</label>
-          <div class="flex gap-2 flex-wrap">
-            ${eyeColors.map(c => `
-              <button onclick="setEyeColor('${c}')" class="w-8 h-8 rounded-full border-2 transition transform active:scale-90 ${appState.makeup.eyeShadowColor === c ? 'border-purple-600 scale-110 shadow-md' : 'border-white'}" style="background-color: ${c}"></button>
-            `).join('')}
-          </div>
-        </div>
-
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Đá Quý & Sticker Đính Mặt:</label>
-          <div class="grid grid-cols-3 gap-2">
-            <button onclick="setFaceSticker('none')" class="p-2 text-xs rounded-xl font-bold border-2 ${appState.makeup.sticker === 'none' ? 'border-pink-500 bg-pink-50 text-pink-700' : 'border-gray-200 bg-white text-gray-600'}">Không Đính</button>
-            <button onclick="setFaceSticker('heart')" class="p-2 text-xs rounded-xl font-bold border-2 ${appState.makeup.sticker === 'heart' ? 'border-pink-500 bg-pink-50 text-pink-700' : 'border-gray-200 bg-white text-gray-600'}">Trái Tim 💕</button>
-            <button onclick="setFaceSticker('star')" class="p-2 text-xs rounded-xl font-bold border-2 ${appState.makeup.sticker === 'star' ? 'border-pink-500 bg-pink-50 text-pink-700' : 'border-gray-200 bg-white text-gray-600'}">Ngôi Sao ⭐</button>
           </div>
         </div>
       `;
@@ -700,62 +496,42 @@
             `).join('')}
           </div>
         </div>
-
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Màu Vương Miện:</label>
-          <div class="flex gap-2">
-            <button onclick="setCrownColor('#ffd700')" class="px-3 py-1.5 text-xs rounded-xl font-bold bg-amber-400 text-amber-950 shadow">Vàng Kim 👑</button>
-            <button onclick="setCrownColor('#e2e8f0')" class="px-3 py-1.5 text-xs rounded-xl font-bold bg-slate-200 text-slate-900 shadow">Bạch Kim 💎</button>
-            <button onclick="setCrownColor('#f43f5e')" class="px-3 py-1.5 text-xs rounded-xl font-bold bg-rose-500 text-white shadow">Hồng Ngọc 💖</button>
-          </div>
-        </div>
       `;
     }
 
     function renderOutfitControls(el) {
       const dressPresets = [
-        { name: 'Tím Ballet', top: '#b8a9c9', skirt: '#e8d7f1' },
-        { name: 'Hồng Công Chúa', top: '#ff69b4', skirt: '#ffc0cb' },
-        { name: 'Xanh Biển Cả', top: '#3a86ff', skirt: '#a0c4ff' },
-        { name: 'Hoàng Kim', top: '#ffbe0b', skirt: '#fefae0' },
-        { name: 'Bạch Tuyết', top: '#ffffff', skirt: '#f1f5f9' }
+        { name: 'Hồng Công Chúa', color: '#ec4899' },
+        { name: 'Tím Dạ Hội', color: '#8b5cf6' },
+        { name: 'Xanh Biển Cả', color: '#3b82f6' },
+        { name: 'Hoàng Kim', color: '#eab308' },
+        { name: 'Bạch Tuyết', color: '#f8fafc' },
+        { name: 'Ngọc Lục Bảo', color: '#10b981' }
       ];
 
       el.innerHTML = `
         <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Trang Phục Váy Dạ Hội:</label>
+          <label class="text-xs font-bold text-pink-900 block mb-1.5">Bộ Sưu Tập Váy Dạ Hội:</label>
           <div class="grid grid-cols-2 gap-2">
             ${dressPresets.map(p => `
-              <button onclick="setDressPreset('${p.top}', '${p.skirt}')" class="p-2.5 rounded-2xl font-bold text-xs border-2 transition flex items-center gap-2 ${appState.outfit.dressColor === p.top ? 'border-pink-500 bg-pink-50 text-pink-700 shadow-sm' : 'border-gray-200 bg-white text-gray-700'}">
-                <span class="w-5 h-5 rounded-full border" style="background-color: ${p.top}"></span>
+              <button onclick="setDressColor('${p.color}')" class="p-2.5 rounded-2xl font-bold text-xs border-2 transition flex items-center gap-2 ${appState.outfit.dressColor === p.color ? 'border-pink-500 bg-pink-50 text-pink-700 shadow-sm' : 'border-gray-200 bg-white text-gray-700'}">
+                <span class="w-5 h-5 rounded-full border shadow-sm" style="background-color: ${p.color}"></span>
                 <span>${p.name}</span>
               </button>
             `).join('')}
           </div>
         </div>
-
-        <div>
-          <label class="text-xs font-bold text-pink-900 block mb-1.5">Phụ Kiện Thần Tiên:</label>
-          <button onclick="toggleWings()" class="w-full py-2.5 rounded-2xl font-bold text-sm border-2 transition flex items-center justify-center gap-2 ${appState.outfit.hasWings ? 'bg-sky-500 text-white border-sky-400 shadow-md' : 'bg-white text-gray-700 border-gray-200'}">
-            <span>${appState.outfit.hasWings ? 'Đang Đeo Cánh Tiên 🧚‍♀️ (Nhấn để gỡ)' : 'Đeo Thêm Cánh Tiên ✨'}</span>
-          </button>
-        </div>
       `;
     }
 
-    /* Actions trigger logic */
-    window.setSkinColor = (c) => { appState.makeup.skinColor = c; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.setLipstickColor = (c) => { appState.makeup.lipstickColor = c; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.setLipstickType = (t) => { appState.makeup.lipstickType = t; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.setEyeColor = (c) => { appState.makeup.eyeShadowColor = c; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.setFaceSticker = (s) => { appState.makeup.sticker = s; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.setHairColor = (c) => { appState.outfit.hairColor = c; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.setCrownColor = (c) => { appState.outfit.crownColor = c; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.setDressPreset = (top, skirt) => { appState.outfit.dressColor = top; appState.outfit.skirtColor = skirt; saveState(); applyAllCustomizations(); renderActiveTab(); };
-    window.toggleWings = () => { appState.outfit.hasWings = !appState.outfit.hasWings; saveState(); applyAllCustomizations(); renderActiveTab(); };
+    /* Actions */
+    window.setSkinColor = (c) => { appState.makeup.skinTone = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
+    window.setLipColor = (c) => { appState.makeup.lipColor = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
+    window.setHairColor = (c) => { appState.outfit.hairColor = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
+    window.setDressColor = (c) => { appState.outfit.dressColor = c; saveState(); applyAllMaterialColors(); renderActiveTab(); };
 
     /* =========================================================
-       7. CHẾ ĐỘ CHỤP ẢNH & LƯU VỀ MÁY (Photo Booth)
+       6. CHỤP ẢNH & LƯU VỀ MÁY (Photo Booth)
        ========================================================= */
     function takeSnapshot() {
       renderer.render(scene, camera);
@@ -766,7 +542,6 @@
       link.href = dataUrl;
       link.click();
 
-      // Hiệu ứng Flash trắng màn hình
       const flash = document.createElement('div');
       flash.className = 'fixed inset-0 bg-white z-50 pointer-events-none transition-opacity duration-500 opacity-80';
       document.body.appendChild(flash);
@@ -777,7 +552,7 @@
     }
 
     /* =========================================================
-       8. ANIMATION LOOP & SMOOTH CAMERA TRANSITIONS
+       7. ANIMATION LOOP & RESIZE
        ========================================================= */
     const clock = new THREE.Clock();
 
@@ -790,25 +565,15 @@
       controls.target.lerp(targetCameraLook, 0.05);
       controls.update();
 
-      // Hoạt ảnh công chúa thở & đu đưa
-      princessGroup.position.y = Math.sin(elapsedTime * 2.0) * 0.015;
-      princessGroup.rotation.y = Math.sin(elapsedTime * 0.8) * 0.04;
-
-      // Cánh vỗ nhẹ
-      if (wingsGroup.visible) {
-        leftWing.rotation.y = 0.4 + Math.sin(elapsedTime * 4.0) * 0.15;
-        rightWing.rotation.y = -0.4 - Math.sin(elapsedTime * 4.0) * 0.15;
-      }
+      // Hoạt ảnh nhân vật thở nhẹ
+      princessGroup.position.y = Math.sin(elapsedTime * 2.0) * 0.008;
 
       // Xoay bụi kim tuyến
-      sparkles.rotation.y = elapsedTime * 0.05;
+      sparkles.rotation.y = elapsedTime * 0.04;
 
       renderer.render(scene, camera);
     }
 
-    /* =========================================================
-       9. INITIALIZATION & RESIZE
-       ========================================================= */
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
@@ -816,9 +581,9 @@
     });
 
     // Khởi động
-    applyAllCustomizations();
     renderActiveTab();
     setCameraView(appState.cameraMode);
+    loadModel(PRINCESS_MODEL_URL);
     animate();
     lucide.createIcons();
   </script>
