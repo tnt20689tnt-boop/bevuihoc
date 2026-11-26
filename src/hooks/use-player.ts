@@ -38,10 +38,6 @@ export function useMyProfile() {
       if (authError) throw authError;
       if (!authData.user) return null;
 
-      // Promote the student's grade once per school year before loading the profile.
-      const { error: promotionError } = await supabase.rpc("promote_my_grade_if_due");
-      if (promotionError) throw promotionError;
-
       const loadProfile = async () => {
         const { data, error } = await supabase
           .from("profiles")
@@ -52,7 +48,15 @@ export function useMyProfile() {
         return data;
       };
 
+      // New accounts may not have a profile yet. Do not run grade-promotion
+      // logic until the profile row exists; the character editor creates it.
       let data = await loadProfile();
+      if (!data) return null;
+
+      // Promote the student's grade once per school year, then reload the row.
+      const { error: promotionError } = await supabase.rpc("promote_my_grade_if_due");
+      if (promotionError) throw promotionError;
+      data = await loadProfile();
       if (!data) return null;
 
       const gender = data.gender as Gender;
