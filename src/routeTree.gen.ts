@@ -22,6 +22,7 @@ import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenticated/bang-xep-hang'
 import { Route as AuthenticatedDuaXeRouteImport } from './routes/_authenticated/dua-xe'
 import { Route as AuthenticatedHoSoRouteImport } from './routes/_authenticated/ho-so'
+import { Route as AuthenticatedMinecraftRouteImport } from './routes/_authenticated/minecraft'
 import { Route as AuthenticatedNhanVatRouteImport } from './routes/_authenticated/nhan-vat'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
 import { Route as AuthenticatedSalonRouteImport } from './routes/_authenticated/salon'
@@ -97,6 +98,11 @@ const AuthenticatedHoSoRoute = AuthenticatedHoSoRouteImport.update({
   path: '/ho-so',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedMinecraftRoute = AuthenticatedMinecraftRouteImport.update({
+  id: '/minecraft',
+  path: '/minecraft',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedNhanVatRoute = AuthenticatedNhanVatRouteImport.update({
   id: '/nhan-vat',
   path: '/nhan-vat',
@@ -157,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/dua-xe': typeof AuthenticatedDuaXeRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
+  '/minecraft': typeof AuthenticatedMinecraftRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
   '/salon': typeof AuthenticatedSalonRoute
@@ -180,6 +187,7 @@ export interface FileRoutesByTo {
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/dua-xe': typeof AuthenticatedDuaXeRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
+  '/minecraft': typeof AuthenticatedMinecraftRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
   '/salon': typeof AuthenticatedSalonRoute
@@ -205,6 +213,7 @@ export interface FileRoutesById {
   '/_authenticated/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
   '/_authenticated/dua-xe': typeof AuthenticatedDuaXeRoute
   '/_authenticated/ho-so': typeof AuthenticatedHoSoRoute
+  '/_authenticated/minecraft': typeof AuthenticatedMinecraftRoute
   '/_authenticated/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
   '/_authenticated/salon': typeof AuthenticatedSalonRoute
@@ -230,6 +239,7 @@ export interface FileRouteTypes {
     | '/bang-xep-hang'
     | '/dua-xe'
     | '/ho-so'
+    | '/minecraft'
     | '/nhan-vat'
     | '/quan-tri'
     | '/salon'
@@ -253,6 +263,7 @@ export interface FileRouteTypes {
     | '/bang-xep-hang'
     | '/dua-xe'
     | '/ho-so'
+    | '/minecraft'
     | '/nhan-vat'
     | '/quan-tri'
     | '/salon'
@@ -394,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHoSoRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/minecraft': {
+      id: '/_authenticated/minecraft'
+      path: '/minecraft'
+      fullPath: '/minecraft'
+      preLoaderRoute: typeof AuthenticatedMinecraftRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/nhan-vat': {
       id: '/_authenticated/nhan-vat'
       path: '/nhan-vat'
@@ -465,6 +483,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedBangXepHangRoute: typeof AuthenticatedBangXepHangRoute
   AuthenticatedDuaXeRoute: typeof AuthenticatedDuaXeRoute
   AuthenticatedHoSoRoute: typeof AuthenticatedHoSoRoute
+  AuthenticatedMinecraftRoute: typeof AuthenticatedMinecraftRoute
   AuthenticatedNhanVatRoute: typeof AuthenticatedNhanVatRoute
   AuthenticatedQuanTriRoute: typeof AuthenticatedQuanTriRoute
   AuthenticatedSalonRoute: typeof AuthenticatedSalonRoute
@@ -480,6 +499,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBangXepHangRoute: AuthenticatedBangXepHangRoute,
   AuthenticatedDuaXeRoute: AuthenticatedDuaXeRoute,
   AuthenticatedHoSoRoute: AuthenticatedHoSoRoute,
+  AuthenticatedMinecraftRoute: AuthenticatedMinecraftRoute,
   AuthenticatedNhanVatRoute: AuthenticatedNhanVatRoute,
   AuthenticatedQuanTriRoute: AuthenticatedQuanTriRoute,
   AuthenticatedSalonRoute: AuthenticatedSalonRoute,

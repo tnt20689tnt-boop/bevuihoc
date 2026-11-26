@@ -22,7 +22,7 @@ export type Activity = {
   z: number;
   label: string;
   icon: string;
-  to: "/hoc/$subject" | "/salon" | "/san-bong" | "/dua-xe" | "/thi-dau" | "/bang-xep-hang" | "/sanh-vinh-danh";
+  to: "/hoc/$subject" | "/salon" | "/san-bong" | "/dua-xe" | "/minecraft" | "/thi-dau" | "/bang-xep-hang" | "/sanh-vinh-danh";
   params?: { subject: string };
 };
 
@@ -257,12 +257,13 @@ export const ROOMS: Record<RoomId, RoomDef> = {
     ground: ["#7ccf6a", "#6cc35a"],
     sky: "#a9dcff",
     image: footballImg,
-    blurb: "Chọn đá bóng hoặc đua xe 3D trong khu game dành cho bé trai.",
+    blurb: "Chọn đá bóng, đua xe 3D hoặc xây thế giới khối kỳ diệu trong khu game dành cho bé trai.",
     radius: 14,
     portals: [EXIT],
     activities: [
       { x: -3.2, z: -5, label: "Ra sân sút bóng", icon: "⚽", to: "/san-bong" },
       { x: 3.2, z: -5, label: "Đua xe 3D", icon: "🏎️", to: "/dua-xe" },
+      { x: 0, z: -7.5, label: "Vương quốc khối", icon: "🧱", to: "/minecraft" },
     ],
     obstacles: [],
   },
