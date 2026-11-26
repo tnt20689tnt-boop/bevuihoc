@@ -556,7 +556,7 @@ function GirlsProps() {
       <FlowerBed position={[2.1, 0, 0.2]} />
       <Html position={[-2.2, 3.25, -0.15]} center distanceFactor={10}>
         <div style={{ color: "#ce4e86", font: "900 19px 'Baloo 2', sans-serif", whiteSpace: "nowrap", background: "#fff4fa", border: "2px solid #fff", borderRadius: 12, padding: "3px 10px", boxShadow: "0 3px 10px #7c315533" }}>
-          💄 SALON LÀM ĐẸP
+          💄 GAME BÉ GÁI
         </div>
       </Html>
       <group position={[3.7, 0, -6]}>
