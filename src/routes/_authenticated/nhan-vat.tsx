@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { profileQueryKey, useMyProfile, type Profile } from "@/hooks/use-player";
 import { AvatarBadge } from "@/components/AvatarBadge";
-import { ACCESSORIES, CLOTH_COLORS, defaultAvatar, EYES, HAIR_COLORS, HAIR_STYLES, MOUTHS, OUTFITS, SKIN_TONES, validateName, type Avatar, type Gender } from "@/lib/avatar";
+import { ACCESSORIES, CLOTH_COLORS, defaultAvatar, EYES, HAIR_COLORS, HAIR_STYLES, MOUTHS, OUTFITS, SKIN_TONES, suggestName, validateName, type Avatar, type Gender } from "@/lib/avatar";
 
 export const Route = createFileRoute("/_authenticated/nhan-vat")({
   head: () => ({
@@ -76,7 +76,7 @@ function CharacterEditor() {
       setError(validation);
       return;
     }
-    if (!profile || !avatar) return;
+    if (!avatar) return;
     setSaving(true);
     setError("");
     try {
@@ -114,8 +114,13 @@ function CharacterEditor() {
       };
       queryClient.setQueryData(profileQueryKey, savedProfile);
       await queryClient.invalidateQueries({ queryKey: profileQueryKey });
-      toast.success("Đã cập nhật hồ sơ của bé! 🌟");
-      await navigate({ to: "/ho-so" });
+      if (profile) {
+        toast.success("Đã cập nhật hồ sơ của bé! 🌟");
+        await navigate({ to: "/ho-so" });
+      } else {
+        toast.success("Chào mừng bé bước vào trường học! 🌟");
+        await navigate({ to: "/the-gioi" });
+      }
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Không lưu được hồ sơ. Bé thử lại nhé.");
     } finally {
@@ -144,15 +149,32 @@ function CharacterEditor() {
         <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_300px]">
           <section className="space-y-5 rounded-[2rem] border-4 border-white bg-white/95 p-5 shadow-xl sm:p-7">
             <section>
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <h2 className="font-black text-slate-800">1. Tên của bé</h2>
+                <button
+                  type="button"
+                  onClick={() => setName(suggestName())}
+                  className="text-xs font-bold text-sky-600 hover:underline"
+                >
+                  🎲 Gợi ý tên hay
+                </button>
+              </div>
+              <input
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ví dụ: Bo Bo, Sóc Nhí, Nhím Xù..."
+                maxLength={20}
+                className="w-full rounded-xl border-2 border-slate-200 px-4 py-3 text-base font-bold text-slate-800 focus:border-sky-500 focus:outline-none"
+              />
+            </section>
+            <section>
               <h2 className="mb-2 font-black">2. Bé là</h2>
               <div className="grid grid-cols-2 gap-3">
                 <button type="button" aria-pressed={gender === "boy"} onClick={() => changeGender("boy")} className={`rounded-xl border-2 px-4 py-3 font-extrabold ${gender === "boy" ? "border-sky-500 bg-sky-50 text-sky-800" : "border-slate-200 bg-white text-slate-600"}`}>👦 Bé trai</button>
                 <button type="button" aria-pressed={gender === "girl"} onClick={() => changeGender("girl")} className={`rounded-xl border-2 px-4 py-3 font-extrabold ${gender === "girl" ? "border-pink-500 bg-pink-50 text-pink-800" : "border-slate-200 bg-white text-slate-600"}`}>👧 Bé gái</button>
               </div>
             </section>
-            <section>
-              <h2 className="mb-2 font-black">3. Lớp đang học</h2>
-
             <section>
               <h2 className="mb-2 font-black">3. Lớp đang học</h2>
               <div className="grid grid-cols-5 gap-2">
@@ -222,7 +244,11 @@ function CharacterEditor() {
 
             {error && <p role="alert" className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">{error}</p>}
             <button type="button" disabled={saving} onClick={() => void saveProfile()} className="w-full rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 px-6 py-4 text-lg font-black text-white shadow-[0_5px_0_#16866e] disabled:opacity-60">{saving ? "Đang lưu…" : profile ? "Lưu thay đổi 🌟" : "Tạo hồ sơ và vào trường 🌟"}</button>
-            <Link to="/ho-so" className="block text-center font-bold text-slate-500 hover:text-slate-800">Hủy, quay lại hồ sơ</Link>
+            {profile ? (
+              <Link to="/ho-so" className="block text-center font-bold text-slate-500 hover:text-slate-800">Hủy, quay lại hồ sơ</Link>
+            ) : (
+              <Link to="/" className="block text-center font-bold text-slate-500 hover:text-slate-800">Hủy, quay lại trang chủ</Link>
+            )}
           </section>
 
           <aside className="h-fit rounded-[2rem] border-4 border-white bg-white/95 p-6 text-center shadow-xl lg:sticky lg:top-6">
