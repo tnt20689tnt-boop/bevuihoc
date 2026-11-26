@@ -1,0 +1,1779 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>Princess World – Bé Vui Học</title>
+<style>
+  :root{
+    --pink:#ff6fae; --pink2:#ffd1e6; --gold:#f7c948; --purple:#7b4bff;
+    --bg:#1a0f2b; --panel:rgba(30,15,50,.82); --panel2:rgba(45,20,70,.9);
+    --text:#fff; --muted:#c9b8e0; --ok:#39d98a; --warn:#ffb020; --bad:#ff5470;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent}
+  html,body{margin:0;width:100%;height:100%;min-height:100%;overflow:hidden;background:var(--bg);color:var(--text);
+    font-family:'Segoe UI',Roboto,system-ui,sans-serif;user-select:none}
+  #app{position:fixed;inset:0;width:100vw;height:100dvh;min-height:100%;overflow:hidden;display:flex;flex-direction:column}
+  #renderCanvas{position:absolute;inset:0;width:100%;height:100%;display:block;outline:none;touch-action:none;z-index:1}
+  #app:fullscreen{width:100vw;height:100vh;background:var(--bg)}
+  #fullscreenBtn{font-size:11px;padding:7px 10px}
+
+  /* ---------- LOADING ---------- */
+  #loader{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;background:radial-gradient(circle at 50% 40%,#2a1247,#120821);
+    z-index:999;gap:18px;transition:opacity .6s}
+  #loader.hide{opacity:0;pointer-events:none}
+  .crown{font-size:54px;animation:float 2s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  #loader h1{margin:0;font-size:26px;letter-spacing:2px;
+    background:linear-gradient(90deg,var(--pink),var(--gold));-webkit-background-clip:text;
+    background-clip:text;color:transparent}
+  #loadBar{width:260px;height:10px;border-radius:8px;background:rgba(255,255,255,.12);overflow:hidden}
+  #loadFill{height:100%;width:0;border-radius:8px;
+    background:linear-gradient(90deg,var(--pink),var(--gold));transition:width .3s}
+  #loadMsg{font-size:13px;color:var(--muted)}
+
+  /* ---------- TOP BAR ---------- */
+  #topbar{position:absolute;top:0;left:0;right:0;height:52px;display:flex;align-items:center;
+    gap:8px;padding:0 10px;z-index:20;
+    background:linear-gradient(180deg,rgba(20,8,35,.92),rgba(20,8,35,0))}
+  #topbar .logo{font-weight:800;letter-spacing:1px;font-size:15px;
+    background:linear-gradient(90deg,var(--pink),var(--gold));-webkit-background-clip:text;
+    background-clip:text;color:transparent;white-space:nowrap}
+  .spacer{flex:1}
+  .pill{background:var(--panel);border:1px solid rgba(255,255,255,.14);border-radius:20px;
+    padding:6px 12px;font-size:12px;display:flex;align-items:center;gap:6px;white-space:nowrap;
+    backdrop-filter:blur(8px)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--bad)}
+  .dot.on{background:var(--ok);box-shadow:0 0 8px var(--ok)}
+  #timerPill{font-variant-numeric:tabular-nums;font-weight:700}
+  #timerPill.low{color:var(--bad);animation:pulse 1s infinite}
+  @keyframes pulse{50%{opacity:.5}}
+  .btn{cursor:pointer;border:none;border-radius:14px;padding:9px 14px;font-size:13px;
+    font-weight:700;color:#fff;background:linear-gradient(135deg,var(--pink),var(--purple));
+    box-shadow:0 4px 14px rgba(123,75,255,.4);transition:transform .1s,filter .2s;white-space:nowrap}
+  .btn:hover{filter:brightness(1.12)}
+  .btn:active{transform:scale(.96)}
+  .btn.ghost{background:var(--panel2);border:1px solid rgba(255,255,255,.2);box-shadow:none}
+  .btn.gold{background:linear-gradient(135deg,var(--gold),#ff9f1c);color:#3a1f00}
+  .btn.small{padding:6px 10px;font-size:12px;border-radius:10px}
+  .btn:disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.5)}
+
+  /* ---------- SIDE PANELS ---------- */
+  .side{position:absolute;top:60px;bottom:78px;width:230px;z-index:15;
+    background:var(--panel);border:1px solid rgba(255,255,255,.12);border-radius:18px;
+    backdrop-filter:blur(12px);display:flex;flex-direction:column;overflow:hidden;
+    transition:transform .3s;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+  #leftPanel{left:10px}
+  #rightPanel{right:10px}
+  .side.hidden{transform:translateX(calc(-100% - 20px))}
+  #rightPanel.hidden{transform:translateX(calc(100% + 20px))}
+  .side-head{padding:10px 12px;font-size:13px;font-weight:800;letter-spacing:.5px;
+    background:linear-gradient(90deg,rgba(255,111,174,.25),rgba(123,75,255,.25));
+    border-bottom:1px solid rgba(255,255,255,.1);display:flex;align-items:center;gap:6px}
+  .tabs{display:flex;overflow-x:auto;gap:4px;padding:6px;border-bottom:1px solid rgba(255,255,255,.08);
+    scrollbar-width:none}
+  .tabs::-webkit-scrollbar{display:none}
+  .tab{cursor:pointer;padding:6px 9px;font-size:11px;border-radius:9px;background:rgba(255,255,255,.06);
+    border:1px solid transparent;white-space:nowrap;color:var(--muted);transition:.15s}
+  .tab.active{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;
+    border-color:rgba(255,255,255,.3);font-weight:700}
+  .tab-content{flex:1;overflow-y:auto;padding:10px;scrollbar-width:thin;
+    scrollbar-color:var(--pink) transparent}
+  .tab-content::-webkit-scrollbar{width:6px}
+  .tab-content::-webkit-scrollbar-thumb{background:var(--pink);border-radius:6px}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .swatch{aspect-ratio:1;border-radius:10px;cursor:pointer;border:2px solid transparent;
+    transition:.15s;position:relative;display:flex;align-items:center;justify-content:center;
+    font-size:16px;background:rgba(255,255,255,.05)}
+  .swatch:hover{transform:scale(1.08);border-color:rgba(255,255,255,.4)}
+  .swatch.active{border-color:#fff;box-shadow:0 0 0 2px var(--pink)}
+  .item{display:flex;align-items:center;gap:8px;padding:8px;border-radius:11px;cursor:pointer;
+    background:rgba(255,255,255,.05);margin-bottom:6px;transition:.15s;font-size:12px}
+  .item:hover{background:rgba(255,255,255,.12)}
+  .item.active{background:linear-gradient(90deg,rgba(255,111,174,.4),rgba(123,75,255,.4));
+    border:1px solid rgba(255,255,255,.3)}
+  .item .ic{font-size:18px;width:26px;text-align:center}
+  .item .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .slider-row{display:flex;align-items:center;gap:8px;margin:10px 0;font-size:11px;color:var(--muted)}
+  .slider-row input[type=range]{flex:1;accent-color:var(--pink)}
+  .section-title{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;
+    margin:12px 0 6px;font-weight:700}
+  .note{font-size:11px;line-height:1.5;color:var(--muted);background:rgba(255,176,32,.1);
+    border:1px solid rgba(255,176,32,.3);border-radius:10px;padding:8px;margin-top:8px}
+
+  /* ---------- BOTTOM TOOLBAR ---------- */
+  #toolbar{position:absolute;bottom:0;left:0;right:0;height:74px;display:flex;align-items:center;
+    justify-content:center;gap:6px;padding:0 8px;z-index:20;overflow-x:auto;
+    background:linear-gradient(0deg,rgba(20,8,35,.95),rgba(20,8,35,0));scrollbar-width:none}
+  #toolbar::-webkit-scrollbar{display:none}
+  .tool{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;
+    padding:6px 9px;border-radius:14px;min-width:58px;transition:.15s;border:1px solid transparent;
+    background:var(--panel);backdrop-filter:blur(8px)}
+  .tool:hover{background:var(--panel2);border-color:rgba(255,255,255,.2)}
+  .tool.active{background:linear-gradient(135deg,var(--pink),var(--purple));
+    border-color:rgba(255,255,255,.4);box-shadow:0 4px 16px rgba(255,111,174,.5)}
+  .tool .ic{font-size:19px}
+  .tool .lb{font-size:9px;white-space:nowrap;opacity:.9}
+
+  /* ---------- TOAST ---------- */
+  #toasts{position:fixed;top:62px;left:50%;transform:translateX(-50%);z-index:200;
+    display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+  .toast{background:var(--panel2);border:1px solid rgba(255,255,255,.25);padding:9px 16px;
+    border-radius:24px;font-size:13px;font-weight:600;animation:tin .3s ease;
+    backdrop-filter:blur(10px);max-width:90vw;text-align:center}
+  .toast.ok{border-color:var(--ok)}
+  .toast.warn{border-color:var(--warn)}
+  .toast.bad{border-color:var(--bad)}
+  @keyframes tin{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:none}}
+
+  /* ---------- MODAL ---------- */
+  .modal{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;
+    background:rgba(10,4,20,.75);backdrop-filter:blur(6px);padding:16px}
+  .modal.show{display:flex}
+  .modal-box{background:linear-gradient(160deg,#2a1247,#1a0f2b);border:1px solid rgba(255,255,255,.18);
+    border-radius:22px;max-width:560px;width:100%;max-height:88vh;overflow-y:auto;padding:22px;
+    box-shadow:0 24px 80px rgba(0,0,0,.6);animation:tin .3s}
+  .modal-box h2{margin:0 0 14px;font-size:20px;
+    background:linear-gradient(90deg,var(--pink),var(--gold));-webkit-background-clip:text;
+    background-clip:text;color:transparent}
+  .modal-box p,.modal-box li{font-size:13px;line-height:1.6;color:var(--muted)}
+  .modal-box input[type=text],.modal-box textarea{width:100%;padding:10px 12px;border-radius:11px;
+    border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.3);color:#fff;font-size:13px;
+    outline:none;font-family:inherit}
+  .modal-box input:focus,.modal-box textarea:focus{border-color:var(--pink)}
+  .row-btns{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  #photoCanvasWrap{margin-top:10px;text-align:center}
+  #photoCanvasWrap canvas{max-width:100%;border-radius:12px;border:2px solid rgba(255,255,255,.2)}
+
+  /* ---------- LEADERBOARD / RESULTS ---------- */
+  .podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;margin:16px 0}
+  .pod{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+  .pod .ava{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-size:24px;border:3px solid}
+  .pod .base{width:100%;border-radius:12px 12px 0 0;padding:8px 4px;text-align:center;
+    font-size:12px;font-weight:800}
+  .pod.p1 .base{height:78px;background:linear-gradient(180deg,var(--gold),#b8860b)}
+  .pod.p2 .base{height:60px;background:linear-gradient(180deg,#c0c0c0,#777)}
+  .pod.p3 .base{height:48px;background:linear-gradient(180deg,#cd7f32,#7a4a1a)}
+  .pod .name{font-size:12px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .pod .score{font-size:11px;color:var(--muted)}
+  .rank-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:11px;
+    background:rgba(255,255,255,.05);margin-bottom:6px;font-size:13px}
+  .rank-row .rk{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;
+    justify-content:center;font-weight:800;font-size:12px;background:rgba(255,255,255,.1)}
+  .rank-row.top1 .rk{background:var(--gold);color:#3a1f00}
+  .rank-row.top2 .rk{background:#c0c0c0;color:#222}
+  .rank-row.top3 .rk{background:#cd7f32;color:#222}
+  .crit{font-size:11px;color:var(--muted);margin-left:auto;text-align:right}
+  .score-big{font-size:22px;font-weight:900;color:var(--gold)}
+
+  /* ---------- PLAYER LIST ---------- */
+  #playerList{font-size:12px}
+  .pl{display:flex;align-items:center;gap:6px;padding:5px 8px;border-radius:8px;
+    background:rgba(255,255,255,.04);margin-bottom:4px}
+  .pl .dot{width:7px;height:7px}
+
+  /* ---------- MOBILE ---------- */
+  #toggleLeft,#toggleRight{display:none}
+  @media (max-width:820px){
+    .side{width:200px;top:56px;bottom:70px}
+    #topbar .logo{font-size:13px}
+    .pill{font-size:11px;padding:5px 9px}
+    .tool{min-width:50px;padding:5px 7px}
+    .tool .lb{font-size:8px}
+    #toggleLeft,#toggleRight{display:flex}
+  }
+  @media (max-width:520px){
+    .side{width:min(78vw,240px)}
+    .grid{grid-template-columns:repeat(4,1fr)}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <canvas id="renderCanvas"></canvas>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <div class="crown">👑</div>
+    <h1>PRINCESS WORLD</h1>
+    <div id="loadBar"><div id="loadFill"></div></div>
+    <div id="loadMsg">Đang khởi động thế giới thời trang…</div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div id="topbar">
+    <div class="logo">👑 PRINCESS WORLD</div>
+    <div class="spacer"></div>
+    <div class="pill" id="netPill" title="Trạng thái multiplayer">
+      <span class="dot" id="netDot"></span><span id="netTxt">Offline</span>
+    </div>
+    <div class="pill" id="timerPill" style="display:none">⏱ 05:00</div>
+    <div class="pill" id="roomPill" style="display:none">🏠 <span id="roomName">–</span></div>
+    <button class="btn small ghost" id="fullscreenBtn" title="Bật/tắt toàn màn hình">⛶ Toàn màn hình</button>
+    <button class="btn small ghost" id="toggleLeft">☰</button>
+    <button class="btn small ghost" id="toggleRight">✨</button>
+  </div>
+
+  <!-- LEFT PANEL: Makeup -->
+  <div class="side" id="leftPanel">
+    <div class="side-head">💄 BEAUTY STUDIO</div>
+    <div class="tabs" id="makeupTabs">
+      <div class="tab active" data-tab="lips">Son môi</div>
+      <div class="tab" data-tab="eyeshadow">Phấn mắt</div>
+      <div class="tab" data-tab="blush">Phấn má</div>
+      <div class="tab" data-tab="eyeliner">Kẻ mắt</div>
+      <div class="tab" data-tab="lashes">Lông mi</div>
+      <div class="tab" data-tab="brows">Lông mày</div>
+      <div class="tab" data-tab="skin">Da</div>
+    </div>
+    <div class="tab-content" id="makeupContent"></div>
+  </div>
+
+  <!-- RIGHT PANEL: Wardrobe -->
+  <div class="side" id="rightPanel">
+    <div class="side-head">👗 FASHION WARDROBE</div>
+    <div class="tabs" id="wardrobeTabs">
+      <div class="tab active" data-tab="dress">Váy</div>
+      <div class="tab" data-tab="hair">Tóc</div>
+      <div class="tab" data-tab="crown">Vương miện</div>
+      <div class="tab" data-tab="shoes">Giày</div>
+      <div class="tab" data-tab="accessory">Phụ kiện</div>
+      <div class="tab" data-tab="color">Màu</div>
+    </div>
+    <div class="tab-content" id="wardrobeContent"></div>
+  </div>
+
+  <!-- BOTTOM TOOLBAR -->
+  <div id="toolbar">
+    <div class="tool" data-act="beauty"><span class="ic">💄</span><span class="lb">Trang điểm</span></div>
+    <div class="tool" data-act="fashion"><span class="ic">👗</span><span class="lb">Tủ đồ</span></div>
+    <div class="tool" data-act="rooms"><span class="ic">🏰</span><span class="lb">Khu vực</span></div>
+    <div class="tool" data-act="multiplayer"><span class="ic">🌐</span><span class="lb">Online</span></div>
+    <div class="tool" data-act="contest"><span class="ic">🏆</span><span class="lb">Thi đấu</span></div>
+    <div class="tool" data-act="catwalk"><span class="ic">🚶‍♀️</span><span class="lb">Catwalk</span></div>
+    <div class="tool" data-act="photo"><span class="ic">📸</span><span class="lb">Chụp ảnh</span></div>
+    <div class="tool" data-act="leaderboard"><span class="ic">📊</span><span class="lb">Xếp hạng</span></div>
+    <div class="tool" data-act="help"><span class="ic">❓</span><span class="lb">Trợ giúp</span></div>
+  </div>
+
+  <div id="toasts"></div>
+
+  <!-- MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal-box" id="modalBox"></div>
+  </div>
+</div>
+
+<!-- Babylon.js CDN -->
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+
+<script>
+/* ============================================================
+   PRINCESS WORLD – phiên bản 0.1
+   Toàn bộ logic trong một file. Multiplayer dùng WebSocket tới
+   server ngoài khi cấu hình (không giả lập người chơi ảo).
+   ============================================================ */
+'use strict';
+
+/* ---------- GLOBAL STATE ---------- */
+const STATE = {
+  engine:null, scene:null, camera:null, canvas:null,
+  avatar:null, avatarParts:{}, mirrors:[],
+  currentZone:'beauty',
+  look:{
+    skinTone:'#f2c9a8',
+    lips:{color:'#e0356b', gloss:0.6, intensity:0.8},
+    eyeshadow:{color:'#b06bff', intensity:0.5},
+    blush:{color:'#ff8fa8', intensity:0.35},
+    eyeliner:{style:'classic'},
+    lashes:{style:'natural'},
+    brows:{color:'#4a2c1a', style:'soft'},
+    dress:{id:'dress_royal_pink', color:'#ff6fae'},
+    hair:{id:'hair_long_wavy', color:'#5a3420'},
+    crown:{id:'crown_gold', color:'#f7c948'},
+    shoes:{id:'shoes_glass', color:'#e6e6ff'},
+    accessories:[]
+  },
+  graphics:'high',
+  multiplayer:{ws:null, connected:false, room:null, players:{}, myId:null, ready:false},
+  contest:{active:false, theme:null, endsAt:0, locked:false, myScore:null, results:[]},
+  photoMode:false,
+  playerName:localStorage.getItem('pw_name')||'Bạn',
+  moveKeys:{}, walking:false, lastMoveSent:0,
+  history:[], future:[]
+};
+
+/* ---------- TOAST / UI HELPERS ---------- */
+function toast(msg,type=''){
+  const t=document.createElement('div');
+  t.className='toast '+type; t.textContent=msg;
+  document.getElementById('toasts').appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transform='translateY(-10px)';
+    t.style.transition='.3s';setTimeout(()=>t.remove(),300);},2600);
+}
+function $(id){return document.getElementById(id);}
+function openModal(html){ $('modalBox').innerHTML=html; $('modal').classList.add('show'); }
+function closeModal(){ $('modal').classList.remove('show'); }
+$('modal').addEventListener('click',e=>{ if(e.target.id==='modal') closeModal(); });
+
+/* ---------- LOADER ---------- */
+function setLoad(pct,msg){
+  $('loadFill').style.width=pct+'%';
+  if(msg) $('loadMsg').textContent=msg;
+}
+
+/* ============================================================
+   1. BABYLON SCENE
+   ============================================================ */
+function bootBabylon(){
+  STATE.canvas=document.getElementById('renderCanvas');
+  STATE.engine=new BABYLON.Engine(STATE.canvas,true,{preserveDrawingBuffer:true,
+    stencil:true,antialias:STATE.graphics!=='low'});
+  STATE.scene=new BABYLON.Scene(STATE.engine);
+  STATE.scene.clearColor=new BABYLON.Color4(0.08,0.04,0.14,1);
+  STATE.scene.environmentIntensity=0.7;
+
+  // Camera orbit
+  const cam=new BABYLON.ArcRotateCamera('cam',-Math.PI/2,Math.PI/2.4,3.4,
+    new BABYLON.Vector3(0,1.05,0),STATE.scene);
+  cam.lowerRadiusLimit=1.2; cam.upperRadiusLimit=6;
+  cam.lowerBetaLimit=0.4; cam.upperBetaLimit=Math.PI/1.8;
+  cam.wheelPrecision=40; cam.panningSensibility=0;
+  cam.attachControl(STATE.canvas,true);
+  STATE.camera=cam;
+
+  // Lights
+  const hemi=new BABYLON.HemisphericLight('hemi',new BABYLON.Vector3(0,1,0),STATE.scene);
+  hemi.intensity=0.7; hemi.groundColor=new BABYLON.Color3(0.2,0.1,0.3);
+
+  const key=new BABYLON.DirectionalLight('key',new BABYLON.Vector3(-0.5,-1,-0.6),STATE.scene);
+  key.intensity=1.4; key.position=new BABYLON.Vector3(3,6,-3);
+  const keySh=key.getShadowGenerator ? null : null; // set after avatar
+
+  const rim=new BABYLON.PointLight('rim',new BABYLON.Vector3(0,2.5,2),STATE.scene);
+  rim.diffuse=new BABYLON.Color3(1,0.6,0.9); rim.intensity=0.6;
+  const fill=new BABYLON.PointLight('fill',new BABYLON.Vector3(-2,1.5,1),STATE.scene);
+  fill.diffuse=new BABYLON.Color3(0.7,0.6,1); fill.intensity=0.4;
+
+  // Ground / studio floor
+  const floor=BABYLON.MeshBuilder.CreateDisc('floor',{radius:4,tessellation:64},STATE.scene);
+  floor.rotation.x=Math.PI/2; floor.position.y=0.001;
+  const fm=new BABYLON.PBRMaterial('floorMat',STATE.scene);
+  fm.albedoColor=new BABYLON.Color3(0.25,0.15,0.4);
+  fm.metallic=0.6; fm.roughness=0.25; fm.environmentIntensity=0.8;
+  floor.material=fm; floor.receiveShadows=true;
+
+  // Backdrop (dressing room wall)
+  const wall=BABYLON.MeshBuilder.CreatePlane('wall',{width:10,height:6},STATE.scene);
+  wall.position.z=3; wall.position.y=3;
+  const wm=new BABYLON.PBRMaterial('wallMat',STATE.scene);
+  wm.albedoColor=new BABYLON.Color3(0.18,0.1,0.28); wm.metallic=0.1; wm.roughness=0.9;
+  wall.material=wm;
+
+  // Mirror behind avatar (large oval) - a reflective plane
+  const mirror=BABYLON.MeshBuilder.CreatePlane('mirror',{width:2.2,height:3.2},STATE.scene);
+  mirror.position=new BABYLON.Vector3(0,1.7,-2.4);
+  const mm=new BABYLON.PBRMaterial('mirrorMat',STATE.scene);
+  mm.albedoColor=new BABYLON.Color3(0.05,0.05,0.08);
+  mm.metallic=1; mm.roughness=0.05; mm.environmentIntensity=1;
+  mirror.material=mm;
+  // LED ring around mirror
+  const ring=new BABYLON.MeshBuilder.CreateTorus('led',{diameter:2.6,thickness:0.08,tessellation:48},STATE.scene);
+  ring.position=new BABYLON.Vector3(0,1.7,-2.35);
+  const rm=new BABYLON.StandardMaterial('ledMat',STATE.scene);
+  rm.emissiveColor=new BABYLON.Color3(1,0.8,0.6); rm.diffuseColor=new BABYLON.Color3(1,1,1);
+  ring.material=rm;
+
+  // Vanity table
+  const table=BABYLON.MeshBuilder.CreateBox('table',{width:1.6,height:0.08,depth:0.7},STATE.scene);
+  table.position=new BABYLON.Vector3(0,0.9,-1.9);
+  const tmat=new BABYLON.PBRMaterial('tmat',STATE.scene);
+  tmat.albedoColor=new BABYLON.Color3(0.6,0.35,0.5); tmat.metallic=0.4; tmat.roughness=0.3;
+  table.material=tmat;
+  // Table legs
+  [[-0.7,-1.6],[0.7,-1.6],[-0.7,-2.2],[0.7,-2.2]].forEach(([x,z])=>{
+    const leg=BABYLON.MeshBuilder.CreateBox('leg',{width:0.06,height:0.9,depth:0.06},STATE.scene);
+    leg.position=new BABYLON.Vector3(x,0.45,z); leg.material=tmat;
+  });
+
+  // Small cosmetics on table
+  for(let i=0;i<5;i++){
+    const b=BABYLON.MeshBuilder.CreateCylinder('cos'+i,{diameter:0.08,height:0.14},STATE.scene);
+    b.position=new BABYLON.Vector3(-0.5+i*0.25,1.0,-1.85);
+    const cm=new BABYLON.StandardMaterial('cm'+i,STATE.scene);
+    cm.diffuseColor=BABYLON.Color3.FromHexString(['#e0356b','#b06bff','#ff8fa8','#f7c948','#39d98a'][i]);
+    cm.emissiveColor=cm.diffuseColor.scale(0.3); b.material=cm;
+  }
+
+  // Spot for catwalk later
+  const spot=new BABYLON.SpotLight('spot',new BABYLON.Vector3(0,5,0),
+    new BABYLON.Vector3(0,-1,0),Math.PI/3,2,STATE.scene);
+  spot.intensity=0; spot.diffuse=new BABYLON.Color3(1,0.9,0.7);
+  STATE.spot=spot;
+
+  // Build avatar
+  buildAvatar();
+
+  // Render loop: camera-relative character movement + 3D name tags
+  STATE.engine.runRenderLoop(()=>{updatePlayerMovement();STATE.scene.render();});
+  window.addEventListener('resize',()=>STATE.engine.resize());
+
+  return true;
+}
+
+/* ============================================================
+   PLAYER NAME TAGS + CAMERA-RELATIVE MOVEMENT
+   ============================================================ */
+function createNameTag(parent,name,isLocal=false){
+  const safe=String(name||'Người chơi').replace(/[^a-z0-9]/gi,'').slice(0,20)||'player';
+  const plane=BABYLON.MeshBuilder.CreatePlane('nameTag_'+(isLocal?'local':safe),{width:1.35,height:0.30},STATE.scene);
+  plane.parent=parent; plane.position=new BABYLON.Vector3(0,2.92,0); plane.billboardMode=BABYLON.Mesh.BILLBOARDMODE_ALL; plane.isPickable=false;
+  const tex=new BABYLON.DynamicTexture('nameTexture_'+(isLocal?'local':safe),{width:512,height:112},STATE.scene,false); tex.hasAlpha=true;
+  const draw=(value)=>{const c=tex.getContext();c.clearRect(0,0,512,112);c.fillStyle='rgba(24,10,42,0.86)';c.beginPath();c.roundRect(8,8,496,96,24);c.fill();c.strokeStyle=isLocal?'#ffd166':'rgba(255,255,255,.75)';c.lineWidth=5;c.stroke();c.font='bold 48px Segoe UI, Arial, sans-serif';c.textAlign='center';c.textBaseline='middle';c.fillStyle='#fff';c.fillText(String(value||'Người chơi').slice(0,18),256,56,470);tex.update();};
+  draw(name); const mat=new BABYLON.StandardMaterial('nameMat_'+(isLocal?'local':safe),STATE.scene);mat.diffuseTexture=tex;mat.opacityTexture=tex;mat.emissiveColor=new BABYLON.Color3(1,1,1);mat.disableLighting=true;mat.backFaceCulling=false;plane.material=mat;
+  return {mesh:plane,texture:tex,material:mat,setName:draw};
+}
+function installPlayerControls(){
+  const valid=['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright','shift'];
+  window.addEventListener('keydown',e=>{const key=e.key.toLowerCase();if(valid.includes(key)&&!e.target.matches('input,textarea,select')){STATE.moveKeys[key]=true;if(key.startsWith('arrow'))e.preventDefault();}},{passive:false});
+  window.addEventListener('keyup',e=>{STATE.moveKeys[e.key.toLowerCase()]=false;});window.addEventListener('blur',()=>{STATE.moveKeys={};STATE.walking=false;});
+}
+function updatePlayerMovement(){
+  const root=STATE.avatar,cam=STATE.camera,engine=STATE.engine;if(!root||!cam||!engine)return;
+  const k=STATE.moveKeys||{};let f=(k.w||k.arrowup?1:0)-(k.s||k.arrowdown?1:0);let side=(k.d||k.arrowright?1:0)-(k.a||k.arrowleft?1:0);
+  if($('modal').classList.contains('show')){STATE.walking=false;return;}const moving=f!==0||side!==0;STATE.walking=moving;if(!moving)return;
+  const len=Math.hypot(f,side)||1;f/=len;side/=len;const a=cam.alpha,fx=-Math.cos(a),fz=-Math.sin(a),rx=-Math.sin(a),rz=Math.cos(a);const dx=rx*side+fx*f,dz=rz*side+fz*f;
+  const speed=(k.shift?5.2:3.2)*(engine.getDeltaTime()/1000);root.position.x=BABYLON.Scalar.Clamp(root.position.x+dx*speed,-3.35,3.35);root.position.z=BABYLON.Scalar.Clamp(root.position.z+dz*speed,-2.65,2.65);root.rotation.y=Math.atan2(dx,dz);
+  const target=new BABYLON.Vector3(root.position.x,1.05,root.position.z);cam.target=BABYLON.Vector3.Lerp(cam.target,target,Math.min(1,engine.getDeltaTime()/100));
+  const mp=STATE.multiplayer,now=performance.now();if(mp.ws&&mp.connected&&mp.ws.readyState===WebSocket.OPEN&&now-STATE.lastMoveSent>80){STATE.lastMoveSent=now;try{mp.ws.send(JSON.stringify({type:'move',pos:{x:root.position.x,y:root.position.y,z:root.position.z},rot:root.rotation.y,anim:'walk'}));}catch(e){}}
+}
+function setupFullscreen(){
+  const btn=$('fullscreenBtn');if(!btn)return;const refresh=()=>{btn.textContent=document.fullscreenElement?'⛶ Thu nhỏ':'⛶ Toàn màn hình';};
+  btn.addEventListener('click',async()=>{try{if(!document.fullscreenElement){const target=$('app');if(target.requestFullscreen)await target.requestFullscreen();else if(target.webkitRequestFullscreen)target.webkitRequestFullscreen();}else if(document.exitFullscreen)await document.exitFullscreen();}catch(e){toast('Trình duyệt không cho phép bật toàn màn hình','warn');}refresh();if(STATE.engine)setTimeout(()=>STATE.engine.resize(),100);});
+  document.addEventListener('fullscreenchange',()=>{refresh();if(STATE.engine)setTimeout(()=>STATE.engine.resize(),100);});refresh();
+}
+
+/* ============================================================
+   2. AVATAR (procedural stylized-but-solid 3D)
+   ============================================================ */
+function makePBR(name,color,opts={}){
+  const m=new BABYLON.PBRMaterial(name,STATE.scene);
+  m.albedoColor=BABYLON.Color3.FromHexString(color);
+  m.metallic=opts.metallic??0.15;
+  m.roughness=opts.roughness??0.55;
+  m.environmentIntensity=opts.env??0.8;
+  return m;
+}
+
+function buildAvatar(){
+  const root=new BABYLON.TransformNode('avatarRoot',STATE.scene);
+  STATE.avatar=root;
+  STATE.localNameTag=createNameTag(root,STATE.playerName||'Bạn',true);
+  const P=STATE.avatarParts={};
+
+  const skinColor=STATE.look.skinTone;
+  const skinMat=makePBR('skinMat',skinColor,{roughness:0.45,metallic:0.02});
+  P.skinMat=skinMat;
+
+  // ---- Torso ----
+  const torso=BABYLON.MeshBuilder.CreateCapsule('torso',{height:0.95,radius:0.28,tessellation:24},STATE.scene);
+  torso.position.y=1.35; torso.parent=root; torso.material=skinMat;
+  torso.scaling=new BABYLON.Vector3(1.0,1.0,0.72);
+  P.torso=torso;
+
+  // Hips
+  const hips=BABYLON.MeshBuilder.CreateSphere('hips',{diameter:0.62,segments:20},STATE.scene);
+  hips.position.y=0.92; hips.parent=root; hips.material=skinMat;
+  hips.scaling=new BABYLON.Vector3(1.05,0.75,0.8);
+  P.hips=hips;
+
+  // ---- Neck ----
+  const neck=BABYLON.MeshBuilder.CreateCylinder('neck',{height:0.18,diameter:0.16},STATE.scene);
+  neck.position.y=1.9; neck.parent=root; neck.material=skinMat;
+  P.neck=neck;
+
+  // ---- Head ----
+  const head=BABYLON.MeshBuilder.CreateSphere('head',{diameter:0.52,segments:32},STATE.scene);
+  head.position.y=2.22; head.parent=root; head.material=skinMat;
+  head.scaling=new BABYLON.Vector3(0.88,1.0,0.92);
+  P.head=head;
+
+  // Jaw / chin taper using second sphere
+  const jaw=BABYLON.MeshBuilder.CreateSphere('jaw',{diameter:0.42,segments:24},STATE.scene);
+  jaw.position=new BABYLON.Vector3(0,2.08,0.04); jaw.parent=root; jaw.material=skinMat;
+  jaw.scaling=new BABYLON.Vector3(0.82,0.7,0.88);
+  P.jaw=jaw;
+
+  // Ears
+  [-1,1].forEach((s,i)=>{
+    const ear=BABYLON.MeshBuilder.CreateSphere('ear'+i,{diameter:0.11,segments:12},STATE.scene);
+    ear.position=new BABYLON.Vector3(0.23*s,2.2,0); ear.parent=root; ear.material=skinMat;
+    ear.scaling=new BABYLON.Vector3(0.45,1,0.7); ear.name='ear'+i;
+  });
+
+  // ---- Eyes ----
+  const eyeWhiteMat=new BABYLON.PBRMaterial('eyeWhite',STATE.scene);
+  eyeWhiteMat.albedoColor=new BABYLON.Color3(0.95,0.95,1); eyeWhiteMat.roughness=0.2;
+  const irisMat=new BABYLON.PBRMaterial('iris',STATE.scene);
+  irisMat.albedoColor=BABYLON.Color3.FromHexString('#5a3420'); irisMat.roughness=0.1;
+  const pupilMat=new BABYLON.PBRMaterial('pupil',STATE.scene);
+  pupilMat.albedoColor=new BABYLON.Color3(0.02,0.02,0.02); pupilMat.roughness=0.05;
+  P.eyeWhiteMat=eyeWhiteMat; P.irisMat=irisMat;
+
+  [-1,1].forEach((s,i)=>{
+    const eyeGroup=new BABYLON.TransformNode('eyeG'+i,STATE.scene);
+    eyeGroup.position=new BABYLON.Vector3(0.11*s,2.27,0.2);
+    eyeGroup.parent=root;
+
+    const white=BABYLON.MeshBuilder.CreateSphere('eyeW'+i,{diameter:0.095,segments:16},STATE.scene);
+    white.parent=eyeGroup; white.material=eyeWhiteMat;
+    white.scaling=new BABYLON.Vector3(1.05,1,0.7);
+
+    const iris=BABYLON.MeshBuilder.CreateSphere('iris'+i,{diameter:0.052,segments:14},STATE.scene);
+    iris.parent=eyeGroup; iris.material=irisMat; iris.position.z=0.035;
+
+    const pupil=BABYLON.MeshBuilder.CreateSphere('pupil'+i,{diameter:0.026,segments:10},STATE.scene);
+    pupil.parent=eyeGroup; pupil.material=pupilMat; pupil.position.z=0.05;
+
+    const glint=BABYLON.MeshBuilder.CreateSphere('glint'+i,{diameter:0.012,segments:8},STATE.scene);
+    glint.parent=eyeGroup; glint.position=new BABYLON.Vector3(0.01,0.012,0.06);
+    const gm=new BABYLON.StandardMaterial('gm'+i,STATE.scene);
+    gm.emissiveColor=new BABYLON.Color3(1,1,1); glint.material=gm;
+
+    // Eyelid (upper) - for blinking
+    const lid=BABYLON.MeshBuilder.CreateSphere('lid'+i,{diameter:0.1,segments:14},STATE.scene);
+    lid.parent=eyeGroup; lid.material=skinMat;
+    lid.scaling=new BABYLON.Vector3(1.06,1.0,0.72);
+    lid.position.z=-0.005;
+    lid.rotation.x=-Math.PI/2;
+    lid.position.y=0.048;
+    // make lid invisible by default (open)
+    lid.scaling.y=0.05;
+    P['lid'+i]=lid;
+    // eyeliner/lash curve
+    const liner=BABYLON.MeshBuilder.CreateTorus('liner'+i,{diameter:0.1,thickness:0.012,tessellation:20},STATE.scene);
+    liner.parent=eyeGroup;
+    const lm=new BABYLON.StandardMaterial('lm'+i,STATE.scene);
+    lm.emissiveColor=new BABYLON.Color3(0.05,0.02,0.02); liner.material=lm;
+    liner.scaling=new BABYLON.Vector3(1.06,1,0.72);
+    liner.rotation.x=Math.PI/2;
+    liner.position.y=0.028; liner.position.z=0.02;
+    P['liner'+i]=liner;
+
+    // Eyeshadow overlay
+    const shadow=BABYLON.MeshBuilder.CreateSphere('shadow'+i,{diameter:0.11,segments:12},STATE.scene);
+    shadow.parent=eyeGroup; shadow.material=makePBR('shadowMat'+i,'#b06bff',{roughness:0.8});
+    shadow.scaling=new BABYLON.Vector3(1.05,0.55,0.6);
+    shadow.position.y=0.045; shadow.position.z=0.01;
+    shadow.visibility=0.35;
+    P['shadow'+i]=shadow;
+    P['shadowMat'+i]=shadow.material;
+  });
+
+  // ---- Eyebrows ----
+  [-1,1].forEach((s,i)=>{
+    const brow=BABYLON.MeshBuilder.CreateBox('brow'+i,{width:0.11,height:0.018,depth:0.03},STATE.scene);
+    brow.parent=root; brow.position=new BABYLON.Vector3(0.11*s,2.36,0.235);
+    brow.rotation.z=-0.12*s;
+    const bm=makePBR('browMat'+i,STATE.look.brows.color,{roughness:0.9});
+    brow.material=bm; P['browMat'+i]=bm;
+  });
+
+  // ---- Nose ----
+  const nose=BABYLON.MeshBuilder.CreateSphere('nose',{diameter:0.09,segments:14},STATE.scene);
+  nose.parent=root; nose.position=new BABYLON.Vector3(0,2.19,0.255);
+  nose.scaling=new BABYLON.Vector3(0.8,0.9,0.9); nose.material=skinMat;
+
+  // ---- Lips ----
+  const upperLip=BABYLON.MeshBuilder.CreateSphere('upLip',{diameter:0.11,segments:16},STATE.scene);
+  upperLip.parent=root; upperLip.position=new BABYLON.Vector3(0,2.11,0.245);
+  upperLip.scaling=new BABYLON.Vector3(1.0,0.45,0.6);
+  const lowerLip=BABYLON.MeshBuilder.CreateSphere('loLip',{diameter:0.1,segments:16},STATE.scene);
+  lowerLip.parent=root; lowerLip.position=new BABYLON.Vector3(0,2.085,0.25);
+  lowerLip.scaling=new BABYLON.Vector3(0.95,0.55,0.6);
+  const lipMat=new BABYLON.PBRMaterial('lipMat',STATE.scene);
+  lipMat.albedoColor=BABYLON.Color3.FromHexString(STATE.look.lips.color);
+  lipMat.metallic=0.1; lipMat.roughness=0.25;
+  upperLip.material=lipMat; lowerLip.material=lipMat;
+  P.lipMat=lipMat;
+  P.upperLip=upperLip; P.lowerLip=lowerLip;
+
+  // ---- Blush ----
+  [-1,1].forEach((s,i)=>{
+    const blush=BABYLON.MeshBuilder.CreateSphere('blush'+i,{diameter:0.14,segments:14},STATE.scene);
+    blush.parent=root; blush.position=new BABYLON.Vector3(0.13*s,2.15,0.2);
+    blush.scaling=new BABYLON.Vector3(1,0.8,0.3);
+    const bm=new BABYLON.PBRMaterial('blushMat'+i,STATE.scene);
+    bm.albedoColor=BABYLON.Color3.FromHexString(STATE.look.blush.color);
+    bm.alpha=STATE.look.blush.intensity;
+    bm.roughness=0.9;
+    bm.transparencyMode=BABYLON.PBRMaterial.PBRMATERIAL_ALPHABLEND;
+    blush.material=bm; blush.visibility=STATE.look.blush.intensity;
+    P['blushMat'+i]=bm; P['blush'+i]=blush;
+  });
+
+  // ---- Arms ----
+  P.arms=[];
+  [-1,1].forEach((s,i)=>{
+    const arm=new BABYLON.MeshBuilder.CreateCapsule('arm'+i,{height:0.62,radius:0.06},STATE.scene);
+    arm.parent=root; arm.position=new BABYLON.Vector3(0.3*s,1.42,0);
+    arm.rotation.z=s*0.12; arm.material=skinMat;
+    const fore=new BABYLON.MeshBuilder.CreateCapsule('fore'+i,{height:0.58,radius:0.052},STATE.scene);
+    fore.parent=root; fore.position=new BABYLON.Vector3(0.34*s,0.9,0);
+    fore.material=skinMat;
+    const hand=BABYLON.MeshBuilder.CreateSphere('hand'+i,{diameter:0.09,segments:12},STATE.scene);
+    hand.parent=root; hand.position=new BABYLON.Vector3(0.36*s,0.58,0);
+    hand.scaling=new BABYLON.Vector3(0.7,1.1,0.5); hand.material=skinMat;
+    P.arms.push({upper:arm,fore:fore,hand:hand,side:s});
+  });
+
+  // ---- Legs ----
+  P.legs=[];
+  [-1,1].forEach((s,i)=>{
+    const thigh=BABYLON.MeshBuilder.CreateCapsule('thigh'+i,{height:0.55,radius:0.085},STATE.scene);
+    thigh.parent=root; thigh.position=new BABYLON.Vector3(0.13*s,0.62,0); thigh.material=skinMat;
+    const shin=BABYLON.MeshBuilder.CreateCapsule('shin'+i,{height:0.55,radius:0.065},STATE.scene);
+    shin.parent=root; shin.position=new BABYLON.Vector3(0.13*s,0.2,0); shin.material=skinMat;
+    P.legs.push({thigh,shin,side:s});
+  });
+
+  // ---- Dress / skirt ----
+  const dress=new BABYLON.MeshBuilder.CreateCylinder('dress',
+    {height:0.85,diameterBottom:0.95,diameterTop:0.42,tessellation:32},STATE.scene);
+  dress.parent=root; dress.position.y=0.85;
+  const dressMat=makePBR('dressMat',STATE.look.dress.color,{roughness:0.35,metallic:0.25});
+  dress.material=dressMat; P.dressMat=dressMat; P.dress=dress;
+
+  // bodice
+  const bodice=BABYLON.MeshBuilder.CreateCylinder('bodice',
+    {height:0.55,diameterTop:0.38,diameterBottom:0.4,tessellation:24},STATE.scene);
+  bodice.parent=root; bodice.position.y=1.42; bodice.material=dressMat;
+  bodice.scaling.z=0.75;
+
+  // sparkle particles on dress
+  const sparkles=new BABYLON.ParticleSystem('spark',300,STATE.scene);
+  sparkles.particleTexture=null;
+  sparkles.emitter=new BABYLON.Vector3(0,0.85,0);
+  sparkles.minEmitBox=new BABYLON.Vector3(-0.45,0,-0.2);
+  sparkles.maxEmitBox=new BABYLON.Vector3(0.45,1.0,0.2);
+  sparkles.color1=new BABYLON.Color4(1,0.8,0.9,1);
+  sparkles.color2=new BABYLON.Color4(1,1,0.8,1);
+  sparkles.minSize=0.02; sparkles.maxSize=0.05;
+  sparkles.minLifeTime=0.6; sparkles.maxLifeTime=1.2;
+  sparkles.emitRate=18; sparkles.blendMode=BABYLON.ParticleSystem.BLENDMODE_ADD;
+  sparkles.gravity=new BABYLON.Vector3(0,0.1,0);
+  sparkles.start();
+  P.sparkles=sparkles;
+
+  // ---- Hair ----
+  const hairRoot=new BABYLON.TransformNode('hairRoot',STATE.scene);
+  hairRoot.parent=root; P.hairRoot=hairRoot;
+  const hairMat=makePBR('hairMat',STATE.look.hair.color,{roughness:0.4,metallic:0.2});
+  P.hairMat=hairMat;
+
+  // cap
+  const cap=BABYLON.MeshBuilder.CreateSphere('hairCap',{diameter:0.56,segments:24},STATE.scene);
+  cap.parent=hairRoot; cap.position.y=2.24; cap.scaling=new BABYLON.Vector3(0.92,1.02,0.98);
+  cap.material=hairMat;
+  // leave face open via scaling trick: use hemisphere-ish by rotating + offset
+  cap.position.z=-0.02;
+
+  // long hair strands
+  P.hairStrands=[];
+  for(let i=0;i<9;i++){
+    const strand=BABYLON.MeshBuilder.CreateCapsule('strand'+i,{height:1.0,radius:0.06},STATE.scene);
+    strand.parent=hairRoot;
+    const ang=(i/9)*Math.PI*2;
+    const r=0.27;
+    strand.position=new BABYLON.Vector3(Math.cos(ang)*r,1.75,Math.sin(ang)*r-0.05);
+    strand.scaling=new BABYLON.Vector3(0.8,1,0.6);
+    strand.material=hairMat;
+    P.hairStrands.push({mesh:strand,ang,baseY:1.75});
+  }
+
+  // ---- Crown ----
+  const crownMat=makePBR('crownMat',STATE.look.crown.color,{metallic:0.95,roughness:0.15,env:1});
+  const crownBase=BABYLON.MeshBuilder.CreateTorus('crownBase',{diameter:0.34,thickness:0.03,tessellation:32},STATE.scene);
+  crownBase.parent=root; crownBase.position.y=2.46; crownBase.rotation.x=Math.PI/2;
+  crownBase.material=crownMat; P.crownMat=crownMat; P.crownBase=crownBase;
+
+  for(let i=0;i<7;i++){
+    const spike=BABYLON.MeshBuilder.CreateCylinder('spike'+i,{height:0.11,diameterTop:0.01,diameterBottom:0.035},STATE.scene);
+    const ang=(i/7)*Math.PI*2;
+    spike.parent=root;
+    spike.position=new BABYLON.Vector3(Math.cos(ang)*0.17,2.53,Math.sin(ang)*0.17);
+    spike.material=crownMat;
+    if(i%2===0){
+      const gem=BABYLON.MeshBuilder.CreateSphere('gem'+i,{diameter:0.035,segments:10},STATE.scene);
+      gem.parent=spike; gem.position.y=0.07;
+      const gm=new BABYLON.StandardMaterial('gemM'+i,STATE.scene);
+      gm.emissiveColor=new BABYLON.Color3(1,0.2,0.4);
+      gm.diffuseColor=new BABYLON.Color3(1,0.2,0.4);
+      gem.material=gm;
+    }
+  }
+
+  // ---- Shoes ----
+  P.shoes=[];
+  [-1,1].forEach((s,i)=>{
+    const shoe=BABYLON.MeshBuilder.CreateBox('shoe'+i,{width:0.12,height:0.06,depth:0.22},STATE.scene);
+    shoe.parent=root; shoe.position=new BABYLON.Vector3(0.13*s,0.03,0.05);
+    const sm=makePBR('shoeMat'+i,STATE.look.shoes.color,{metallic:0.5,roughness:0.2});
+    shoe.material=sm; P.shoes.push({mesh:shoe,mat:sm});
+  });
+
+  // store base Y for animation
+  P.baseY={};
+  root.getChildMeshes().forEach(m=>{P.baseY[m.name]=m.position.y;});
+
+  // idle animation via onBeforeRender
+  STATE.avatarT=0;
+  STATE.scene.onBeforeRenderObservable.add(()=>{
+    const dt=STATE.engine.getDeltaTime()/1000;
+    STATE.avatarT+=dt;
+    const t=STATE.avatarT;
+
+    // Breathing
+    if(P.torso){ P.torso.scaling.y=1+Math.sin(t*1.4)*0.012; }
+    // Head slight sway
+    if(P.head){ P.head.rotation.y=Math.sin(t*0.6)*0.06; P.head.rotation.x=Math.sin(t*0.9)*0.02; }
+    if(P.jaw){ P.jaw.rotation.y=P.head?P.head.rotation.y:0; }
+    // Hair sway
+    P.hairStrands.forEach((h,i)=>{
+      h.mesh.rotation.z=Math.sin(t*1.2+i)*0.05;
+      h.mesh.rotation.x=Math.sin(t*1.0+i*0.5)*0.04;
+    });
+    // Arms subtle
+    P.arms.forEach((a,i)=>{
+      a.upper.rotation.x=Math.sin(t*0.8+i)*0.03;
+    });
+    // Blink every ~3s
+    const blinkPhase=(t%3.2);
+    const blink = blinkPhase<0.12 ? Math.sin(blinkPhase/0.12*Math.PI) : 0;
+    [0,1].forEach(i=>{
+      const lid=P['lid'+i];
+      if(lid){ lid.scaling.y=0.05+blink*1.0; lid.position.y=0.048-blink*0.045; }
+    });
+    // Walk animation if walking
+    if(STATE.walking){
+      P.legs.forEach((l,i)=>{
+        l.thigh.rotation.x=Math.sin(t*6+i*Math.PI)*0.5;
+        l.shin.rotation.x=Math.sin(t*6+i*Math.PI+0.6)*0.4;
+      });
+      P.arms.forEach((a,i)=>{
+        a.upper.rotation.x=Math.sin(t*6+i*Math.PI+Math.PI)*0.4;
+      });
+    } else {
+      P.legs.forEach(l=>{l.thigh.rotation.x*=0.9;l.shin.rotation.x*=0.9;});
+      P.arms.forEach(a=>{a.upper.rotation.x*=0.9;});
+    }
+  });
+
+  // Shadow
+  const shadowGen=new BABYLON.ShadowGenerator(1024,key);
+  root.getChildMeshes().forEach(m=>shadowGen.addShadowCaster(m));
+  floor.receiveShadows=true;
+}
+
+/* ============================================================
+   3. APPLY LOOK → AVATAR
+   ============================================================ */
+function applyLookToAvatar(){
+  const L=STATE.look, P=STATE.avatarParts; if(!P.head) return;
+
+  // Skin
+  if(P.skinMat) P.skinMat.albedoColor=BABYLON.Color3.FromHexString(L.skinTone);
+
+  // Lips
+  if(P.lipMat){
+    P.lipMat.albedoColor=BABYLON.Color3.FromHexString(L.lips.color);
+    P.lipMat.roughness=0.35-L.lips.gloss*0.3;
+    P.lipMat.metallic=L.lips.gloss*0.4;
+  }
+  // Eyeshadow
+  [0,1].forEach(i=>{
+    const sm=P['shadowMat'+i]; if(sm){
+      sm.albedoColor=BABYLON.Color3.FromHexString(L.eyeshadow.color);
+      sm.alpha=0.15+L.eyeshadow.intensity*0.7;
+    }
+    const sh=P['shadow'+i]; if(sh) sh.visibility=0.15+L.eyeshadow.intensity*0.7;
+  });
+  // Blush
+  [0,1].forEach(i=>{
+    const bm=P['blushMat'+i]; if(bm){
+      bm.albedoColor=BABYLON.Color3.FromHexString(L.blush.color);
+      bm.alpha=L.blush.intensity*0.6;
+    }
+    const b=P['blush'+i]; if(b) b.visibility=L.blush.intensity*0.6;
+  });
+  // Brows
+  [0,1].forEach(i=>{
+    const bm=P['browMat'+i]; if(bm) bm.albedoColor=BABYLON.Color3.FromHexString(L.brows.color);
+  });
+  // Eyeliner style -> thickness
+  const linerStyles={none:0, classic:0.012, cat:0.016, thin:0.008, bold:0.02, wing:0.018};
+  const th=linerStyles[L.eyeliner.style]??0.012;
+  [0,1].forEach(i=>{
+    const l=P['liner'+i]; if(l){ l.thickness=Math.max(0.004,th); l.isVisible=L.eyeliner.style!=='none'; }
+  });
+  // Lashes -> scale liner torus slightly & add lashes feel via thicker liner
+  const lashFactor={natural:1, long:1.3, dramatic:1.6, doll:1.4, none:0.6}[L.lashes.style]??1;
+  [0,1].forEach(i=>{
+    const l=P['liner'+i]; if(l) l.scaling.y=1*lashFactor;
+  });
+
+  // Dress color
+  if(P.dressMat) P.dressMat.albedoColor=BABYLON.Color3.FromHexString(L.dress.color);
+  // Hair
+  if(P.hairMat) P.hairMat.albedoColor=BABYLON.Color3.FromHexString(L.hair.color);
+  // Crown
+  if(P.crownMat){
+    P.crownMat.albedoColor=BABYLON.Color3.FromHexString(L.crown.color);
+    P.crownMat.metallic=0.95;
+    const show=L.crown.id!=='crown_none';
+    P.crownBase.setEnabled(show);
+    if(P.crownBase.parent) P.crownBase.parent.getChildMeshes().forEach(m=>{
+      if(m.name.startsWith('spike')||m.name.startsWith('gem')) m.setEnabled(show);
+    });
+  }
+  // Shoes
+  P.shoes.forEach((s,i)=>{
+    s.mat.albedoColor=BABYLON.Color3.FromHexString(L.shoes.color);
+    s.mesh.setEnabled(L.shoes.id!=='shoes_bare');
+    // style: glass = low roughness
+    s.mat.roughness = L.shoes.id==='shoes_glass'?0.05:0.4;
+  });
+  // Hair length style
+  P.hairStrands.forEach((h,i)=>{
+    const style=L.hair.id;
+    let hgt=1.0;
+    if(style==='hair_short') hgt=0.4;
+    if(style==='hair_bob') hgt=0.65;
+    if(style==='hair_pony') hgt=0.85;
+    if(style==='hair_long_straight') hgt=1.15;
+    h.mesh.scaling.y=hgt;
+    h.mesh.position.y=h.baseY - (1-hgt)*0.35;
+  });
+
+  // Update UI swatches active
+  refreshUI();
+}
+
+/* ============================================================
+   4. UI – MAKEUP PANEL
+   ============================================================ */
+const LIP_COLORS=['#e0356b','#c2185b','#ff4d6d','#ff6f91','#ff8fa8','#ffb3c1','#d81b60',
+  '#8e0038','#b03060','#e91e63','#f06292','#ff80ab','#f48fb1','#ad1457','#c51162',
+  '#ff1744','#ff5252','#ff8a80','#e57373','#ef5350','#d32f2f','#b71c1c','#880e4f',
+  '#4a0033','#7b1fa2','#9c27b0','#ba68c8','#ce93d8','#e1bee7','#8e24aa',
+  '#ff7b00','#ff9800','#ffb74d','#ffd54f','#fff176','#fff59d','#ffeb3b',
+  '#d4e157','#aed581','#81c784','#4db6ac','#4dd0e1','#4fc3f7','#64b5f6',
+  '#7986cb','#9575cd','#b39ddb','#d1c4e9','#ffe0b2','#ffccbc','#f8bbd0',
+  '#d7ccc8','#bcaaa4','#a1887f','#8d6e63','#6d4c41','#5d4037','#4e342e',
+  '#3e2723','#212121','#424242','#616161','#757575','#9e9e9e','#bdbdbd',
+  '#e0e0e0','#f5f5f5','#ffffff','#ffebee','#fce4ec','#f3e5f5','#ede7f6',
+  '#e8eaf6','#e3f2fd','#e1f5fe','#e0f7fa','#e0f2f1','#e8f5e9','#f1f8e9',
+  '#f9fbe7','#fffde7','#fff8e1','#fff3e0','#fbe9e7','#f4e1d2','#e8c8b0',
+  '#c9a27e','#a8714a','#7a4a24','#5a2d0c','#2b1408','#7b3f00','#b05e27',
+  '#ff8a65','#ff7043','#f4511e','#d84315','#bf360c','#ffd1e6','#ffc0cb'];
+const EYE_COLORS=['#b06bff','#d0a3ff','#e6d0ff','#ff8fa8','#ffb3c1','#ffd1e6','#c9a227',
+  '#ffd700','#ffe066','#39d98a','#7dffb0','#2ec4b6','#4dd0e1','#00bcd4','#0288d1',
+  '#64b5f6','#3f51b5','#7b4bff','#9c27b0','#e91e63','#f06292','#ff6fae','#ad1457',
+  '#795548','#8d6e63','#a1887f','#bcaaa4','#5a3420','#3e2723','#212121','#424242',
+  '#616161','#9e9e9e','#e0e0e0','#f5f5f5','#ffffff','#ffebee','#fce4ec','#f3e5f5',
+  '#e8eaf6','#e3f2fd','#e1f5fe','#e0f7fa','#e0f2f1','#e8f5e9','#f1f8e9','#fffde7',
+  '#ffe0b2','#ffccbc','#d7ccc8','#f8bbd0','#ff8a65','#ff7043','#f4511e','#d84315',
+  '#bf360c','#7b3f00','#b05e27','#e0356b'];
+const BLUSH_COLORS=['#ff8fa8','#ffb3c1','#ffd1e6','#ff6f91','#e0356b','#ff4d6d','#f06292',
+  '#f48fb1','#ffc0cb','#ffb6c1','#ffa07a','#ff7f50','#ff6347','#ff4500','#ff69b4',
+  '#dda0dd','#da70d6','#ba55d3','#9370db','#8a2be2','#7b68ee','#6a5acd','#483d8b',
+  '#e6e6fa','#d8bfd8','#dda0dd','#ee82ee','#ffb6c1','#ffaeb9','#ffaeb9','#ffc0cb',
+  '#f4e1d2','#e8c8b0','#c9a27e','#a8714a','#ffe0b2','#ffccbc','#d7ccc8','#f8bbd0'];
+const SKIN_TONES=['#fde8d7','#f8d5c2','#f2c9a8','#e8b894','#d9a57e','#c98f66','#b87a52',
+  '#a86840','#8f5530','#774422','#5c3317','#e0b89a','#f0c8a8','#ffd9c0','#f5cba7'];
+const BROWS_COLORS=['#4a2c1a','#2b1408','#5a3420','#7a4a24','#8d6e63','#a1887f',
+  '#bcaaa4','#d7ccc8','#212121','#424242','#616161','#9e9e9e','#bdbdbd','#e0e0e0',
+  '#fff','#5d4037','#6d4c41','#795548','#8d6e63','#a8714a','#b05e27','#7b3f00'];
+const EYELINER_STYLES=[{id:'none',n:'Không'},{id:'classic',n:'Cổ điển'},
+  {id:'cat',n:'Mắt mèo'},{id:'thin',n:'Mảnh'},{id:'bold',n:'Đậm'},{id:'wing',n:'Cánh'}];
+const LASH_STYLES=[{id:'none',n:'Tự nhiên'},{id:'natural',n:'Mềm'},{id:'long',n:'Dài'},
+  {id:'dramatic',n:'Ấn tượng'},{id:'doll',n:'Búp bê'}];
+const BROW_STYLES=[{id:'soft',n:'Mềm'},{id:'arch',n:'Cong'},{id:'straight',n:'Thẳng'},
+  {id:'bold',n:'Đậm'}];
+
+function renderMakeupTab(tab){
+  const el=$('makeupContent'); el.innerHTML='';
+  const L=STATE.look;
+  if(tab==='lips'){
+    el.innerHTML='<div class="section-title">Màu son ('+LIP_COLORS.length+')</div>';
+    const g=document.createElement('div'); g.className='grid';
+    LIP_COLORS.forEach(c=>{
+      const s=document.createElement('div'); s.className='swatch'+(L.lips.color===c?' active':'');
+      s.style.background=c; s.onclick=()=>{ L.lips.color=c; pushHistory(); applyLookToAvatar(); };
+      g.appendChild(s);
+    });
+    el.appendChild(g);
+    el.insertAdjacentHTML('beforeend',
+      '<div class="section-title">Độ bóng</div>'+
+      '<div class="slider-row">Bóng<input type="range" min="0" max="1" step="0.05" value="'+L.lips.gloss+'" id="lipGloss"></div>'+
+      '<div class="slider-row">Đậm<input type="range" min="0" max="1" step="0.05" value="'+L.lips.intensity+'" id="lipInt"></div>');
+    el.querySelector('#lipGloss').oninput=e=>{L.lips.gloss=+e.target.value;applyLookToAvatar();};
+    el.querySelector('#lipInt').oninput=e=>{L.lips.intensity=+e.target.value;};
+  }
+  else if(tab==='eyeshadow'){
+    el.innerHTML='<div class="section-title">Màu phấn mắt ('+EYE_COLORS.length+')</div>';
+    const g=document.createElement('div'); g.className='grid';
+    EYE_COLORS.forEach(c=>{
+      const s=document.createElement('div'); s.className='swatch'+(L.eyeshadow.color===c?' active':'');
+      s.style.background=c; s.onclick=()=>{L.eyeshadow.color=c;pushHistory();applyLookToAvatar();};
+      g.appendChild(s);
+    });
+    el.appendChild(g);
+    el.insertAdjacentHTML('beforeend','<div class="section-title">Độ đậm</div>'+
+      '<div class="slider-row">Đậm<input type="range" min="0" max="1" step="0.05" value="'+L.eyeshadow.intensity+'" id="esInt"></div>');
+    el.querySelector('#esInt').oninput=e=>{L.eyeshadow.intensity=+e.target.value;applyLookToAvatar();};
+  }
+  else if(tab==='blush'){
+    el.innerHTML='<div class="section-title">Màu phấn má ('+BLUSH_COLORS.length+')</div>';
+    const g=document.createElement('div'); g.className='grid';
+    BLUSH_COLORS.forEach(c=>{
+      const s=document.createElement('div'); s.className='swatch'+(L.blush.color===c?' active':'');
+      s.style.background=c; s.onclick=()=>{L.blush.color=c;pushHistory();applyLookToAvatar();};
+      g.appendChild(s);
+    });
+    el.appendChild(g);
+    el.insertAdjacentHTML('beforeend','<div class="section-title">Độ đậm</div>'+
+      '<div class="slider-row">Đậm<input type="range" min="0" max="0.8" step="0.02" value="'+L.blush.intensity+'" id="blInt"></div>');
+    el.querySelector('#blInt').oninput=e=>{L.blush.intensity=+e.target.value;applyLookToAvatar();};
+  }
+  else if(tab==='eyeliner'){
+    EYELINER_STYLES.forEach(s=>{
+      const d=document.createElement('div');
+      d.className='item'+(L.eyeliner.style===s.id?' active':'');
+      d.innerHTML='<span class="ic">✏️</span><span class="nm">'+s.n+'</span>';
+      d.onclick=()=>{L.eyeliner.style=s.id;pushHistory();applyLookToAvatar();renderMakeupTab('eyeliner');};
+      el.appendChild(d);
+    });
+  }
+  else if(tab==='lashes'){
+    LASH_STYLES.forEach(s=>{
+      const d=document.createElement('div');
+      d.className='item'+(L.lashes.style===s.id?' active':'');
+      d.innerHTML='<span class="ic">👁️</span><span class="nm">'+s.n+'</span>';
+      d.onclick=()=>{L.lashes.style=s.id;pushHistory();applyLookToAvatar();renderMakeupTab('lashes');};
+      el.appendChild(d);
+    });
+  }
+  else if(tab==='brows'){
+    el.innerHTML='<div class="section-title">Màu lông mày</div>';
+    const g=document.createElement('div'); g.className='grid';
+    BROWS_COLORS.forEach(c=>{
+      const s=document.createElement('div'); s.className='swatch'+(L.brows.color===c?' active':'');
+      s.style.background=c; s.onclick=()=>{L.brows.color=c;pushHistory();applyLookToAvatar();renderMakeupTab('brows');};
+      g.appendChild(s);
+    });
+    el.appendChild(g);
+    el.insertAdjacentHTML('beforeend','<div class="section-title">Kiểu</div>');
+    BROW_STYLES.forEach(s=>{
+      const d=document.createElement('div');
+      d.className='item'+(L.brows.style===s.id?' active':'');
+      d.innerHTML='<span class="ic">〰️</span><span class="nm">'+s.n+'</span>';
+      d.onclick=()=>{L.brows.style=s.id;pushHistory();applyLookToAvatar();renderMakeupTab('brows');};
+      el.appendChild(d);
+    });
+  }
+  else if(tab==='skin'){
+    el.innerHTML='<div class="section-title">Màu da ('+SKIN_TONES.length+')</div>';
+    const g=document.createElement('div'); g.className='grid';
+    SKIN_TONES.forEach(c=>{
+      const s=document.createElement('div'); s.className='swatch'+(L.skinTone===c?' active':'');
+      s.style.background=c; s.onclick=()=>{L.skinTone=c;pushHistory();applyLookToAvatar();renderMakeupTab('skin');};
+      g.appendChild(s);
+    });
+    el.appendChild(g);
+    el.insertAdjacentHTML('beforeend',
+      '<div class="note">Màu son: '+LIP_COLORS.length+' · Phấn mắt: '+EYE_COLORS.length+
+      ' · Phấn má: '+BLUSH_COLORS.length+' · Kẻ mắt: '+EYELINER_STYLES.length+
+      ' · Lông mi: '+LASH_STYLES.length+' · Lông mày: '+BROW_STYLES.length+'</div>');
+  }
+}
+
+/* ============================================================
+   5. UI – WARDROBE
+   ============================================================ */
+const DRESSES=[
+  {id:'dress_royal_pink',n:'Váy công chúa hồng',c:'#ff6fae',ic:'👗'},
+  {id:'dress_gold_royal',n:'Dạ hội hoàng gia',c:'#f7c948',ic:'👗'},
+  {id:'dress_ice_blue',n:'Nữ hoàng băng',c:'#8fd3ff',ic:'👗'},
+  {id:'dress_emerald',n:'Lục bảo',c:'#2ecc71',ic:'👗'},
+  {id:'dress_purple',n:'Tím mộng mơ',c:'#b06bff',ic:'👗'},
+  {id:'dress_red_carpet',n:'Thảm đỏ',c:'#e0356b',ic:'👗'},
+  {id:'dress_wedding',n:'Váy cưới trong mơ',c:'#ffffff',ic:'👰'},
+  {id:'dress_spring',n:'Công chúa mùa xuân',c:'#ffb3c1',ic:'🌸'},
+  {id:'dress_winter',n:'Mùa đông',c:'#e0f7fa',ic:'❄️'},
+  {id:'dress_ocean',n:'Công chúa biển',c:'#00bcd4',ic:'🌊'},
+  {id:'dress_future',n:'Tương lai',c:'#7dffb0',ic:'🤖'},
+  {id:'dress_fairy',n:'Cổ tích',c:'#ffd1e6',ic:'🧚'},
+  {id:'dress_star',n:'Dạ tiệc ánh sao',c:'#c9a227',ic:'⭐'},
+  {id:'dress_street',n:'Đường phố',c:'#ff7043',ic:'👟'},
+  {id:'dress_night',n:'Đêm huyền bí',c:'#3f51b5',ic:'🌙'},
+  {id:'dress_peach',n:'Đào ngọt ngào',c:'#ffccbc',ic:'🍑'},
+  {id:'dress_mint',n:'Bạc hà',c:'#aed581',ic:'🌿'},
+  {id:'dress_lilac',n:'Tử đinh hương',c:'#d1c4e9',ic:'💜'},
+  {id:'dress_coral',n:'San hô',c:'#ff8a65',ic:'🐚'},
+  {id:'dress_silver',n:'Bạc lấp lánh',c:'#e0e0e0',ic:'✨'}
+];
+const HAIRS=[
+  {id:'hair_long_wavy',n:'Tóc dài gợn sóng',c:'#5a3420',ic:'💇‍♀️'},
+  {id:'hair_long_straight',n:'Tóc dài thẳng',c:'#2b1408',ic:'💇‍♀️'},
+  {id:'hair_short',n:'Tóc ngắn',c:'#a8714a',ic:'💇‍♀️'},
+  {id:'hair_bob',n:'Tóc bob',c:'#8d6e63',ic:'💇‍♀️'},
+  {id:'hair_pony',n:'Tóc đuôi ngựa',c:'#b05e27',ic:'💇‍♀️'},
+  {id:'hair_curly',n:'Tóc xoăn',c:'#212121',ic:'💇‍♀️'},
+  {id:'hair_braid',n:'Tóc tết',c:'#c9a27e',ic:'💇‍♀️'},
+  {id:'hair_bun',n:'Búi tóc',c:'#7a4a24',ic:'💇‍♀️'}
+];
+const CROWNS=[
+  {id:'crown_gold',n:'Vương miện vàng',c:'#f7c948',ic:'👑'},
+  {id:'crown_silver',n:'Vương miện bạc',c:'#d0d0d0',ic:'👑'},
+  {id:'crown_pink',n:'Vương miện hồng',c:'#ff6fae',ic:'👑'},
+  {id:'crown_emerald',n:'Vương miện lục bảo',c:'#2ecc71',ic:'👑'},
+  {id:'crown_sapphire',n:'Vương miện sapphire',c:'#3f51b5',ic:'👑'},
+  {id:'crown_ruby',n:'Vương miện ruby',c:'#e0356b',ic:'👑'},
+  {id:'crown_none',n:'Không đội',c:'#000',ic:'🚫'}
+];
+const SHOES=[
+  {id:'shoes_glass',n:'Giày thủy tinh',c:'#e6e6ff',ic:'👠'},
+  {id:'shoes_gold',n:'Giày vàng',c:'#f7c948',ic:'👠'},
+  {id:'shoes_pink',n:'Giày hồng',c:'#ff6fae',ic:'👠'},
+  {id:'shoes_silver',n:'Giày bạc',c:'#d0d0d0',ic:'👠'},
+  {id:'shoes_red',n:'Giày đỏ',c:'#e0356b',ic:'👠'},
+  {id:'shoes_bare',n:'Chân trần',c:'#f2c9a8',ic:'🦶'}
+];
+const ACCS=[
+  {id:'acc_necklace',n:'Dây chuyền',c:'#f7c948',ic:'📿'},
+  {id:'acc_earrings',n:'Bông tai',c:'#ffd700',ic:'💎'},
+  {id:'acc_bracelet',n:'Vòng tay',c:'#d0d0d0',ic:'🔗'},
+  {id:'acc_gloves',n:'Găng tay',c:'#ffffff',ic:'🧤'},
+  {id:'acc_cape',n:'Áo choàng',c:'#b06bff',ic:'🦸‍♀️'},
+  {id:'acc_bag',n:'Túi xách',c:'#ff6fae',ic:'👜'},
+  {id:'acc_hairpin',n:'Kẹp tóc',c:'#ffd1e6',ic:'🎀'}
+];
+
+function renderWardrobeTab(tab){
+  const el=$('wardrobeContent'); el.innerHTML='';
+  const L=STATE.look;
+  if(tab==='dress'){
+    el.innerHTML='<div class="section-title">Chọn váy ('+DRESSES.length+')</div>';
+    DRESSES.forEach(d=>{
+      const row=document.createElement('div');
+      row.className='item'+(L.dress.id===d.id?' active':'');
+      row.innerHTML='<span class="ic">'+d.ic+'</span><span class="nm">'+d.n+'</span>';
+      row.onclick=()=>{ L.dress.id=d.id; L.dress.color=d.c; pushHistory(); applyLookToAvatar(); renderWardrobeTab('dress'); };
+      el.appendChild(row);
+    });
+  }
+  else if(tab==='hair'){
+    el.innerHTML='<div class="section-title">Kiểu tóc ('+HAIRS.length+')</div>';
+    HAIRS.forEach(d=>{
+      const row=document.createElement('div');
+      row.className='item'+(L.hair.id===d.id?' active':'');
+      row.innerHTML='<span class="ic">'+d.ic+'</span><span class="nm">'+d.n+'</span>';
+      row.onclick=()=>{ L.hair.id=d.id; L.hair.color=d.c; pushHistory(); applyLookToAvatar(); renderWardrobeTab('hair'); };
+      el.appendChild(row);
+    });
+  }
+  else if(tab==='crown'){
+    CROWNS.forEach(d=>{
+      const row=document.createElement('div');
+      row.className='item'+(L.crown.id===d.id?' active':'');
+      row.innerHTML='<span class="ic">'+d.ic+'</span><span class="nm">'+d.n+'</span>';
+      row.onclick=()=>{ L.crown.id=d.id; L.crown.color=d.c; pushHistory(); applyLookToAvatar(); renderWardrobeTab('crown'); };
+      el.appendChild(row);
+    });
+  }
+  else if(tab==='shoes'){
+    SHOES.forEach(d=>{
+      const row=document.createElement('div');
+      row.className='item'+(L.shoes.id===d.id?' active':'');
+      row.innerHTML='<span class="ic">'+d.ic+'</span><span class="nm">'+d.n+'</span>';
+      row.onclick=()=>{ L.shoes.id=d.id; L.shoes.color=d.c; pushHistory(); applyLookToAvatar(); renderWardrobeTab('shoes'); };
+      el.appendChild(row);
+    });
+  }
+  else if(tab==='accessory'){
+    el.innerHTML='<div class="section-title">Phụ kiện (chọn nhiều)</div>';
+    ACCS.forEach(d=>{
+      const active=L.accessories.includes(d.id);
+      const row=document.createElement('div');
+      row.className='item'+(active?' active':'');
+      row.innerHTML='<span class="ic">'+d.ic+'</span><span class="nm">'+d.n+'</span><span>'+(active?'✓':'+')+'</span>';
+      row.onclick=()=>{
+        if(active) L.accessories=L.accessories.filter(x=>x!==d.id);
+        else L.accessories.push(d.id);
+        pushHistory(); applyAccessories(); renderWardrobeTab('accessory');
+      };
+      el.appendChild(row);
+    });
+  }
+  else if(tab==='color'){
+    el.innerHTML='<div class="section-title">Màu váy</div>';
+    const g=document.createElement('div'); g.className='grid';
+    ['#ff6fae','#f7c948','#8fd3ff','#2ecc71','#b06bff','#e0356b','#ffffff','#ffb3c1',
+     '#e0f7fa','#00bcd4','#7dffb0','#ffd1e6','#c9a227','#ff7043','#3f51b5','#ffccbc',
+     '#aed581','#d1c4e9','#ff8a65','#e0e0e0','#212121','#5a3420','#880e4f','#1a237e'].forEach(c=>{
+      const s=document.createElement('div'); s.className='swatch'+(L.dress.color===c?' active':'');
+      s.style.background=c; s.onclick=()=>{L.dress.color=c;pushHistory();applyLookToAvatar();renderWardrobeTab('color');};
+      g.appendChild(s);
+    });
+    el.appendChild(g);
+    el.insertAdjacentHTML('beforeend','<div class="section-title">Màu tóc</div>');
+    const g2=document.createElement('div'); g2.className='grid';
+    ['#5a3420','#2b1408','#a8714a','#8d6e63','#b05e27','#212121','#c9a27e','#7a4a24',
+     '#e0b89a','#f0c8a8','#ffd1e6','#b06bff','#e0356b','#f7c948'].forEach(c=>{
+      const s=document.createElement('div'); s.className='swatch'+(L.hair.color===c?' active':'');
+      s.style.background=c; s.onclick=()=>{L.hair.color=c;pushHistory();applyLookToAvatar();renderWardrobeTab('color');};
+      g2.appendChild(s);
+    });
+    el.appendChild(g2);
+  }
+}
+
+function applyAccessories(){
+  const A=STATE.look.accessories, P=STATE.avatarParts;
+  // simple proxy: necklace ring, earrings spheres, cape plane
+  if(P.necklace) P.necklace.setEnabled(A.includes('acc_necklace'));
+  if(P.earrings) P.earrings.forEach(e=>e.setEnabled(A.includes('acc_earrings')));
+  if(P.cape) P.cape.setEnabled(A.includes('acc_cape'));
+  if(P.bracelet) P.bracelet.setEnabled(A.includes('acc_bracelet'));
+}
+
+/* ============================================================
+   6. HISTORY (undo/redo)
+   ============================================================ */
+function pushHistory(){
+  STATE.history.push(JSON.parse(JSON.stringify(STATE.look)));
+  if(STATE.history.length>50) STATE.history.shift();
+  STATE.future=[];
+  saveLocal();
+}
+function undo(){ if(STATE.history.length){ STATE.future.push(JSON.parse(JSON.stringify(STATE.look)));
+  STATE.look=STATE.history.pop(); applyLookToAvatar(); } }
+function redo(){ if(STATE.future.length){ STATE.history.push(JSON.parse(JSON.stringify(STATE.look)));
+  STATE.look=STATE.future.pop(); applyLookToAvatar(); } }
+
+/* ============================================================
+   7. PERSISTENCE
+   ============================================================ */
+function saveLocal(){
+  try{ localStorage.setItem('pw_look',JSON.stringify(STATE.look));
+    localStorage.setItem('pw_lb',JSON.stringify(STATE.contest.results||[])); }catch(e){}
+}
+function loadLocal(){
+  try{
+    const l=localStorage.getItem('pw_look'); if(l) STATE.look=Object.assign(STATE.look,JSON.parse(l));
+    const lb=localStorage.getItem('pw_lb'); if(lb) STATE.contest.results=JSON.parse(lb);
+  }catch(e){}
+}
+
+/* ============================================================
+   8. CATWALK
+   ============================================================ */
+function doCatwalk(){
+  if(!STATE.avatar) return;
+  STATE.walking=true;
+  STATE.spot.intensity=2.5;
+  STATE.camera.radius=4;
+  STATE.camera.beta=Math.PI/2.6;
+  toast('🚶‍♀️ Bắt đầu catwalk!','ok');
+  // twirl
+  let t=0;
+  const obs=STATE.scene.onBeforeRenderObservable.add(()=>{
+    t+=STATE.engine.getDeltaTime()/1000;
+    if(STATE.avatar) STATE.avatar.rotation.y+=0.02;
+    if(t>4){ STATE.walking=false; STATE.avatar.rotation.y=0;
+      STATE.spot.intensity=0; STATE.scene.onBeforeRenderObservable.remove(obs);
+      toast('✨ Catwalk hoàn tất!','ok');
+    }
+  });
+}
+
+/* ============================================================
+   9. PHOTO MODE
+   ============================================================ */
+function openPhotoMode(){
+  STATE.photoMode=true;
+  openModal(`
+    <h2>📸 Photo Mode</h2>
+    <p>Chọn góc chụp và tải ảnh về máy. Ảnh được tạo trực tiếp từ nhân vật 3D của bạn.</p>
+    <div class="row-btns">
+      <button class="btn" id="shotFull">Toàn thân</button>
+      <button class="btn" id="shotFace">Chân dung</button>
+      <button class="btn ghost" id="shotClose">Đóng</button>
+    </div>
+    <div id="photoCanvasWrap"></div>
+  `);
+  $('shotFull').onclick=()=>takePhoto('full');
+  $('shotFace').onclick=()=>takePhoto('face');
+  $('shotClose').onclick=closeModal;
+}
+function takePhoto(kind){
+  // Position camera then render and capture
+  const cam=STATE.camera;
+  const oldR=cam.radius, oldB=cam.beta, oldT=cam.target.clone();
+  if(kind==='face'){ cam.radius=1.4; cam.beta=Math.PI/2.4; cam.target=new BABYLON.Vector3(0,2.2,0); }
+  else { cam.radius=3.6; cam.beta=Math.PI/2.2; cam.target=new BABYLON.Vector3(0,1.2,0); }
+  STATE.scene.render();
+  const data=STATE.canvas.toDataURL('image/png');
+  cam.radius=oldR; cam.beta=oldB; cam.target=oldT;
+  const wrap=$('photoCanvasWrap'); wrap.innerHTML='';
+  const img=new Image(); img.src=data; img.style.maxWidth='100%'; img.style.borderRadius='12px';
+  wrap.appendChild(img);
+  const a=document.createElement('a'); a.href=data; a.download='princess-'+(kind==='face'?'portrait':'full')+'-'+Date.now()+'.png';
+  a.textContent='⬇️ Tải ảnh';
+  a.className='btn'; a.style.display='inline-block'; a.style.marginTop='10px';
+  wrap.appendChild(document.createElement('br')); wrap.appendChild(a);
+  toast('📸 Đã chụp ảnh!','ok');
+}
+
+/* ============================================================
+   10. SCORING (transparent, data-driven, server-confirmable)
+   ============================================================ */
+const THEMES=[
+  {id:'spring',n:'Công chúa mùa xuân',kw:['#ffb3c1','#ffd1e6','#aed581','#ff8fa8'],dress:['dress_spring']},
+  {id:'winter',n:'Nữ hoàng mùa đông',kw:['#e0f7fa','#8fd3ff','#ffffff','#e6e6ff'],dress:['dress_winter','dress_ice_blue']},
+  {id:'royal',n:'Dạ hội hoàng gia',kw:['#f7c948','#c9a227','#e0356b','#b06bff'],dress:['dress_gold_royal','dress_royal_pink']},
+  {id:'ocean',n:'Công chúa biển cả',kw:['#00bcd4','#4dd0e1','#8fd3ff','#2ecc71'],dress:['dress_ocean']},
+  {id:'future',n:'Thời trang tương lai',kw:['#7dffb0','#b06bff','#e0e0e0','#3f51b5'],dress:['dress_future']},
+  {id:'wedding',n:'Váy cưới trong mơ',kw:['#ffffff','#ffd1e6','#e6e6ff','#ffccbc'],dress:['dress_wedding']},
+  {id:'fairy',n:'Công chúa cổ tích',kw:['#ffd1e6','#d1c4e9','#aed581','#f7c948'],dress:['dress_fairy','dress_lilac']},
+  {id:'redcarpet',n:'Thảm đỏ',kw:['#e0356b','#f7c948','#212121','#ffffff'],dress:['dress_red_carpet','dress_night']},
+  {id:'street',n:'Thời trang đường phố',kw:['#ff7043','#ff8a65','#212121','#e0e0e0'],dress:['dress_street']},
+  {id:'star',n:'Dạ tiệc ánh sao',kw:['#c9a227','#f7c948','#3f51b5','#ffffff'],dress:['dress_star','dress_silver']}
+];
+function hex2rgb(h){ const n=parseInt(h.replace('#',''),16); return [n>>16&255,n>>8&255,n&255]; }
+function colorDist(a,b){ const A=hex2rgb(a),B=hex2rgb(b);
+  return Math.sqrt((A[0]-B[0])**2+(A[1]-B[1])**2+(A[2]-B[2])**2); }
+function scoreLook(look,themeId){
+  const theme=THEMES.find(t=>t.id===themeId)||THEMES[0];
+  // A. Theme fit 30: dress id match + color proximity + makeup/hair palette match
+  let a=0;
+  if(theme.dress.includes(look.dress.id)) a+=12;
+  let minC=999; theme.kw.forEach(k=>{ minC=Math.min(minC,colorDist(look.dress.color,k)); });
+  a+=Math.max(0,10-minC/25.5*10);
+  // makeup palette match
+  let mk=0; [look.lips.color,look.eyeshadow.color,look.blush.color].forEach(c=>{
+    let md=999; theme.kw.forEach(k=>{md=Math.min(md,colorDist(c,k));});
+    mk+=Math.max(0,1-md/441);
+  });
+  a+=mk/3*8;
+  a=Math.min(30,Math.round(a));
+
+  // B. Color coordination 20: dress vs hair vs accessories harmony
+  const dHair=colorDist(look.dress.color,look.hair.color);
+  let b=0;
+  b+=Math.max(0,10-dHair/441*10); // contrast good
+  const accCount=look.accessories.length;
+  b+=Math.min(6,accCount*1.5);
+  // crown presence
+  if(look.crown.id!=='crown_none') b+=4;
+  b=Math.min(20,Math.round(b));
+
+  // C. Makeup 15
+  let c=0;
+  const lipSat=colorDist(look.lips.color,'#ffffff');
+  if(lipSat>30) c+=5;
+  if(look.eyeshadow.intensity>0.15) c+=5;
+  if(look.blush.intensity>0.1) c+=5;
+  c=Math.min(15,Math.round(c));
+
+  // D. Hair 10
+  let d=0;
+  if(look.hair.id) d+=5;
+  if(look.hair.color) d+=3;
+  if(look.brows.color) d+=2;
+  d=Math.min(10,Math.round(d));
+
+  // E. Accessories 15
+  let e=0;
+  e+=Math.min(8,look.accessories.length*2);
+  if(look.crown.id!=='crown_none') e+=4;
+  if(look.shoes.id!=='shoes_bare') e+=3;
+  e=Math.min(15,Math.round(e));
+
+  // F. Creativity 10
+  let f=0;
+  const uniqueC=new Set([look.dress.color,look.hair.color,look.lips.color,look.eyeshadow.color]);
+  f+=Math.min(5,uniqueC.size);
+  f+=Math.min(3,look.accessories.length);
+  if(look.crown.id!=='crown_none'&&look.shoes.id!=='shoes_bare') f+=2;
+  f=Math.min(10,Math.round(f));
+
+  const total=a+b+c+d+e+f;
+  return {total,breakdown:{theme:a,color:b,makeup:c,hair:d,accessories:e,creativity:f},theme:theme.n};
+}
+
+/* ============================================================
+   11. CONTEST FLOW
+   ============================================================ */
+function openContestDialog(){
+  openModal(`
+    <h2>🏆 Cuộc thi thời trang</h2>
+    <p>Chọn chủ đề. Đồng hồ 5 phút sẽ bắt đầu và tự động khóa trang phục khi hết giờ.</p>
+    <div id="themeList" style="display:flex;flex-direction:column;gap:6px;margin:10px 0">
+      ${THEMES.map((t,i)=>`<label class="item" style="cursor:pointer">
+        <input type="radio" name="th" value="${t.id}" ${i===0?'checked':''}>
+        <span class="nm">${t.n}</span></label>`).join('')}
+    </div>
+    <div class="row-btns">
+      <button class="btn" id="startContest">Bắt đầu thi</button>
+      <button class="btn ghost" id="cancelContest">Hủy</button>
+    </div>
+    <div class="note">Chấm điểm dựa trên dữ liệu thực (trang phục, màu, phụ kiện) – không ngẫu nhiên. Điểm được tính minh bạch theo 6 tiêu chí.</div>
+  `);
+  $('cancelContest').onclick=closeModal;
+  $('startContest').onclick=()=>{
+    const sel=document.querySelector('input[name="th"]:checked').value;
+    startContest(sel);
+    closeModal();
+  };
+}
+
+function startContest(themeId){
+  STATE.contest.active=true;
+  STATE.contest.theme=themeId;
+  STATE.contest.locked=false;
+  STATE.contest.endsAt=Date.now()+5*60*1000; // 5 min
+  $('timerPill').style.display='flex';
+  const th=THEMES.find(t=>t.id===themeId);
+  toast('👑 Chủ đề: '+th.n+' — Bạn có 5 phút!','ok');
+  // if multiplayer, send to server
+  if(STATE.multiplayer.ws && STATE.multiplayer.connected){
+    try{ STATE.multiplayer.ws.send(JSON.stringify({type:'contest:start',theme:themeId,duration:300})); }catch(e){}
+  }
+  if(STATE._timerInterval) clearInterval(STATE._timerInterval);
+  STATE._timerInterval=setInterval(tickContestTimer,250);
+}
+function tickContestTimer(){
+  if(!STATE.contest.active){ clearInterval(STATE._timerInterval); return; }
+  const remain=Math.max(0,STATE.contest.endsAt-Date.now());
+  const s=Math.floor(remain/1000);
+  const mm=String(Math.floor(s/60)).padStart(2,'0');
+  const ss=String(s%60).padStart(2,'0');
+  const tp=$('timerPill');
+  tp.textContent='⏱ '+mm+':'+ss;
+  tp.classList.toggle('low',s<60);
+  if(remain<=0 && !STATE.contest.locked){
+    lockContest();
+  }
+}
+function lockContest(){
+  STATE.contest.locked=true;
+  clearInterval(STATE._timerInterval);
+  $('timerPill').style.display='none';
+  toast('🔒 Hết giờ! Trang phục đã khóa.','warn');
+  // score locally
+  const sc=scoreLook(STATE.look,STATE.contest.theme);
+  STATE.contest.myScore=sc;
+  // if multiplayer, server authoritative; else show local result
+  if(STATE.multiplayer.ws && STATE.multiplayer.connected){
+    try{ STATE.multiplayer.ws.send(JSON.stringify({type:'contest:submit',look:STATE.look,score:sc})); }catch(e){}
+    toast('⏳ Đang chờ máy chủ tổng hợp điểm…','');
+  } else {
+    // local only: one-player contest
+    showResults([{id:'you',name:'Bạn',score:sc}]);
+  }
+}
+
+function showResults(results){
+  results.sort((a,b)=>b.score.total-a.score.total);
+  STATE.contest.results=(STATE.contest.results||[]).concat([{
+    date:new Date().toISOString(),theme:STATE.contest.theme,results:results.slice(0,3)
+  }]);
+  saveLocal();
+  const top=results.slice(0,3);
+  const medals=['🥇','🥈','🥉'];
+  const html=`
+    <h2>🏆 Kết quả cuộc thi</h2>
+    <div class="podium">
+      ${top.map((r,i)=>`
+        <div class="pod p${i+1}">
+          <div class="ava" style="border-color:${['#f7c948','#c0c0c0','#cd7f32'][i]};background:rgba(255,255,255,.1)">${medals[i]}</div>
+          <div class="name">${escapeHtml(r.name)}</div>
+          <div class="score">${r.score.total} điểm</div>
+          <div class="base">${['NHẤT','NHÌ','BA'][i]}</div>
+        </div>`).join('')}
+    </div>
+    <div style="margin-top:14px">
+      ${results.map((r,i)=>`
+        <div class="rank-row ${i===0?'top1':i===1?'top2':i===2?'top3':''}">
+          <div class="rk">${i+1}</div>
+          <div style="flex:1">${escapeHtml(r.name)}</div>
+          <div class="score-big">${r.score.total}</div>
+        </div>
+        <div style="font-size:10px;color:var(--muted);margin:-2px 0 8px 36px">
+          Chủ đề ${r.score.breakdown.theme}/30 · Màu ${r.score.breakdown.color}/20 ·
+          Trang điểm ${r.score.breakdown.makeup}/15 · Tóc ${r.score.breakdown.hair}/10 ·
+          Phụ kiện ${r.score.breakdown.accessories}/15 · Sáng tạo ${r.score.breakdown.creativity}/10
+        </div>`).join('')}
+    </div>
+    <div class="note">Điểm do thuật toán minh bạch tính từ dữ liệu thực. Khi có server, máy chủ xác nhận điểm cuối cùng.</div>
+    <div class="row-btns">
+      <button class="btn" onclick="closeModal()">Đóng</button>
+      <button class="btn ghost" onclick="openLeaderboard()">Xem bảng xếp hạng</button>
+    </div>
+  `;
+  openModal(html);
+  STATE.contest.active=false;
+  STATE.contest.locked=false;
+}
+
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function openLeaderboard(){
+  const hist=STATE.contest.results||[];
+  let html='<h2>📊 Bảng xếp hạng</h2>';
+  html+='<p style="font-size:12px;color:var(--muted)">Lịch sử cục bộ trên thiết bị này. Khi kết nối server, bảng xếp hạng toàn hệ thống sẽ hiển thị tại đây.</p>';
+  if(!hist.length){ html+='<p>Chưa có cuộc thi nào. Hãy tham gia thi đấu!</p>'; }
+  else{
+    hist.slice().reverse().forEach(h=>{
+      const th=THEMES.find(t=>t.id===h.theme);
+      html+=`<div class="section-title">${th?th.n:h.theme} · ${new Date(h.date).toLocaleString('vi-VN')}</div>`;
+      h.results.forEach((r,i)=>{
+        html+=`<div class="rank-row ${i===0?'top1':i===1?'top2':i===2?'top3':''}">
+          <div class="rk">${i+1}</div><div style="flex:1">${escapeHtml(r.name)}</div>
+          <div class="score-big">${r.score.total}</div></div>`;
+      });
+    });
+  }
+  html+='<div class="row-btns"><button class="btn" onclick="closeModal()">Đóng</button></div>';
+  openModal(html);
+}
+
+/* ============================================================
+   12. MULTIPLAYER (REAL WebSocket client)
+   ============================================================ */
+function openMultiplayerDialog(){
+  const mp=STATE.multiplayer;
+  openModal(`
+    <h2>🌐 Multiplayer</h2>
+    <p>Multiplayer <b>thật</b> cần một máy chủ WebSocket/Colyseus chạy bên ngoài (một file HTML không thể tự tạo server).
+    Nhập URL máy chủ của bạn bên dưới. Nếu chưa có, game vẫn chơi offline bình thường.</p>
+    <div class="note">Ví dụ URL: <code>wss://your-server.com/ws</code> — Server cần xử lý các message:
+      <code>join, move, look, chat, contest:start, contest:submit</code> và broadcast tới phòng.</div>
+    <label style="font-size:12px;color:var(--muted)">Tên biệt danh</label>
+    <input type="text" id="mpName" maxlength="16" placeholder="Công chúa nhí" value="${escapeHtml(localStorage.getItem('pw_name')||'Công chúa nhí')}">
+    <label style="font-size:12px;color:var(--muted);display:block;margin-top:10px">Mã phòng (tùy chọn)</label>
+    <input type="text" id="mpRoom" maxlength="16" placeholder="VD: ROYAL01">
+    <label style="font-size:12px;color:var(--muted);display:block;margin-top:10px">WebSocket URL máy chủ</label>
+    <input type="text" id="mpUrl" placeholder="wss://..." value="${escapeHtml(localStorage.getItem('pw_ws')||'')}">
+    <div class="row-btns">
+      <button class="btn" id="mpConnect">Kết nối</button>
+      <button class="btn ghost" id="mpDisconnect" ${mp.connected?'':'disabled'}>Ngắt kết nối</button>
+      <button class="btn ghost" onclick="closeModal()">Đóng</button>
+    </div>
+    <div id="mpStatus" style="margin-top:12px;font-size:12px;color:var(--muted)">
+      Trạng thái: ${mp.connected?'<b style="color:var(--ok)">Đã kết nối</b>':'Chưa kết nối'}
+    </div>
+    <div id="mpPlayers" style="margin-top:8px"></div>
+  `);
+  $('mpConnect').onclick=()=>{
+    const url=$('mpUrl').value.trim();
+    const name=$('mpName').value.trim()||'Công chúa nhí';
+    const room=$('mpRoom').value.trim()||null;
+    localStorage.setItem('pw_name',name);
+    localStorage.setItem('pw_ws',url);
+    if(!url){ toast('Vui lòng nhập URL máy chủ WebSocket','bad'); return; }
+    connectMultiplayer(url,name,room);
+    closeModal();
+  };
+  $('mpDisconnect').onclick=()=>{ disconnectMultiplayer(); closeModal(); };
+}
+
+function connectMultiplayer(url,name,room){
+  const mp=STATE.multiplayer;
+  try{
+    if(mp.ws) { try{mp.ws.close();}catch(e){} }
+    mp.ws=new WebSocket(url);
+    mp.ws.onopen=()=>{
+      mp.connected=true;
+      updateNetUI();
+      toast('🌐 Đã kết nối máy chủ!','ok');
+      mp.ws.send(JSON.stringify({type:'join',name,room,look:STATE.look}));
+    };
+    mp.ws.onmessage=(ev)=>{
+      let msg; try{ msg=JSON.parse(ev.data); }catch(e){ return; }
+      handleServerMessage(msg);
+    };
+    mp.ws.onerror=()=>{ toast('Lỗi kết nối máy chủ','bad'); };
+    mp.ws.onclose=()=>{
+      mp.connected=false; updateNetUI();
+      toast('Mất kết nối máy chủ','warn');
+    };
+  }catch(e){
+    toast('Không thể kết nối: '+e.message,'bad');
+  }
+}
+function disconnectMultiplayer(){
+  const mp=STATE.multiplayer;
+  if(mp.ws){ try{mp.ws.close();}catch(e){} mp.ws=null; }
+  mp.connected=false; mp.players={}; mp.room=null;
+  updateNetUI();
+  // remove remote avatars
+  Object.values(mp.remoteNodes||{}).forEach(n=>n.dispose());
+  mp.remoteNodes={};
+  toast('Đã ngắt kết nối','');
+}
+function handleServerMessage(msg){
+  const mp=STATE.multiplayer;
+  switch(msg.type){
+    case 'welcome':
+      mp.myId=msg.id; mp.room=msg.room;
+      $('roomPill').style.display='flex'; $('roomName').textContent=msg.room||'—';
+      if(msg.players){
+        msg.players.forEach(p=>addRemotePlayer(p));
+      }
+      toast('🏠 Vào phòng '+(msg.room||'')+' ('+(msg.players?msg.players.length:0)+' người)','ok');
+      break;
+    case 'player:join':
+      addRemotePlayer(msg.player); toast('👋 '+msg.player.name+' đã vào phòng','');
+      break;
+    case 'player:leave':
+      removeRemotePlayer(msg.id);
+      break;
+    case 'player:move':
+      updateRemotePlayer(msg.id,msg.pos,msg.rot,msg.anim);
+      break;
+    case 'player:look':
+      updateRemoteLook(msg.id,msg.look);
+      break;
+    case 'chat':
+      toast('💬 '+msg.name+': '+msg.text,'');
+      break;
+    case 'contest:start':
+      STATE.contest.theme=msg.theme;
+      STATE.contest.endsAt=Date.now()+ (msg.duration||300)*1000;
+      startContestTimerOnly();
+      toast('🏆 Cuộc thi bắt đầu: chủ đề '+msg.theme,'ok');
+      break;
+    case 'contest:results':
+      showResults(msg.results);
+      break;
+    case 'error':
+      toast('Lỗi server: '+msg.message,'bad');
+      break;
+  }
+}
+function startContestTimerOnly(){
+  STATE.contest.active=true; STATE.contest.locked=false;
+  $('timerPill').style.display='flex';
+  if(STATE._timerInterval) clearInterval(STATE._timerInterval);
+  STATE._timerInterval=setInterval(tickContestTimer,250);
+}
+function addRemotePlayer(p){
+  const mp=STATE.multiplayer;
+  mp.players[p.id]={id:p.id,name:p.name,look:p.look,pos:p.pos||{x:0,y:0,z:0}};
+  // build simplified avatar clone
+  buildRemoteAvatar(p.id,p.look,p.pos);
+  updateNetUI();
+}
+function removeRemotePlayer(id){
+  const mp=STATE.multiplayer;
+  delete mp.players[id];
+  if(mp.remoteNodes&&mp.remoteNodes[id]){ mp.remoteNodes[id].dispose(); delete mp.remoteNodes[id]; }
+  updateNetUI();
+}
+function buildRemoteAvatar(id,look,pos){
+  const mp=STATE.multiplayer; look=look||{}; pos=pos||{x:0,y:0,z:0};
+  mp.remoteNodes=mp.remoteNodes||{};
+  const root=new BABYLON.TransformNode('remote_'+id,STATE.scene);
+  // simple capsule figure with dress color
+  const body=BABYLON.MeshBuilder.CreateCapsule('rb',{height:1.0,radius:0.25},STATE.scene);
+  body.parent=root; body.position.y=1.3;
+  const skin=BABYLON.PBRMaterial? new BABYLON.PBRMaterial('rs',STATE.scene) : new BABYLON.StandardMaterial('rs',STATE.scene);
+  skin.albedoColor=BABYLON.Color3.FromHexString(look.skinTone||'#f2c9a8');
+  body.material=skin;
+  const head=BABYLON.MeshBuilder.CreateSphere('rh',{diameter:0.5},STATE.scene);
+  head.parent=root; head.position.y=2.1; head.material=skin;
+  const dress=BABYLON.MeshBuilder.CreateCylinder('rd',{height:0.8,diameterBottom:0.85,diameterTop:0.4},STATE.scene);
+  dress.parent=root; dress.position.y=0.85;
+  const dm=new BABYLON.PBRMaterial('rdm_'+id,STATE.scene);
+  dm.albedoColor=BABYLON.Color3.FromHexString((look.dress&&look.dress.color)||'#ff6fae');
+  dress.material=dm;
+  root.position=new BABYLON.Vector3(pos.x||0,pos.y||0,pos.z||0);
+  const label=createNameTag(root,(mp.players[id]&&mp.players[id].name)||'Người chơi',false);
+  mp.remoteNodes[id]={root,body,head,dress,label,dispose:()=>{ root.dispose(); }};
+}
+function updateRemotePlayer(id,pos,rot,anim){
+  const mp=STATE.multiplayer; const n=mp.remoteNodes&&mp.remoteNodes[id];
+  if(!n) return;
+  if(pos) n.root.position=new BABYLON.Vector3(pos.x,pos.y,pos.z);
+  if(typeof rot==='number') n.root.rotation.y=rot;
+}
+function updateRemoteLook(id,look){
+  const mp=STATE.multiplayer; const n=mp.remoteNodes&&mp.remoteNodes[id];
+  if(!n||!n.dress) return;
+  n.dress.material.albedoColor=BABYLON.Color3.FromHexString(look.dress.color);
+}
+function updateNetUI(){
+  const mp=STATE.multiplayer;
+  const dot=$('netDot'), txt=$('netTxt');
+  dot.classList.toggle('on',mp.connected);
+  txt.textContent=mp.connected?('Online · '+(Object.keys(mp.players).length+1)+'/20'):'Offline';
+  $('roomPill').style.display=mp.connected&&mp.room?'flex':'none';
+  if(mp.room) $('roomName').textContent=mp.room;
+  const el=$('mpPlayers');
+  if(el){
+    el.innerHTML=Object.values(mp.players).map(p=>
+      `<div class="pl"><span class="dot on"></span>${escapeHtml(p.name)}</div>`).join('');
+  }
+}
+// send look update when changed
+function broadcastLook(){
+  const mp=STATE.multiplayer;
+  if(mp.ws&&mp.connected){ try{ mp.ws.send(JSON.stringify({type:'look',look:STATE.look})); }catch(e){} }
+}
+
+/* ============================================================
+   13. ZONES
+   ============================================================ */
+const ZONES=[
+  {id:'beauty',n:'Beauty Salon',ic:'💄',env:{wall:'#2a1247',floor:'#3a2050',light:'#ff9ecb'}},
+  {id:'hair',n:'Hair Salon',ic:'💇‍♀️',env:{wall:'#3a1f5c',floor:'#2a1640',light:'#c9a227'}},
+  {id:'fashion',n:'Fashion Room',ic:'👗',env:{wall:'#1a237e',floor:'#283593',light:'#8fd3ff'}},
+  {id:'palace',n:'Royal Palace',ic:'🏰',env:{wall:'#4a3520',floor:'#2a1a10',light:'#f7c948'}},
+  {id:'runway',n:'Fashion Runway',ic:'🚶‍♀️',env:{wall:'#111',floor:'#222',light:'#ffffff'}},
+  {id:'photo',n:'Photo Studio',ic:'📸',env:{wall:'#263238',floor:'#37474f',light:'#e0f7fa'}},
+  {id:'gallery',n:'Fashion Gallery',ic:'🖼️',env:{wall:'#3e2723',floor:'#4e342e',light:'#ffe0b2'}},
+  {id:'lobby',n:'Multiplayer Lobby',ic:'🌐',env:{wall:'#1a0f2b',floor:'#2a1247',light:'#7b4bff'}}
+];
+function openZonesDialog(){
+  openModal(`
+    <h2>🏰 Khu vực thời trang</h2>
+    <p>Di chuyển giữa các khu vực. Nhân vật và trang phục được giữ nguyên.</p>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      ${ZONES.map(z=>`<div class="item" onclick="switchZone('${z.id}');closeModal()">
+        <span class="ic">${z.ic}</span><span class="nm">${z.n}</span></div>`).join('')}
+    </div>
+    <div class="row-btns"><button class="btn ghost" onclick="closeModal()">Đóng</button></div>
+  `);
+}
+function switchZone(id){
+  const z=ZONES.find(z=>z.id===id); if(!z) return;
+  STATE.currentZone=id;
+  // change scene colors
+  STATE.scene.clearColor=BABYLON.Color4.FromHexString(z.env.wall+'ff');
+  const floor=STATE.scene.getMeshByName('floor');
+  if(floor&&floor.material) floor.material.albedoColor=BABYLON.Color3.FromHexString(z.env.floor);
+  toast(z.ic+' Đã đến '+z.n,'ok');
+  // adjust camera
+  if(id==='runway'){ STATE.camera.radius=5; STATE.camera.beta=Math.PI/3; }
+  else { STATE.camera.radius=3.4; STATE.camera.beta=Math.PI/2.4; }
+}
+
+/* ============================================================
+   14. TOOLBAR ROUTING
+   ============================================================ */
+function setActiveTool(act){
+  document.querySelectorAll('.tool').forEach(t=>t.classList.toggle('active',t.dataset.act===act));
+}
+document.getElementById('toolbar').addEventListener('click',e=>{
+  const tool=e.target.closest('.tool'); if(!tool) return;
+  const act=tool.dataset.act;
+  setActiveTool(act);
+  if(act==='beauty'){ openLeftPanel(); $('leftPanel').classList.remove('hidden'); }
+  else if(act==='fashion'){ openRightPanel(); $('rightPanel').classList.remove('hidden'); }
+  else if(act==='rooms') openZonesDialog();
+  else if(act==='multiplayer') openMultiplayerDialog();
+  else if(act==='contest') openContestDialog();
+  else if(act==='catwalk') doCatwalk();
+  else if(act==='photo') openPhotoMode();
+  else if(act==='leaderboard') openLeaderboard();
+  else if(act==='help') openHelp();
+});
+function openLeftPanel(){ $('leftPanel').classList.remove('hidden'); }
+function openRightPanel(){ $('rightPanel').classList.remove('hidden'); }
+
+function openHelp(){
+  openModal(`
+    <h2>❓ Hướng dẫn & Giới hạn</h2>
+    <p><b>Di chuyển:</b> Dùng W/A/S/D hoặc phím mũi tên để đi theo hướng camera; giữ Shift để chạy. Kéo chuột để xoay góc nhìn. Tên người chơi hiển thị phía trên đầu nhân vật.</p>
+    <p><b>Toàn màn hình:</b> Nhấn nút ⛶ trên thanh phía trên để mở rộng game.</p>
+    <p><b>Làm đẹp:</b> Chọn tab 💄 Trang điểm hoặc 👗 Tủ đồ để thay đổi nhân vật 3D.</p>
+    <p><b>Thi đấu:</b> Chọn 🏆 Thi đấu → chọn chủ đề → 5 phút chuẩn bị → tự động khóa và chấm điểm minh bạch theo 6 tiêu chí.</p>
+    <p><b>Catwalk & Ảnh:</b> 🚶‍♀️ để trình diễn, 📸 để chụp và tải ảnh.</p>
+    <p><b>Multiplayer:</b> Cần máy chủ WebSocket bên ngoài. Nhập URL trong 🌐 Online. Nếu chưa kết nối, game chạy offline; tôi KHÔNG giả lập người chơi ảo.</p>
+    <div class="note">Giới hạn của 1 file HTML: không thể tự chạy server/database. Các chức năng client đều hoạt động thật; multiplayer và bảng xếp hạng toàn hệ thống cần server cấu hình qua URL/API.</div>
+    <div class="row-btns"><button class="btn" onclick="closeModal()">Đã hiểu</button></div>
+  `);
+}
+
+/* ============================================================
+   15. TAB WIRING
+   ============================================================ */
+document.getElementById('makeupTabs').addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t) return;
+  document.querySelectorAll('#makeupTabs .tab').forEach(x=>x.classList.toggle('active',x===t));
+  renderMakeupTab(t.dataset.tab);
+});
+document.getElementById('wardrobeTabs').addEventListener('click',e=>{
+  const t=e.target.closest('.tab'); if(!t) return;
+  document.querySelectorAll('#wardrobeTabs .tab').forEach(x=>x.classList.toggle('active',x===t));
+  renderWardrobeTab(t.dataset.tab);
+});
+$('toggleLeft').onclick=()=>$('leftPanel').classList.toggle('hidden');
+$('toggleRight').onclick=()=>$('rightPanel').classList.toggle('hidden');
+
+/* ---------- Keyboard ---------- */
+window.addEventListener('keydown',e=>{
+  if(e.ctrlKey&&e.key==='z'){ e.preventDefault(); undo(); }
+  if(e.ctrlKey&&e.key==='y'){ e.preventDefault(); redo(); }
+});
+
+/* ============================================================
+   16. INIT
+   ============================================================ */
+function refreshUI(){ /* placeholder for active states */ }
+
+function init(){
+  setLoad(10,'Đang tải Babylon.js…');
+  if(typeof BABYLON==='undefined'){
+    setLoad(100,'Lỗi: không tải được thư viện 3D. Kiểm tra kết nối mạng.');
+    $('loadMsg').style.color='#ff5470';
+    return;
+  }
+  try{
+    loadLocal();
+    installPlayerControls(); setupFullscreen();
+    setLoad(35,'Đang dựng phòng Beauty Studio…');
+    bootBabylon();
+    setLoad(70,'Đang tạo nhân vật công chúa…');
+    applyLookToAvatar();
+    applyAccessories();
+    setLoad(90,'Đang hoàn thiện giao diện…');
+    renderMakeupTab('lips');
+    renderWardrobeTab('dress');
+    updateNetUI();
+    setLoad(100,'Sẵn sàng!');
+    setTimeout(()=>{ $('loader').classList.add('hide'); },600);
+    setTimeout(()=>toast('👑 Chào mừng đến Princess World!','ok'),1200);
+  }catch(err){
+    console.error(err);
+    $('loadMsg').textContent='Lỗi khởi tạo: '+err.message;
+    $('loadMsg').style.color='#ff5470';
+  }
+}
+
+/* Handle library load failure */
+window.addEventListener('load',()=>{
+  if(typeof BABYLON==='undefined'){
+    setLoad(100,'Không tải được Babylon.js. Vui lòng kiểm tra kết nối.');
+    return;
+  }
+  init();
+});
+</script>
+</body>
+</html>
