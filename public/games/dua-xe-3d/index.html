@@ -2,7 +2,10 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>SIÊU GAME ĐUA XE 3D – BÉ HỌC VUI</title>
   <!-- ========================================================================
        MỤC LỤC MÃ NGUỒN MỞ (TABLE OF CONTENTS) – SIÊU GAME ĐUA XE 3D BÉ HỌC VUI
@@ -70,17 +73,28 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
+  height: 100svh;
   overflow: hidden;
   font-family: 'Segoe UI', system-ui, -apple-system, Roboto, Arial, sans-serif;
   background: radial-gradient(circle at 20% 10%, #1e2a5a 0%, #0b1024 65%, #060916 100%);
   color: var(--text);
   user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  overscroll-behavior: none;
+}
+body {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ---- THANH TRÊN CÙNG (TOP BAR) ---- */
 .topbar {
   height: 54px;
   padding: 0 14px;
+  padding-top: env(safe-area-inset-top, 0px);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -133,7 +147,9 @@ html, body {
 .screens-root {
   position: relative;
   width: 100%;
-  height: calc(100% - 54px);
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
 }
 .screen {
   position: absolute;
@@ -193,6 +209,8 @@ html, body {
   gap: 6px;
   transition: transform 0.12s ease, filter 0.15s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.28);
+  touch-action: manipulation;
+  min-height: 44px;
 }
 .btn:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
 .btn:active:not(:disabled) { transform: scale(0.97); }
@@ -565,6 +583,9 @@ html, body {
   flex-direction: column;
   justify-content: space-between;
   padding: 10px;
+  padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+  padding-left: max(10px, env(safe-area-inset-left, 0px));
+  padding-right: max(10px, env(safe-area-inset-right, 0px));
 }
 .hud-top {
   display: flex;
@@ -661,53 +682,70 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 10px;
+  gap: 12px;
+  position: relative;
+  z-index: 8;
 }
 .touch-cluster {
   display: flex;
-  gap: 10px;
+  gap: 12px;
   align-items: flex-end;
   pointer-events: auto;
 }
+#touch-lr-wrap { gap: 14px; }
+.touch-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 12px;
+  align-items: end;
+}
 .tbtn {
-  width: 64px;
-  height: 64px;
-  border-radius: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  background: rgba(15, 23, 48, 0.65);
+  width: 92px;
+  height: 92px;
+  border-radius: 26px;
+  border: 3px solid rgba(255, 255, 255, 0.42);
+  background: rgba(15, 23, 48, 0.74);
   color: #fff;
-  font-size: 20px;
+  font-size: 30px;
   font-weight: 900;
+  line-height: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 1px;
   touch-action: none;
   cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255,255,255,0.18);
+  padding: 0;
 }
-.tbtn small { font-size: 9.5px; font-weight: 800; }
-.tbtn.pressed, .tbtn:active { background: rgba(56, 189, 248, 0.72); transform: scale(0.94); }
-.tbtn.gas   { background: rgba(16, 185, 129, 0.62); border-color: #6ee7b7; height: 74px; }
-.tbtn.brake { background: rgba(239, 68, 68, 0.58); border-color: #fca5a5; }
-.tbtn.nitro { background: rgba(168, 85, 247, 0.65); border-color: #d8b4fe; }
-.tbtn.drift { background: rgba(245, 158, 11, 0.62); border-color: #fde68a; }
+.tbtn small { font-size: 12px; font-weight: 900; letter-spacing: 0.3px; }
+.tbtn.pressed, .tbtn:active { background: rgba(56, 189, 248, 0.84); transform: scale(0.95); }
+.tbtn.steer { width: 108px; height: 108px; font-size: 38px; border-radius: 30px; }
+.tbtn.gas   { background: rgba(16, 185, 129, 0.74); border-color: #6ee7b7; width: 108px; height: 128px; font-size: 36px; }
+.tbtn.brake { background: rgba(239, 68, 68, 0.7); border-color: #fca5a5; }
+.tbtn.nitro { background: rgba(168, 85, 247, 0.74); border-color: #d8b4fe; }
+.tbtn.drift { background: rgba(245, 158, 11, 0.74); border-color: #fde68a; }
 
-#touch-wheel-wrap { display: none; align-items: center; justify-content: center; }
+#touch-wheel-wrap { display: none; align-items: center; justify-content: center; pointer-events: auto; }
 #touch-wheel {
-  width: 118px;
-  height: 118px;
+  width: 148px;
+  height: 148px;
   border-radius: 50%;
-  border: 8px solid rgba(56, 189, 248, 0.8);
-  background: radial-gradient(circle, rgba(15,23,48,0.85) 35%, rgba(30,41,78,0.5) 100%);
+  border: 10px solid rgba(56, 189, 248, 0.9);
+  background: radial-gradient(circle, rgba(15,23,48,0.9) 35%, rgba(30,41,78,0.55) 100%);
   position: relative;
   touch-action: none;
   cursor: grab;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 800;
   color: #bae6fd;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.4);
 }
 #touch-wheel::before {
   content: '';
@@ -796,14 +834,99 @@ html, body {
 .toast.ok   { border-color: #10b981; background: #064e3b; }
 .toast.warn { border-color: #f59e0b; background: #78350f; }
 
-@media (max-width: 680px) {
+@media (max-width: 980px), (pointer: coarse) {
   .tb-brand span.hide-sm { display: none; }
+  .topbar {
+    height: auto;
+    min-height: 46px;
+    padding: 6px 8px;
+    padding-top: max(6px, env(safe-area-inset-top, 0px));
+  }
+  .tb-brand { font-size: 13px; }
+  .pill { font-size: 12px; padding: 4px 8px; }
+  .screens-root { height: auto; flex: 1 1 auto; }
+  .screen { padding: 10px; }
+  .hero-banner { padding: 14px; }
+  .menu-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+  .menu-tile { padding: 12px; min-height: 88px; }
+  .page-wrap { gap: 10px; padding-bottom: max(18px, env(safe-area-inset-bottom, 0px)); }
+  .btn, .chip-btn, .tab-btn, .quiz-opt-btn, .select-card, .map-card, .car-card { min-height: 46px; }
   .hud-lb { display: none; }
-  #minimap-canvas { width: 88px; height: 88px; }
-  .tbtn { width: 54px; height: 54px; font-size: 17px; }
-  .tbtn.gas { height: 64px; }
-  .speedo-box { min-width: 124px; padding: 6px 10px; }
-  .speedo-num { font-size: 24px; }
+  .hud-layer {
+    padding: 6px;
+    padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
+    padding-left: max(6px, env(safe-area-inset-left, 0px));
+    padding-right: max(6px, env(safe-area-inset-right, 0px));
+  }
+  .hud-card { padding: 5px 8px; }
+  .hm-item b { font-size: 15px; }
+  .hud-btn { padding: 8px 10px; font-size: 12px; min-height: 38px; }
+  #minimap-canvas { width: 72px; height: 72px; }
+  .hud-bottom { gap: 6px; }
+  .hud-bottom { gap: 8px; align-items: flex-end; }
+  /* Đồng hồ tốc độ nổi phía trên cụm HUD, không nằm trong hàng nút nên không đè Ga/Phanh */
+  .speedo-box {
+    position: absolute;
+    left: 50%;
+    top: auto;
+    bottom: calc(100% + 8px);
+    transform: translateX(-50%);
+    min-width: 86px;
+    padding: 4px 8px;
+    pointer-events: none;
+    z-index: 3;
+  }
+  .speedo-num { font-size: 22px; }
+  .speedo-box .hud-nitro-bar { width: 78px; }
+  .touch-cluster { gap: 8px; padding-bottom: 2px; }
+  .touch-actions { gap: 8px; }
+  .tbtn {
+    width: clamp(64px, 16vw, 88px);
+    height: clamp(64px, 14vh, 88px);
+    font-size: clamp(20px, 5.5vw, 28px);
+    border-radius: 22px;
+  }
+  .tbtn small { font-size: 11px; }
+  .tbtn.steer {
+    width: clamp(76px, 18vw, 104px);
+    height: clamp(76px, 16vh, 104px);
+    font-size: clamp(26px, 7vw, 36px);
+  }
+  .tbtn.gas {
+    width: clamp(76px, 18vw, 104px);
+    height: clamp(88px, 18vh, 118px);
+    font-size: clamp(24px, 6.5vw, 34px);
+  }
+  #touch-wheel { width: clamp(104px, 26vw, 136px); height: clamp(104px, 22vh, 136px); }
+  #hud-countdown { font-size: 84px; }
+  #hud-popup { top: 58px; font-size: 12px; max-width: 88vw; white-space: normal; text-align: center; }
+  .modal-box { padding: 14px; }
+  .quiz-q { font-size: 17px; }
+}
+
+@media (max-width: 980px) and (orientation: portrait) {
+  .hud-metrics { gap: 8px; }
+  .hm-item span { font-size: 9px; }
+  #btn-hud-cam, #btn-hud-reset { display: none; }
+  #minimap-canvas { width: 56px; height: 56px; }
+  .tbtn { width: clamp(60px, 15vw, 80px); height: clamp(60px, 12vh, 78px); }
+  .tbtn.steer { width: clamp(72px, 18vw, 96px); height: clamp(72px, 14vh, 92px); }
+  .tbtn.gas { width: clamp(72px, 18vw, 96px); height: clamp(82px, 16vh, 104px); }
+  .speedo-box { opacity: 0.94; min-width: 78px; }
+}
+@media (max-width: 980px) and (orientation: portrait) {
+  .speedo-box { display: none; }
+}
+
+@media (max-width: 420px) {
+  .menu-grid { grid-template-columns: 1fr; }
+  .pill.cyan { display: none; }
+  .tb-stats .pill:nth-child(2) { display: none; }
+  .tbtn { width: clamp(64px, 17vw, 78px); height: clamp(64px, 17vw, 78px); font-size: 24px; }
+  .tbtn.steer { width: clamp(76px, 21vw, 94px); height: clamp(76px, 21vw, 94px); font-size: 32px; }
+  .tbtn.gas { width: clamp(78px, 21vw, 96px); height: clamp(92px, 24vw, 110px); }
+  #touch-lr-wrap { gap: 8px; }
+  .touch-actions { gap: 8px; }
 }
 
   </style>
@@ -1057,7 +1180,7 @@ html, body {
         <div class="panel">
           <div class="panel-title">🎮 Chế Độ Điều Khiển Mobile / iPad / Trẻ Nhỏ</div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px">
-            <button class="chip-btn" data-ctrl="buttons">⬅️➡️ Nút Bấm Trái / Phải</button>
+            <button class="chip-btn" data-ctrl="buttons">⬅️➡️ Nút lớn Trái / Phải (điện thoại)</button>
             <button class="chip-btn" data-ctrl="wheel">🛞 Vô-Lăng Xoay Cảm Ứng</button>
             <button class="chip-btn" data-ctrl="kid">🧸 Chế Độ Bé Lái Dễ (Tự ga & giữ làn)</button>
           </div>
@@ -1126,8 +1249,8 @@ html, body {
         <div class="hud-bottom">
           <!-- Cụm lái bên trái: Nút Trái/Phải HOẶC Vô-lăng xoay cảm ứng -->
           <div class="touch-cluster" id="touch-lr-wrap">
-            <button class="tbtn" id="tbtn-left">◀<small>TRÁI</small></button>
-            <button class="tbtn" id="tbtn-right">▶<small>PHẢI</small></button>
+            <button class="tbtn steer" id="tbtn-left" type="button">◀<small>TRÁI</small></button>
+            <button class="tbtn steer" id="tbtn-right" type="button">▶<small>PHẢI</small></button>
           </div>
           <div class="touch-cluster" id="touch-wheel-wrap">
             <div id="touch-wheel">XOAY LÁI</div>
@@ -1144,14 +1267,12 @@ html, body {
           </div>
 
           <!-- Cụm bàn đạp bên phải: Phanh, Drift, Nitro, Ga -->
-          <div class="touch-cluster">
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <button class="tbtn nitro" id="tbtn-nitro">⚡<small>NITRO</small></button>
-              <button class="tbtn brake" id="tbtn-brake">🛑<small>PHANH</small></button>
-            </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
-              <button class="tbtn drift" id="tbtn-drift">🔥<small>DRIFT</small></button>
-              <button class="tbtn gas" id="tbtn-gas">▲<small>GA</small></button>
+          <div class="touch-cluster" id="touch-action-wrap">
+            <div class="touch-actions">
+              <button class="tbtn nitro" id="tbtn-nitro" type="button">⚡<small>NITRO</small></button>
+              <button class="tbtn drift" id="tbtn-drift" type="button">🔥<small>DRIFT</small></button>
+              <button class="tbtn brake" id="tbtn-brake" type="button">🛑<small>PHANH</small></button>
+              <button class="tbtn gas" id="tbtn-gas" type="button">▲<small>GA</small></button>
             </div>
           </div>
         </div>
@@ -1278,9 +1399,14 @@ const GAME_CONFIG = {
     try {
       const cores = navigator.hardwareConcurrency || 4;
       const mem = navigator.deviceMemory || 4;
-      const dpr = window.devicePixelRatio || 1;
       const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-      if (cores >= 8 && mem >= 6 && !coarse) return 'ultra';
+      const narrow = Math.min(window.innerWidth || 800, window.innerHeight || 600) < 820;
+      // Điện thoại / máy tính bảng ưu tiên mượt: không bật Cao/Siêu cao ở lần chạy đầu
+      if (coarse || narrow) {
+        if (cores <= 4 || mem <= 3) return 'low';
+        return 'medium';
+      }
+      if (cores >= 8 && mem >= 6) return 'ultra';
       if (cores >= 6 && mem >= 4) return 'high';
       if (cores >= 4) return 'medium';
       return 'low';
@@ -5088,7 +5214,9 @@ function buildCarMesh(car, custom, opts) {
       raceRenderer.toneMapping = T.ACESFilmicToneMapping;
       raceRenderer.toneMappingExposure = 1.18;
     }
-    raceRenderer.setPixelRatio(Math.min(2, (window.devicePixelRatio || 1) * (preset.pixelRatio || 1)));
+    const coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const mobileCap = coarse ? 1.15 : 2;
+    raceRenderer.setPixelRatio(Math.min(mobileCap, (window.devicePixelRatio || 1) * (preset.pixelRatio || 1)));
     raceRenderer.setSize(Math.max(320, width), Math.max(240, height), false);
     raceRenderer.shadowMap.enabled = !!glCfg.shadows;
     raceRenderer.shadowMap.type = T.PCFSoftShadowMap;
@@ -6044,7 +6172,9 @@ const RaceController = (function () {
       fpsWatch.acc = 0; fpsWatch.frames = 0;
       const order = ['low', 'medium', 'high', 'ultra'];
       const curIdx = order.indexOf(st.settings.graphics);
-      if (avgFps < 26 && curIdx > 1 && active && !paused && countdown <= 0) {
+      const coarseNow = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+      const floorIdx = coarseNow ? 0 : 1;
+      if (avgFps < (coarseNow ? 32 : 26) && curIdx > floorIdx && active && !paused && countdown <= 0) {
         st.settings.graphics = order[curIdx - 1];
         BeHocVuiBridge.saveGameProgress(st);
         resizeCanvas();
@@ -7107,12 +7237,22 @@ const AppUI = (function () {
     const bindHold = (elId, field) => {
       const el = $(elId);
       if (!el) return;
-      const down = (e) => { e.preventDefault(); el.classList.add('pressed'); RaceController.setTouchInput(field, true); };
-      const up = (e) => { e.preventDefault(); el.classList.remove('pressed'); RaceController.setTouchInput(field, false); };
+      const down = (e) => {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        e.preventDefault();
+        try { el.setPointerCapture(e.pointerId); } catch (err) {}
+        el.classList.add('pressed');
+        RaceController.setTouchInput(field, true);
+      };
+      const up = (e) => {
+        if (e && e.cancelable) e.preventDefault();
+        el.classList.remove('pressed');
+        RaceController.setTouchInput(field, false);
+      };
       el.addEventListener('pointerdown', down);
       el.addEventListener('pointerup', up);
       el.addEventListener('pointercancel', up);
-      el.addEventListener('pointerleave', up);
+      el.addEventListener('lostpointercapture', up);
     };
     // v3.2 sửa cảm giác lái trên cảm ứng: cụm nút Trái/Phải dưới góc nhìn camera
     // sau xe từng cho cảm giác bị ngược. Gán nút TRÁI -> rẽ trái thật (steer -1),
@@ -7172,9 +7312,18 @@ const AppUI = (function () {
     bindGarageDrag();
     bindTouchControls();
 
-    window.addEventListener('resize', () => {
+    const fitMobileViewport = () => {
+      const vv = window.visualViewport;
+      const h = Math.round((vv && vv.height) || window.innerHeight || 0);
+      if (h > 0) {
+        document.documentElement.style.height = h + 'px';
+        document.body.style.height = h + 'px';
+      }
       if (RaceController.isActive()) RaceController.resizeCanvas();
-    });
+    };
+    fitMobileViewport();
+    window.addEventListener('resize', fitMobileViewport);
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', fitMobileViewport);
 
     // Mở khóa âm thanh ở lần chạm/click đầu tiên
     const unlockOnce = () => { SoundEngine.unlock(); window.removeEventListener('pointerdown', unlockOnce); };
@@ -7266,6 +7415,7 @@ const AppUI = (function () {
         BeHocVuiBridge.saveGameProgress(st);
         SoundEngine.playClick();
         renderSettingsUI();
+        applyTouchLayout();
       };
     });
     $('set-sfx-toggle').onchange = (e) => {
