@@ -157,7 +157,7 @@ export function CampusHUD({
       {room.activities.length > 0 && (
         <section
           aria-label="Hoạt động trong phòng"
-          className="pointer-events-auto absolute left-3 top-[7.7rem] flex max-w-[min(78vw,21rem)] flex-col gap-1.5 sm:left-5 sm:top-[8rem]"
+          className={`pointer-events-auto absolute left-3 top-[7.7rem] max-w-[min(78vw,21rem)] gap-1.5 sm:left-5 sm:top-[8rem] ${room.id === "boys" ? "grid grid-cols-2" : "flex flex-col"}`}
         >
           {room.activities.map((activity) => (
             <button
@@ -248,4 +248,3 @@ export function CampusHUD({
     </div>
   );
 }
-

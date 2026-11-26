@@ -20,6 +20,7 @@ import { Route as ToanLop1RouteImport } from './routes/toan-lop-1'
 import { Route as ToanLop2RouteImport } from './routes/toan-lop-2'
 import { Route as AuthenticatedArenaRouteImport } from './routes/_authenticated/arena'
 import { Route as AuthenticatedBangXepHangRouteImport } from './routes/_authenticated/bang-xep-hang'
+import { Route as AuthenticatedDuaXeRouteImport } from './routes/_authenticated/dua-xe'
 import { Route as AuthenticatedHoSoRouteImport } from './routes/_authenticated/ho-so'
 import { Route as AuthenticatedNhanVatRouteImport } from './routes/_authenticated/nhan-vat'
 import { Route as AuthenticatedQuanTriRouteImport } from './routes/_authenticated/quan-tri'
@@ -86,6 +87,11 @@ const AuthenticatedBangXepHangRoute =
     path: '/bang-xep-hang',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedDuaXeRoute = AuthenticatedDuaXeRouteImport.update({
+  id: '/dua-xe',
+  path: '/dua-xe',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedHoSoRoute = AuthenticatedHoSoRouteImport.update({
   id: '/ho-so',
   path: '/ho-so',
@@ -149,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/toan-lop-2': typeof ToanLop2Route
   '/arena': typeof AuthenticatedArenaRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
+  '/dua-xe': typeof AuthenticatedDuaXeRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/toan-lop-2': typeof ToanLop2Route
   '/arena': typeof AuthenticatedArenaRoute
   '/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
+  '/dua-xe': typeof AuthenticatedDuaXeRoute
   '/ho-so': typeof AuthenticatedHoSoRoute
   '/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/toan-lop-2': typeof ToanLop2Route
   '/_authenticated/arena': typeof AuthenticatedArenaRoute
   '/_authenticated/bang-xep-hang': typeof AuthenticatedBangXepHangRoute
+  '/_authenticated/dua-xe': typeof AuthenticatedDuaXeRoute
   '/_authenticated/ho-so': typeof AuthenticatedHoSoRoute
   '/_authenticated/nhan-vat': typeof AuthenticatedNhanVatRoute
   '/_authenticated/quan-tri': typeof AuthenticatedQuanTriRoute
@@ -219,6 +228,7 @@ export interface FileRouteTypes {
     | '/toan-lop-2'
     | '/arena'
     | '/bang-xep-hang'
+    | '/dua-xe'
     | '/ho-so'
     | '/nhan-vat'
     | '/quan-tri'
@@ -241,6 +251,7 @@ export interface FileRouteTypes {
     | '/toan-lop-2'
     | '/arena'
     | '/bang-xep-hang'
+    | '/dua-xe'
     | '/ho-so'
     | '/nhan-vat'
     | '/quan-tri'
@@ -264,6 +275,7 @@ export interface FileRouteTypes {
     | '/toan-lop-2'
     | '/_authenticated/arena'
     | '/_authenticated/bang-xep-hang'
+    | '/_authenticated/dua-xe'
     | '/_authenticated/ho-so'
     | '/_authenticated/nhan-vat'
     | '/_authenticated/quan-tri'
@@ -368,6 +380,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedBangXepHangRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/dua-xe': {
+      id: '/_authenticated/dua-xe'
+      path: '/dua-xe'
+      fullPath: '/dua-xe'
+      preLoaderRoute: typeof AuthenticatedDuaXeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/ho-so': {
       id: '/_authenticated/ho-so'
       path: '/ho-so'
@@ -444,6 +463,7 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedArenaRoute: typeof AuthenticatedArenaRoute
   AuthenticatedBangXepHangRoute: typeof AuthenticatedBangXepHangRoute
+  AuthenticatedDuaXeRoute: typeof AuthenticatedDuaXeRoute
   AuthenticatedHoSoRoute: typeof AuthenticatedHoSoRoute
   AuthenticatedNhanVatRoute: typeof AuthenticatedNhanVatRoute
   AuthenticatedQuanTriRoute: typeof AuthenticatedQuanTriRoute
@@ -458,6 +478,7 @@ interface AuthenticatedRouteRouteChildren {
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedArenaRoute: AuthenticatedArenaRoute,
   AuthenticatedBangXepHangRoute: AuthenticatedBangXepHangRoute,
+  AuthenticatedDuaXeRoute: AuthenticatedDuaXeRoute,
   AuthenticatedHoSoRoute: AuthenticatedHoSoRoute,
   AuthenticatedNhanVatRoute: AuthenticatedNhanVatRoute,
   AuthenticatedQuanTriRoute: AuthenticatedQuanTriRoute,
